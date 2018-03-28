@@ -1,0 +1,36 @@
+year <- sub("-.*", "", meta$Date)
+vers <- sprintf("R package version: %s",meta$Version)
+
+bibentry(bibtype="Manual",
+         title="lcmm: Extended Mixed Models Using Latent Classes and Latent Processes",
+         author=c(person("Cecile","Proust-Lima",email="cecile.proust-lima@inserm.fr",role=c("aut","cre")),person("Viviane","Philipps",role="aut"),person("Amadou","Diakite",role="aut"),person("Benoit","Liquet",role="aut")),
+         year=year,
+         note=vers,
+         url="https://cran.r-project.org/package=lcmm"
+    )
+
+bibentry(bibtype = "Article",
+  title        = "Estimation of Extended Mixed Models Using Latent Classes and Latent Processes: The {R} Package {lcmm}",
+  author       = c(person(given = "C\\'ecile",
+                          family = "Proust-Lima",
+                          email = "Cecile.Proust-Lima@inserm.fr"),
+                   person(given = "Viviane",
+                          family = "Philipps",
+                          email = "viviane.philipps@u-bordeaux.fr"),
+                   person(given = "Benoit",
+                          family = "Liquet",
+                          email = "benoit.liquet@pau-univ.fr")),
+  journal      = "Journal of Statistical Software",
+  year         = "2017",
+  volume       = "78",
+  number       = "2",
+  pages        = "1--56",
+  doi          = "10.18637/jss.v078.i02",
+
+  header       = "To cite lcmm in publications use:",
+  textVersion  =
+  paste("Cecile Proust-Lima, Viviane Philipps, Benoit Liquet (2017).",
+        "Estimation of Extended Mixed Models Using Latent Classes and Latent Processes: The R Package lcmm.",
+        "Journal of Statistical Software, 78(2), 1-56.",
+        "doi:10.18637/jss.v078.i02")
+)

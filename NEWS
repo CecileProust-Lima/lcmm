@@ -1,0 +1,169 @@
+News about R package lcmm :
+---------------------------
+
+
+The companion paper is accepted in Journal of Statistical Software and available on arxiv! 
+
+Proust-Lima C, Philipps V, Liquet B (2015). Estimation of Extended Mixed Models Using Latent Classes and Latent Processes: the R package lcmm, Arxiv
+
+http://arxiv.org/abs/1503.00890
+
+
+Changes in Version 1.7.8 :
+
+* shades in plot.predictlink/L/Y
+* subset in plot, which="fit"
+
+
+
+Changes in Version 1.7.6 (2016-12-12):
+
+* Small bugs identified and solved in multlcmm
+
+
+Changes in Version 1.7.5 (2016-03-15):
+
+* Small bugs identified and solved in multlcmm, predictY and predictL
+
+
+Changes in Version 1.7.4 (2015-12-26):
+
+* The package uses lazydata to automatically load the datasets of the package.
+
+* 'jlcmm' and 'mlcmm' are shortcuts for functions 'Jointlcmm' and 'multlcmm', respectively.
+
+* Function 'gridsearch' provides an automatic grid of departures for reducing the odds of converging towards a local maximum. 
+
+* Initial values can be randomly generated from a model with 1 class (called m1 in next example) with option B=random(m1) in hlme, lcmm, multlcmm and Jointlcmm.
+
+
+Changes in Version 1.7.3.0 (2015-10-23):
+
+
+* Functions 'hlme', 'lcmm', 'multlcmm', 'Jointlcmm' now include a posfix option to specify parameters that should not be estimated.
+
+* Functions 'lcmm', 'multlcmm', 'Jointlcmm' now include a partialH option to restrict the computation of the inverse of the Hessian matrix to a submatrix
+
+* Functions 'hlme', 'lcmm', 'multlcmm', 'Jointlcmm' now allow optional vector B to be an estimated model (with G=1) to reduce calculation time of initial values.
+
+* Bug identified and solved in calculation of subject-specific predictions in  'hlme', 'lcmm', 'multlcmm' and 'Jointlcmm' when cor is not NULL.
+
+* Bug identified and solved in the calculation of confidence bands for individual dynamic predictions in dynpred with draws=T.
+
+* Bug identified and solved in the calculation of the explained variance for multlcmm objects when cor is not NULL.
+
+
+
+Changes in Version 1.7.1 & 1.7.2 (2015-02-27):
+
+
+* Function plot now includes a which="fit" option to plot observed and predicted trajectories stemming from a hlme, lcmm, Jointlcmm or multlcmm object.
+
+* Function 'predictlink' replaces deprecated function 'link.confint' 
+
+* Function 'plot' gathers deprecated functions 'plot.linkfunction', 'plot.baselinerisk', 'plot.survival', 'plot.fit' together 
+
+
+
+Changes in Version 1.7.0 (2015-02-13):
+
+* The function 'Jointlcmm' now allows competing risks data for the survival part and is also available for non-Gaussian longitudinal data. All existing methods for Jointlcmm objects (except EPOCE and Diffepoce functions) are adapted to the new framework. 
+
+* Functions 'link.confint', 'plot.linkfunction', 'predictL' are now available for Jointlcmm objects.
+
+* The new functions 'incidcum' and 'plot.incidcum' respectively compute and plot the cumulative incidence associated to each competing event for Jointlcmm object.
+
+* The new function 'fitY' computes the marginal predicted values of longitudinal outcomes in their natural scale for lcmm or multlcmm objects.
+
+* Bug identified and solved in 'dynpred' function when used with a joint model assuming proportional hazards between latent classes.
+
+* The Makevars file now allows compilation of the package with parallel make.
+
+
+
+Changes in Version 1.6.5 & 1.6.6 (2014-09-10):
+
+* bug solved regarding installation problem with parallel make
+
+
+
+Changes in Version 1.6.4 (2014-04-11):
+
+* The new functions 'dynpred' and 'plot.dynpred' respectively compute and plot individual dynamic predictions obtained from a joint latent class model estimated by Jointlcmm.
+
+* The new function 'VarCovRE' computes the standard errors of the parameters of variance-covariance of the random effects for a hlme, lcmm, Jointlcmm or multlcmm object
+
+* The new function 'WaldMult' computes multivariate Wald tests and Wald tests for combinations of parameters from hlme, lcmm, Jointlcmm or multlcmm object
+
+* The new function 'VarExpl' computes the percentages of variance explained by the linear regression for a hlme, lcmm, Jointlclmm or multlcmm object
+
+* The new functions 'estimates' and 'VarCov' get respectively all parameters estimated and their variance-covariance matrix for a hlme, lcmm, Jointlcmm or multlcmm object
+
+* Function 'summary' now returns the table containing the results about the fixed effects in the longitudinal model 
+
+* All plots consider now the ... options
+
+* Functions plot.linkfunction and plot.predict have now an add argument
+
+* Function multlcmm now allows "splines" or "Splines" specification for the link functions
+
+* Functions 'lcmm' and 'multlcmm' now compute the transformations even if the maximum number of iterations is reached without convergence
+
+* bug identified and solved in multlcmm when the response variables are not integers
+
+* bug identified and solved in multlcmm when using contrast
+
+* bug identified and solved in plot.linkfunction for the y axes positions
+
+* bug identified and solved in hlme, lcmm, Jointlcmm and multlcmm when including interactions in 'mixture'.
+
+
+
+
+Changes in Version 1.6.2 (2013-03-06):
+
+* The new function 'multlcmm' now estimates latent process mixed models for multivariate curvilinear longitudinal outcomes (with link functions: linear, beta or splines). Various post-fit computation and output functions are also available including plot.linkfunction, predictY, predictL, etc
+
+* All the functions hlme, lcmm, Jointlcmm include a 'cor' option for including a brownian motion or a first-order autoregressive error process in addition to the independent errors of measurement
+
+* bug identified and solved in predictL, predictY and plot.predict when used with factor covariate
+
+
+Changes in Version 1.5.8 (2012-10-01):
+
+* bug identified and solved in predictY.lcmm when used with a 'splines' link function and an outcome with minimum value not at 0
+
+
+Changes in Version 1.5.7 (2012-07-24):
+
+* The function 'predictY' now computes the predicted values (possibly class-specific) of the longitudinal outcome not only from a lcmm object but also from a hlme or a Jointlcmm object for a specified profile of covariates.
+
+* bug identified and solved in predictY.lcmm when used with a 'threshold' link function and a Monte Carlo method
+
+
+Changes in Version 1.5.6 (2012-07-16):
+
+* missing data handled in hlme, lcmm and Jointlcmm using 'na.action' with attributes 1 for 'na.omit' or 2 for 'na.fail'
+
+* The new function 'predictY.lcmm' computes predicted values of a lcmm object in the natural outcome scale for a specified profile of covariates, and also provides confidence bands using a Monte Carlo method.
+
+* bugs in epoce computation solved (with splines baseline risk function, and/or NaN values under solaris system)
+
+* bug identified and solved in summary functions regarding the labels of covariate effects in peculiar cases
+
+
+Changes in Version 1.5.2 (2012-04-06):
+
+* improved variable specification in the estimating functions Jointlcmm, lcmm and hlme with 
+	- categorical variables using factor() 
+	- variables entered as functions using I() 
+	- interaction terms using "*" and ":"
+
+* computation of the predictive accuracy measure EPOCE from a Jointlcmm object either on the training data or on external data (post-fit functions epoce and Diffepoce)
+
+* for discrete outcomes, lcmm function now computates the posterior discrete log-likelihood and the universal approximate cross-validation criterion (UACV)
+
+* Jointlcmm now includes two parameterizations of I-splines and piecewise-constant baseline risks functions to ensure positive risks: either log/exp or sqrt/square (option logscale=).  
+
+
+
