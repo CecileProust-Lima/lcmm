@@ -1854,7 +1854,7 @@
          !end do
          
          
-         if(istop.eq.1.or.istop.eq.2) then 
+         if(istop.eq.1.or.istop.eq.2.or.istop.eq.3) then 
          !            write(*,*)'avant transfo'
 
             call transfo_estimee_ord(btot,npmtot,marker,transfY)
@@ -1874,7 +1874,7 @@
 !                rlindiv(i)=funcpio(b,npm,id,thi,id,thi,i)
 !                nmescur=nmescur+nmes(i)
 !           end do      
-         if (istop.eq.1) then
+         if (istop.eq.1.or.istop.eq.2.or.istop.eq.3) then
             if (ng.gt.1) then
                call postprobo(btot,npmtot,PPI)
             end if

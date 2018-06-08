@@ -353,7 +353,7 @@
 
 !probas posteriori
 
-         if (istop.eq.1) then
+         if (istop.eq.1.or.istop.eq.2.or.istop.eq.3) then
             if (ng.gt.1) then
                call postprob(btot,npmtot,PPI)
             end if
