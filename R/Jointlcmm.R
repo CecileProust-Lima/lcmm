@@ -2659,5 +2659,6 @@ attributes(data)$terms <- NULL
     }
 
 
-
+#' @rdname Jointlcmm
+#' @export
 jlcmm <- Jointlcmm

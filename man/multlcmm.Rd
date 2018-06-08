@@ -14,6 +14,13 @@ multlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE,
   convG = 1e-04, maxiter = 100, nsim = 100, prior, range = NULL,
   subset = NULL, na.action = 1, posfix = NULL, partialH = FALSE,
   verbose = TRUE)
+
+mlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE,
+  nwg = FALSE, randomY = FALSE, link = "linear", intnodes = NULL,
+  epsY = 0.5, cor = NULL, data, B, convB = 1e-04, convL = 1e-04,
+  convG = 1e-04, maxiter = 100, nsim = 100, prior, range = NULL,
+  subset = NULL, na.action = 1, posfix = NULL, partialH = FALSE,
+  verbose = TRUE)
 }
 \arguments{
 \item{fixed}{a two-sided linear formula object for specifying the

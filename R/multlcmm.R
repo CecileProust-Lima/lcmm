@@ -117,7 +117,6 @@
 #' randomly) from a model with \code{ng=}. Finally, function \code{gridsearch}
 #' performs an automatic grid search.
 #' 
-#' @aliases multlcmm mlcmm
 #' @param fixed a two-sided linear formula object for specifying the
 #' fixed-effects in the linear mixed model at the latent process level. The
 #' response outcomes are separated by \code{+} on the left of \code{~} and the
@@ -1331,7 +1330,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
             b[(nef+nvc+nw+ncor0+ny0+nalea0+1):NPM] <-init$best[(nef2+nvc+ncor0+ny0+1):NPM2]
 
         }
-print(zitr,digits=20)
+
 ###estimation
     out <- .Fortran(C_hetmixcontmult,
                     as.double(Y0),
@@ -1538,5 +1537,6 @@ print(zitr,digits=20)
 }
 
 
-
+#' @rdname multlcmm
+#' @export
 mlcmm <- multlcmm
