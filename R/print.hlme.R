@@ -1,3 +1,5 @@
+#' @export
+#'
 print.hlme <- function(x,...){
 if (!inherits(x, "hlme")) stop("use only with \"hlme\" objects")
 

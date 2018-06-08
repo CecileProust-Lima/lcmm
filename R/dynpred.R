@@ -1,3 +1,79 @@
+#' Individual dynamic predictions from a joint latent class model
+#' 
+#' This function computes individual dynamic predictions and 95\% confidence
+#' bands. Given a joint latent class model, a landmark time s, a horizon time t
+#' and measurements until time s, the predicted probability of event in the
+#' window [s,s+t] is calculated. Confidence bands can be provided using a Monte
+#' Carlo method.
+#' 
+#' 
+#' @param model an object inheriting from class \code{Jointlcmm}.
+#' @param newdata a data frame containing the data from which predictions are
+#' computed. This data frame must contain all the model's covariates, the
+#' observations of the longitudinal and survival outcomes, the subject
+#' identifier and if necessary the variables specified in prior and TimeDepVar
+#' argumentsfrom Jointlcmm.
+#' @param event integer giving the event for which the prediction is to be
+#' calculated
+#' @param landmark a numeric vector containing the landmark times.
+#' @param horizon a numeric vector containing the horizon times.
+#' @param var.time a character indicating the time variable in \code{newdata}
+#' @param fun.time an optional function. This is only required if the time
+#' scales in the longitudinal part of the model and the survival part are
+#' different. In that case, \code{fun.time} is the function that translates the
+#' times from the longitudinal part into the time scale of the survival part.
+#' The default is the identity function which means that the two time scales
+#' are the same.
+#' @param na.action Integer indicating how NAs are managed. The default is 1
+#' for 'na.omit'. The alternative is 2 for 'na.fail'. Other options such as
+#' 'na.pass' or 'na.exclude' are not implemented in the current version.
+#' @param draws optional boolean specifying whether median and confidence bands
+#' of the predicted values should be computed (TRUE). IF TRUE, a Monte Carlo
+#' approximation of the posterior distribution of the predicted values is
+#' computed and the median, 2.5\% and 97.5\% percentiles are given. Otherwise,
+#' the predicted values are computed at the point estimate. By default,
+#' draws=FALSE.
+#' @param ndraws if draws=TRUE, ndraws specifies the number of draws that
+#' should be generated to approximate the posterior distribution of the
+#' predicted values. By default, ndraws=2000.
+#' @return A list containing : \item{pred}{a matrix with 4 columns if
+#' draws=FALSE and 6 columns if draws=TRUE, containing the subjects identifier,
+#' the landmark times, the horizon times, the predicted probability (if
+#' draws=FALSE) or the median, 2.5\% and 97.5 \% percentiles of the 'ndraws'
+#' probabilities calculated (if draws=TRUE). If a subject has no measurement
+#' before time s or if the event has already occured at time s, his probability
+#' is NA.} \item{newdata}{a data frame obtained from argument newdata
+#' containing time measurements and longitudinal observations used to compute
+#' the predictions}
+#' @author Cecile Proust-Lima, Viviane Philipps
+#' @seealso
+#' \code{\link{plot.dynpred}}, \code{\link{Jointlcmm}}, \code{\link{predictY}}, \code{\link{plot.predict}}
+#' @references Proust-Lima, Sene, Taylor and Jacqmin-Gadda (2014). Joint latent
+#' class models of longitudinal and time-to-event data: a review. Statistical
+#' Methods in Medical Research 23, 74-90.
+#' @examples
+#' 
+#' 
+#' ## Joint latent class model with 2 classes :
+#' m32 <- Jointlcmm(Ydep1~Time*X1,mixture=~Time,random=~Time,subject="ID",
+#' classmb=~X3,ng=2,survival=Surv(Tevent,Event)~X1+mixture(X2),
+#' hazard="3-quant-splines",hazardtype="PH",data=data_lcmm,
+#' B = c(0.641, -0.6217, 0, 0, 0.5045, 0.8115, -0.4316, 0.7798, 0.1027, 
+#' 0.7704, -0.0479, 10.4257, 11.2972, -2.5955, -0.5234, 1.4147, 
+#' -0.05, 0.9124, 0.0501, 0.2138, 1.5027))
+#' 
+#' ## Predictions at landmark 10 and 12 for horizon 3, 5 and 10 for two subjects :
+#' 
+#' dynpred(m32,landmark=c(10,12),horizon=c(3,5,10),var.time="Time",
+#' fun.time=function(x){10*x},newdata=data_lcmm[1:8,])
+#' \dontrun{
+#' dynpred(m32,landmark=c(10,12),horizon=c(3,5,10),var.time="Time",
+#' fun.time=function(x){10*x},newdata=data_lcmm[1:8,],draws=TRUE,ndraws=2000)
+#' }
+#' 
+#' @export
+#' 
+#' 
 dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                     fun.time=identity,na.action=1,draws=FALSE,ndraws=2000)    
 {                                                       
@@ -148,7 +224,7 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                 }
 
             ##cas ou on a factor() dans l'appel
-            z <- all.names(call_fixed)
+            z <- all.names(as.formula(paste("~",call_fixed)))
             ind_factor <- which(z=="factor")
             if(length(ind_factor))
                 {
@@ -158,11 +234,17 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                             mod <- levels(as.factor(olddata[,v]))
                             if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
                             newdata1[,v] <- factor(newdata1[,v], levels=mod)
+
+                            fv <- paste("factor\\(",v,"\\)",sep="")
+                            if(length(grep(fv,model$Names$Xnames)))
+                                {
+                                    model$Names$Xnames <- gsub(fv,v,model$Names$Xnames)
+                                }
                         }
                 }
             call_fixed <- gsub("factor","",call_fixed)
 
-            z <- all.names(call_random)
+            z <- all.names(as.formula(paste("~",call_random)))
             ind_factor <- which(z=="factor")
             if(length(ind_factor))
                 {
@@ -172,11 +254,17 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                             mod <- levels(as.factor(olddata[,v]))
                             if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
                             newdata1[,v] <- factor(newdata1[,v], levels=mod)
+
+                            fv <- paste("factor\\(",v,"\\)",sep="")
+                            if(length(grep(fv,model$Names$Xnames)))
+                                {
+                                    model$Names$Xnames <- gsub(fv,v,model$Names$Xnames)
+                                }
                         }
                 }
             call_random <- gsub("factor","",call_random)
 
-            z <- all.names(call_classmb)
+            z <- all.names(as.formula(paste("~",call_classmb)))
             ind_factor <- which(z=="factor")
             if(length(ind_factor))
                 {
@@ -186,11 +274,17 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                             mod <- levels(as.factor(olddata[,v]))
                             if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
                             newdata1[,v] <- factor(newdata1[,v], levels=mod)
+
+                            fv <- paste("factor\\(",v,"\\)",sep="")
+                            if(length(grep(fv,model$Names$Xnames)))
+                                {
+                                    model$Names$Xnames <- gsub(fv,v,model$Names$Xnames)
+                                }
                         }
                 }
             call_classmb <- gsub("factor","",call_classmb)
 
-            z <- all.names(call_survival)
+            z <- all.names(as.formula(paste("~",call_survival)))
             ind_factor <- which(z=="factor")
             if(length(ind_factor))
                 {
@@ -200,6 +294,12 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                             mod <- levels(as.factor(olddata[,v]))
                             if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
                             newdata1[,v] <- factor(newdata1[,v], levels=mod)
+
+                            fv <- paste("factor\\(",v,"\\)",sep="")
+                            if(length(grep(fv,model$Names$Xnames)))
+                                {
+                                    model$Names$Xnames <- gsub(fv,v,model$Names$Xnames)
+                                }
                         }
                 }
             call_survival <- gsub("factor","",call_survival)
@@ -487,7 +587,7 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
             if(!is.null(model$call$survival))
                 {
                     X_survival <- model.matrix(formula(paste("~",call_survival,sep="")),data=newdata1)
-                    colnames(X_survival)[1] <- "intercept"
+                    if(ncol(X_survival)) colnames(X_survival)[1] <- "intercept"
                 }
             else
                 {
@@ -1271,6 +1371,10 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                     
                     resdraws <- replicate(ndraws,doOneDraw())
 
+                    if(is.vector(resdraws))
+                        {
+                            resdraws <- matrix(resdraws,nrow=1)
+                        }
                     #probs <- resdraws[-1,,drop=FALSE]
                     #pb <- sum(resdraws[1,])
                     

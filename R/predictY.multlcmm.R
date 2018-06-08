@@ -1,3 +1,6 @@
+#' @rdname predictY
+#' @export
+#'
 predictY.multlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndraws=2000,na.action=1,...)
 {
 if(missing(newdata)) stop("The argument newdata should be specified")
@@ -109,7 +112,7 @@ if(x$conv==1 | x$conv==2 | x$conv==3)
   {                                                                              
    newdata <- as.data.frame(newdata[-linesNA,])
    colnames(newdata) <- x$Xnames2
-   times <- times[-linesNA]
+   times <- times[-linesNA,,drop=FALSE]
   }
   
  

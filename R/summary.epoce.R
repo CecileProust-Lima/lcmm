@@ -1,3 +1,5 @@
+#' @export
+#'
 summary.epoce <- function(object,...){
 	x <- object
 	if (!inherits(x, "epoce")) stop("use only with \"epoce\" objects")

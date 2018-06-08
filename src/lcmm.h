@@ -286,6 +286,20 @@ void F77_SUB(predictmult)(double * X0,
 			   int * methInteg,
 			   double * Ymarg);
 
+void F77_SUB(predictcondmult)(double * X0,
+			      int * nalea,
+			      int * ny,
+			      int * maxmes,
+			      int * npm,
+			      double * b1,
+			      int * debut,
+			      double * epsY,
+			      int * idlink,
+			      int * nbzitr,
+			      double * zitr0,
+			      int * nsim,
+			      double * Ymarg);
+
 void F77_SUB(cvpl)(double * Y0, 
 		   double * X0, 
 		   int * Prior0,

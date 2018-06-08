@@ -1,3 +1,6 @@
+#' @rdname predictY
+#' @export
+#'
 predictY.Jointlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndraws=2000,na.action=1,...)
 {
     if(missing(newdata)) stop("The argument newdata should be specified")
@@ -277,8 +280,8 @@ call_survival <- formula(paste("~",call_survival,sep=""))
             na.action <- unique(c(na.fixed,na.mixture,na.random,na.classmb,na.survival,na.cor))
             if(length(na.action))
                 {
-                    newdata1 <- newdata1[-na.action,]
-                    times <- times[-na.action]
+                    newdata1 <- newdata1[-na.action,,drop=FALSE]
+                    times <- times[-na.action,,drop=FALSE]
                 }
             
 

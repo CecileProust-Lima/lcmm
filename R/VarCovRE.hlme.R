@@ -1,4 +1,5 @@
-
+#' @export
+#'
 VarCovRE.hlme <- function(Mod) 
 {
     if(missing(Mod)) stop("The model should be specified")
@@ -149,5 +150,27 @@ VarCovRE.hlme <- function(Mod)
 
 }
 
+
+
+#' Estimates, standard errors and Wald test for the parameters of the
+#' variance-covariance matrix of the random effects.
+#' 
+#' Fromm the Cholesky transformed parameters, this function provides estimates,
+#' standard errors and Wald test for the parameters of the variance-covariance
+#' matrix of the random effects.
+#' 
+#' 
+#' @aliases VarCovRE VarCovRE.hlme VarCovRE.lcmm VarCovRE.Jointlcmm
+#' VarCovRE.multlcmm
+#' @param Mod an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
+#' \code{Jointlcmm}
+#' @return a matrix containing the estimates of the parameters of the
+#' variance-covariance matrix of the random effects, their standard errors,
+#' and, for the covariance parameters, the Wald statistic and the associated
+#' p-value.
+#' @author Cecile Proust-Lima, Lionelle Nkam and Viviane Philipps
+#' 
+#' @export
+#' 
 VarCovRE <- function(Mod) UseMethod("VarCovRE")
 

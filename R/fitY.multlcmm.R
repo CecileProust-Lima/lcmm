@@ -1,4 +1,4 @@
-
+#' @export
 fitY.multlcmm <- function(x)
     {
         if(missing(x)) stop("The model should be specified")
@@ -54,6 +54,3 @@ fitY.multlcmm <- function(x)
         
         return(res)
     }
-
-
-fitY <- function(x) UseMethod("fitY")

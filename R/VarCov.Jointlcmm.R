@@ -1,3 +1,5 @@
+#' @export
+#'
 VarCov.Jointlcmm <- function(x)
 {
  if(missing(x)) stop("The argument x should be specified")
@@ -22,5 +24,3 @@ VarCov.Jointlcmm <- function(x)
 
  return(res)
 }
-
-VarCov <- function(x) UseMethod("VarCov")

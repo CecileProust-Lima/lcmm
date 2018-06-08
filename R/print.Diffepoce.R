@@ -1,3 +1,5 @@
+#' @export
+#'
 print.Diffepoce <- function(x,...){
 	if (!inherits(x, "Diffepoce")) stop("use only with \"Diffepoce\" objects")
 	cat("Difference in Expected Prognostic Observed Cross-Entropy (EPOCE) estimates", "\n")

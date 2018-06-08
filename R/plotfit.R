@@ -1,4 +1,4 @@
-.plotfit <-function(x,var.time,break.times=NULL,marg=TRUE,legend.loc="bottomleft",legend,outcome=1,subset=NULL,...)
+.plotfit <-function(x,var.time,break.times=NULL,marg=TRUE,legend.loc="bottomleft",legend,outcome=1,subset=NULL,shades=FALSE,...)
 {
     if(missing(x)) stop("Argument x should be specified")
     if(!(class(x) %in% c("hlme","lcmm","Jointlcmm","multlcmm"))) stop("Use with hlme, lcmm, multlcmm or Jointlcmm only")
@@ -45,11 +45,13 @@
             if(length(linesNA)) data <- data[-linesNA,]
         }
 
+    subset2 <- try(as.numeric(subset),silent=TRUE)
     
-    if(!is.null(subset))
+    #if(!is.null(subset))
+    if(length(subset2))
         {
             # data pprob et pred a reduire
-            data <- model.frame(formula(paste("~",paste(colnames(data),collapse="+"))),subset=subset,data=data)
+            data <- do.call("model.frame",args=list(formula=formula(paste("~",paste(colnames(data),collapse="+"))),subset=sys.call(which=-1)$subset,data=data,na.action=na.pass))
 
             ids <- unique(data[,x$call$subject])
             
@@ -122,7 +124,7 @@
                 {
                     indg <- lapply(1:ng,function(g) which( (pred_complet0[,ng+3]>=break.times[i]) & (pred_complet0[,ng+3]<min(break.times[i+1],maxT[g])) ) )
                     if(i==(length(break.times)-1)) sapply(1:ng, function(g) indg[[g]] <- c(indg[[g]],which( (pred_complet0[,ng+3]==min(break.times[i+1],maxT[g]))  )))
-            
+                    
                     if(any(sapply(indg,length)>0))
                         {
                             ##predictions ponderees
@@ -177,7 +179,7 @@
                 {
                     indg <- lapply(1:ng,function(g) which( (pred_complet[,ng+3]>=break.times[i]) & (pred_complet[,ng+3]<min(break.times[i+1],maxT[g])) ) )
                     if(i==(length(break.times)-1)) sapply(1:ng, function(g) indg[[g]] <- c(indg[[g]],which( (pred_complet[,ng+3]==min(break.times[i+1],maxT[g]))  )))
-            
+                                        
                     if(any(sapply(indg,length)>0))
                         {
                             ##predictions ponderees
@@ -395,9 +397,29 @@
                 }
             else
                 {
-                    do.call(matlines,c(lapply(dots.plot,"[",2*ng+1:ng),
+                    if(shades==FALSE)
+                        {
+                            do.call(matlines,c(lapply(dots.plot,"[",2*ng+1:ng),
                                      list(x=pred_times0[,rep(1,2*ng),drop=FALSE],
                                         y=pred_times0[,1+2*ng+1:(2*ng),drop=FALSE])))
+                        }
+                    else
+                        {
+                            rgbcols <- sapply(dots.plot$col,col2rgb)/255
+                            colors2 <- apply(rgbcols,2,function(x) rgb(x[1],x[2],x[3],alpha=0.15))
+                            ##sapply(1:ng, function(k,t,binf,bsup,cols) polygon(x=unlist(c(t,rev(t))),y=c(binf[,k],rev(bsup[,k])),col=cols[k],border=NA), t=pred_times0[,1],binf=pred_times0[,1+2*ng+1:ng,drop=FALSE],bsup=pred_times0[,1+3*ng+1:ng,drop=FALSE],cols=colors2)
+                            ombre <- function(k,t0,binf0,bsup0,cols)
+                                {
+                                    mat <- na.omit(cbind(t0,binf0[,k],bsup0[,k]))
+                                    t <- mat[,1]
+                                    binf <- mat[,2]
+                                    bsup <- mat[,3]
+
+                                    polygon(x=unlist(c(t,rev(t))),y=c(binf,rev(bsup)),col=cols[k],border=NA)
+                                }
+                            sapply(1:ng,ombre,t0=pred_times0[,1],binf0=pred_times0[,1+2*ng+1:ng,drop=FALSE],bsup0=pred_times0[,1+3*ng+1:ng,drop=FALSE],cols=colors2)
+                                                        
+                        }
                 }
             ##ajouter la legende :
             if(!is.null(legend)) do.call("legend",c(dots.leg,list(x=legend.loc)))
@@ -446,10 +468,31 @@
                 }
             else
                 {
-                    do.call(matlines,c(lapply(dots.plot,"[",2*ng+1:ng),
+                    if(shades==FALSE)
+                        {
+                            do.call(matlines,c(lapply(dots.plot,"[",2*ng+1:ng),
                                        list(x=pred_times[,rep(1,2*ng),drop=FALSE],
                                             y=pred_times[,1+2*ng+1:(2*ng),drop=FALSE])))
+                        }
+                    else
+                        {
+                            rgbcols <- sapply(dots.plot$col,col2rgb)/255
+                            colors2 <- apply(rgbcols,2,function(x) rgb(x[1],x[2],x[3],alpha=0.15))
+                            ##sapply(1:ng, function(k,t,binf,bsup,cols) polygon(x=unlist(c(t,rev(t))),y=c(binf[,k],rev(bsup[,k])),col=cols[k],border=NA), t=pred_times[,1],binf=pred_times[,1+2*ng+1:ng,drop=FALSE],bsup=pred_times[,1+3*ng+1:ng,drop=FALSE],cols=colors2) ## pb avec les NA
+                            ombre <- function(k,t0,binf0,bsup0,cols)
+                                {
+                                    mat <- na.omit(cbind(t0,binf0[,k],bsup0[,k]))
+                                    t <- mat[,1]
+                                    binf <- mat[,2]
+                                    bsup <- mat[,3]
+
+                                    polygon(x=unlist(c(t,rev(t))),y=c(binf,rev(bsup)),col=cols[k],border=NA)
+                                }
+                            sapply(1:ng,ombre,t0=pred_times[,1],binf0=pred_times[,1+2*ng+1:ng,drop=FALSE],bsup0=pred_times[,1+3*ng+1:ng,drop=FALSE],cols=colors2)
+                            
+                        }
                 }
+            
             ##ajouter la legende :
             if(!is.null(legend)) do.call("legend",c(dots.leg,list(x=legend.loc)))
 

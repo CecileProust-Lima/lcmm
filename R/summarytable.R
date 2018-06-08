@@ -1,3 +1,22 @@
+#' Summary of models
+#' 
+#' This function provides a table summarizing the results of different models
+#' fitted by \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}.
+#' 
+#' 
+#' @param m1 an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
+#' \code{Jointlcmm}
+#' @param ...  further arguments, in particular other objects of class
+#' \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}
+#' @return a matrix giving for each model: the number a latent classes, the
+#' log-likelihood, the number of parameters, the BIC and the posterior
+#' probability of the latent classes.
+#' @author Cecile Proust-Lima, Viviane Philipps
+#' @seealso \code{\link{summary}}, \code{\link{hlme}}, \code{\link{lcmm}},
+#' \code{\link{multlcmm}}, \code{\link{Jointlcmm}}
+#' 
+#' @export
+#' 
 summarytable <- function(m1,...)
     {
         if(missing(m1)) stop("At least one model should be specified")

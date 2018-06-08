@@ -800,7 +800,6 @@
         transfY <- rep(0,nsim)
 
 
-        
         out <- .Fortran(C_hetmixcont,
                         as.double(Y0),
                         as.double(X0),

@@ -1,4 +1,4 @@
-
+#' @export
 plot.predictlink <- function(x,legend.loc="topleft",legend,add=FALSE,shades=FALSE,...)
     {
         if(missing(x)) stop("Argument 'x' is missing")

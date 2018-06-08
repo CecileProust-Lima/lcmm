@@ -1,3 +1,5 @@
+#' @export
+#'
 VarExpl.Jointlcmm <- function(x,values)
 {
  if(missing(x)) stop("The model should be specified")
@@ -124,5 +126,3 @@ VarExpl.Jointlcmm <- function(x,values)
 
  return(res)
 }
-
-VarExpl <- function(x,values) UseMethod("VarExpl")

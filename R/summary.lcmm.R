@@ -1,3 +1,31 @@
+#' Summary of a \code{hlme}, \code{lcmm}, \code{Jointlcmm}, \code{multlcmm},
+#' \code{epoce} or \code{Diffepoce} objects
+#' 
+#' The function provides a summary of \code{hlme}, \code{lcmm}, \code{multlcmm}
+#' and \code{Jointlcmm} estimations, or \code{epoce} and \code{Diffepoce}
+#' computations.
+#' 
+#' 
+#' @aliases summary.hlme summary.lcmm summary.Jointlcmm summary.multlcmm
+#' summary.epoce summary.Diffepoce
+#' @param object an object inheriting from classes \code{hlme}, \code{lcmm},
+#' \code{multlcmm} for fitted latent class mixed-effects, or class
+#' \code{Jointlcmm} for a Joint latent class mixed model or \code{epoce} or
+#' \code{Diffepoce} for predictive accuracy computations.
+#' @param \dots further arguments to be passed to or from other methods.  They
+#' are ignored in this function.
+#' @return For \code{epoce} or \code{Diffepoce} objects, returns NULL. For
+#' \code{hlme}, \code{lcmm}, \code{Jointlcmm} or \code{multlcmm} returns also a
+#' matrix containing the fixed effect estimates in the longitudinal model,
+#' their standard errors, Wald statistics and p-values
+#' @author Cecile Proust-Lima, Viviane Philipps, Amadou Diakite and Benoit
+#' Liquet
+#' @seealso \code{\link{hlme}}, \code{\link{lcmm}}, \code{\link{multlcmm}},
+#' \code{\link{Jointlcmm}}, \code{epoce}, \code{Diffepoce}
+#' @keywords print
+#' 
+#' @export
+#'
 summary.lcmm <- function(object,...)
 {
     x <- object
@@ -145,14 +173,30 @@ summary.lcmm <- function(object,...)
             }
 
 
-
+        ## fct pr determiner la longueur max d'une chaine de caracteres
+        ## (avec gestion des NA)
+        maxchar <- function(x)
+            {
+                xx <- na.omit(x)
+                if(length(xx))
+                    {
+                        res <- max(nchar(xx))
+                    }
+                else
+                    {
+                        res <- 2
+                    }
+                return(res)
+            }
+        
+        
         if(NPROB>0)
             {
                 cat("Fixed effects in the class-membership model:\n" )
                 cat("(the class of reference is the last class) \n")
 
                 tmp <- cbind(coefch[1:NPROB],sech[1:NPROB],waldch[1:NPROB],pwaldch[1:NPROB])
-                maxch <- apply(tmp,2,function(x) max(nchar(x)))
+                maxch <- apply(tmp,2,maxchar)
                 if(any(c(1:NPROB) %in% posfix)) maxch[1] <- maxch[1]-1
                 dimnames(tmp) <- list(names(coef)[1:NPROB],
                                       c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
@@ -169,7 +213,7 @@ summary.lcmm <- function(object,...)
 
         cat("Fixed effects in the longitudinal model:\n" )
         
-        tmp <- matrix(c(paste(c(rep(" ",max(nchar(coefch[NPROB+1:NEF]))-ifelse(any(c(NPROB+1:NEF) %in% posfix),2,1)),0),collapse=""),"","",""),nrow=1,ncol=4)
+        tmp <- matrix(c(paste(c(rep(" ",maxchar(coefch[NPROB+1:NEF])-ifelse(any(c(NPROB+1:NEF) %in% posfix),2,1)),0),collapse=""),"","",""),nrow=1,ncol=4)
         tTable <- matrix(c(0,NA,NA,NA),nrow=1,ncol=4)
 
         if (NEF>0)
@@ -197,7 +241,7 @@ summary.lcmm <- function(object,...)
             
         if(NEF>0)
             {
-                maxch <- apply(tmp,2,function(x) max(nchar(x)))
+                maxch <- apply(tmp,2,maxchar)
                 if(any(c(NPROB+1:NEF) %in% posfix)) maxch[1] <- maxch[1]-1
 
                 dimnames(tmp) <- list(c(interc,names(coef)[NPROB+1:NEF]),
@@ -292,7 +336,7 @@ summary.lcmm <- function(object,...)
         if (!is.null(std))
             { 
                 rownames(std) <- nom
-                maxch <- apply(std,2,function(x) max(nchar(x)))
+                maxch <- apply(std,2,maxchar)
                 if(NW>0 & any(c(NPROB+NEF+NVC+1:NW) %in% posfix))
                     {
                         maxch[1] <- maxch[1]-1
@@ -322,7 +366,7 @@ summary.lcmm <- function(object,...)
 
         tmp <- cbind(coefch[NPROB+NEF+NVC+NW+1:ntrtot],sech[NPROB+NEF+NVC+NW+1:ntrtot],waldch[NPROB+NEF+NVC+NW+1:ntrtot],pwaldch[NPROB+NEF+NVC+NW+1:ntrtot])
         rownames(tmp) <- names(coef)[NPROB+NEF+NVC+NW+1:ntrtot]
-        maxch <- apply(tmp,2,function(x) max(nchar(x)))
+        maxch <- apply(tmp,2,maxchar)
         if(any(c(NPROB+NEF+NVC+NW+1:ntrtot) %in% posfix)) maxch[1] <- maxch[1]-1
         colnames(tmp) <- c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
                            paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""),

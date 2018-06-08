@@ -1,4 +1,5 @@
-
+#' @export
+#'
 VarExpl.multlcmm <- function(x,values)
 {
  if(missing(x)) stop("The model should be specified")
@@ -126,6 +127,3 @@ VarExpl.multlcmm <- function(x,values)
 
  return(res)
 }
-
-
-VarExpl <- function(x,values) UseMethod("VarExpl")

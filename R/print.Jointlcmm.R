@@ -1,3 +1,5 @@
+#' @export
+#'
 print.Jointlcmm <- function(x,...)
 {
 

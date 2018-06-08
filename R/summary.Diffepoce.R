@@ -1,3 +1,5 @@
+#' @export
+#'
 summary.Diffepoce <- function(object,...){
 	x <- object
 	if (!inherits(x, "Diffepoce")) stop("use only with \"Diffepoce\" objects")

@@ -1,3 +1,5 @@
+#' @export
+#'
 summary.multlcmm <- function(object,...)
 {
     x <- object
@@ -143,6 +145,22 @@ summary.multlcmm <- function(object,...)
                     pwaldch[posfix] <- ""
                 }
 
+            ## fct pr determiner la longueur max d'une chaine de caracteres
+            ## (avec gestion des NA)
+            maxchar <- function(x)
+                {
+                    xx <- na.omit(x)
+                    if(length(xx))
+                        {
+                            res <- max(nchar(xx))
+                        }
+                    else
+                        {
+                            res <- 2
+                        }
+                    return(res)
+                }
+
 #browser()
             
             if(nprob>0)
@@ -151,7 +169,7 @@ summary.multlcmm <- function(object,...)
                     cat("(the class of reference is the last class) \n")
 
                     tmp <- cbind(coefch[1:nprob],sech[1:nprob],waldch[1:nprob],pwaldch[1:nprob])
-                    maxch <- apply(tmp,2,function(x) max(nchar(x)))
+                    maxch <- apply(tmp,2,maxchar)
                     if(any(c(1:nprob) %in% posfix)) maxch[1] <- maxch[1]-1
                     dimnames(tmp) <- list(names(coef)[1:nprob],
                                           c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
@@ -267,7 +285,7 @@ summary.multlcmm <- function(object,...)
 
                     tmp <- cbind(col1,col2,col3,col4)
                     rownames(tmp) <- rownames(tTable)
-                    maxch <- apply(tmp,2,function(x) max(nchar(x)))
+                    maxch <- apply(tmp,2,maxchar)
                     maxch[1] <- maxch[1]-1
 
                     colnames(tmp) <- c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
@@ -353,7 +371,7 @@ summary.multlcmm <- function(object,...)
             if (!is.null(std)) 
                 {
                     rownames(std) <- nom
-                    maxch <- apply(std,2,function(x) max(nchar(x)))
+                    maxch <- apply(std,2,maxchar)
                     if(any(c(nef+nvc+1:(nw+ncor)) %in% posfix)) maxch[1] <- maxch[1]-1
                     colnames(std) <- c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
                                        paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""))
@@ -374,7 +392,7 @@ summary.multlcmm <- function(object,...)
                 }  
 
             rownames(std.err) <- nom
-            maxch <- apply(std.err,2,function(x) max(nchar(x)))
+            maxch <- apply(std.err,2,maxchar)
             if(any(c(nef+nvc+nw+ncor+1:(ny+nalea)) %in% posfix))
                 {
                     if(nalea>0)
@@ -386,7 +404,7 @@ summary.multlcmm <- function(object,...)
                             maxch[grep("*",std.err[1,])] <- maxch[grep("*",std.err[1,])]-1
                         }
                 }
-            colnames(std.err) <- sapply(1:ny,function(k) paste(paste(rep(" ",max(0,maxch[k]-nchar(x$Ynames[k]))),collapse=""),x$Ynames[k],sep=""))
+            colnames(std.err) <- sapply(1:ny,function(k) paste(paste(rep(" ",max(0,maxch[k]-maxchar(x$Ynames[k]))),collapse=""),x$Ynames[k],sep=""))
             print(std.err,quote=FALSE,na.print="")
             
             cat("\n")
@@ -403,7 +421,7 @@ summary.multlcmm <- function(object,...)
                     tmp.rownames <- c(tmp.rownames, paste(rep(x$Ynames[yk],ntrtot[yk]),names(coef[(nef+nvc+nw+ncor+ny+nalea+sum(ntrtot[1:yk])-ntrtot[yk]+1):(nef+nvc+nw+ncor+ny+nalea+sum(ntrtot[1:yk]))]),sep="-"))
                 }
             rownames(tmp) <- tmp.rownames
-            maxch <- apply(tmp,2,function(x) max(nchar(x)))
+            maxch <- apply(tmp,2,maxchar)
             if(any(c((nef+nvc+nw+ncor+ny+nalea+1):NPM) %in% posfix)) maxch[1] <- maxch[1]-1
             colnames(tmp) <- c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
                                paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""),

@@ -1,3 +1,5 @@
+#' @export
+#'
 summary.hlme <- function(object,...){
     x <- object
     if (!inherits(x, "hlme")) stop("use only with \"hlme\" objects")
@@ -115,6 +117,22 @@ summary.hlme <- function(object,...){
                 }
             
 
+            ## fct pr determiner la longueur max d'une chaine de caracteres
+            ## (avec gestion des NA)
+            maxchar <- function(x)
+                {
+                    xx <- na.omit(x)
+                    if(length(xx))
+                        {
+                            res <- max(nchar(xx))
+                        }
+                    else
+                        {
+                            res <- 2
+                        }
+                    return(res)
+                }
+
 
 
             if(NPROB>0)
@@ -123,7 +141,7 @@ summary.hlme <- function(object,...){
                     cat("(the class of reference is the last class) \n")
 
                     tmp <- cbind(coefch[1:NPROB],sech[1:NPROB],waldch[1:NPROB],pwaldch[1:NPROB])
-                    maxch <- apply(tmp,2,function(x) max(nchar(x)))
+                    maxch <- apply(tmp,2,maxchar)
                     if(any(c(1:NPROB) %in% posfix)) maxch[1] <- maxch[1]-1
                     dimnames(tmp) <- list(names(coef)[1:NPROB],
                                           c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
@@ -144,7 +162,7 @@ summary.hlme <- function(object,...){
                          waldch[(NPROB+1):(NPROB+NEF)],
                          pwaldch[(NPROB+1):(NPROB+NEF)])
             
-            maxch <- apply(tmp,2,function(x) max(nchar(x)))
+            maxch <- apply(tmp,2,maxchar)
             if(any(c(NPROB+1:NEF) %in% posfix)) maxch[1] <- maxch[1]-1
             dimnames(tmp) <- list(names(coef)[NPROB+1:NEF],
                                           c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
@@ -243,7 +261,7 @@ summary.hlme <- function(object,...){
             nom <- c(nom,"Residual standard error:")
             
             rownames(std) <- nom
-            maxch <- apply(std,2,function(x) max(nchar(x)))
+            maxch <- apply(std,2,maxchar)
             if(any(c(NPROB+NEF+NVC+1:(NW+ncor+1)) %in% posfix)) maxch[1] <- maxch[1]-1
             colnames(std) <- c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
                                paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""))

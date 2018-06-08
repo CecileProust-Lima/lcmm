@@ -1,4 +1,33 @@
-
+#' Multivariate Wald Test
+#' 
+#' This function provides multivariate and univariate Wald tests for
+#' combinations of parameters from \code{hlme}, \code{lcmm}, \code{multlcmm} or
+#' \code{Jointlcmm} models.
+#' 
+#' 
+#' @param Mod an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
+#' \code{Jointlcmm}
+#' @param pos a vector containing the indices in Mod\$best of the parameters to
+#' test
+#' @param contrasts a numeric vector of same length as pos.  If NULL (the
+#' default), a simultaneous test of the appropriate parameters is realised.  If
+#' contrasts is specified, the quantity to test is the dot product of pos and
+#' contrasts.
+#' @param name a character containing the name the user wants to give to the
+#' test. By default, the name's test is the null hypothesis.
+#' @param value the value(s) to test against. By default, test against 0.
+#' @return If contrasts is NULL, the function returns a matrix with 1 row and 2
+#' columns containing the value of the Wald test's statistic and the associated
+#' p-value.
+#' 
+#' If contrasts is not NULL, the function returns a matrix with 1 row and 4
+#' columns containing the value of the coefficient (dot product of pos and
+#' contrasts), his standard deviation, the value of the Wald test's statistic
+#' and the associated p-value.
+#' @author Cecile Proust-Lima, Lionelle Nkam and Viviane Philipps
+#' 
+#' @export
+#' 
 WaldMult <- function(Mod,pos=NULL,contrasts=NULL,name=NULL,value=NULL)
 { 
     if (!(class(Mod) %in% c("hlme","lcmm","multlcmm","Jointlcmm"))) stop("applies to \"hlme\" or \"lcmm\" or \"multlcmm\" or \"Jointlcmm\" objects only")

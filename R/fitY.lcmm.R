@@ -1,4 +1,4 @@
-
+#' @export
 fitY.lcmm <- function(x)
     {
         if(missing(x)) stop("The model should be specified")
@@ -37,6 +37,3 @@ fitY.lcmm <- function(x)
         return(res)
     }
 
-
-
-fitY <- function(x) UseMethod("fitY")

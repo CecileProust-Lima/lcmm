@@ -1,3 +1,4 @@
+#' @export
 estimates.Jointlcmm <- function(x,cholesky=TRUE)
 {
  if(missing(x)) stop("The argument x should be specified")
@@ -24,5 +25,3 @@ estimates.Jointlcmm <- function(x,cholesky=TRUE)
  
  return(res)
 }
-
-estimates <- function(x,cholesky=TRUE) UseMethod("estimates")

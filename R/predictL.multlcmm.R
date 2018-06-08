@@ -1,4 +1,5 @@
-
+#' @export
+#'
 predictL.multlcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE,...)
 {
  if(missing(newdata)) stop("The argument newdata should be specified")

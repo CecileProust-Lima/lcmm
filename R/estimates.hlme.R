@@ -1,4 +1,4 @@
-
+#' @export
 estimates.hlme <- function(x,cholesky=TRUE)
 {
  if(missing(x)) stop("The argument x should be specified")
@@ -34,4 +34,27 @@ estimates.hlme <- function(x,cholesky=TRUE)
  return(res)
 }
 
+
+
+#' Maximum likelihood estimates
+#' 
+#' This function provides the vector of maximum likelihood estimates of a model
+#' estimated with \code{hlme}, \code{lcmm}, \code{multlcmm} or
+#' \code{Jointlcmm}.
+#' 
+#' 
+#' @aliases estimates estimates.hlme estimates.lcmm estimates.Jointlcmm
+#' estimates.multlcmm
+#' @param x an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
+#' \code{Jointlcmm}
+#' @param cholesky optional logical indicating if the parameters of
+#' variance-covariance of the random effets should be displayed instead of
+#' their cholesky transformations used in the estimation process.
+#' @return a vector with all estimates of the model.
+#' @author Cecile Proust-Lima, Viviane Philipps
+#' @seealso \code{\link{VarCov}}, \code{\link{hlme}}, \code{\link{lcmm}},
+#' \code{\link{multlcmm}}, \code{\link{Jointlcmm}}
+#' 
+#' @export
+#' 
 estimates <- function(x,cholesky=TRUE) UseMethod("estimates")

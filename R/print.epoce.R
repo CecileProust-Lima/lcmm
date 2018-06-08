@@ -1,3 +1,5 @@
+#' @export
+#'
 print.epoce <- function(x,...){
 	if (!inherits(x, "epoce")) stop("use only with \"epoce\" objects")
 	cat("Expected Prognostic Observed Cross-Entropy (EPOCE) of the joint latent class model:", "\n")

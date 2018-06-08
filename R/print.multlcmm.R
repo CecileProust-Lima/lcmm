@@ -1,3 +1,5 @@
+#' @export
+#'
 print.multlcmm <- function(x,...){
 if (!inherits(x, "multlcmm")) stop("use only with \"multlcmm\" objects")
 

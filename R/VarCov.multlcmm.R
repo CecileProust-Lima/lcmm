@@ -1,4 +1,5 @@
-
+#' @export
+#'
 VarCov.multlcmm <- function(x)
 {
  if(missing(x)) stop("The argument x should be specified")
@@ -23,5 +24,3 @@ VarCov.multlcmm <- function(x)
 
  return(res)
 }
-
-VarCov <- function(x) UseMethod("VarCov")

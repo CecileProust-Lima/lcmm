@@ -1,3 +1,5 @@
+#' @export
+#'
 VarCovRE.multlcmm <- function(Mod)
 {
   if(missing(Mod)) stop("The model should be specified")
@@ -148,5 +150,3 @@ VarCovRE.multlcmm <- function(Mod)
   return(invisible(Results))
 
 }
-
-VarCovRE <- function(Mod) UseMethod("VarCovRE")

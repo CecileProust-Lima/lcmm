@@ -1,3 +1,62 @@
+#' Plot of individual dynamic predictions
+#' 
+#' This function provides a graphical representation of individual dynamic
+#' predictions obtained from a joint latent class model and plots
+#' simultaneously the observed outcome.
+#' 
+#' 
+#' Two types of plot are provided for the moment :
+#' 
+#' - if one horizon is selected (and one or several landmarks), each prediction
+#' is represented by a point at the landmark time. If available, the
+#' predictions are surrounded by confidence intervals.
+#' 
+#' - if several horizons (t1, t2, etc) and only one landmark (s) is selected, a
+#' line linking the predictions (placed at abscissa s+t1, s+t2, etc) is drawn.
+#' Confidence bands (if available) are represented as dotted lines.
+#' 
+#' @param x a dynpred object, containing the predicted probabilities of event
+#' in a time window, obtained from a joint latent class model.
+#' @param subject a vector containing the identifiers of the subjects the user
+#' wants to display. If NULL (the default), all subjects are plotted.
+#' @param landmark a vector containing the landmark times from which the
+#' probabilities are to be plotted. If NULL (the default), all landmarks are
+#' used. If several horizon are specified, only one landmark should be
+#' selected.
+#' @param horizon a vector containing the horizon times from which the
+#' probabilities are to be plotted. If NULL (the default), all horizons are
+#' used. If several landmarks are specified, only one horizon should be
+#' selected.
+#' @param add logical indicating if the plot should be added to an existing
+#' plot. By default (add=FALSE), a new plot is created.
+#' @param \dots optional graphical parameters.
+#' @return returns NULL
+#' @author Cecile Proust-Lima, Viviane Philipps
+#' @seealso \code{\link{dynpred}}
+#' @examples
+#' 
+#' 
+#' \dontrun{
+#' 
+#' ## Joint latent class model with 2 classes :
+#' m32 <- Jointlcmm(Ydep1~Time*X1,mixture=~Time,random=~Time,subject="ID",
+#' classmb=~X3,ng=2,survival=Surv(Tevent,Event)~X1+mixture(X2),
+#' hazard="3-quant-splines",hazardtype="PH",data=data_lcmm,B = c(0.64, -0.62, 
+#' 0, 0, 0.52, 0.81, 0.41, 0.78, 0.1, 0.77, -0.05, 10.43, 11.3, -2.6, -0.52, 1.41, 
+#' -0.05, 0.91, 0.05, 0.21, 1.5))
+#' 
+#' ## Predictions at landmark 10 and 12 for horizon 3, 5 and 10 for two subjects :
+#' dynpred.m32 <- dynpred(m32,landmark=c(10,12),horizon=c(3,5,10),var.time="Time",
+#' fun.time=function(x){10*x},newdata=data_lcmm[4:8,],draws=TRUE,ndraws=2000)
+#' 
+#' ## Plot of the predictions at landmark 10 for horizon 3,5,10 :
+#' plot(dynpred.m32,landmark=10)
+#' 
+#' ## Plot of the predictions at landmark 10 and 12 for horizon 3 :
+#' plot(dynpred.m32,horizon=3)
+#' }
+#' 
+#' @export
 plot.dynpred <- function(x,subject=NULL,landmark=NULL,horizon=NULL,add=FALSE,...)
 {
     if(missing(x)) stop("The argument \'x\' is missing.")

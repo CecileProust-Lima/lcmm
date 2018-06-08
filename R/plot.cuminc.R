@@ -1,4 +1,33 @@
-
+#' Plot of predicted cumulative incidences according to a profile of covariates
+#' 
+#' This function displays the predicted cause-specific cumulative incidences
+#' derived from a joint latent class model according to a profile of
+#' covariates.  %% ~~ A concise (1-5 lines) description of what the function
+#' does. ~~
+#' 
+#' 
+#' @param x an object of class \code{cuminc}
+#' @param profil an integer giving the profile number for which the cumulative
+#' incidences are to be plotted.
+#' @param event an integer giving the event indicator for which the cumulative
+#' incidence are to be plotted.
+#' @param add logical indicating if the curves should be added to an existing
+#' plot. Default to FALSE.
+#' @param legend character or expression to appear in the legend. If no legend
+#' should be added, \code{"legend"} should be NULL.
+#' @param legend.loc keyword for the position of the legend from the list
+#' \code{"bottomright"}, \code{"bottom"}, \code{"bottomleft"}, \code{"left"},
+#' \code{"topleft"},\code{"top"}, \code{"topright"}, \code{"right"} and
+#' \code{"center"}. By default, the legend is located in the top left of the
+#' plot.
+#' @param \dots other parameters to be passed through to plotting functions
+#' @return returns NULL
+#' @author Viviane Philipps and Cecile Proust-Lima
+#' @seealso
+#' \code{\link{Jointlcmm}}, \code{\link{plot.Jointlcmm}}, \code{\link{cuminc}}
+#' 
+#' 
+#' @export
 plot.cuminc <- function(x,profil=1,event=1,add=FALSE,legend,legend.loc="topleft",...)
     {
         if(missing(x)) stop("The argument 'x' should be specified")

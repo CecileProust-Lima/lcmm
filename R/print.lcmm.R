@@ -1,3 +1,27 @@
+#' Brief summary of a \code{hlme}, \code{lcmm},
+#' \code{Jointlcmm},\code{multlcmm}, \code{epoce} or \code{Diffepoce} objects
+#' 
+#' The function provides a brief summary of \code{hlme},
+#' \code{lcmm},\code{multlcmm} or \code{Jointlcmm} estimations, and
+#' \code{epoce} or \code{Diffepoce} computations.
+#' 
+#' 
+#' @aliases print.hlme print.lcmm print.Jointlcmm print.multlcmm print.epoce
+#' print.Diffepoce
+#' @param x an object inheriting from classes \code{hlme}, \code{lcmm} for
+#' fitted latent class mixed-effects, or class \code{Jointlcmm}for a Joint
+#' latent class mixed model or \code{epoce} for predictive accuracy
+#' computations.
+#' @param \dots further arguments to be passed to or from other methods.  They
+#' are ignored in this function.
+#' @author Cecile Proust-Lima, Viviane Philipps, Amadou Diakite and Benoit
+#' Liquet
+#' @seealso \code{\link{hlme}}, \code{\link{lcmm}}, \code{\link{Jointlcmm}},
+#' \code{epoce}, \code{Diffepoce}
+#' @keywords print
+#' 
+#' @export
+#'
 print.lcmm <-
 function(x,...){
 if (!inherits(x, "lcmm")) stop("use only with \"lcmm\" objects")

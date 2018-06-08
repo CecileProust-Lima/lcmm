@@ -1,3 +1,5 @@
+#' @export
+#'
 summary.Jointlcmm <- function(object,...)
 {
     x <- object
@@ -200,6 +202,22 @@ summary.Jointlcmm <- function(object,...)
                     pwaldch[posfix] <- ""
                 }
 
+            ## fct pr determiner la longueur max d'une chaine de caracteres
+            ## (avec gestion des NA)
+            maxchar <- function(x)
+                {
+                    xx <- na.omit(x)
+                    if(length(xx))
+                        {
+                            res <- max(nchar(xx))
+                        }
+                    else
+                        {
+                            res <- 2
+                        }
+                    return(res)
+                }
+            
             
             if(nprob>0)
                 {
@@ -207,7 +225,7 @@ summary.Jointlcmm <- function(object,...)
                     cat("(the class of reference is the last class) \n")
 
                     tmp <- cbind(coefch[1:nprob],sech[1:nprob],waldch[1:nprob],pwaldch[1:nprob])
-                    maxch <- apply(tmp,2,function(x) max(nchar(x)))
+                    maxch <- apply(tmp,2,maxchar)
                     if(any(c(1:nprob) %in% posfix)) maxch[1] <- maxch[1]-1
                     dimnames(tmp) <- list(names(coef)[1:nprob],
                                           c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
@@ -227,7 +245,7 @@ summary.Jointlcmm <- function(object,...)
                          sech[nprob+1:(nrisqtot+nvarxevt)],
                          waldch[nprob+1:(nrisqtot+nvarxevt)],
                          pwaldch[nprob+1:(nrisqtot+nvarxevt)])
-            maxch <- apply(tmp,2,function(x) max(nchar(x)))
+            maxch <- apply(tmp,2,maxchar)
             if(any(c(nprob+1:(nrisqtot+nvarxevt)) %in% posfix)) maxch[1] <- maxch[1]-1
             dimnames(tmp) <- list(names(coef)[nprob+1:(nrisqtot+nvarxevt)],
                                   c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
@@ -245,7 +263,7 @@ summary.Jointlcmm <- function(object,...)
             
             if(x$linktype!=-1)
                 {
-                    tmp <- matrix(c(paste(c(rep(" ",max(nchar(coefch[nprob+nrisqtot+nvarxevt+1:nef]))-ifelse(any(c(nprob+nrisqtot+nvarxevt+1:nef) %in% posfix),2,1)),0),collapse=""),"","",""),nrow=1,ncol=4)
+                    tmp <- matrix(c(paste(c(rep(" ",maxchar(coefch[nprob+nrisqtot+nvarxevt+1:nef])-ifelse(any(c(nprob+nrisqtot+nvarxevt+1:nef) %in% posfix),2,1)),0),collapse=""),"","",""),nrow=1,ncol=4)
                     tTable <- matrix(c(0,NA,NA,NA),nrow=1,ncol=4)
                 }
             if(x$linktype==-1)
@@ -277,7 +295,7 @@ summary.Jointlcmm <- function(object,...)
             
             if(nef>0)
                 {
-                    maxch <- apply(tmp,2,function(x) max(nchar(x)))
+                    maxch <- apply(tmp,2,maxchar)
                     if(any(c(nprob+nrisqtot+nvarxevt+1:nef) %in% posfix)) maxch[1] <- maxch[1]-1
 
                     dimnames(tmp) <- list(c(interc,names(coef)[nprob+nrisqtot+nvarxevt+1:nef]),
@@ -367,7 +385,7 @@ summary.Jointlcmm <- function(object,...)
             if (!is.null(std)) 
                 {
                     rownames(std) <- nom
-                    maxch <- apply(std,2,function(x) max(nchar(x)))
+                    maxch <- apply(std,2,maxchar)
                     if(any(c(nprob+nrisqtot+nvarxevt+nef+nvc+1:(nw+ncor)) %in% posfix)) maxch[1] <- maxch[1]-1
                     colnames(std) <- c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
                                        paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""))
@@ -380,7 +398,7 @@ summary.Jointlcmm <- function(object,...)
                 {
                     tmp <- cbind(coefch[NPM],sech[NPM])
                     rownames(tmp) <- "Residual standard error"
-                    maxch <- apply(tmp,2,function(x) max(nchar(x)))
+                    maxch <- apply(tmp,2,maxchar)
                     if(c(NPM) %in% posfix) maxch[1] <- maxch[1]-1
                     colnames(tmp) <- c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
                                        paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""))
@@ -401,7 +419,7 @@ summary.Jointlcmm <- function(object,...)
                                  waldch[(nprob+nrisqtot+nvarxevt+nef+nvc+nw+ncor+1):NPM],
                                  pwaldch[(nprob+nrisqtot+nvarxevt+nef+nvc+nw+ncor+1):NPM])
                     rownames(tmp) <- names(x$best[(nprob+nrisqtot+nvarxevt+nef+nvc+nw+ncor+1):NPM])
-                    maxch <- apply(tmp,2,function(x) max(nchar(x)))
+                    maxch <- apply(tmp,2, maxchar)
                     if(any(c((nprob+nrisqtot+nvarxevt+nef+nvc+nw+ncor+1):NPM) %in% posfix)) maxch[1] <- maxch[1]-1
                     colnames(tmp) <- c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
                                        paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""),

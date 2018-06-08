@@ -1,3 +1,5 @@
+#' @export
+#'
 postprob.Jointlcmm <- function(x,threshold=c(0.7,0.8,0.9),...)
 {
  if (!inherits(x, "Jointlcmm")) stop("use only with \"Jointlcmm\" objects")
@@ -99,6 +101,3 @@ postprob.Jointlcmm <- function(x,threshold=c(0.7,0.8,0.9),...)
  
  return(invisible(res))
 }
-
-
-postprob <- function(x,threshold=c(0.7,0.8,0.9),...) UseMethod("postprob")

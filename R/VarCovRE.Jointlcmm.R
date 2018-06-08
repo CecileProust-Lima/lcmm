@@ -1,3 +1,5 @@
+#' @export
+#'
 VarCovRE.Jointlcmm <- function(Mod)
 {
   if(missing(Mod)) stop("The model should be specified")
@@ -153,5 +155,3 @@ VarCovRE.Jointlcmm <- function(Mod)
   return(invisible(Results))
 
 }
-
-VarCovRE <- function(Mod) UseMethod("VarCovRE")

@@ -1,4 +1,6 @@
-
+#' @rdname predictY
+#' @export
+#'
 predictY.hlme <- function(x,newdata,var.time,draws=FALSE,na.action=1,...){
 
 if(missing(newdata)) stop("The argument newdata should be specified")
@@ -212,7 +214,7 @@ na.action <- unique(c(na.fixed,na.mixture,na.random,na.classmb,na.cor))
  
 if(length(na.action)){
 	newdata1 <- newdata1[-na.action,]
-        times <- times[-na.action]
+        times <- times[-na.action,,drop=FALSE]
 }
 
 

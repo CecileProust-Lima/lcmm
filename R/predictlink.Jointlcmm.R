@@ -1,5 +1,4 @@
-
-
+#' @export
 predictlink.Jointlcmm <- function(x,ndraws=2000,Yvalues,...)
 {
     ## verification des arguments

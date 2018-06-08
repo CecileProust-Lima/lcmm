@@ -1,4 +1,5 @@
-
+#' @export
+#'
 VarCov.lcmm <- function(x)
 {
  if(missing(x)) stop("The argument x should be specified")
@@ -23,5 +24,3 @@ VarCov.lcmm <- function(x)
 
  return(res)
 }
-
-VarCov <- function(x) UseMethod("VarCov")

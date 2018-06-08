@@ -1,3 +1,30 @@
+#' Predicted cumulative incidence of event according to a profile of covariates
+#' 
+#' This function computes the predicted cumulative incidence of each cause of
+#' event according to a profile of covariates from a joint latent class model.
+#' Confidence bands can be computed by a Monte-Carlo method.
+#' 
+#' 
+#' @param x an object inheriting from class \code{Jointlcmm}
+#' @param time a vector of times at which the cumulative incidence is
+#' calculated
+#' @param draws optional boolean specifying whether a Monte Carlo approximation
+#' of the posterior distribution of the cumulative incidence is computed and
+#' the median, 2.5\% and 97.5\% percentiles are given. Otherwise, the predicted
+#' cumulative incidence is computed at the point estimate. By default,
+#' draws=FALSE.
+#' @param ndraws if draws=TRUE, ndraws specifies the number of draws that
+#' should be generated to approximate the posterior distribution of the
+#' predicted cumulative incidence. By default, ndraws=2000.
+#' @param \dots further arguments, in particular values of the covariates
+#' specified in the survival part of the joint model.
+#' @return An object of class \code{cuminc} containing as many matrices as
+#' profiles defined by the covariates values. Each of these matrices contains
+#' the event-specific cumulative incidences in each latent class at the
+#' different times specified.
+#' @author Viviane Philipps and Cecile Proust-Lima
+#' @seealso
+#' \code{\link{Jointlcmm}}, \code{\link{plot.Jointlcmm}}, \code{\link{plot.cuminc}}
 cuminc <- function(x,time,draws=FALSE,ndraws=2000,...)
     {   
         if(!inherits(x,"Jointlcmm")) stop("The argument 'x' must be a'Jointlcmm' object")
@@ -5,7 +32,7 @@ cuminc <- function(x,time,draws=FALSE,ndraws=2000,...)
        
         ## infos sur le modele
         nbevt <- length(x$hazard[[1]])
-        if(nbevt<2) stop("Culmulative incidence is only available in a competing risks setting.")
+#        if(nbevt<2) stop("Culmulative incidence is only available in a competing risks setting.")
         ng <- x$ng
 
         typrisq <- x$hazard[[1]]
