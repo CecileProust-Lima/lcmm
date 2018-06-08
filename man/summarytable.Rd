@@ -4,7 +4,7 @@
 \alias{summarytable}
 \title{Summary of models}
 \usage{
-summarytable(m1, ...)
+summarytable(m1, ..., which = c("G", "loglik", "npm", "BIC", "\%class"))
 }
 \arguments{
 \item{m1}{an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
@@ -12,9 +12,14 @@ summarytable(m1, ...)
 
 \item{...}{further arguments, in particular other objects of class
 \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}}
+
+\item{which}{character vector indicating which results should be returned.
+Possible values are "G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
+"entropy", "%class".}
 }
 \value{
-a matrix giving for each model: the number a latent classes, the
+a matrix giving for each model the values of the requested indexes.
+By default, the number a latent classes, the
 log-likelihood, the number of parameters, the BIC and the posterior
 probability of the latent classes.
 }

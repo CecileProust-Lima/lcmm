@@ -8,7 +8,11 @@
 #' \code{Jointlcmm}
 #' @param ...  further arguments, in particular other objects of class
 #' \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}
-#' @return a matrix giving for each model: the number a latent classes, the
+#' @param which character vector indicating which results should be returned.
+#' Possible values are "G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
+#' "entropy", "%class".
+#' @return a matrix giving for each model the values of the requested indexes.
+#' By default, the number a latent classes, the
 #' log-likelihood, the number of parameters, the BIC and the posterior
 #' probability of the latent classes.
 #' @author Cecile Proust-Lima, Viviane Philipps
@@ -17,10 +21,11 @@
 #' 
 #' @export
 #' 
-summarytable <- function(m1,...)
+summarytable <- function(m1,...,which=c("G","loglik","npm","BIC","%class"))
     {
         if(missing(m1)) stop("At least one model should be specified")
         if(!(class(m1) %in% c("hlme","lcmm","multlcmm","Jointlcmm"))) stop("Use with 'hlme', 'lcmm' , 'multlcmm', or 'Jointlcmm' objects only")
+        if(any(!(which %in% c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "%class")))) stop(paste("which should contain elements among",paste(c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "%class"),collapse=", ")))
 
         dots <- list(...)
 
@@ -54,25 +59,43 @@ summarytable <- function(m1,...)
                 ng <- m1$ng
             }
 
+        sabic <- function(m)
+        {
+            return((length(m$best)-length(m$call$posfix))*log((m$ns+2)/24)-2*m$loglik)
+        }
 
-        tmp <- c(m1$ng,m1$loglik,length(m1$best)-length(eval(m1$call$posfix)),m1$BIC)
+        
+        entropy <- function(x)
+        {
+            z <- as.matrix(log(x$pprob[,c(3:(x$ng+2))])*x$pprob[,c(3:(x$ng+2))])
+            if(any(!is.finite(z)))
+            {
+                z[which(!is.finite(z))] <- 0
+            }
+            res <- 1+sum(z)/(x$ns*log(x$ng))
+            if(x$ng==1) res <- 1
+            return(res)
+        }
+
+        ## tous les indicateurs pour le modele m1
+        tmp <- c(m1$ng,m1$loglik,m1$conv,length(m1$best)-length(eval(m1$call$posfix)),m1$AIC,m1$BIC,sabic(m1),entropy(m1))
         for(g in 1:m1$ng)
             {
                 tmp <- c(tmp,length(which(m1$pprob[,2]==g))/m1$ns*100)
             }
         if(m1$ng<max(ng)) tmp <- c(tmp,rep(NA,max(ng)-m1$ng))
         
-        res <- matrix(tmp,nrow=1,ncol=4+max(ng))
-        colnames(res) <- c("G","loglik","npm","BIC",paste("%class",1:max(ng),sep=""))
+        res <- matrix(tmp,nrow=1,ncol=8+max(ng))
+        colnames(res) <- c("G","loglik","conv","npm","AIC","BIC","SABIC","entropy",paste("%class",1:max(ng),sep=""))
 
-
+        ## tous les indicateurs pour les autres modeles
         if(nbmodels>0)
             {
                 for(i in 2:(nbmodels+1))
                     {
                         m <- get(paste("m",i,sep=""))
                         
-                        tmp <- c(m$ng,m$loglik,length(m$best)-length(eval(m$call$posfix)),m$BIC)
+                        tmp <- c(m$ng,m$loglik,m$conv,length(m$best)-length(eval(m$call$posfix)),m$AIC,m$BIC,sabic(m),entropy(m))
                         
                         for(g in 1:m$ng)
                             {
@@ -84,6 +107,11 @@ summarytable <- function(m1,...)
                         
                     }
             }
+
+        ## selection des indicateurs
+        which2 <- setdiff(which,"%class")
+        if("%class" %in% which) which2 <- c(which2,paste("%class",1:max(ng),sep=""))
+        res <- res[,which2,drop=FALSE]
         
 
         rownames(res) <- noms.mod
