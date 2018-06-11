@@ -10,7 +10,8 @@ lcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE,
   nwg = FALSE, link = "linear", intnodes = NULL, epsY = 0.5,
   cor = NULL, data, B, convB = 1e-04, convL = 1e-04, convG = 1e-04,
   maxiter = 100, nsim = 100, prior, range = NULL, subset = NULL,
-  na.action = 1, posfix = NULL, partialH = FALSE, verbose = TRUE)
+  na.action = 1, posfix = NULL, partialH = FALSE, verbose = TRUE,
+  returndata = FALSE)
 }
 \arguments{
 \item{fixed}{a two-sided linear formula object for specifying the
@@ -141,6 +142,9 @@ the Hessian matrix to define convergence criteria.}
 
 \item{verbose}{logical indicating if information about computation should be
 reported. Default to TRUE.}
+
+\item{returndata}{logical indicating if data used for computation should be
+returned. Default to FALSE, data are not returned.}
 }
 \value{
 The list returned is: \item{ns}{number of grouping units in the
@@ -179,7 +183,7 @@ used to rescale the marker in (0,1) when the beta link function is used. By
 default, epsY=0.5.} \item{linktype}{indicator of link function type: 0 for
 linear, 1 for beta, 2 for splines and 3 for thresholds}
 \item{linknodes}{vector of nodes useful only for the 'splines' link
-function}
+function}\item{data}{the original data set (if returndata is TRUE)}
 }
 \description{
 This function fits mixed models and latent class mixed models for different

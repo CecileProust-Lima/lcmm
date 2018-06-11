@@ -226,6 +226,8 @@
 #' the Hessian matrix to define convergence criteria.
 #' @param verbose logical indicating if information about computation should be
 #' reported. Default to TRUE.
+#' @param returndata logical indicating if data used for computation should be
+#' returned. Default to FALSE, data are not returned.
 #' @return The list returned is: \item{ns}{number of grouping units in the
 #' dataset} \item{ng}{number of latent classes} \item{loglik}{log-likelihood of
 #' the model} \item{best}{vector of parameter estimates in the same order as
@@ -260,8 +262,8 @@
 #' used. By default, epsY=0.5.} \item{linktype}{indicators of link function
 #' types: 0 for linear, 1 for beta, 2 for splines and 3 for thresholds}
 #' \item{linknodes}{vector of nodes useful only for the 'splines' link
-#' functions} %% idea0,
-#' idprob0,idg0,idcontr0,idcor0,Xnames2,na.action,pred_RE_Y,Ynames,nbnodes
+#' functions} \item{data}{the original data set (if returndata is TRUE)}
+#' %% idea0,idprob0,idg0,idcontr0,idcor0,Xnames2,na.action,pred_RE_Y,Ynames,nbnodes
 #' @author Cecile Proust-Lima and Viviane Philipps
 #' 
 #' \email{cecile.proust-lima@@inserm.fr}
@@ -339,7 +341,7 @@
 #' 
 #' @export
 #' 
-multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,randomY=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=TRUE)
+multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,randomY=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=TRUE,returndata=FALSE)
 {
     ptm<-proc.time()
     if(verbose==TRUE) cat("Be patient, multlcmm is running ... \n")
@@ -379,6 +381,17 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 
     if(length(posfix) & missing(B)) stop("A set of initial parameters must be specified if some parameters are not estimated")
 
+
+    ## garder data tel quel pour le renvoyer
+    if(returndata==TRUE)
+    {
+        datareturn <- data
+    }
+    else
+    {
+        datareturn <- NULL
+    }
+    
 ### test de l'argument cor
     ncor0 <- 0
     cor.type <- cl$cor[1]
@@ -1525,7 +1538,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,
                predRE_Y=predRE_Y,Ynames=nomsY,Xnames=nom.X0,Xnames2=ttesLesVar,cholesky=Cholesky,
                estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,nbnodes=nbnodes,
-               na.action=nayk,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik)
+               na.action=nayk,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn)
     
     names(res$best) <- names(b)
     class(res) <-c("multlcmm")

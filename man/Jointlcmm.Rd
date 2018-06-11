@@ -13,7 +13,7 @@ Jointlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE,
   epsY = 0.5, range = NULL, cor = NULL, data, B, convB = 1e-04,
   convL = 1e-04, convG = 1e-04, maxiter = 100, nsim = 100, prior,
   logscale = FALSE, subset = NULL, na.action = 1, posfix = NULL,
-  partialH = FALSE, verbose = TRUE)
+  partialH = FALSE, verbose = TRUE, returndata = FALSE)
 
 jlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE,
   nwg = FALSE, survival, hazard = "Weibull", hazardtype = "Specific",
@@ -21,7 +21,7 @@ jlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE,
   epsY = 0.5, range = NULL, cor = NULL, data, B, convB = 1e-04,
   convL = 1e-04, convG = 1e-04, maxiter = 100, nsim = 100, prior,
   logscale = FALSE, subset = NULL, na.action = 1, posfix = NULL,
-  partialH = FALSE, verbose = TRUE)
+  partialH = FALSE, verbose = TRUE, returndata = FALSE)
 }
 \arguments{
 \item{fixed}{two-sided linear formula object for the fixed-effects in the
@@ -163,7 +163,7 @@ Three options are allowed: (1) a vector of initial values is entered (the
 order in which the parameters are included is detailed in \code{details}
 section).  (2) nothing is specified. A preliminary analysis involving the
 estimation of a standard linear mixed model is performed to choose initial
-values.  (3) when ng>1, a multlcmm object is entered. It should correspond
+values.  (3) when ng>1, a Jointlcmm object is entered. It should correspond
 to the exact same structure of model but with ng=1. The program will
 automatically generate initial values from this model. This specification
 avoids the preliminary analysis indicated in (2) Note that due to possible
@@ -215,6 +215,9 @@ criteria.}
 
 \item{verbose}{logical indicating if information about computation should be
 reported. Default to TRUE.}
+
+\item{returndata}{logical indicating if data used for computation should be
+returned. Default to FALSE, data are not returned.}
 }
 \value{
 The list returned is: \item{loglik}{log-likelihood of the model}
@@ -252,7 +255,8 @@ model. See Jacqmin-Gadda and Proust-Lima (2009) for more details.}
 (called "time"), the predicted baseline risk function in each latent class
 (called "RiskFct") and the predicted cumulative baseline risk function in
 each latent class (called "CumRiskFct").} \item{hazard}{internal information
-about the hazard specification used in related functions}
+about the hazard specification used in related functions} \item{data}{the
+original data set (if returndata is TRUE)}
 %\item{specif}{internal information used in related functions}
 %\item{Names}{internal information used in related fnctions}
 %\item{Names2}{internal information used in related functions}

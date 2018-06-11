@@ -230,7 +230,7 @@
 #' order in which the parameters are included is detailed in \code{details}
 #' section).  (2) nothing is specified. A preliminary analysis involving the
 #' estimation of a standard linear mixed model is performed to choose initial
-#' values.  (3) when ng>1, a multlcmm object is entered. It should correspond
+#' values.  (3) when ng>1, a Jointlcmm object is entered. It should correspond
 #' to the exact same structure of model but with ng=1. The program will
 #' automatically generate initial values from this model. This specification
 #' avoids the preliminary analysis indicated in (2) Note that due to possible
@@ -270,6 +270,8 @@
 #' criteria.
 #' @param verbose logical indicating if information about computation should be
 #' reported. Default to TRUE.
+#' @param returndata logical indicating if data used for computation should be
+#' returned. Default to FALSE, data are not returned.
 #' @return The list returned is: \item{loglik}{log-likelihood of the model}
 #' \item{best}{vector of parameter estimates in the same order as specified in
 #' \code{B} and detailed in section \code{details}} \item{V}{vector containing
@@ -305,7 +307,8 @@
 #' (called "time"), the predicted baseline risk function in each latent class
 #' (called "RiskFct") and the predicted cumulative baseline risk function in
 #' each latent class (called "CumRiskFct").} \item{hazard}{internal information
-#' about the hazard specification used in related functions}
+#' about the hazard specification used in related functions} \item{data}{the
+#' original data set (if returndata is TRUE)}
 #' %\item{specif}{internal information used in related functions}
 #' %\item{Names}{internal information used in related fnctions}
 #' %\item{Names2}{internal information used in related functions}
@@ -435,7 +438,8 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                       hazardnodes=NULL,TimeDepVar=NULL,link=NULL,intnodes=NULL,
                       epsY=0.5,range=NULL,cor=NULL,data,B,convB=0.0001,
                       convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,
-                      logscale=FALSE,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=TRUE)
+                      logscale=FALSE,subset=NULL,na.action=1,posfix=NULL,
+                      partialH=FALSE,verbose=TRUE,returndata=FALSE)
     {
         
         ptm<-proc.time()
@@ -490,6 +494,18 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
 
         if(length(posfix) & missing(B)) stop("A set of initial parameters must be specified if some parameters are not estimated")
 
+
+        ## garder data tel quel pour le renvoyer
+        if(returndata==TRUE)
+        {
+            datareturn <- data
+        }
+        else
+        {
+            datareturn <- NULL
+        }
+
+        
         if(!isTRUE(all.equal(as.character(cl$subset),character(0))))
             {
                 cc <- cl
@@ -501,7 +517,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                 data <- eval(cc)
             }
 
-attributes(data)$terms <- NULL
+        attributes(data)$terms <- NULL
         
 ### test de l'argument cor
         ncor0 <- 0
@@ -2636,7 +2652,6 @@ attributes(data)$terms <- NULL
                       ID=nom.subject,Tnames=noms.surv,prior.name=nom.prior,
                       TimeDepVar.name=nom.timedepvar)
 
-
         res <-list(ns=ns0,ng=ng0,idprob=idprob0,idcom=idcom,
                    idspecif=idspecif,idtdv=idtdv,idg=idg0,idea=idea0,
                    idcor=idcor0,loglik=out$loglik,best=out$best,V=V,
@@ -2647,7 +2662,8 @@ attributes(data)$terms <- NULL
                    predSurv=predSurv,hazard=list(typrisq,hazardtype,zi,nz),
                    scoretest=stats,na.action=linesNA,
                    AIC=2*(length(out$best)-length(posfix)-out$loglik),
-                   BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik)
+                   BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,
+                   data=datareturn)
 
         class(res) <-c("Jointlcmm")
 

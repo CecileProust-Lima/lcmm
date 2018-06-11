@@ -1,7 +1,7 @@
 ############## last change 2012/03/16 #####################
 
 .Contlcmm <-
-    function(fixed,mixture,random,subject,classmb,ng,idiag,nwg,cor,data,B,convB,convL,convG,prior,maxiter,epsY,idlink0,ntrtot0,nbzitr0,zitr,nsim,call,Ydiscrete,subset,na.action,posfix,partialH,verbose){
+    function(fixed,mixture,random,subject,classmb,ng,idiag,nwg,cor,data,B,convB,convL,convG,prior,maxiter,epsY,idlink0,ntrtot0,nbzitr0,zitr,nsim,call,Ydiscrete,subset,na.action,posfix,partialH,verbose,returndata){
         
         cl <- match.call()
 
@@ -29,6 +29,16 @@
         if(class(classmb)!="formula") stop("The argument classmb must be a formula")
         if(missing(data)){ stop("The argument data should be specified and defined as a data.frame")} 
         if(missing(subject)){ stop("The argument subject must be specified in any model even without random-effects")} 
+
+        ## garder data tel quel pour le renvoyer
+        if(returndata==TRUE)
+        {
+            datareturn <- data
+        }
+        else
+        {
+            datareturn <- NULL
+        }
 
 ### test de l'argument cor
         ncor0 <- 0    
@@ -951,11 +961,11 @@
         
         estimlink <- cbind(out$marker,out$transfY)
         colnames(estimlink) <- c("Y","transfY")
-
+        
 ### ad 2/04/2012
         if (!("intercept" %in% nom.X0)) X0.names2 <- X0.names2[-1]
 ### ad
-        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=call,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,Ydiscrete=Ydiscrete,discrete_loglik=out$vraisdiscret,UACV=out$UACV,IndivContrib=out$rlindiv,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik)
+        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=call,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,Ydiscrete=Ydiscrete,discrete_loglik=out$vraisdiscret,UACV=out$UACV,IndivContrib=out$rlindiv,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn)
         class(res) <- c("lcmm") 
 
         cost <- proc.time()-ptm

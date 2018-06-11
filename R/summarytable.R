@@ -6,11 +6,11 @@
 #' 
 #' @param m1 an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
 #' \code{Jointlcmm}
-#' @param ...  further arguments, in particular other objects of class
+#' @param \dots  further arguments, in particular other objects of class
 #' \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}
 #' @param which character vector indicating which results should be returned.
 #' Possible values are "G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
-#' "entropy", "%class".
+#' "entropy", "\%class".
 #' @return a matrix giving for each model the values of the requested indexes.
 #' By default, the number a latent classes, the
 #' log-likelihood, the number of parameters, the BIC and the posterior

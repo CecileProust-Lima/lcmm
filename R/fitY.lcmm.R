@@ -4,7 +4,14 @@ fitY.lcmm <- function(x)
         if(missing(x)) stop("The model should be specified")
         if(!inherits(x,"lcmm")) stop("Use with 'lcmm' objects only")
 
-        data <- eval(x$call$data)
+        if(!is.null(x$data))
+        {
+            data <- x$data
+        }
+        else
+        {
+            data <- eval(x$call$data)
+        }
 
         if(!isTRUE(all.equal(as.character(x$call$subset),character(0))))
             {

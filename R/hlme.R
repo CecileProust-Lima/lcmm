@@ -159,6 +159,8 @@
 #' estimated.
 #' @param verbose logical indicating if information about computation should be
 #' reported. Default to TRUE.
+#' @param returndata logical indicating if data used for computation should be
+#' returned. Default to FALSE, data are not returned.
 #' @return The list returned is: \item{ns}{number of grouping units in the
 #' dataset} \item{ng}{number of latent classes} \item{loglik}{log-likelihood of
 #' the model} \item{best}{vector of parameter estimates in the same order as
@@ -182,12 +184,12 @@
 #' the latent class: pred_m_1,pred_m_2,...,pred_ss_1,pred_ss_2,...)}
 #' \item{pprob}{table of posterior classification and posterior individual
 #' class-membership probabilities} \item{Xnames}{list of covariates included in
-#' the model}
-#' 
+#' the model} 
 #' \item{predRE}{table containing individual predictions of the random-effects
 #' : a column per random-effect, a line per subject} \item{cholesky}{vector
 #' containing the estimates of the Cholesky transformed parameters of the
 #' variance-covariance matrix of the random-effects}
+#' \item{data}{the original data set (if returndata is TRUE)}
 #' @author Cecile Proust-Lima, Benoit Liquet and Viviane Philipps
 #' 
 #' \email{cecile.proust-lima@@inserm.fr}
@@ -279,7 +281,7 @@
 #' 
 #' 
 hlme <-
-    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=TRUE){
+    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=TRUE,returndata=FALSE){
 
         ptm<-proc.time()
         if(verbose==TRUE) cat("Be patient, hlme is running ... \n")
@@ -317,6 +319,17 @@ hlme <-
             na.action=na.fail
         }
 
+
+        ## garder data tel quel pour le renvoyer
+        if(returndata==TRUE)
+        {
+            datareturn <- data
+        }
+        else
+        {
+            datareturn <- NULL
+        }
+        
 ### test de l'argument cor
         ncor0 <- 0
         cor.type <- cl$cor[1]
@@ -694,8 +707,7 @@ hlme <-
         Y0 <- as.numeric(matYXord[,3])
         X0 <- apply(matYXord[,-c(1,2,3),drop=FALSE],2,as.numeric)
         IND <- matYXord[,1]
-
-
+        
 #### INCLUSION PRIOR 
         PRIOR <- as.numeric(matYXord[,2])
         PRIOR <-as.integer(as.vector(PRIOR))
@@ -1186,11 +1198,11 @@ hlme <-
         names(out$best)<-names(b)
         btest <- out$best[1:length(inddepvar.fixed.nom)]
         names(btest) <-inddepvar.fixed.nom
-
+        
 ### ad 2/04/2012
         if (!("intercept" %in% nom.X0)) X0.names2 <- X0.names2[-1]
 ### ad
-        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,dataset=args$data,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik)
+        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,dataset=args$data,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn)
         class(res) <-c("hlme") 
         cost<-proc.time()-ptm
         if(verbose==TRUE) cat("The program took", round(cost[3],2), "seconds \n")

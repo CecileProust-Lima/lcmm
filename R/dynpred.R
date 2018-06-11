@@ -211,8 +211,17 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
 
             Xnames2 <- model$Names$Xnames2
 
+            ##donnees de l estimation
+            if(!is.null(model$data))
+            {
+                olddata <- model$data
+            }
+            else
+            {
+                olddata <- eval(model$call$data)
+            }
+            
             ##cas ou une variable du dataset est un facteur
-            olddata <- eval(model$call$data)
             for(v in Xnames2[-1])
                 {
                     if (is.factor(olddata[,v]) & !(is.factor(newdata[,v])))

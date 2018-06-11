@@ -1,6 +1,6 @@
 ###################### derniere mise a jour : 2012/03/16 ############"
 .Ordlcmm <-
-    function(fixed,mixture,random,subject,classmb,ng,idiag,nwg,data,B,convB,convL,convG,prior,maxiter,zitr,ide,call,Ydiscrete,subset=subset,na.action,posfix,verbose)
+    function(fixed,mixture,random,subject,classmb,ng,idiag,nwg,data,B,convB,convL,convG,prior,maxiter,zitr,ide,call,Ydiscrete,subset=subset,na.action,posfix,verbose,returndata)
 {
     
     ptm<-proc.time()
@@ -40,6 +40,16 @@
     int.random <- 0
     int.classmb <- 0
 
+    ## garder data tel quel pour le renvoyer
+    if(returndata==TRUE)
+    {
+        datareturn <- data
+    }
+    else
+    {
+        datareturn <- NULL
+    }
+    
     ## Table sans donnees manquante: newdata
     ##prendre le subset :
     newdata <- data  
@@ -274,7 +284,6 @@
     X0 <- apply(matYXord[,-c(1,2,3),drop=FALSE],2,as.numeric)
     #IDnum <- matYXord[,1]
     IND <- matYXord[,1]
-
 
 #### INCLUSION PRIOR 
     PRIOR <- as.numeric(matYXord[,2])
@@ -817,7 +826,7 @@
     if (!("intercept" %in% nom.X0)) X0.names2 <- X0.names2[-1]
 ### ad
 
-    res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=rep(0,nvar.exp),loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=call,niter=out$niter,N=N,idiag=idiag0,pprob=ppi,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,estimlink=estimlink,linktype=3,linknodes=zitr,ide=ide,Ydiscrete=Ydiscrete,discrete_loglik=out$loglik,UACV=out$UACV,IndivContrib=out$rlindiv,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik)
+    res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=rep(0,nvar.exp),loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=call,niter=out$niter,N=N,idiag=idiag0,pprob=ppi,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,estimlink=estimlink,linktype=3,linknodes=zitr,ide=ide,Ydiscrete=Ydiscrete,discrete_loglik=out$loglik,UACV=out$UACV,IndivContrib=out$rlindiv,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn)
     class(res) <-c("lcmm")  
 
     cost<-proc.time()-ptm

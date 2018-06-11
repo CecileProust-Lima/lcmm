@@ -18,7 +18,15 @@ predictL.multlcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE,...)
   if(!(na.action%in%c(1,2)))stop("only 1 for 'na.omit' or 2 for 'na.fail' are required in na.action argument")
 
     ##pour les facteurs
-  olddata <- eval(x$call$data)
+    ##donnees de l estimation
+    if(!is.null(x$data))
+    {
+        olddata <- x$data
+    }
+    else
+    {
+        olddata <- eval(x$call$data)
+    }
   termes <- x$Xnames[-1]
   
    #cas ou une variable dans le dataset du modele est un facteur

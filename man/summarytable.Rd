@@ -10,12 +10,12 @@ summarytable(m1, ..., which = c("G", "loglik", "npm", "BIC", "\%class"))
 \item{m1}{an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
 \code{Jointlcmm}}
 
-\item{...}{further arguments, in particular other objects of class
+\item{\dots}{further arguments, in particular other objects of class
 \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}}
 
 \item{which}{character vector indicating which results should be returned.
 Possible values are "G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
-"entropy", "%class".}
+"entropy", "\%class".}
 }
 \value{
 a matrix giving for each model the values of the requested indexes.

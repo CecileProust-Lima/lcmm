@@ -199,9 +199,16 @@ epoce <- function(model,pred.times,var.time,fun.time=identity,newdata=NULL,subse
 ### new data or data from estimation
 
     if(missing(newdata))
+    {
+        if(!is.null(model$data))
+        {
+            data <- model$data
+        }
+        else
         {
             data <- eval(model$call$data)
-            if(!(var.time %in% names(data))) stop("The Jointlcmm data must contain the var.time variable")
+        }
+        if(!(var.time %in% names(data))) stop("The Jointlcmm data must contain the var.time variable")
             new.data <- FALSE
             ##  var.time est dedans
         }

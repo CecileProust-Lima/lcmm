@@ -80,9 +80,17 @@ predictY.Jointlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALS
 
 
 ### pour les facteurs
+    ##donnees de l estimation
+    if(!is.null(x$data))
+    {
+        olddata <- x$data
+    }
+    else
+    {
+        olddata <- eval(x$call$data)
+    }
 
             ##cas ou une variable du dataset est un facteur
-            olddata <- eval(x$call$data)
             for(v in Xnames2[-1])
                 {
                     if (is.factor(olddata[,v]))     

@@ -7,7 +7,7 @@
 hlme(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE,
   nwg = FALSE, cor = NULL, data, B, convB = 1e-04, convL = 1e-04,
   convG = 1e-04, prior, maxiter = 500, subset = NULL, na.action = 1,
-  posfix = NULL, verbose = TRUE)
+  posfix = NULL, verbose = TRUE, returndata = FALSE)
 }
 \arguments{
 \item{fixed}{two-sided linear formula object for the fixed-effects in the
@@ -104,6 +104,9 @@ estimated.}
 
 \item{verbose}{logical indicating if information about computation should be
 reported. Default to TRUE.}
+
+\item{returndata}{logical indicating if data used for computation should be
+returned. Default to FALSE, data are not returned.}
 }
 \value{
 The list returned is: \item{ns}{number of grouping units in the
@@ -129,12 +132,12 @@ class-specific marginal and subject-specific predictions (with the number of
 the latent class: pred_m_1,pred_m_2,...,pred_ss_1,pred_ss_2,...)}
 \item{pprob}{table of posterior classification and posterior individual
 class-membership probabilities} \item{Xnames}{list of covariates included in
-the model}
-
+the model} 
 \item{predRE}{table containing individual predictions of the random-effects
 : a column per random-effect, a line per subject} \item{cholesky}{vector
 containing the estimates of the Cholesky transformed parameters of the
 variance-covariance matrix of the random-effects}
+\item{data}{the original data set (if returndata is TRUE)}
 }
 \description{
 This function fits linear mixed models and latent class linear mixed models

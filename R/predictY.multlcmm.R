@@ -29,10 +29,18 @@ if(x$conv==1 | x$conv==2 | x$conv==3)
 
  
   ##pour les facteurs
-  olddata <- eval(x$call$data)
+  ##donnees de l estimation
+  if(!is.null(x$data))
+  {
+      olddata <- x$data
+  }
+  else
+    {
+        olddata <- eval(x$call$data)
+    }
   termes <- x$Xnames[-1]
   
-   #cas ou une variable dans le dataset du modele est un facteur
+  #cas ou une variable dans le dataset du modele est un facteur
    for(v in x$Xnames2[-1])
    {
     if (is.factor(olddata[,v]))
