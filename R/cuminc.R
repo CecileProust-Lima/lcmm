@@ -25,6 +25,7 @@
 #' @author Viviane Philipps and Cecile Proust-Lima
 #' @seealso
 #' \code{\link{Jointlcmm}}, \code{\link{plot.Jointlcmm}}, \code{\link{plot.cuminc}}
+#' @export
 cuminc <- function(x,time,draws=FALSE,ndraws=2000,...)
     {   
         if(!inherits(x,"Jointlcmm")) stop("The argument 'x' must be a'Jointlcmm' object")
