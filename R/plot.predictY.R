@@ -4,7 +4,6 @@
 #' from a \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm} object.
 #' 
 #' 
-#' @name plot.predict
 #' 
 #' @aliases plot.predictY.hlme plot.predictY.lcmm plot.predictY.Jointlcmm
 #' plot.predictY.multlcmm plot.predictY plot.predictL.lcmm
@@ -66,7 +65,7 @@
 #' plot(predictY(m3,newdata=data,var.time="Time"),bty="l")
 #' }
 #' 
-#' 
+#' @rdname plot.predict
 #' @export
 
 

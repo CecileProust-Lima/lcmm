@@ -1,12 +1,12 @@
 
-subroutine predictcondmult(X0,nalea,ny,maxmes,npm,b1,debut,epsY,idlink &
+subroutine predictcondmult(X0,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,idlink &
      ,nbzitr,zitr0,nsim,Ymarg)  
 
   use optim
   IMPLICIT NONE
 
   ! in input
-  integer,intent(in)::maxmes,npm,nsim,nalea,ny,debut
+  integer,intent(in)::maxmes,npm,nsim,nalea,ny,nerr,debut
   double precision,dimension(maxmes*ny),intent(in) ::X0
   integer,dimension(ny),intent(in)::idlink,nbzitr
   double precision,dimension(npm),intent(in)::b1
@@ -71,9 +71,14 @@ subroutine predictcondmult(X0,nalea,ny,maxmes,npm,b1,debut,epsY,idlink &
            if(nalea.eq.ny) VC(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) = VC(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) +&
                 b1(debut+ny+yk)**2 !variance de alpha_k
 
-           if(j1.eq.j2) VC(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) = VC(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2)+&
-                b1(debut+yk) **2 ! variance de l'erreur
-
+           if(j1.eq.j2) then
+              if(nerr.gt.0) then
+                 VC(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) = VC(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2)+&
+                      b1(debut+yk) **2 ! variance de l'erreur
+              else
+                 VC(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) = VC(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2)+1 ! variance de l'erreur fixee a 1
+              end if
+           end if
         end do
      end do
   end do
@@ -152,6 +157,7 @@ subroutine predictcondmult(X0,nalea,ny,maxmes,npm,b1,debut,epsY,idlink &
               if (ytemp.gt.1) then
                  ytemp=1.d0
               end if
+              ier=0
               ymarg(maxmes*(yk-1)+j)=ymarg(maxmes*(yk-1)+j)+xinbta(aa,bb,beta,ytemp,ier)/dble(nsim)
               if (ier.ne.0.or.ymarg(maxmes*(yk-1)+j).eq.9999.d0) then
                  ymarg(maxmes*(yk-1)+j)=9999.d0
@@ -200,7 +206,7 @@ subroutine predictcondmult(X0,nalea,ny,maxmes,npm,b1,debut,epsY,idlink &
 
 
   do yk=1,ny
-
+     ! pour les betas !
      if (idlink(yk).eq.1) then
         do j=1,maxmes
            if (ymarg(maxmes*(yk-1)+j).ne.9999.d0) then

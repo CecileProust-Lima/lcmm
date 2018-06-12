@@ -1,12 +1,15 @@
-plot.predictYcond <- function(x,legend.loc="topleft",legend=x$object$Ynames,add=FALSE,shades=TRUE,...)
+#' @rdname plot.predict
+#' @export
+plot.predictYcond <- function(x,legend.loc="topleft",legend,add=FALSE,shades=TRUE,...)
 {
   if(missing(x)) stop("The argument x should be specified")
   if(is.na(as.logical(add))) stop("add should be TRUE or FALSE")  
-  
+
+  if(missing(legend)) legend <- unique(x$pred[,1])
   
   if(!all(is.na(x$pred)))
-      {
-          ny <- length(x$object$Ynames) 
+  {
+      ny <- max(length(x$object$Ynames),1)
    
           dots <- list(...)
           plot.axes <- list(axes=TRUE,yaxt="s",xaxt="s")
@@ -15,71 +18,53 @@ plot.predictYcond <- function(x,legend.loc="topleft",legend=x$object$Ynames,add=
           
           dots <- dots[setdiff(names(dots),c("ylim","ylab","yaxt","x","y","log","xaxt","axes"))]
 
-          if(length(list(...)$main)) 
+          if(!length(dots$main)) 
               {
-                  title1 <- as.character(list(...)$main)
-                  dots <- dots[setdiff(names(dots),"main")]
+                  dots$main <- "Conditional predicted values" #expression(E(Y~symbol("\174")~symbol("\114")))
               }
-          else title1 <- expression(E(Y~symbol("\174")~symbol("\114")))
 
-          if(length(list(...)$col)) 
+          if(!length(dots$col)) 
               {
-                  color <- as.vector(list(...)$col)
-                  dots <- dots[-which(names(dots)=="col")]
+                  dots$col <- rainbow(ny)
               }
-          else  color <- rainbow(ny)
-          color <- rep(color,length.out=ny)                            
+          color <- rep(dots$col,length.out=ny)                            
 
-          if(length(list(...)$type))    
+          if(!length(dots$type))    
               {
-                  type1 <- list(...)$type
-                  dots <- dots[-which(names(dots)=="type")]
+                  dots$type <- "l"
               }
-          else  type1 <- "l" 
 
-          if(length(list(...)$lty))    
+          if(!length(dots$lty))    
               {
-                  lty1 <- dots$lty
-                  dots <- dots[-which(names(dots)=="lty")]
+                  dots$lty <- 1
               }
-          else  lty1 <- 1 
           
-          if(length(list(...)$xlab)) 
+          if(!length(dots$xlab)) 
               {
-                  xlab1 <- as.character(list(...)$xlab)
-                  dots <- dots[setdiff(names(dots),"xlab")]
+                  dots$xlab <- "Latent process"
               }
-          else xlab1 <- "Latent process"
           
-          if(length(list(...)$frame.plot)) 
+          if(!length(dots$frame.plot)) 
               {
-                  frame.plot1 <- list(...)$frame.plot
-                  dots <- dots[setdiff(names(dots),"frame.plot")]
+                  dots$frame.plot <- FALSE
               }
-          else frame.plot1 <- FALSE   
           
-          if(length(list(...)$box.lty)) 
+          if(!length(dots$box.lty)) 
               {
-                  box.lty1 <- as.integer(list(...)$box.lty)
-                  dots <- dots[setdiff(names(dots),"box.lty")]
+                  dots$box.lty <- 0
               }
-          else box.lty1 <- 0
           
-          if(length(list(...)$inset)) 
+          if(!length(dots$inset)) 
               {
-                  inset1 <- list(...)$inset
-                  dots <- dots[setdiff(names(dots),"inset")]
+                  dots$inset <- c(0.05,0.05)
               }
-          else inset1 <- c(0.05,0.05)
 
-          if(length(list(...)$cex.axis)) 
+          if(!length(dots$cex.axis)) 
               {
-                  cex.axis1 <- list(...)$cex.axis
-                  dots <- dots[setdiff(names(dots),"cex.axis")]
-              }
-          else cex.axis1 <- 0.8   
+                  dots$ces.axis <- 0.8 
+              }   
 
-          if(length(list(...)$mar))
+          if(length(dots$mar))
               {
                   mar1 <- list(...)$mar
                   dots <- dots[setdiff(names(dots),"mar")]
@@ -112,7 +97,7 @@ plot.predictYcond <- function(x,legend.loc="topleft",legend=x$object$Ynames,add=
                       }
               }
 
-          linknodes <- x$object$linknodes
+          linknodes <- matrix(x$object$linknodes,ncol=ny)
           linktype <- x$object$linktype
           
           loc.grad <- function(y.grad,yk)
@@ -120,9 +105,15 @@ plot.predictYcond <- function(x,legend.loc="topleft",legend=x$object$Ynames,add=
                   (nsim*(y.grad-min(linknodes[1:nbnodes[yk],yk]))-y.grad+max(linknodes[1:nbnodes[yk],yk]))/(max(linknodes[1:nbnodes[yk],yk])-min(linknodes[1:nbnodes[yk],yk]))
               }
 
-          nbnodes <- rep(2,ny)
+      nbnodes <- rep(2,ny)
+      if(ny>1)
+      {
           nbnodes[which(linktype==2)] <- x$object$nbnodes
-          
+      }
+      else
+      {
+           nbnodes[which(linktype==2)] <- length(linknodes)
+      }
           
           oldmar <- par("mar")
           on.exit(par(mar=oldmar))
@@ -147,18 +138,18 @@ plot.predictYcond <- function(x,legend.loc="topleft",legend=x$object$Ynames,add=
 
           if(!isTRUE(add))
               {
-                  do.call("matplot",c(dots.plot,list(x=lambda,y=loc.y,type=type1,col=color,axes=FALSE,ylim=c(1,nsim),xlab=xlab1,ylab="",main=title1,lty=lty1)))
+                  do.call("matplot",c(dots.plot,list(x=lambda,y=loc.y,axes=FALSE,ylim=c(1,nsim),ylab="")))
 
                   names.axis <- c("lwd","lwd.ticks","hadj","padj","cex.axis","font.axis",
-                                  "xaxp","yaxp","tck","tcl","las","xpd","cex.axis")
+                                  "xaxp","yaxp","tck","tcl","las","xpd")
                   dots.axis <- dots[intersect(names(dots),names.axis)]                                                        
                   
-                  if(plot.axes$xaxt=="s") do.call("axis",c(dots.axis,list(side=1,col=1,cex.axis=cex.axis1)))
+                  if(plot.axes$xaxt=="s") do.call("axis",c(dots.axis,list(side=1,col=1)))
                   
                   y.grad <- pretty(min(linknodes[1:nbnodes[1],1]):max(linknodes[1:nbnodes[1],1]))
                   y.grad[1] <- round(min(linknodes[1:nbnodes[1],1]),2)
                   y.grad[length(y.grad)] <- round(max(linknodes[1:nbnodes[1],1]),2)
-                  if(plot.axes$yaxt=="s") do.call("axis",c(dots.axis,list(side=2,at=loc.grad(y.grad,1),labels=y.grad,col=color[1],col.axis=color[1],cex.axis=cex.axis1)))
+                  if(plot.axes$yaxt=="s") do.call("axis",c(dots.axis,list(side=2,at=loc.grad(y.grad,1),labels=y.grad,col=color[1],col.axis=color[1])))
 
                   if(ny>1)
                       {
@@ -167,13 +158,13 @@ plot.predictYcond <- function(x,legend.loc="topleft",legend=x$object$Ynames,add=
                                   y.grad <- pretty(min(linknodes[1:nbnodes[i],i]):max(linknodes[1:nbnodes[i],i]))
                                   y.grad[1] <- round(min(linknodes[1:nbnodes[i],i]),2)
                                   y.grad[length(y.grad)] <- round(max(linknodes[1:nbnodes[i],i]),2)
-                                  if(plot.axes$yaxt=="s") do.call("axis",c(dots.axis,list(side=ifelse(i%%2==0,4,2),at=loc.grad(y.grad,i),labels=y.grad,col=color[i],col.axis=color[i],cex.axis=cex.axis1,line=(round((i+0.1)/2)-1)*2)))
+                                  if(plot.axes$yaxt=="s") do.call("axis",c(dots.axis,list(side=ifelse(i%%2==0,4,2),at=loc.grad(y.grad,i),labels=y.grad,col=color[i],col.axis=color[i],line=(round((i+0.1)/2)-1)*2)))
                               }
                       }
               }
           else
               {
-                  do.call("matlines",c(dots.plot,list(x=lambda,y=loc.y,type=type1,col=color,axes=FALSE,lty=lty1)))   
+                  do.call("matlines",c(dots.plot,list(x=lambda,y=loc.y,axes=FALSE)))
               }
 
           if(ncol(x$pred)==5) ## avec IC
@@ -225,7 +216,7 @@ plot.predictYcond <- function(x,legend.loc="topleft",legend=x$object$Ynames,add=
                             "text.col","text.font","merge","trace","plot","ncol","horiz","title","xpd","title.col","title.adj","seg.len")    
           dots.leg <- dots[intersect(names(dots),names.legend)]
           
-          if(!is.null(legend)) do.call("legend",c(dots.leg,list(x=legend.loc,legend=legend,col=color,box.lty=box.lty1,inset=inset1,lty=lty1)))
+          if(!is.null(legend)) do.call("legend",c(dots.leg,list(x=legend.loc,legend=legend,col=color)))
       }
   else
       {

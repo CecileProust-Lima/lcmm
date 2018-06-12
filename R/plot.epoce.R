@@ -14,7 +14,6 @@
 #' 
 #' @name plot.pred.accuracy
 #' 
-#' @aliases plot.epoce plot.Diffepoce
 #' @param x an object inheriting from classes \code{epoce} or \code{Diffepoce}
 #' @param \dots other parameters to be passed through to plotting functions
 #' @return Returns plots related to \code{epoce} and \code{Diffepoce}

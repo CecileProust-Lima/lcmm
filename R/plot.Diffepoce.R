@@ -1,3 +1,4 @@
+#' @rdname plot.pred.accuracy
 #' @export
 plot.Diffepoce <- function(x,...)
 {
