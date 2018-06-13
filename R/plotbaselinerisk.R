@@ -17,42 +17,42 @@
 
    if(length(list(...)$main)) 
    {
-    title1 <- as.character(eval(match.call()$main))
+    title1 <- as.character(eval(dots$main))
     dots <- dots[setdiff(names(dots),"main")]
    }
    else title1 <- "Class-specific baseline risk functions"
 
    if(length(list(...)$col)) 
    {
-    color <- as.vector(eval(match.call()$col))
+    color <- as.vector(eval(dots$col))
     dots <- dots[-which(names(dots)=="col")]
    }
    else  color <- 1:ng                            
  
    if(length(list(...)$type))    
    {
-    type1 <- eval(match.call()$type)
+    type1 <- eval(dots$type)
     dots <- dots[-which(names(dots)=="type")]
    }
    else  type1 <- "l"
       
    if(length(list(...)$xlab)) 
    {
-    xlab1 <- as.character(eval(match.call()$xlab))
+    xlab1 <- as.character(eval(dots$xlab))
     dots <- dots[setdiff(names(dots),"xlab")]
    }
    else xlab1 <- "Time"
    
    if(length(list(...)$ylab)) 
    {
-    ylab1 <- as.character(eval(match.call()$ylab))
+    ylab1 <- as.character(eval(dots$ylab))
     dots <- dots[setdiff(names(dots),"ylab")]
    }
    else ylab1 <- "Baseline risk function" 
    
    if(length(list(...)$lty))    
    {
-    lty1 <- eval(match.call()$lty)
+    lty1 <- eval(dots$lty)
     dots <- dots[-which(names(dots)=="lty")]
    }
    else  lty1 <- 1:ng  
@@ -61,14 +61,14 @@
    
    if(length(list(...)$box.lty)) 
    {
-    box.lty1 <- as.integer(eval(match.call()$box.lty))
+    box.lty1 <- as.integer(eval(dots$box.lty))
     dots <- dots[setdiff(names(dots),"box.lty")]
    }
    else box.lty1 <- 0
    
    if(length(list(...)$inset)) 
    {
-    inset1 <- eval(match.call()$inset)
+    inset1 <- eval(dots$inset)
     dots <- dots[setdiff(names(dots),"inset")]
    }
    else inset1 <- c(0.05,0.05)
@@ -84,11 +84,11 @@
   
   if(!isTRUE(add))
   {
-   do.call("matplot",c(dots.plot,list(x=x$predSurv[,1],y=x$predSurv[,(1+(event-1)*ng+1:ng)],xlab=xlab1,ylab=ylab1,main=title1,type=type1,col=color)))
+   do.call("matplot",c(dots.plot,list(x=x$predSurv[,1],y=x$predSurv[,(1+(event-1)*ng+1:ng)],xlab=xlab1,ylab=ylab1,main=title1,type=type1,col=color,lty=lty1)))
   }
   else
   {
-   do.call("matlines",c(dots.plot,list(x=x$predSurv[,1],y=x$predSurv[,(1+(event-1)*ng+1:ng)],type=type1,col=color)))
+   do.call("matlines",c(dots.plot,list(x=x$predSurv[,1],y=x$predSurv[,(1+(event-1)*ng+1:ng)],type=type1,col=color,lty=lty1)))
   }
   
   names.legend <- c("fill","border","lty","lwd","pch","angle","density","bg","box.lwd",   
