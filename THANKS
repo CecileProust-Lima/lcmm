@@ -1,7 +1,7 @@
 Fundings and special thanks :
 -----------------------------
 
-Development of lcmm was part of the ANR-funded project MOBIDYQ, grant n° 2010 PRSP 006 01, and the IRESP-funded project MULTIPLE, grant n° AAP12CanBio16.
+Development of lcmm was part of the ANR-funded project MOBIDYQ, grant #2010 PRSP 006 01, and the IRESP-funded project MULTIPLE, grant #AAP12CanBio16.
 
 The authors warmly thank Thomas A. Gerds for his very useful R package Refresh which we used a million times to re-build and/or check lcmm. 
 Refresh can be downloaded at: http://staff.pubhealth.ku.dk/~tag/research/Rontology/Refresh-snps.html

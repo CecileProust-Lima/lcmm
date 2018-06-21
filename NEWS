@@ -2,11 +2,20 @@ News about R package lcmm :
 ---------------------------
 
 
-The companion paper is accepted in Journal of Statistical Software and available on arxiv! 
+A detailed companion paper is available in Journal of Statistical Software: 
 
-Proust-Lima C, Philipps V, Liquet B (2015). Estimation of Extended Mixed Models Using Latent Classes and Latent Processes: the R package lcmm, Arxiv
+Proust-Lima C, Philipps V, Liquet B. Estimation of Extended Mixed Models Using Latent Classes and Latent Processes: The R Package lcmm. Journal of Statistical Software, Articles. 2017;78(2):1???56. 
 
-http://arxiv.org/abs/1503.00890
+https://www.jstatsoft.org/article/view/v078i02
+
+
+Changes in Version 1.7.9 :
+
+* bug in summary when the model did not converge
+* bug in dynpred when draws=TRUE and only 1 horizon or 1 landmark, or when o covariates are included in the survival model, or when using factor
+* bug in Jointlcmm when using B=m1
+* bug in plot.predictY with CI
+* bug in Jointlcmm when B=random(m1)
 
 
 Changes in Version 1.7.8 :
