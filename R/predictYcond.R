@@ -57,8 +57,8 @@
 predictYcond <- function(x,lprocess,nsim=200,draws=FALSE,ndraws=2000,...)
 {
     if((!class(x) %in% c("lcmm","multlcmm","Jointlcmm"))) stop("Use only with lcmm, multlcmm or Jointlcmm objects")
-    if((class(x)=="lcmm") & (x$linktype==3)) stop("This function is not available for ordinal outcome")
-    if((class(x)=="Jointlcmm") & (x$linktype==-1)) stop("This function is not available without any link function")
+    if((class(x)=="lcmm") & any(x$linktype==3)) stop("This function is not available for ordinal outcome")
+    if((class(x)=="Jointlcmm") & any(x$linktype==-1)) stop("This function is not available without any link function")
     
     if(x$conv!=1 & draws==TRUE)
     {
