@@ -2,7 +2,7 @@ Package: lcmm
 Type: Package
 Title: Extended Mixed Models Using Latent Classes and Latent Processes
 Version: 1.7.9
-Date: 2018-06-08
+Date: 2018-06-22
 Author: Cecile Proust-Lima, Viviane Philipps, Amadou Diakite and Benoit Liquet
 Maintainer: Cecile Proust-Lima <cecile.proust-lima@inserm.fr>
 Description: Estimation of various extensions of the mixed models including latent class mixed models, joint latent latent class mixed models and mixed models for curvilinear univariate or multivariate longitudinal outcomes using a maximum likelihood estimation method.
