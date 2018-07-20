@@ -13,7 +13,7 @@
     
     if(length(list(...)$main)) 
     {
-     main1 <- as.character(eval(match.call()$main))
+     main1 <- as.character(eval(dots$main))
      dots <- dots[setdiff(names(dots),"main")]
     }
     else main1 <- c("marginal residuals versus marginal predictions", "subject-specific residuals versus subject-specific predictions","Normal QQ Plot for marginal residuals","Normal QQ Plot for subject-specific residuals")
@@ -21,7 +21,7 @@
     
     if(length(list(...)$xlab)) 
     {
-     xlab1 <- as.character(eval(match.call()$xlab))
+     xlab1 <- as.character(eval(dots$xlab))
      dots <- dots[setdiff(names(dots),"xlab")]
     }
     else xlab1 <- c("marginal predictions","subject-specific predictions","theoretical quantiles","theoretical quantiles")
@@ -29,7 +29,7 @@
  
     if(length(list(...)$ylab)) 
     {
-     ylab1 <- as.character(eval(match.call()$ylab))
+     ylab1 <- as.character(eval(dots$ylab))
      dots <- dots[setdiff(names(dots),"ylab")]
     }
     else ylab1 <- c("marginal residuals","subject-specific residuals","sample quantiles","sample quantiles")

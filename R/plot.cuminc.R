@@ -93,14 +93,14 @@ plot.cuminc <- function(x,profil=1,event=1,add=FALSE,legend,legend.loc="topleft"
         
         if(length(list(...)$box.lty)) 
             {
-                box.lty1 <- as.integer(eval(match.call()$box.lty))
+                box.lty1 <- as.integer(eval(dots$box.lty))
                 dots <- dots[setdiff(names(dots),"box.lty")]
             }
         else box.lty1 <- 0
 
         if(length(list(...)$inset))
             {
-                inset1 <- eval(match.call()$inset)
+                inset1 <- eval(dots$inset)
                 dots <- dots[setdiff(names(dots),"inset")]
             }
         else inset1 <- c(0.02,0.02)

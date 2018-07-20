@@ -51,14 +51,14 @@ plot.epoce <- function(x,...)
 
         if(length(list(...)$add))
             {
-                add <- eval(match.call()$add)
+                add <- eval(dots$add)
             }
         else
             add <- FALSE
         
    if(length(list(...)$main)) 
    {
-    title1 <- as.character(eval(match.call()$main))
+    title1 <- as.character(eval(dots$main))
     dots <- dots[setdiff(names(dots),"main")]
    }
    else 
@@ -69,14 +69,14 @@ plot.epoce <- function(x,...)
 
    if(length(list(...)$type))    
    {
-    type1 <- eval(match.call()$type)
+    type1 <- eval(dots$type)
     dots <- dots[-which(names(dots)=="type")]
    }
    else  type1 <- "o"
 
    if(length(list(...)$pch))    
    {
-    pch1 <- eval(match.call()$pch)
+    pch1 <- eval(dots$pch)
     dots <- dots[-which(names(dots)=="pch")]
    }
    else  pch1 <- 18
@@ -84,14 +84,14 @@ plot.epoce <- function(x,...)
  
    if(length(list(...)$xlab)) 
    {
-    xlab1 <- as.character(eval(match.call()$xlab))
+    xlab1 <- as.character(eval(dots$xlab))
     dots <- dots[setdiff(names(dots),"xlab")]
    }
    else xlab1 <- "prediction time"
 
    if(length(list(...)$ylab)) 
    {
-    ylab1 <- as.character(eval(match.call()$ylab))
+    ylab1 <- as.character(eval(dots$ylab))
     dots <- dots[setdiff(names(dots),"ylab")]
    }
    else 
@@ -106,7 +106,7 @@ plot.epoce <- function(x,...)
 
    if(length(list(...)$ylim)) 
    {
-       ylim1 <- eval(match.call()$ylim)
+       ylim1 <- eval(dots$ylim)
        dots <- dots[setdiff(names(dots),"ylim")]
    }
    else

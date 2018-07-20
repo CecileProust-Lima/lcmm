@@ -11,63 +11,63 @@ plot.Diffepoce <- function(x,...)
 
         if(length(list(...)$add))
             {
-                add <- eval(match.call()$add)
+                add <- eval(dots$add)
             }
         else
             add <- FALSE
 
    if(length(list(...)$main)) 
    {
-    title1 <- as.character(eval(match.call()$main))
+    title1 <- as.character(eval(dots$main))
     dots <- dots[setdiff(names(dots),"main")]
    }
    else title1 <- "Difference in EPOCE estimates"  
    
    if(length(list(...)$col)) 
    {
-    color <- as.vector(eval(match.call()$col))
+    color <- as.vector(eval(dots$col))
     dots <- dots[-which(names(dots)=="col")]
    }
    else  color <- c("black","black","black","lightgrey")                             
 
    if(length(list(...)$type))    
    {
-    type1 <- eval(match.call()$type)
+    type1 <- eval(dots$type)
     dots <- dots[-which(names(dots)=="type")]
    }
    else  type1 <- c("o","o","o","l")
 
    if(length(list(...)$pch))    
    {
-    pch1 <- eval(match.call()$pch)
+    pch1 <- eval(dots$pch)
     dots <- dots[-which(names(dots)=="pch")]
    }
    else  pch1 <- c(18,18,18,NA)
 
    if(length(list(...)$lty))    
    {
-    lty1 <- eval(match.call()$lty)
+    lty1 <- eval(dots$lty)
     dots <- dots[-which(names(dots)=="lty")]
    }
    else  lty1 <- c(1,3,3,1)
 
    if(length(list(...)$ylim)) 
    {
-    ylim1 <- eval(match.call()$ylim)
+    ylim1 <- eval(dots$ylim)
     dots <- dots[setdiff(names(dots),"ylim")]
    }
    else ylim1 <- c(min(x$DiffEPOCE[!(is.na(x$DiffEPOCE[,2])),2],x$DiffEPOCE[!(is.na(x$DiffEPOCE[,3])),3]),max(x$DiffEPOCE[!(is.na(x$DiffEPOCE[,2])),2],x$DiffEPOCE[!(is.na(x$DiffEPOCE[,4])),4]))
    
    if(length(list(...)$xlab)) 
    {
-    xlab1 <- as.character(eval(match.call()$xlab))
+    xlab1 <- as.character(eval(dots$xlab))
     dots <- dots[setdiff(names(dots),"xlab")]
    }
    else xlab1 <- "prediction time"
 
    if(length(list(...)$ylab)) 
    {
-    ylab1 <- as.character(eval(match.call()$ylab))
+    ylab1 <- as.character(eval(dots$ylab))
     dots <- dots[setdiff(names(dots),"ylab")]
    }
    else 

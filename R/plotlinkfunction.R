@@ -10,14 +10,14 @@
 
    if(length(list(...)$main)) 
    {
-    title1 <- as.character(eval(match.call()$main))
+    title1 <- as.character(eval(dots$main))
     dots <- dots[setdiff(names(dots),"main")]
    }
    else title1 <- "Estimated link function"                          
 
    if(length(list(...)$type))    
    {
-    type1 <- eval(match.call()$type)
+    type1 <- eval(dots$type)
     dots <- dots[-which(names(dots)=="type")]
    }
    else  type1 <- "l" 
@@ -29,14 +29,14 @@
    }        
    if(length(list(...)$xlab)) 
    {
-    xlab1 <- as.character(eval(match.call()$xlab))
+    xlab1 <- as.character(eval(dots$xlab))
     dots <- dots[setdiff(names(dots),"xlab")]
    }
    else xlab1 <- "Latent process"
    
    if(length(list(...)$ylab)) 
    {
-    ylab1 <- as.character(eval(match.call()$ylab))
+    ylab1 <- as.character(eval(dots$ylab))
     dots <- dots[setdiff(names(dots),"ylab")]
    }
    else ylab1 <- "Longitudinal outcome"
@@ -54,7 +54,7 @@
    xlim1 <- c(min(x$estimlink[,2]),max(x$estimlink[,2]))
   }
 
-  if("xlim" %in% names(match.call())) xlim1 <- eval(match.call()$xlim) 
+  if("xlim" %in% names(dots)) xlim1 <- eval(dots$xlim) 
 
   
   names.plot <- c("adj","ann","asp","axes","bg","bty","cex","cex.axis","cex.lab","cex.main","cex.sub","col","col.axis",

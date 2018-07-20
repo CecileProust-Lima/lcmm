@@ -14,72 +14,72 @@
 
    if(length(list(...)$main))
    {
-    title1 <- as.character(eval(match.call()$main))
+    title1 <- as.character(eval(dots$main))
     dots <- dots[setdiff(names(dots),"main")]
    }
    else title1 <- "Class-specific event-free probability"
 
    if(length(list(...)$type))
    {
-    type1 <- eval(match.call()$type)
+    type1 <- eval(dots$type)
     dots <- dots[-which(names(dots)=="type")]
    }
    else  type1 <- "l"
 
    if(length(list(...)$ylim))
    {
-    ylim1 <- eval(match.call()$ylim)
+    ylim1 <- eval(dots$ylim)
     dots <- dots[setdiff(names(dots),"ylim")]
    }
    else ylim1 <- c(0,1)
 
    if(length(list(...)$xlab))
    {
-    xlab1 <- as.character(eval(match.call()$xlab))
+    xlab1 <- as.character(eval(dots$xlab))
     dots <- dots[setdiff(names(dots),"xlab")]
    }
    else xlab1 <- "Time"
 
    if(length(list(...)$ylab))
    {
-    ylab1 <- as.character(eval(match.call()$ylab))
+    ylab1 <- as.character(eval(dots$ylab))
     dots <- dots[setdiff(names(dots),"ylab")]
    }
    else ylab1 <- "Event-free probability"
 
    if(length(list(...)$col))
    {
-    color <- as.vector(eval(match.call()$col))
+    color <- as.vector(eval(dots$col))
     dots <- dots[-which(names(dots)=="col")]
    }
    else  color <- 1:ng
    
    if(length(list(...)$lty))
    {
-    lty1 <- as.vector(eval(match.call()$lty))
+    lty1 <- as.vector(eval(dots$lty))
     dots <- dots[-which(names(dots)=="lty")]
    }
    else  lty1 <- 1:ng
 
    if(missing(legend)) legend <- paste("class",1:ng,sep="")
 
-#   if("legend" %in% names(match.call()))
+#   if("legend" %in% names(dots))
 #   {
-#    nomsleg <- eval(match.call()$legend)
+#    nomsleg <- eval(dots$legend)
 #    dots <- dots[setdiff(names(dots),"legend")]
 #   }
 #   else nomsleg <- paste("class",1:ng,sep="")
 
    if(length(list(...)$box.lty))
    {
-    box.lty1 <- as.character(eval(match.call()$box.lty))
+    box.lty1 <- as.character(eval(dots$box.lty))
     dots <- dots[setdiff(names(dots),"box.lty")]
    }
    else box.lty1 <- 0
 
    if(length(list(...)$inset))
    {
-    inset1 <- eval(match.call()$inset)
+    inset1 <- eval(dots$inset)
     dots <- dots[setdiff(names(dots),"inset")]
    }
    else inset1 <- c(0.02,0.02)
@@ -97,7 +97,7 @@
   }
   else
   {
-   do.call("matlines",c(dots.plot,list(x$predSurv[,1],y=exp(-x$predSurv[,(1+ng+1:ng)]),type=type1,col=color))) 
+   do.call("matlines",c(dots.plot,list(x$predSurv[,1],y=exp(-x$predSurv[,(1+ng+1:ng)]),type=type1,col=color,lty=lty1))) 
   }
   
   names.legend <- c("fill","border","lty","lwd","pch","angle","density","bg","box.lwd",

@@ -14,7 +14,7 @@
 
                     if(length(list(...)$main)) 
                         {
-                            title1 <- as.character(eval(match.call()$main))
+                            title1 <- as.character(eval(dots$main))
                             dots <- dots[setdiff(names(dots),"main")]
                             title1 <- rep(title1,length.out=x$ng)
                         }
@@ -22,7 +22,7 @@
                     
                     if(length(list(...)$xlab)) 
                         {
-                            xlab1 <- as.character(eval(match.call()$xlab))
+                            xlab1 <- as.character(eval(dots$xlab))
                             dots <- dots[setdiff(names(dots),"xlab")]
                             xlab1 <- rep(xlab1,length.out=x$ng)
                         }
@@ -30,14 +30,14 @@
                     
                     if(length(list(...)$probability)) 
                         {
-                            prob1 <- as.character(eval(match.call()$probability))
+                            prob1 <- as.character(eval(dots$probability))
                             dots <- dots[setdiff(names(dots),"probability")]
                         }
                     else prob1 <- TRUE
 
                     if(length(list(...)$col)) 
                         {
-                            color <- as.character(eval(match.call()$col))
+                            color <- as.character(eval(dots$col))
                             dots <- dots[setdiff(names(dots),"col")]
                             color <- rep(color,length.out=x$ng)
                         }
@@ -45,12 +45,13 @@
                     
                     if(length(list(...)$border)) 
                         {
-                            border1 <- as.character(eval(match.call()$border))
+                            border1 <- as.character(eval(dots$border))
                             dots <- dots[setdiff(names(dots),"border")]
                             border1 <- rep(border1,length.out=x$ng)
                         }
                     else border1 <- NULL
 
+                    par(mfrow=n2mfrow(x$ng))
                     for(i in 1:x$ng)
                         {
                             do.call("hist",c(dots,list(x=x$pprob[,i+2],probability=prob1,xlab=xlab1[i],main=title1[i],col=color[i],border=border1[i])))   #va pas si col=1:ng
