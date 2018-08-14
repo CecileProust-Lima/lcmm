@@ -29,8 +29,7 @@ is included. If no intercept, \code{-1} should be the first term included.}
 
 \item{random}{an optional one-sided formula for the random-effects in the
 latent process mixed model. Covariates with a random-effect are separated by
-\code{+}.  By default, an intercept is included. If no intercept, \code{-1}
-should be the first term included.}
+\code{+}.  By default, no random effect is included.}
 
 \item{subject}{name of the covariate representing the grouping structure.}
 
