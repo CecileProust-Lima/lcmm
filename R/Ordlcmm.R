@@ -12,8 +12,6 @@
 
     nom.subject <- as.character(subject)
 
-#### INCLUSION PRIOR
-    nom.prior <- as.character(args$prior)
 ####
     if(!missing(mixture) & ng==1) stop("No mixture can be specified with ng=1")
     if(missing(mixture) & ng>1) stop("The argument mixture has to be specified for ng > 1")
@@ -251,7 +249,7 @@
 #### INCLUSION PRIOR 
     if(missing(prior)){ PRIOR <- seq(0,length=length(IND))} 
     if(!missing(prior)){ 
-        PRIOR <- newdata[,nom.prior]
+        PRIOR <- newdata[,prior]
         PRIOR[(is.na(PRIOR))] <- 0
     }
 ####
