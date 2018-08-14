@@ -171,8 +171,7 @@
 #' is included. If no intercept, \code{-1} should be the first term included.
 #' @param random an optional one-sided formula for the random-effects in the
 #' latent process mixed model. Covariates with a random-effect are separated by
-#' \code{+}.  By default, an intercept is included. If no intercept, \code{-1}
-#' should be the first term included.
+#' \code{+}.  By default, no random effect is included.
 #' @param subject name of the covariate representing the grouping structure.
 #' @param classmb an optional one-sided formula describing the covariates in
 #' the class-membership multinomial logistic model. Covariates included are

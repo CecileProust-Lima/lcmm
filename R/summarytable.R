@@ -25,7 +25,7 @@ summarytable <- function(m1,...,which=c("G","loglik","npm","BIC","%class"))
     {
         if(missing(m1)) stop("At least one model should be specified")
         if(!(class(m1) %in% c("hlme","lcmm","multlcmm","Jointlcmm"))) stop("Use with 'hlme', 'lcmm' , 'multlcmm', or 'Jointlcmm' objects only")
-        if(any(!(which %in% c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "%class")))) stop(paste("which should contain elements among",paste(c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "%class"),collapse=", ")))
+        if(any(!(which %in% c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "scoretest", "%class")))) stop(paste("which should contain elements among",paste(c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "scoretest", "%class"),collapse=", ")))
 
         dots <- list(...)
 
@@ -78,15 +78,17 @@ summarytable <- function(m1,...,which=c("G","loglik","npm","BIC","%class"))
         }
 
         ## tous les indicateurs pour le modele m1
-        tmp <- c(m1$ng,m1$loglik,m1$conv,length(m1$best)-length(eval(m1$call$posfix)),m1$AIC,m1$BIC,sabic(m1),entropy(m1))
+        pscoretest <- NA
+        if(class(m1)=="Jointlcmm") pscoretest <- round((1-pchisq(m1$scoretest[1],sum(m1$idea))),4)
+        tmp <- c(m1$ng,m1$loglik,m1$conv,length(m1$best)-length(eval(m1$call$posfix)),m1$AIC,m1$BIC,sabic(m1),entropy(m1),pscoretest)
         for(g in 1:m1$ng)
             {
                 tmp <- c(tmp,length(which(m1$pprob[,2]==g))/m1$ns*100)
             }
         if(m1$ng<max(ng)) tmp <- c(tmp,rep(NA,max(ng)-m1$ng))
         
-        res <- matrix(tmp,nrow=1,ncol=8+max(ng))
-        colnames(res) <- c("G","loglik","conv","npm","AIC","BIC","SABIC","entropy",paste("%class",1:max(ng),sep=""))
+        res <- matrix(tmp,nrow=1,ncol=9+max(ng))
+        colnames(res) <- c("G","loglik","conv","npm","AIC","BIC","SABIC","entropy","scoretest",paste("%class",1:max(ng),sep=""))
 
         ## tous les indicateurs pour les autres modeles
         if(nbmodels>0)
@@ -94,8 +96,9 @@ summarytable <- function(m1,...,which=c("G","loglik","npm","BIC","%class"))
                 for(i in 2:(nbmodels+1))
                     {
                         m <- get(paste("m",i,sep=""))
-                        
-                        tmp <- c(m$ng,m$loglik,m$conv,length(m$best)-length(eval(m$call$posfix)),m$AIC,m$BIC,sabic(m),entropy(m))
+                        pscoretest <- NA
+                        if(class(m)=="Jointlcmm") pscoretest <- round((1-pchisq(m$scoretest[1],sum(m$idea))),4)
+                        tmp <- c(m$ng,m$loglik,m$conv,length(m$best)-length(eval(m$call$posfix)),m$AIC,m$BIC,sabic(m),entropy(m),pscoretest)
                         
                         for(g in 1:m$ng)
                             {
