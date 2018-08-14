@@ -317,4 +317,20 @@ plot.Jointlcmm <- function(x,which="residuals",var.time,break.times,marg,event,s
 
 
 
-#plot <- function(x,...) UseMethod("plot")
+#' @rdname plot
+#' @export
+plot.mpjlcmm <- function(x,which,event,...)
+{
+    if(missing(x)) stop("The model should be specified")
+    if(!inherits(x,"mpjlcmm")) stop("Use with 'mpjlcmm' objects only")
+    
+    if(which %in% c("residuals","link","linkfunction","fit")) stop(paste("For ",paste(c("residuals","link","linkfunction","fit"),collapse=" "),", please see the 'update' function",sep=""))
+    
+    if(!(which %in% c("hazard","baselinerisk","survival"))) stop("Argument 'which' should be one of hazard, baselinerisk or survival.")
+
+    xx <- list(N=c(rep(0,9+x$nbevt)), conv=x$conv, predSurv=x$predSurv, ng=x$ng)
+    class(xx) <- "Jointlcmm"
+    
+    plot.Jointlcmm(xx,which=which,event=event,...)
+}
+

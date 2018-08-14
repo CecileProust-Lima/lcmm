@@ -745,6 +745,51 @@
             }
         
 
+        ## faire wRandom et b0Random
+        NEF2 <- sum(idg0!=0)-1
+        NPM2 <- NEF2+NVC+ntrtot0+ncor0
+        wRandom <- rep(0,NPM)
+        b0Random <- rep(0,ng-1) # nprob 
+        
+        l <- 0
+        t <- 0
+        for (i in 1:nvar.exp)
+        {
+            if(idg0[i]==1)
+            {
+                if(i==1) next
+                l <- l+1
+                t <- t+1
+                wRandom[NPROB+t] <- l
+            }
+            if(idg0[i]==2)
+            {
+                if(i==1)
+                {
+                    t <- t+ng-1
+                    next
+                }
+                l <- l+1
+                for (g in 1:ng)
+                {
+                    t <- t+1
+                    wRandom[NPROB+t] <- l
+                }
+            }
+        }
+
+        if(NVC>0)
+        {
+            wRandom[NPROB+NEF+1:NVC] <- NEF2+1:NVC
+        }
+        if(NW>0)
+        {
+            b0Random <- c(b0Random,rep(1,ng-1))
+        }
+        wRandom[NPROB+NEF+NVC+NW+1:ntrtot0] <- NEF2+NVC+1:ntrtot0
+        if (ncor0>0) {wRandom[NPROB+NEF+NVC+NW+ntrtot0+1:ncor0] <- NEF2+NVC+ntrtot0+1:ncor0}
+        ## wRandom et b0Random ok.
+        
         ##------------------------------------------
         ##------nom au vecteur best
         ##--------------------------------------------
