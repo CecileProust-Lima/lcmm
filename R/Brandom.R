@@ -1,3 +1,4 @@
+#' @export
 Brandom <- function(theta0,v0,w,b0,chol=NULL,mult=0)
 {
     b <- rep(NA,length(w)) # initialisation

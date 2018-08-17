@@ -6,6 +6,7 @@
 \alias{plot.lcmm}
 \alias{plot.multlcmm}
 \alias{plot.Jointlcmm}
+\alias{plot.mpjlcmm}
 \title{Plot of a fitted model}
 \usage{
 \method{plot}{hlme}(x, which = "residuals", var.time, break.times, marg,
@@ -19,6 +20,8 @@
 
 \method{plot}{Jointlcmm}(x, which = "residuals", var.time, break.times, marg,
   event, subset, shades, ...)
+
+\method{plot}{mpjlcmm}(x, which, event, ...)
 }
 \arguments{
 \item{x}{an object inheriting from classes \code{hlme}, \code{lcmm},
