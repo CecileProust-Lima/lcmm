@@ -24,7 +24,7 @@ permut <- function(m,order,estim=TRUE)
 
         if(!(class(m) %in% c("hlme","lcmm","multlcmm","Jointlcmm"))) stop("Please use this function only with hlme, lcmm, multlcmm or Jointlcmm models")
         if(ng==1) stop("Please use this function only with latent classes")
-        if(length(order)!=ng) stop(paste("Argument 'order' shouldbe of length",ng))
+        if(length(order)!=ng) stop(paste("Argument 'order' should be of length",ng))
         if(!all(order %in% 1:ng)) stop(paste("Please specify classes between 1 and",ng,"in argument 'order'",collapse=" "))
         if(!all(c(1:ng) %in% order)) stop("Please specify all the classes in argument 'order'")
 
@@ -107,7 +107,7 @@ permut <- function(m,order,estim=TRUE)
                                                     }
                                                 if(idspecif[ke,j]==2) # coef en mixture
                                                     {
-                                                        bnew[m$N[1]+m$N[2]+avt1+1:ng] <- m$best[m$N[1]+m$N[2]+avt+order] # echanger les coef
+                                                        bnew[m$N[1]+m$N[2]+avt+1:ng] <- m$best[m$N[1]+m$N[2]+avt+order] # echanger les coef
                                                         avt <- avt+ng
                                                     }
                                             }

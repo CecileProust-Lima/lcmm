@@ -77,7 +77,7 @@
 #' Association 91, 217-21
 #' @keywords package
 #' @importFrom graphics axis hist lines matlines matplot mtext par plot points segments polygon
-#' @importFrom grDevices rainbow rgb col2rgb
+#' @importFrom grDevices rainbow rgb col2rgb n2mfrow
 #' @importFrom stats as.formula formula get_all_vars integrate median model.frame model.matrix na.fail na.omit na.pass pchisq pnorm qnorm quantile rnorm sd terms residuals vcov fitted coef
 #' @importFrom survival Surv untangle.specials
 #' @useDynLib lcmm, .registration=TRUE, .fixes="C_"
