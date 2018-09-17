@@ -23,6 +23,17 @@
 #' the event-specific cumulative incidences in each latent class at the
 #' different times specified.
 #' @author Viviane Philipps and Cecile Proust-Lima
+#' @examples
+#' m2 <- Jointlcmm(fixed= Ydep1~Time*X1,mixture=~Time,random=~Time,
+#' classmb=~X3,subject='ID',survival = Surv(Tevent,Event)~X1+mixture(X2),
+#' hazard="3-quant-splines",hazardtype="PH",ng=2,data=data_lcmm,
+#' B=c(0.64,-0.62,0,0,0.52,0.81,0.41,0.78,0.1,0.77,-0.05,10.43,11.3,-2.6,
+#' -0.52,1.41,-0.05,0.91,0.05,0.21,1.5))
+#'
+#' par(mfrow=c(1,2))
+#' plot(cuminc(m2,time=seq(0,20),X1=0,X2=0), ylim=c(0,1))
+#' plot(cuminc(m2,time=seq(0,20),X1=0,X2=1), ylim=c(0,1))
+#' 
 #' @seealso
 #' \code{\link{Jointlcmm}}, \code{\link{plot.Jointlcmm}}, \code{\link{plot.cuminc}}
 #' @export
