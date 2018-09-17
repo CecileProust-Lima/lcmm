@@ -374,6 +374,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     if(missing(data)){ stop("The argument data should be specified and defined as a data.frame")}
     if(nrow(data)==0) stop("Data should not be empty")
     if(missing(subject)){ stop("The argument subject must be specified")}
+    if(!is.numeric(data[,subject])) stop("The argument subject must be numeric")
     if(any(link=="thresholds"))  stop("The link function thresholds is not available in multivariate case")
     if(all(link %in% c("linear","beta")) & !is.null(intnodes)) stop("Intnodes should only be specified with splines links")
 
