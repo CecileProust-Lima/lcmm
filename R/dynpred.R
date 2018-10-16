@@ -827,7 +827,7 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                                     if(nvdepsurv>0)
                                         {
                                             itimedepvar <- which(colnames(Xevt_ns)==model$Names$TimeDepVar.name)
-                                            tint <- Xevt[i,itimedepvar]
+                                            tint <- Xevt_ns[i,itimedepvar]
                                             Xevt <- as.vector(Xevt_ns[i,-itimedepvar])
                                         }
                                     else
@@ -842,7 +842,7 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                                     for (g in 1:ng)
                                         {
                                             ## coef pour la classe g
-                                            bevt <- matrix(0,length(which(idsurv!=0)),nbevt)
+                                            bevt <- matrix(0,length(which(idsurv!=0))-nvdepsurv,nbevt)
                                             bevtint <- rep(0,nbevt)
                                             l <- 0
                                             kcurr <- 0
@@ -1142,7 +1142,7 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                                             if(nvdepsurv>0)
                                                 {
                                                     itimedepvar <- which(colnames(Xevt_ns)==model$Names$TimeDepVar.name)
-                                                    tint <- Xevt[i,itimedepvar]
+                                                    tint <- Xevt_ns[i,itimedepvar]
                                                     Xevt <- as.vector(Xevt_ns[i,-itimedepvar])
                                                 }
                                             else
@@ -1158,7 +1158,7 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                                             for (g in 1:ng)
                                                 {
                                                     ## coef pour la classe g
-                                                    bevt <- matrix(0,length(which(idsurv!=0)),nbevt)
+                                                    bevt <- matrix(0,length(which(idsurv!=0))-nvdepsurv,nbevt)
                                                     bevtint <- rep(0,nbevt)
                                                     l <- 0
                                                     kcurr <- 0
