@@ -690,7 +690,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 next
             }
             
-            ym <- dataY$measureY[which((dataY$processK==1) & (dataY$outcomeM==m))]
+            ym <- dataY$measureY[which((dataY$processK==k) & (dataY$outcomeM==m))]
             uniqueTemp <- sort(unique(ym))
             permut <- order(order(ym))  # sort(y)[order(order(y))] = y
             if(length(as.vector(table(ym)))==length(uniqueTemp))

@@ -551,7 +551,6 @@
             go to 1236
          end if
       end if
-
       
       ! creer base de splines si au moins un hazard splines
       if(nbevt.gt.0) then
@@ -1106,10 +1105,10 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
                    b1(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+nvc(k)+nw(k)+ &
                    ncor(k)+nerr(k)+nalea(k)+sumntr+kk)
            end do
-           !if(i==1 .and. id==0 .and. jd==0) print*,"eta0=",eta0,"splaa=",sqrt(splaa)
+           !if(i<=5 .and. id==0 .and. jd==0) print*,"eta0=",eta0,"splaa=",sqrt(splaa)
            do j=1,nmes(i,sumny+yk)
               ll=0
-              !if(i==1 .and. id==0 .and. jd==0) print*,"Y=",Y(nmescur+sumMesYk+j)
+              !if(i<=5 .and. id==0 .and. jd==0) print*,"Y=",Y(nmescur+sumMesYk+sumparK+j)
               if (abs(Y(nmescur+sumMesYk+sumparK+j)-zitr(ntr(sumny+yk)-2,numSPL)).lt.1.d-6) then
                  ll=ntr(sumny+yk)-3
               end if
@@ -1121,7 +1120,8 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
                     ll=kk-1
                  end if
               end do
-
+!if(i<=5 .and. id==0 .and. jd==0) print*,"ll=",ll,"im=",im(1:10),"im1=",im1(1:10),"im2=",im2(1:10)
+           
               if (ll.lt.1.or.ll.gt.ntr(sumny+yk)-3) then          
                  vrais_mpj_i=-1.d9
                  !print*,"-1.d9 ll<1 ou ll>ntrtot-3"
@@ -1140,10 +1140,11 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
               jacobien = jacobien + log(splaa(ll-2)*mm2(indiceY(nmescur+sumMesYk+sumparK+j))&
                    +splaa(ll-1)*mm1(indiceY(nmescur+sumMesYk+sumparK+j))&
                    +splaa(ll)*mm(indiceY(nmescur+sumMesYk+sumparK+j)))
+             ! if(i<=5 .and. id==0 .and. jd==0) print*,"Ytrans=",Y1(sumMesYk+sumparK+j)
            end do
         else if(idlink(sumny+yk).eq.-1) then
            do j=1,nmes(i,sumny+yk)
-              Y1(sumMesYk+sumparK+j)=Y(sumMesYk+sumparK+j)
+              Y1(sumMesYk+sumparK+j)=Y(nmescur+sumMesYk+sumparK+j)
            end do
         end if
         sumntr = sumntr + ntr(sumny+yk)
@@ -2031,7 +2032,6 @@ end function vrais_mpj
       double precision ::ht,htm,ht2,ht3,h,hh,h2,h3,h2n,hn,hht
 
       nytot=sum(ny(:))
-      
       ier=0
       jj=0
       l=0
@@ -2048,7 +2048,6 @@ end function vrais_mpj
                   end if
                 End do  
 
-
             if (abs(uniqueY(sumnval+jj)-zitr(ntr(yk)-2,q)).lt.1.d-6) then
                l=ntr(yk)-3
             end if
@@ -2064,8 +2063,8 @@ end function vrais_mpj
             h2n=zitr(l+2,q)-zitr(l-1,q)
             h2= zitr(l+2,q)-zitr(l,q)
             h3= zitr(l+3,q)-zitr(l,q)
-
-            if (abs(uniqueY(sumnval+jj)-zitr(ntr(yk)-2,q)).lt.1.d-6) then
+            
+            if (abs(uniqueY(sumnval+jj)-zitr(ntr(yk)-2,q)).gt.1.d-6) then
                mm2(sumnval+jj) = (3.d0*ht2*ht2)/(hh*h*hn)
                mm1(sumnval+jj) = (3.d0*htm*ht2)/(h2n*hh*h)+(3.d0*ht*ht3)/(h2*h*h2n)
                mm(sumnval+jj)  = (3.d0*ht*ht)/(h3*h2*h)
@@ -2081,12 +2080,11 @@ end function vrais_mpj
                 ier=-1
                 goto 765
             end if
-
+            
             im2(sumnval+jj)=hht*mm2(sumnval+jj)/(3.d0)+ h2n*mm1(sumnval+jj)/(3.d0) &
              +h3*mm(sumnval+jj)/(3.d0)
             im1(sumnval+jj)=htm*mm1(sumnval+jj)/(3.d0)+h3*mm(sumnval+jj)/(3.d0)
             im(sumnval+jj)=ht*mm(sumnval+jj)/(3.d0)
-
         end do
         sumnval = sumnval + nvalSPL(q)
         
@@ -2182,7 +2180,7 @@ subroutine splines_mpj(k)
      hh3 = zi(l+1,k)-zi(l-3,k)
      hh2 = zi(l+2,k)-zi(l-2,k)
 
-     if (abs(Tsurv(i)-zi(n-2,k)).lt.1.d-6) then
+     if (abs(Tsurv(i)-zi(n-2,k)).gt.1.d-6) then
 
         Tmm3(i) = ((4.d0*ht2*ht2*ht2)/(h*hh*hn*hh3))
         Tmm2(i) = ((4.d0*hht*ht2*ht2)/(hh2*hh*h*hn))  &
@@ -2244,7 +2242,7 @@ subroutine splines_mpj(k)
         hh3 = zi(l+1,k)-zi(l-3,k)
         hh2 = zi(l+2,k)-zi(l-2,k)
 
-        if (abs(Tsurv0(i)-zi(nz(k)-2,k)).lt.1.d-6) then
+        if (abs(Tsurv0(i)-zi(nz(k)-2,k)).gt.1.d-6) then
 
            Tmm03(i) = ((4.d0*ht2*ht2*ht2)/(h*hh*hn*hh3))
 
@@ -2308,7 +2306,7 @@ subroutine splines_mpj(k)
         hh3 = zi(l+1,k)-zi(l-3,k)
         hh2 = zi(l+2,k)-zi(l-2,k)
 
-        if (abs(Tsurvint(i)-zi(nz(k)-2,k)).lt.1.d-6) then
+        if (abs(Tsurvint(i)-zi(nz(k)-2,k)).gt.1.d-6) then
 
            Tmmt3(i) = ((4.d0*ht2*ht2*ht2)/(h*hh*hn*hh3))
            Tmmt2(i) = ((4.d0*hht*ht2*ht2)/(hh2*hh*h*hn)) &

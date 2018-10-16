@@ -1176,8 +1176,8 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
         }
         if(idcontr0[i]==1)
         {
-            wRandom[nef-ncontr+m+1:(ny-1)] <- nef2-ncontr+m+1:(ny-1)
-            m <- m+ny-1
+            wRandom[nef-ncontr+m+1:(ny0-1)] <- nef2-ncontr+m+1:(ny0-1)
+            m <- m+ny0-1
         }
     }
 

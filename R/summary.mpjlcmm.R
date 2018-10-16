@@ -35,9 +35,9 @@ summary.mpjlcmm <- function(x,...)
         nrisq <- rep(NA,nbevt)
         for(ke in 1:nbevt)
         {
-            if(x$typrisq[ke]==1) nprisq[ke] <- nz[ke]-1
+            if(x$typrisq[ke]==1) nprisq[ke] <- x$nz[ke]-1
             if(x$typrisq[ke]==2) nprisq[ke] <- 2
-            if(x$typrisq[ke]==3) nprisq[ke] <- nz[ke]+2
+            if(x$typrisq[ke]==3) nprisq[ke] <- x$nz[ke]+2
 
             nrisq[ke] <- x$Nprm[1+ke]
             
@@ -62,7 +62,7 @@ summary.mpjlcmm <- function(x,...)
             if (x$typrisq[ke]==3)
             {
                 cat("        M-splines constant baseline risk function with nodes \n")
-                cat("        ",x$hazardnodes[1:x$nz[ke],ke]," \n")
+                cat("        ",x$hazardnodes[1:x$n[zke],ke]," \n")
             }
             
             
