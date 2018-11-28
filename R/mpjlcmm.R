@@ -1164,7 +1164,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 Brandom <- TRUE
                 B <- eval(cl$B[[2]])
                 
-                if(length(posfix)) stop("Argument posfix is not compatible with random intial values")
+                #if(length(posfix)) stop("Argument posfix is not compatible with random intial values")
             }
         }
         ## valeurs initiales :
@@ -1217,39 +1217,67 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                             var0[upper.tri(var0,diag=TRUE)] <- B$V
                             var0 <- t(var0)
                             var0[upper.tri(var0,diag=TRUE)] <- B$V
+
+                            theta0 <- B$best
+
+                            fix1 <- which(diag(var0)==0)
                             
-                            b <- rep(0,ng-1) # pour nprob
+                            ##b <- rep(0,nprob)
+                            w <- rep(0,nprob)
+                            b0 <- rep(0,nprob)
                             
                             if(nbevt>0) #survie
                             {
-                                bSurv <- Brandom(theta0=B$best[1:(sum(nprisq)+nvarxevt2)],v0=var0[1:(sum(nprisq)+nvarxevt2),1:(sum(nprisq)+nvarxevt2)],b0=b0Brandom,w=wBrandom)
-                                b <- c(b,bSurv)
+                                w <- c(w,wBrandom)
                             }
 
                             sumnpm <- 0
+                            sumch <- 0
+                            sumnpmG <- nprob+nrisq+nvarxevt
+                            cholRandom <- vector("list",K)
                             for (k in 1:K) #m1,..,mK
                             {
                                 mk <- get(paste("mod",k,sep=""))
                                 if(class(mk)=="multlcmm")
                                 {
                                     multRandom <- TRUE
-                                    cholRandom <- mk$N[1]+1:mk$N[4]
+                                    cholRandom[[k]] <- sumnpmG+1:mk$N[4]
                                 }
                                 else
                                 {
                                     multRandom <- FALSE
-                                    cholRandom <- mk$N[1]+mk$N[2]+1:mk$N[3]
+                                    cholRandom[[k]] <- sumnpmG+mk$N[2]+1:mk$N[3]
                                 }
 
-                                npmk <- B$npmK[k]
-                                b1 <- Brandom(B$best[sum(nprisq)+nvarxevt2+sumnpm+1:npmk],
-                                              v0=var0[sum(nprisq)+nvarxevt2+sumnpm+1:npmk,sum(nprisq)+nvarxevt2+sumnpm+1:npmk],
-                                              b0=mk$b0Random,w=mk$wRandom,
-                                              chol=cholRandom,mult=multRandom)
-                                sumnpm <- sumnpm + npmk
+                                ## remplacer varcov par cholesky
+                                theta0[sum(nprisq)+nvarxevt2+sumnpm+B$Nprm[3+k]+B$Nprm[3+K+k]+1:B$Nprm[3+2*K+k]] <- B$cholesky[sumch+1:B$Nprm[3+2*K+k]]
 
-                                b <- c(b,b1[-c(1:(ng-1))])
+
+                                mkw <- max(w)+mk$wRandom
+                                mkw[which(mk$wRandom==0)] <- 0
+                                w <- c(w,mkw[-c(1:(ng-1))])
+                                
+                                b0 <- c(b0,mk$b0Random[-c(1:(ng-1))])
+                                
+                                sumnpm <- sumnpm + B$npmK[k]
+                                sumch <- sumch + B$Nprm[3+2*K+k]
+                                sumnpmG <- sumnpmG + npmtot[k]
                             }
+
+
+
+                            ## gerer les posfix de B
+                            ww <- w
+                            for(j in fix1)
+                            {
+                                ww[which(w>fix1)] <- ww[which(w>fix1)]-1
+                                b0 <- c(b0,rep(m1$best[j],length(which(w==j))))
+                            }
+                            ww[which(w %in% fix1)] <- 0
+                            theta1 <- theta0[setdiff(1:length(theta0),fix1)]
+                            var1 <- var0[setdiff(1:length(B$best),fix1),setdiff(1:length(B$best),fix1)]
+
+                            b <- Brandom(theta0=theta1,v0=var1,w=ww,b0=b0,chol=cholRandom,mult=multRandom)
 
                         } # fin random
                         

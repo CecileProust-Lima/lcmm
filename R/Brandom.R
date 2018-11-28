@@ -4,7 +4,7 @@ Brandom <- function(theta0,v0,w,b0,chol=NULL,mult=0)
     b <- rep(NA,length(w)) # initialisation
 
     ## indices des prm non generes a partir de theta0
-    pasrandom <- which(w==0)
+    pasrandom <- which((w==0))
 
     ## w sans les 0
     wr <- w[which(w!=0)]
@@ -44,26 +44,38 @@ Brandom <- function(theta0,v0,w,b0,chol=NULL,mult=0)
     ## transformer chol en var-cov
     if(!is.null(chol))
     {
-        nvc <- length(chol)
-        if(mult==0) # cas general
+        if(is.list(chol))
         {
-            nea <- (-1+sqrt(1+8*nvc))/2
-            chea <- matrix(0,nrow=nea,ncol=nea)
-            chea[upper.tri(chea,diag=TRUE)] <- b[chol]
-            v <- t(chea)%*%chea
-
-            b[chol] <- v[upper.tri(v,diag=TRUE)]            
+            nvc <- sapply(chol,length)
+        }
+        else
+        {
+            nvc <- length(chol)
+            chol <- list(chol)
         }
         
-        if(mult==1) # cas multlcmm : mettre 1 pour la premiere variance
-        {
-            nea <- (-1+sqrt(1+8*(nvc+1)))/2
-            chea <- matrix(0,nrow=nea,ncol=nea)
-            chea[upper.tri(chea,diag=TRUE)] <- c(1,b[chol])
-            v <- t(chea)%*%chea
-
-            b[chol] <- v[upper.tri(v,diag=TRUE)][-1]
-        }
+        for(k in 1:length(nvc))
+            {
+                if(mult==0) # cas general
+                {
+                    nea <- (-1+sqrt(1+8*nvc[k]))/2
+                    chea <- matrix(0,nrow=nea,ncol=nea)
+                    chea[upper.tri(chea,diag=TRUE)] <- b[chol[[k]]]
+                    v <- t(chea)%*%chea
+                    
+                    b[chol[[k]]] <- v[upper.tri(v,diag=TRUE)]            
+                }
+        
+                if(mult==1) # cas multlcmm : mettre 1 pour la premiere variance
+                {
+                    nea <- (-1+sqrt(1+8*(nvc[k]+1)))/2
+                    chea <- matrix(0,nrow=nea,ncol=nea)
+                    chea[upper.tri(chea,diag=TRUE)] <- c(1,b[chol[[k]]])
+                    v <- t(chea)%*%chea
+                    
+                    b[chol[[k]]] <- v[upper.tri(v,diag=TRUE)][-1]
+                }
+            }
     }
     
 

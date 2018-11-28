@@ -1165,6 +1165,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
             if(i==1)
             {
                 t <- t+ng-1
+                b0Random <- c(b0Random,rep(0,ng-1))
                 next
             }
             l <- l+1
