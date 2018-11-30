@@ -106,8 +106,8 @@
                 }
             else
                 {
-                    if(is.numeric(outcome)) indpred <- which(x$pred[,"Yname"]==x$Ynames[outcome])
-                    if(is.character(outcome)) indpred <- which(x$pred[,"Yname"]==outcome)
+                    if(is.numeric(outcome)) indpred <- which(x$pred[,"Ynames"]==x$Ynames[outcome])
+                    if(is.character(outcome)) indpred <- which(x$pred[,"Ynames"]==outcome)
 
                     if(length(indpred)==0) stop("Argument outcome is not correct")
                     
@@ -163,8 +163,8 @@
                 }
             else
                 {
-                    if(is.numeric(outcome)) indpred <- which(x$pred[,"Yname"]==x$Ynames[outcome])
-                    if(is.character(outcome)) indpred <- which(x$pred[,"Yname"]==outcome)
+                    if(is.numeric(outcome)) indpred <- which(x$pred[,"Ynames"]==x$Ynames[outcome])
+                    if(is.character(outcome)) indpred <- which(x$pred[,"Ynames"]==outcome)
 
                     if(length(indpred)==0) stop("Argument outcome is not correct")
             

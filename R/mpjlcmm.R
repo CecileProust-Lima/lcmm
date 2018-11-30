@@ -96,7 +96,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 if(k>1){if(subject != colnames(dataY)[1]) stop("Subject variable should be the same for all longitudinal models")}
 
                 ## pas de classmb
-                if(sum(mod$idprob)>0) stop("No classmb should be specified in the longitudunal models")
+                if(mod$N[1]>(ng-1)) stop("No classmb should be specified in the longitudunal models")
                 if(mod$ng!=ng) stop(paste("The longitudinal model (number ",k,") does not define the correct number of latent classes",sep=""))
                 
                 
@@ -545,7 +545,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     {
                         if(mod$linktype[m]==0) ntr[sum(ny[1:k])-ny[k]+m] <- 2
                         if(mod$linktype[m]==1) ntr[sum(ny[1:k])-ny[k]+m] <- 4
-                        if(mod$linktype[m]==2) ntr[sum(ny[1:k])-ny[k]+m] <- length(na.omit(mod$linknodes[,m]))+2
+                        if(mod$linktype[m]==2) ntr[sum(ny[1:k])-ny[k]+m] <- mod$nbnodes[m]+2
                     }
                 }
                 if(contrainte==1)

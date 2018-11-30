@@ -36,7 +36,14 @@ update.mpjlcmm <- function(object,...)
     {
         ## le k-ieme modele mixte avec les estimations du conjoint:
         mcall <- lK[[k]]$call
-        mcall$B <- c(object$best[1:(ng-1)],object$best[nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k]])
+        if(ng>1)
+        {
+            mcall$B <- c(object$best[1:(ng-1)],object$best[nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k]])
+        }
+        else
+        {
+            mcall$B <- c(object$best[nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k]])
+        }
         mcall$maxiter <- 0
         mcall$verbose <- FALSE
         m <- eval(mcall)
