@@ -62,7 +62,7 @@ summary.mpjlcmm <- function(x,...)
             if (x$typrisq[ke]==3)
             {
                 cat("        M-splines constant baseline risk function with nodes \n")
-                cat("        ",x$hazardnodes[1:x$n[zke],ke]," \n")
+                cat("        ",x$hazardnodes[1:x$nz[ke],ke]," \n")
             }
             
             
