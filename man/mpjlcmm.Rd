@@ -80,10 +80,11 @@ reported. Default to TRUE.}
 Estimation of multi-process joint latent class mixed models
 }
 \examples{
+\dontrun{
 paquid$age65 <- (paquid$age-65)/10
 
 ###################################################################################
-### EXEMPLE 1 : two outcomes measuring the same latent process along with dementia onset
+### EXAMPLE 1 : two outcomes measuring the same latent process along with dementia onset
 ###################################################################################
 
 ## multlcmm model for MMSE and BVRT for 1 class
@@ -170,7 +171,7 @@ postprob(m2S)
 
 
 ###################################################################################
-### EXEMPLE 2 : two latent processes measured each by one outcome along with dementia onset
+### EXAMPLE 2 : two latent processes measured each by one outcome along with dementia onset
 ###################################################################################
 
 ## define the two longitudinal models
@@ -212,7 +213,7 @@ mod1_biv <- update(mm1S)
 mod2_biv <- update(mm2S)
 
 ## -> use post-fit functions as in exemple 1
-
+}
 
 }
 \author{
