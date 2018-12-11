@@ -267,6 +267,7 @@ summary.mpjlcmm <- function(x,...)
             }
             else
             {
+                interc <- NULL
                 tmp <- NULL
             }
             

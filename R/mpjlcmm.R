@@ -233,7 +233,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         
         if(!(na.action %in% c(1,2))) stop("only 1 for 'na.omit' or 2 for 'na.fail' are required in na.action argument")
 
-        if(length(posfix) & missing(B)) stop("A set of initial parameters must be specified if some parameters are not estimated")
+##        if(length(posfix) & missing(B)) stop("A set of initial parameters must be specified if some parameters are not estimated")
 
         if(!isTRUE(all.equal(as.character(cl$subset),character(0))))
             {
