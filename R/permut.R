@@ -170,7 +170,7 @@ permut <- function(m,order,estim=TRUE)
         tmpnef <- 0
         if(m$idg[1]==2) # intercept en mixture
             {
-                if((class(m)=="hlme") | ((class(m)=="Jointlcmm") & isTRUE(m$linktype==0)))
+                if((class(m)=="hlme") | ((class(m)=="Jointlcmm") & isTRUE(m$linktype==-1)))
                     {
                         bnew[avtnef+1:ng] <- m$best[avtnef+order] # echanger
                         tmpnef <- tmpnef+ng
