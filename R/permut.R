@@ -70,13 +70,46 @@ permut <- function(m,order,estim=TRUE)
                                 bnew[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+1:nrisq[ke]] <- m$best[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+sapply(order,function(x,np) {(x-1)*np+1:np},np=nprisq[ke])]
                             }
                         if(hazardtype=="PH")
+                        {
+                            if(order[ng]==ng)
                             {
-                                ## PH : wg devient wg/wref
-                                coefold <- c(m$best[m$N[1]+nprisq[ke]+1:(ng-1)],1) # car wG=1
+                                wref <- 0
+                            }
+                            else
+                            {
+                                wref <- m$best[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+nprisq[ke]+order[ng]] 
+                            }
+                            
+                            if(typrisq[ke]==2) #Weibull
+                            {
+                                if(m$logspecif==1)
+                                {
+                                    bnew[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+1] <- m$best[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+1] + wref # a devient a+wref 
+                                }
+                                else
+                                {
+                                    bnew[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+1] <- m$best[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+1] * exp(wref/(2*m$best[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+2]^2)) # a devient a*exp(wref/(2*b^2))
+                                }
+                                ## b ne change pas
+                            }
+                            else #piecewise ou splines
+                            {
+                                if(m$logspecif==1)
+                                {
+                                    bnew[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+1:nprisq[ke]] <- m$best[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+1:nprisq[ke]] + wref
+                                }
+                                else
+                                {
+                                    bnew[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+1:nprisq[ke]] <- m$best[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+1:nprisq[ke]] * exp(wref/2)
+                                }
+                            }
+                            
+                                ## PH : wg devient wg-wref
+                                coefold <- c(m$best[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+nprisq[ke]+1:(ng-1)],0) # car wG=0
                                 coeford <- coefold[order] # ordonner selon order
-                                coefref <- coeford/coeford[ng] # diviser par le coef de la nouvelle classe de reference
+                                coefref <- coeford-coeford[ng] # soustraire le coef de la nouvelle classe de reference
                                 coefnew <- coefref[1:(ng-1)] # enlever le dernier
-                                bnew[m$N[1]+nprisq[ke]+1:(ng-1)] <- coefnew
+                                bnew[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+nprisq[ke]+1:(ng-1)] <- coefnew
                             }
                     }
 
