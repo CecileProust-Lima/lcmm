@@ -593,14 +593,14 @@
          
          if (idiag(k).eq.1) then
             do j=1,nvc(k)
-               btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+j)=dsqrt(abs(btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+j)))
+               btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+j)=dsqrt(abs(btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+j)))
             end do
          else
 
             if(contraint.eq.2) then
                mvc(1)=1.d0
                do j=1,nvc(k)
-                  mvc(1+j)=btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+j)
+                  mvc(1+j)=btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+j)
                end do
             else
                do j=1,nvc(k)
@@ -613,7 +613,7 @@
             
             if(contraint.eq.2) then
                do j=1,nvc(k)
-                  btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+j)=mvc(1+j)
+                  btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+j)=mvc(1+j)
                end do
             else
                do j=1,nvc(k)
