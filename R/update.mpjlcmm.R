@@ -54,8 +54,8 @@ update.mpjlcmm <- function(object,...)
         m$conv <- object$conv
 
         ##predictions
-        if(class(m)=="multlcmm") m$pred <- object$pred[sumnobs+1:object$N[11+k],]
-        else m$pred <- object$pred[sumnobs+1:object$N[11+k],-2]
+        if(class(m)=="multlcmm") m$pred <- object$pred[which(object$pred[,2] %in% m$Ynames),]
+        else m$pred <- object$pred[which(object$pred[,2]==object$Names$Yname[k]),-2]
 
         m$pprob <- object$pprob
         m$pprobY <- object$pprobY
