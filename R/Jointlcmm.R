@@ -2625,8 +2625,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         else
             {
                 stats <- c(out$statglob,out$statevt)
-                if(out$statglob==9999) stats[1] <- NA
-                if(any(out$statevt==9999)) stats[1+which(out$statevt==9999)] <- NA
+                stats[which((!is.finite(stats)) | (stats==9999))] <- NA
             }
         if(nbevt==1) stats <- stats[1]
         
