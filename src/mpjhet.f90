@@ -1714,7 +1714,7 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
               end if
 
               ! si variance specifique a la classe
-              if(nw(g).ne.0.and.g.lt.ng) then
+              if(nw(k).ne.0.and.g.lt.ng) then
                  Ut = abs(b1(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+nvc(k)+g))*Ut
               end if
            end if
@@ -1801,7 +1801,7 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
                  Vi(jj)=VC(j1,j2)
               end do
            end do
-
+           
            CALL dsinv(Vi,nmesparK(i,k),eps,ier,det)
            if (ier.eq.-1) then
               vrais_mpj_i=-1.d9
@@ -1916,12 +1916,13 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
            
            vrais_Y = vrais_Y*exp((-det-Y4)/2.d0)
 
-       !    if(i.eq.1) then
-
-!              print*,"det=",det, " Y4=", Y4
-!              print*,"b0=",b0, " b2=",b2
-!              print*,'mu=',mu
-!           end if
+          ! if(i.le.3) then
+          !    print*,"i=",i," g=",g, "pi(g)=",pi(g)
+          !    print*,"det=",det, " Y4=", Y4
+          !   ! print*,"b0=",b0, " b2=",b2
+          !   ! print*,'mu=',mu
+          !    print*,"vrais_Y = ",vrais_Y
+          ! end if
            
 !           if(g.eq.1) then
 !              if(k.eq.1) vrais_Y1_G1 = vrais_Y1_G1 +((-det-Y4)/2)
@@ -1955,7 +1956,13 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
      
      ! log-vraisemblance totale
      vrais_mpj_i = -sum(nmesparK(i,:))/2.d0*dlog(dble(2*3.14159265)) + log(expo) + jacobien
-
+     ! if(i.le.3) then
+     !    print*,"log(expo)=",log(expo)
+     !    print*,"jac=",jacobien
+     !    print*,"nmes=",sum(nmesparK(i,:))
+     !    print*,"vrais_mpj_i=",vrais_mpj_i
+     ! endif
+     
      ! entree retardee
      if(idtrunc.eq.1) then 
         vrais_mpj_i = vrais_mpj_i - log(retard)
