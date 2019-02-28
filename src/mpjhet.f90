@@ -3205,14 +3205,15 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
   integer ::ier,nmoins,it,sumea,sumalea,sumntr,sumparK,sumny,numSPL,tmp,sumMesYk,sumnv
   double precision,dimension(maxmes,maxval(nv)) ::X0,X2
   double precision,dimension(maxmes,maxval(nea)) ::Z,P
-  double precision,dimension(maxval(nv)) ::Xprob,err2
+  double precision,dimension(maxval(nv)) ::err2
+  double precision,dimension(nvarprob) ::Xprob, bprob
   double precision,dimension(maxval(nea),maxval(nea)) ::Ut
   double precision,dimension(maxmes,maxmes) ::VC,Corr
   double precision,dimension(maxmes,maxmes)::Valea,SigmaE,CovDev
   double precision,dimension(maxval(nea),maxmes)::covUY
   double precision,dimension(npm) ::b1
   double precision,dimension(:),allocatable ::Vi
-  double precision,dimension(maxval(nv)) :: b0,b2,bprob
+  double precision,dimension(maxval(nv)) :: b0,b2
   double precision ::eps,det,temp
   double precision,dimension(nbK*maxmes) :: Y1
   double precision,dimension(maxmes) :: mu,Y2,pred1,err1,tcor

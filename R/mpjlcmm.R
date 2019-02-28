@@ -1343,6 +1343,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             B <- try(eval(B),silent=TRUE)
             if(class(B)=="try-error")
             {
+                if(length(cl$B)==1) stop(B)
                 if(class(eval(cl$B[[2]]))!="mpjlcmm") stop("The model specified in B should be of class mpjlcmm")
                 if(as.character(cl$B[1])!="random") stop("Please use random() to specify random initial values")
                 
@@ -1378,7 +1379,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
 
                         if(Brandom==FALSE) # B deterministe
                         {
-                            b <- rep(0,ng-1) # pour nprob
+                            b <- rep(0,nprob) # pour nprob
                             
                             if(nbevt>0) #survie
                             {
@@ -1528,7 +1529,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 
             }
   # B par defaut ok!
-               
+       
 ### nom au vecteur best
 
         nom.X0 <- colnames(X0)
