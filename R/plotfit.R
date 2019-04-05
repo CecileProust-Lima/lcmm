@@ -29,7 +29,7 @@
             attributes(data)$terms <- NULL
         }
 
-
+    timeInterv <- data[,var.time]
     
     if(class(x) %in% c("hlme","lcmm","Jointlcmm"))
         {
@@ -69,16 +69,15 @@
 
     
     
-    times <- data[,var.time]
 
-    if(is.null(break.times)) break.times <- quantile(times,prob=seq(0,1,length.out=10))
+    if(is.null(break.times)) break.times <- quantile(timeInterv,prob=seq(0,1,length.out=10))
     else
         {
-            if(length(break.times)==1) break.times <- quantile(times,prob=seq(0,1,length.out=break.times))
+            if(length(break.times)==1) break.times <- quantile(timeInterv,prob=seq(0,1,length.out=break.times))
         }
 
-    if(min(times)<min(break.times)) stop("Values in break.times do not cover the entire range of time")
-    if(max(times)>max(break.times)) stop("Values in break.times do not cover the entire range of time")
+    #if(min(times)<min(break.times)) stop("Values in break.times do not cover the entire range of time")
+    #if(max(times)>max(break.times)) stop("Values in break.times do not cover the entire range of time")
     
     break.times <- sort(break.times)
 
@@ -90,6 +89,7 @@
     ntps <- length(break.times)-1
 
     numsg <- lapply(1:ng,function(g) x$pprob[which(x$pprob$class==g),1])
+    times <- data[,var.time]
     maxT <- sapply(numsg,function(y) max(times[which(data[,x$call$subject] %in% y)]))
 
 
