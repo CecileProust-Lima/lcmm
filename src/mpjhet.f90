@@ -3633,9 +3633,11 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
 
            !pred_RE_Y 
            err3=0.d0
+           sumMesYk=0
            if (nalea(k).eq.ny(k)) then
               do yk=1,ny(k)
-                 err3(yk,:) = Valea(nmesparK(i,k),:)
+                 err3(yk,:) = Valea(sumMesYk+nmes(i,sumny+yk),:)
+                 sumMesYk=sumMesYk+nmes(i,sumny+yk)
               end do
            end if
            err4=0.d0
@@ -3650,6 +3652,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
            sumalea = sumalea + nalea(k)
            sumparK = sumparK + nmesparK(i,k)
            sumnv = sumnv + nv(k)
+           sumny = sumny+ ny(k)
         end do ! fin boucle k
 
      else ! ng>1

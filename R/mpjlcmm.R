@@ -1929,19 +1929,8 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                                         #print(cbind(b,out$best))
         
         ## predictions des effets aleatoires
-        jre <- 0
         if (sum(nea)>0)
         {
-            ## predRE <- NULL
-            ## for (k in 1:K)
-            ## {
-            ##     if (nea[k]>0)
-            ##     {
-            ##         matRE <- matrix(out$predRE[jre+1:(nea[k]*ns)],ncol=nea[k],byrow=TRUE)
-            ##         predRE <- cbind(predRE,matRE)
-            ##         jre <- jre + ns*nea[k]
-            ##     }
-            ## }
             predRE <- data.frame(unique(IND),matrix(out$predRE,nrow=ns,ncol=sum(nea),byrow=TRUE))
             colnames(predRE) <- c(subject,nom.X0[idea!=0])
         }
@@ -1950,20 +1939,10 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             predRE <- NA
         }
 
-        jre <- 0
         if (sum(nalea)>0)
         {
             predRE_Y <- NULL
-            for (k in 1:K)
-            {
-                if (nalea[k]>0)
-                {
-                    matRE <- matrix(out$predRE_Y[jre+1:(nalea[k]*ns)],ncol=nalea[k],byrow=TRUE)
-                    matRE <- cbind(predRE_Y,matRE)
-                    jre <- jre + ns*nalea[k]
-                }
-            }
-            predRE_Y <- data.frame(unique(IND),predRE_Y)
+            predRE_Y <- data.frame(unique(IND),matrix(out$predRE_Y,nrow=ns,ncol=sum(nalea),byrow=TRUE))
             colnames(predRE_Y)  <- c(nom.subject,unlist(Ynames[which(nalea>0)]))
         }        
         else
