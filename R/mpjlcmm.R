@@ -655,7 +655,8 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
 
 
                 ## formule k
-                formk <- paste("processK+outcomeM",paste(mod$call$fixed[3],collapse="+"),paste(mod$call$random[2],collapse="+"),sep="+")
+                formf <- gsub("contrast","",mod$call$fixed[3])
+                formk <- paste("processK+outcomeM",paste(formf,collapse="+"),paste(mod$call$random[2],collapse="+"),sep="+")
                 if(!is.null(mod$call$cor))
                     {
                         formk <- paste(formk,as.character(mod$call$cor)[2],sep="+")

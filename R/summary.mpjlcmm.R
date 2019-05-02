@@ -292,7 +292,7 @@ summary.mpjlcmm <- function(x,...)
                 for (i in 1:sum(x$idcontr[sumnv+1:x$nv[k]]))
                 {
                     ##matrice de variance pour test et se du dernier coef
-                    indtmp <- indice2[(nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+((i-1)*(ny[k]-1)+1)):(i*(ny[k]-1))]
+                    indtmp <- indice2[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+((i-1)*(ny[k]-1)+1):(i*(ny[k]-1))]
                     indtmp <- cbind(indtmp-0:(length(indtmp)-1),indtmp)
                     indV <- NULL
                     for (j in 1:dim(indtmp)[1])
