@@ -1142,6 +1142,69 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                 }
         }
 
+    ## faire wRandom et b0Random
+    nef2 <- sum(idg0!=0)-1 + (ny0-1)*sum(idcontr0)
+    NPM2 <- nef2+ nvc+ncor0+nalea0+ny0+sum(ntrtot0)
+    
+    wRandom <- rep(0,NPM)
+    b0Random <- rep(0,ng-1)
+    
+    l <- 0
+    t <- 0
+    m <- 0
+    for (i in 1:nv0)
+    {
+        if(idg0[i]==1)
+        {
+            if(i==1) next
+            l <- l+1
+            t <- t+1
+            wRandom[nprob+t] <- l
+        }
+        if(idg0[i]==2)
+        {
+            if(i==1)
+            {
+                t <- t+ng-1
+                b0Random <- c(b0Random,rep(0,ng-1))
+                next
+            }
+            l <- l+1
+            for (g in 1:ng)
+            {
+                t <- t+1
+                wRandom[nprob+t] <- l
+            }
+        }
+        if(idcontr0[i]==1)
+        {
+            wRandom[nef-ncontr+m+1:(ny0-1)] <- nef2-ncontr+m+1:(ny0-1)
+            m <- m+ny0-1
+        }
+    }
+
+    if(nvc>0)
+    {
+        wRandom[nef+1:nvc] <- nef2+1:nvc
+    }
+    if(nw>0)
+    {
+        b0Random <- c(b0Random,rep(1,ng-1))
+    }
+    
+    wRandom[nef+nvc+nw+1:ncor0] <- (NPM2-ncor0):(NPM2-1)
+    
+    wRandom[nef+nvc+nw+ncor0+1:ny0] <- nef2+nvc+ncor0+1:ny0
+
+    if(nalea0>0)
+    {
+        wRandom[nef+nvc+nw+ncor0+ny0+1:nalea0] <- nef2+nvc+ncor0+ny0+1:nalea0
+    }
+
+    wRandom[nef+nvc+nw+ncor0+ny0+nalea0+1:sum(ntrtot0)] <- nef2+nvc+ncor0+ny0+nalea0+1:sum(ntrtot0)
+    ## wRandom et b0Random ok.
+
+
     ##------------------------------------------
     ##------nom au vecteur best
     ##--------------------------------------------
@@ -1539,7 +1602,8 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,
                predRE_Y=predRE_Y,Ynames=nomsY,Xnames=nom.X0,Xnames2=ttesLesVar,cholesky=Cholesky,
                estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,nbnodes=nbnodes,
-               na.action=nayk,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn)
+               na.action=nayk,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,
+               wRandom=wRandom,b0Random=b0Random)
     
     names(res$best) <- names(b)
     class(res) <-c("multlcmm")

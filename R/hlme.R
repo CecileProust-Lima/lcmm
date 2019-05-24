@@ -1050,7 +1050,47 @@ hlme <-
                     }
             }
                 
-  
+        ## faire wRandom et b0Random
+        NEF2 <- sum(idg0!=0)
+        NPM2 <- NEF2+NVC+ncor0+1
+
+        wRandom <- rep(0,NPM)
+        b0Random <- rep(0,ng-1) # nprob 
+        
+        l <- 0
+        t <- 0
+        for (i in 1:nvar.exp)
+        {
+            if(idg0[i]==1)
+            {
+                l <- l+1
+                t <- t+1
+                wRandom[NPROB+t] <- l
+            }
+            if(idg0[i]==2)
+            {
+                l <- l+1
+                for (g in 1:ng)
+                {
+                    t <- t+1
+                    wRandom[NPROB+t] <- l
+                }
+            }
+        }
+
+        if(NVC>0)
+        {
+            wRandom[NPROB+NEF+1:NVC] <- NEF2+1:NVC
+        }
+        if(NW>0)
+        {
+            b0Random <- c(b0Random,rep(1,ng-1))
+        }
+        
+        if (ncor0>0) {wRandom[NPROB+NEF+NVC+NW+1:ncor0] <- NEF2+NVC+1:ncor0}
+        wRandom[NPM] <- NPM2
+        ## wRandom et b0Random ok.
+        
         ##------------------------------------------
         ##------nom au vecteur best
         ##--------------------------------------------
@@ -1203,7 +1243,7 @@ hlme <-
 ### ad 2/04/2012
         if (!("intercept" %in% nom.X0)) X0.names2 <- X0.names2[-1]
 ### ad
-        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,dataset=args$data,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn)
+        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,dataset=args$data,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random)
         class(res) <-c("hlme") 
         cost<-proc.time()-ptm
         if(verbose==TRUE) cat("The program took", round(cost[3],2), "seconds \n")
