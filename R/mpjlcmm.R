@@ -11,9 +11,22 @@
 #' (Weibull, piecewise or splines)
 #' @param hazardtype optional indicator for the type of baseline risk function
 #' (Specific, PH or Common)
+#' @param hazardnodes optional vector containing interior nodes if
+#' \code{splines} or \code{piecewise} is specified for the baseline hazard
+#' function in \code{hazard}
 #' @param TimeDepVar optional vector specifying the name of the time-depending
 #' covariate in the survival model
 #' @param data data frame containing all the variables used in the model
+#' @param B optional specification for the initial values for the parameters.
+#' Three options are allowed: (1) a vector of initial values is entered (the
+#' order in which the parameters are included is detailed in \code{details}
+#' section).  (2) nothing is specified. Initial values are extracted from the models
+#' specified in \code{longitudinal}, and default initial values are chosen for the
+#' survival part (3) when ng>1, a mpjlcmm object is entered. It should correspond to
+#' the exact same structure of model but with ng=1. The program will
+#' automatically generate initial values from this model. Note that due to possible
+#' local maxima, the \code{B} vector should be specified and several different
+#' starting points should be tried.
 #' @param convB optional threshold for the convergence criterion based on the
 #' parameter stabilit
 #' @param convL optional threshold for the convergence criterion based on the
@@ -1458,7 +1471,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                             for(j in fix1)
                             {
                                 ww[which(w>fix1)] <- ww[which(w>fix1)]-1
-                                b0 <- c(b0,rep(m1$best[j],length(which(w==j))))
+                                b0 <- c(b0,rep(B$best[j],length(which(w==j))))
                             }
                             ww[which(w %in% fix1)] <- 0
                             theta1 <- theta0[setdiff(1:length(theta0),fix1)]
@@ -1834,13 +1847,13 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             {
                 if(out$conv==3)
                     {
-                        mr <- NPM-sum(pbH0)-length(posfix)
+                        mr <- NPM-sum(pbH)-length(posfix)
                         Vr <- matrix(0,mr,mr)
                         Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
                         Vr <- t(Vr)
                         Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
                         V <- matrix(NA,NPM,NPM)
-                        V[setdiff(1:NPM,c(which(pbH0==1),posfix)),setdiff(1:NPM,c(which(pbH0==1),posfix))] <- Vr
+                        V[setdiff(1:NPM,c(which(pbH==1),posfix)),setdiff(1:NPM,c(which(pbH==1),posfix))] <- Vr
                         V[,posfix] <- 0
                         V[posfix,] <- 0
                         V <- V[upper.tri(V,diag=TRUE)]
@@ -1861,13 +1874,13 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             {
                 if(out$conv==3)
                     {
-                        mr <- NPM-sum(pbH0)
+                        mr <- NPM-sum(pbH)
                         Vr <- matrix(0,mr,mr)
                         Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
                         Vr <- t(Vr)
                         Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
                         V <- matrix(NA,NPM,NPM)
-                        V[setdiff(1:NPM,which(pbH0==1)),setdiff(1:NPM,which(pbH0==1))] <- Vr
+                        V[setdiff(1:NPM,which(pbH==1)),setdiff(1:NPM,which(pbH==1))] <- Vr
                         V <- V[upper.tri(V,diag=TRUE)]
                     }
                 else

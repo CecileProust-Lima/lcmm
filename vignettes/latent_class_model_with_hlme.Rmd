@@ -1,0 +1,349 @@
+---
+title: "How to estimate a latent class mixed model using hlme function"
+output: 
+  rmarkdown::html_vignette:
+    toc: true # table of content true
+    toc_depth : 3  
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include = FALSE}
+library(stringr)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+# Background and definitions
+
+<p align="justify">The linear mixed model assumes that the population of N subjects is homogeneous and described at the population level by a unique profile $X_{i}(t)\beta$. In contrast, the latent class mixed model consists in assuming that the population is heterogeneous and composed of $G$ latent classes of subjects characterized by $G$ mean profiles of trajectories.</p>
+
+
+## The latent class mixed model
+
+<p align="justify">Latent class membership is defined by a discrete random variable $c_{i}$ that equals $g$ if subject $i$ belongs to latent class $g$ ($g$ = 1, ...,$G$). The variable $c_{i}$ is latent; its probability is described using a multinomial logistic model according to covariates $X_{ci}$:
+
+$\pi_{ig}= P(c_{i} = g|X_{ci}) = \frac{\exp(\xi_{0g}+X_{ci}\xi_{1g})}{ \sum_{l=1}^{G}\exp(\xi_{0l}+X_{ci}\xi_{1l})}$
+
+where $\xi_{0g}$ is the intercept for class $g$ and $\xi_{1g}$ is the q1-vector of class-specific parameters associated with the q1-vector of time-independent covariates $X_{ci}$. For identifiability, $\xi_{0G} = 0$ and $\xi_{1G} = 0$. When no covariate predicts the latent class membership, this model reduces to a class-specific probability.</p>
+
+
+<p align="justify">For a continuous and Gaussian variable, the trajectories of $Y$ are defined conditionally to the latent class by a linear mixed model. So, conditional on class $g$, the model is defined for subject $i$ at occasion $j$:</p>
+  
+
+&nbsp;
+
+$$Y_{ij}|_{c_{i}=g} = X_{2ij}\beta+X_{3ij}\gamma_{g}+Z_{ij}b_{i}+\epsilon_{ij}$$ 
+
+&nbsp;
+
+<p align="justify">where $X_{2ij}$, $X_{3ij}$ and $Z_{ij}$ are vectors of covariates respectively associated with common fixed effects over classes $\beta$, class-specific fixed effects $\gamma_{g}$ and with individual random effects $b_{i}|_{ci=g}$ called $b_{ig}$ whose distributions are now class-specific. $X_{2}$ and $X_{3}$ can't have common variables. </p> 
+
+## Posterior classification 
+
+<p align="justify">In models involving latent classes, a posterior classification of the subjects in each latent class can be made. It is based on the posterior calculation of the class-membership probabilities and is used to characterize the classification of the subjects as well as to evaluate the goodness-of-fit of the model (Proust-Lima et al. 2014 - https://doi.org/10.1177/0962280212445839
+).</p>
+
+<p align="justify">Posterior class-membership probabilities are computed using the Bayes theorem as the probability of belonging to a latent class given the information collected. In a longitudinal model, they are defined for subject $i$ and latent class $g$ as:</p>
+
+&nbsp;
+
+$$\hat{\pi}_{ig}^Y=P(c_{i}=g|X_{i},Y_{i},\hat{\theta}_{G})$$   
+
+*where :* $\hat{\theta}_{G}$ is the vector of parameters estimated in the $G$ latent class model.
+
+&nbsp;
+
+&nbsp;
+
+# Example for Gaussian Data
+
+<p align="justify"> In this example, we study the quadratic trajectory of a cognitive marker, the Mini Mental State Examination (**MMSE**) pre-normalized (to have a Gaussian distribution) in a sample of old people (aged 65 years old and over at inclusion) followed for up to 15 years with an adjustment on education level. The model does not consider interactions here although any regression may be considered.</p>
+
+
+## Model considered 
+
+<p align="justify">We consider the following latent class linear mixed model, where $g$ denotes the class, $i$ the subject and $j$ the repeated measurement:</p>
+
+&nbsp;
+
+$$normMMSE_{ij}|_{c_{i}=g}=\beta_{0g}+\beta_{1g}age_{ij}+\beta_{2g}age_{ij}^2+\beta_{3}CEP_{i}+u_{0ig}+u_{1ig}age_{ij}+u_{2ig}age_{ij}^2+\epsilon_{ij}$$
+
+&nbsp;
+
+*Where :*  $u_{ig} \sim \mathcal{N}(0,B_{g})$ and $\epsilon_{ij}  \sim \mathcal{N}(0,\sigma^2)$
+
+&nbsp;
+
+The *Fixed part* is $\beta_{0g}+\beta_{1g}age_{ij}+\beta_{2g}age_{ij}^2+\beta_{3}CEP_{i}$ with a mixture on $age_{ij}$ and $age_{ij}^2$; the *random part* is $u_{0ig}+u_{1ig}age_{ij}+u_{2ig}age_{ij}^2$,
+
+&nbsp;
+
+## Dependent variable: normalized MMSE 
+
+```{r, results='hide',message=FALSE,warning=FALSE, echo=FALSE}
+library(lcmm)
+set.seed(1)
+```
+&nbsp;
+
+<p align="justify"> As MMSE has a very skewed distribution, we use its normalized version easily obtained from NormPsy package (see Introduction vignette: https://cran.r-project.org/web/packages/lcmm/vignettes/introduction.html
+).</p>
+
+&nbsp;
+
+```{r,comment=''}
+library(NormPsy)
+paquid$normMMSE <- normMMSE(paquid$MMSE)
+```
+
+&nbsp;
+
+Here are the individual trajectories of the repeated measures of normMMSE
+
+&nbsp;
+
+```{r,comment='', fig.height=4, fig.width=6}
+library(lattice)
+color <- paquid$ID
+xyplot(normMMSE ~ age, paquid, groups = ID, col=color, lwd=2, type="l")
+```
+
+&nbsp;
+
+
+
+## Estimate the model with only one class (G=1)
+
+Analysis is done according to age. To avoid any numerical problems, we recenter and scale age:  
+
+```{r,message=FALSE}
+paquid$age65 <- (paquid$age - 65)/10
+```
+&nbsp;
+
+We fit the linear mixed model for normMMSE:  
+
+
+```{r, comment='', results='hide'}
+m1 <- hlme(normMMSE ~ age65+I(age65^2)+CEP,random =~ age65+I(age65^2), subject = 'ID', data = paquid) # ng=1
+```
+&nbsp
+
+## Estimate the model with more than one class (G > 1)
+
+
+<p align="justify">From the model estimated by assuming a single latent class, we can now search for heterogeneous profiles. The next lines provide the estimation of the model for 2 latent classes using the automatic specification for the initial values when $G>1$.</p>
+
+
+```{r,comment='', results='hide'}
+#Estimation considering 2 classes : 
+m2 <- hlme(normMMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject = 'ID', data = paquid, ng = 2, mixture=~age65+I(age65^2), B=m1)
+```
+
+## Be careful with initial values ! 
+
+<p align="justify">Initial values are specified in argument `B`. The option `B=m1` automatically generates initial values from the maximum likelihood estimates of a 1-class model (here, `m1`). Not specifying `B` or specifying  `B=NULL` is not recommended since it induces the internal pre-estimation of the model with $G = 1$ (i.e `m1`) which may substantially increase computational time.</p>
+
+&nbsp;
+
+### Values pre-specified by the user
+
+<p align="justify">In the following example, the initial values are pre-specified by the user: parameters of the variance covariance were taken at the estimated values of the linear mixed model and arbitrary initial values were tried for the class-specific trajectories:</p>
+
+&nbsp;
+
+```{r, comment='', results='hide'}
+m2b <- hlme(normMMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), mixture =~ age65+I(age65^2), subject = 'ID', ng = 2, data = paquid, B = c(0, 60, 40, 0, -4, 0, -10, 10, 212.869397, -216.421323,456.229910, 55.713775, -145.715516, 59.351000, 10.072221))
+```
+
+### Values randomly generated 
+
+<p align="justify">An alternative is to randomly generate the initial values from the asymptotic distribution of the estimates of the 1-class model (here, `m1`):</p>
+
+&nbsp;
+
+```{r, results='hide'}
+m2c <- hlme(normMMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), mixture =~ age65+I(age65^2), subject = 'ID', ng = 2, data = paquid, B = random(m1))
+```
+
+
+### Grid search
+
+<p align="justify">Finally, gridsearch function can be used to run an automatic grid search. In the next examples with $G=2$ and $G=3$ classes (`m2d`and `m3b`, respectively), `hlme` is run for a maximum of 50 iterations from 100 random vectors of initial values. The estimation procedure is then finalized only for the departure that provided the best log-likelihood after 30 iterations.</p>
+
+&nbsp;
+
+```{r, results='hide'}
+m2d <- gridsearch(hlme(normMMSE ~ age65+I(age65^2)+CEP,  random =~ age65+I(age65^2), subject = 'ID', data=paquid, ng = 2, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
+```
+
+
+```{r, comment='', results='hide'}
+m3g <- gridsearch(hlme(normMMSE ~ age65+I(age65^2)+CEP,  random =~ age65+I(age65^2), subject = 'ID', data=paquid, ng = 3, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
+```
+
+This method is recommended as it enables to better explore the parameter space when the number of replicates is large enough and the number of iterations is fairly large. 
+
+
+## Choose the best model 
+
+&nbsp;
+
+<p align="justify">The estimation process of a set of models (usually with a varying number of latent classes) can be summarized with `summarytable`. Different information can be displayed:</p>
+
+&nbsp;
+
+```{r, comment=''}
+summarytable(m1,m2,m2b,m2c, m2d, m3g, which = c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "%class"))
+```
+
+&nbsp; 
+
+<p align="justify">We summarize here the 6 models we previously estimated. We can see that all the 2-class models converged at the same estimation point. Only the order of the classes is changed. This phenomenon called "label switching" often happens. **It is not a problem: this is the exact same optimum**.
+
+This example illustrates the complexity to define the "optimal number of latent classes". Indeed, according to recommended BIC, the 2 class model should be retained (as it provides the lowest value). But both the AIC and Size adjusted BIC (which involve smaller penalties) favor the 3-class model. The entropy also favors the 3-class model as having a better discriminatory power (entropy closer to 1). Finally, the 3-class model creates a very very small class, which is usually not the kind of heterogeneity ones searches for and is interested in. 
+In this example, depending on the statistical and clinical criteria, either the 2- or the 3-class model could be retained. Below, we retained the 2-class model for the final output description.</p>
+ 
+&nbsp;
+
+## Description of the 2-class linear mixed model  
+
+### Summary of the model 
+
+```{r, comment=''}
+summary(m2d)
+```
+
+### Predictions of the model 
+
+<p align="justify">Class-specific predictions can be computed for any data contained in a dataframe as soon as all the covariates specified in the model are included in the dataframe. In the next lines, such a dataframe is created by generating a vector of $age$ values between 65 and 95 and defining $CEP$ at 1 or 0. The predictions are computed with `predictY` and plotted with the associated `plot` functionality or by using standard R tools.</p>
+
+&nbsp;
+
+```{r, comment=''}
+data_pred0 <- data.frame(age=seq(65,95,length.out=50),CEP=0)
+data_pred1 <- data.frame(age=seq(65,95,length.out=50),CEP=1)
+data_pred0$age65 <- (data_pred0$age - 65)/10
+data_pred1$age65 <- (data_pred1$age - 65)/10
+```
+
+&nbsp;
+
+Predictions are computed for each class at the point estimate:
+
+&nbsp;
+
+```{r,comment=''}
+pred0 <- predictY(m2d, data_pred0, var.time = "age")
+pred1 <- predictY(m2d, data_pred1, var.time = "age")
+```
+
+&nbsp;
+
+Predictions can then be plotted: 
+
+&nbsp;
+
+```{r,comment='', fig.height=4, fig.width=6}
+plot(pred0, col=c("red","navy"), lty=1,lwd=5,ylab="normMMSE",legend=NULL,main="Predicted trajectories for normMMSE ",ylim=c(0,100))
+plot(pred1, col=c("red","navy"), lty=2,lwd=3,legend=NULL,add=TRUE)
+legend(x="topright",legend=c("class1 :","CEP-","CEP+","class2:","CEP-","CEP+"), col=c("red","navy"), lwd=2, lty=c(0,1,2,0,1,2), ncol=2, bty="n", cex = 0.7)
+```
+
+&nbsp;
+
+If we want to have a sense of the variability, we can compute the predictions with confidence intervals and plot them: 
+
+&nbsp;
+
+```{r,comment='', fig.height=4, fig.width=6}
+predIC0 <- predictY(m2d, data_pred0, var.time = "age",draws=TRUE)
+predIC1 <- predictY(m2d, data_pred1, var.time = "age",draws=TRUE)
+plot(predIC0, col=c("deeppink","deepskyblue"), lty=1, lwd=2, ylab="normMMSE", main="Predicted trajectories for normMMSE", ylim=c(0,100), shades=TRUE)
+plot(predIC1, col=c("deeppink","deepskyblue"), lty=2, lwd=2, ylab="normMMSE", main="Predicted trajectories for normMMSE", legend=NULL, ylim=c(0,100), shades=TRUE, add=TRUE)
+```
+
+&nbsp;
+
+Finally, the predicted trajectories for 1-, 2- and 3-class models can be represented together in the following graph:
+
+&nbsp;
+
+```{r,comment='',fig.height=6, fig.width=8}
+predG1 <- predictY(m1, data_pred0, var.time = "age")
+predG3 <- predictY(m3g, data_pred0, var.time = "age")
+
+par(mfrow=c(1,3))
+plot(predG1, col=1, lty=1, lwd=2, ylab="normMMSE", legend=NULL, main="Predicted trajectories G=1",ylim=c(0,100))
+plot(pred0, col=c("red","navy"), lty=1, lwd=2,ylab="normMMSE", legend=NULL, main="Predicted trajectories G=2", ylim=c(0,100))
+plot(predG3, col=2:4, lty=1, lwd=2, ylab="normMMSE", legend=NULL, main="Predicted trajectories G=3", ylim=c(0,100))
+```
+
+&nbsp; 
+
+## Evaluation of the final latent class mixed model 
+
+### Plot of the residuals
+
+```{r, fig.height=5, fig.width=8}
+plot(m2d, cex.main=0.8)
+```
+
+
+### Graph of the predictions versus observations 
+
+&nbsp;
+
+<p align="justify">In order to evaluate the fit of the selected model, we plot simultaneously the observations and the predicted values for each latent class.</p>
+
+&nbsp;
+
+```{r, comment='',fig.height=4, fig.width=6}
+plot(m2d, which="fit", var.time="age", marg=FALSE, shades = TRUE)
+```
+
+The graph shows here the very good fit to the data.
+&nbsp;
+
+### Classification 
+
+The posterior classification of the model is obtained with: 
+
+&nbsp;
+
+```{r, comment=''}
+postprob(m2d) 
+```
+
+&nbsp; 
+
+<p align="justify">`Class 1` is composed of 62 subjects (12.4%), whereas 438 are in the second class. 
+
+We can also see information about the discrimination power of the model with:
+
+- the posterior classification table: subjects classified in `class 1` (resp. `class 2`) have a mean probability of 0.8054 (resp. 0.8730) to belong to this class. This show good discrimination of the classes.
+
+- the proportion of classified subjects above a threshold: here 90.18% (resp. 61.29%) of subjects in class 1 (resp. 2) are classified in the class with a posterior probability greater than 70%. </p>
+
+
+
+# Examples with other types of dependent variables
+
+Latent class mixed models can be estimated for other types of data within lcmm R package: 
+
+- with lcmm function for not necessarily Gaussian longitudinal marker
+
+- with multlcmm function for multiple longitudinal markers measuring the same underlying latent process
+
+- with Jointlcmm function for longitudinal markers and time to event (possibly with competing risks)
+
+- with other functions to come ... !
+
+Each time, the same functions (e.g., summarytable, gridsearch, postprob, predictY) apply exactly in the same way.  

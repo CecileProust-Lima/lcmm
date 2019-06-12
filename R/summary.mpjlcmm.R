@@ -1,7 +1,8 @@
 #' @export
 #'
-summary.mpjlcmm <- function(x,...)
+summary.mpjlcmm <- function(object,...)
 {
+    x <- object
     cat("Multivariate joint latent class model for quantitative outcome and competing risks", "\n")
     cat("     fitted by maximum likelihood method", "\n")
 

@@ -29,10 +29,25 @@ class-membership multinomial logistic model}
 \item{hazardtype}{optional indicator for the type of baseline risk function
 (Specific, PH or Common)}
 
+\item{hazardnodes}{optional vector containing interior nodes if
+\code{splines} or \code{piecewise} is specified for the baseline hazard
+function in \code{hazard}}
+
 \item{TimeDepVar}{optional vector specifying the name of the time-depending
 covariate in the survival model}
 
 \item{data}{data frame containing all the variables used in the model}
+
+\item{B}{optional specification for the initial values for the parameters.
+Three options are allowed: (1) a vector of initial values is entered (the
+order in which the parameters are included is detailed in \code{details}
+section).  (2) nothing is specified. Initial values are extracted from the models
+specified in \code{longitudinal}, and default initial values are chosen for the
+survival part (3) when ng>1, a mpjlcmm object is entered. It should correspond to
+the exact same structure of model but with ng=1. The program will
+automatically generate initial values from this model. Note that due to possible
+local maxima, the \code{B} vector should be specified and several different
+starting points should be tried.}
 
 \item{convB}{optional threshold for the convergence criterion based on the
 parameter stabilit}

@@ -1,0 +1,170 @@
+---
+title: "Description of lcmm package"
+output: 
+  rmarkdown::html_vignette:
+    toc: true # table of content true
+    toc_depth : 2  
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+
+```{r setup, include = FALSE}
+library(stringr)
+library(lcmm)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+  
+)
+```
+&nbsp;
+
+# Functionalities of the package  
+
+<p align="justify"> The R package lcmm provides a series of functions to estimate statistical models based on the linear mixed model theory. It includes the estimation of:
+
+- mixed models and latent class mixed models for Gaussian longitudinal outcomes (hlme),
+- curvilinear and ordinal univariate longitudinal outcomes (lcmm)
+- curvilinear multivariate outcomes (multlcmm)
+- joint latent class mixed models (Jointlcmm) for a (Gaussian or curvilinear) longitudinal outcome and a time-to-event that can be possibly left-truncated right-censored and defined in a competing setting. 
+
+
+<p align="justify">The package lcmm includes 4 main functions: lcmm, hlme, multlcmm and Jointlcmm. Each function is described in a different vignette. These functions apply to longitudinal markers, even those that have limited metrological properties but the functions can also be used in cross-sectional context.</p>
+
+
+For each model, maximum likelihood estimators are obtained using a modified Marquardt algorithm with strict convergence criteria based on the parameters and likelihood stability, and on the negativity of the second derivatives. The package also provides various post-fit functions including goodness-of-fit analyses, classification, plots, predicted trajectories, individual dynamic prediction of the event and predictive accuracy assessment.</p>
+
+
+
+# Calls functions
+
+Each function is precisely introduced in the companion paper (Proust-Lima, JSS 2017 -  https://www.jstatsoft.org/article/view/v078i02).
+
+## hlme
+
+This function is used for standard linear mixed models and their extension to multiple profiles of trajectory : the latent class linear mixed models 
+
+```{r, eval=FALSE}
+hlme(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALSE, cor = NULL, data, B, convB = 0.0001, convL = 0.0001, convG = 0.0001, prior, maxiter = 500, subset = NULL, na.action = 1, posfix = NULL)
+```
+
+
+## lcmm 
+
+This function is used to estimate mixed models when the outcome does not have a Gaussian distribution. The method is called "latent process model". As hlme, the method also handles heterogeneous profiles of trajectories in a "latent process and latent class mixed model". 
+
+```
+lcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALSE, link = "linear", intnodes = NULL, epsY = 0.5, cor = NULL, data, B, convB = 1e-04, convL = 1e-04, convG = 1e-04, maxiter = 100, nsim = 100, prior, range = NULL, subset = NULL, na.action = 1, posfix = NULL, partialH = FALSE)
+``` 
+
+## multlcmm
+
+This function extends lcmm function when more than one marker measures the same underlying construct of interest. Again the function handles either homogeneous or heterogeneous profiles of trajectories.
+
+```
+multlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALSE, randomY = FALSE, link = "linear", intnodes = NULL, epsY = 0.5, cor = NULL, data, B, convB = 1e-04, convL = 1e-04, convG = 1e-04, maxiter = 100, nsim = 100, prior, range = NULL, subset = NULL, na.action = 1, posfix = NULL, partialH = FALSE)
+``` 
+
+
+## Jointlcmm 
+
+This function extends hlme, lcmm and multlcmm to jointly analyze times to event (in a competing setting). The latent structure shared between the longitudinal outcome(s) and the time(s) to event is latent classes. 
+
+```
+Jointlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALSE, survival, hazard = "Weibull", hazardtype = "Specific", hazardnodes = NULL, TimeDepVar = NULL, link = NULL, intnodes = NULL, epsY = 0.5, range = NULL, cor = NULL, data, B, convB = 1e-4, convL = 1e-4, convG = 1e-4, maxiter = 100, nsim = 100, prior, logscale = FALSE, subset = NULL, na.action = 1, posfix = NULL, partialH = FALSE)
+``` 
+
+
+
+# Package installation
+
+If the package lcmm is not installed, install it:
+
+```{r,eval=FALSE}
+install.packages("lcmm")
+```
+
+Each time you will open a R session, you will first have to load the lcmm library:
+
+```{r,results='hide',message=FALSE,warning=FALSE}
+library(lcmm)
+```
+
+# Dataset example
+
+## paquid subsample
+
+<p align="justify">
+
+In the wikis, lcmm is illutrated with paquid dataset. This is a subsample of 500 subjects from the original French prospective study Paquid. This dataset can not be used for epidemiological purposes as the subsample is not representative of the original cohort (in particular, dementia cases have been over sampled).  
+
+The data are in the longitudinal format including some variables such as 3 psychometric tests $MMSE$, $BVRT$, $IST$, the depressive symptomatology scale $CESD$ and the variables $age$, $agedem$ (age until dementia), $dem$ (boolean with 1 for dementia), $ageinit$, $CEP$ (education level) and $male$.</p>
+
+&nbsp;
+
+For visualizing the data (head of the table only):
+
+&nbsp;
+
+```{r,comment=''}
+head(paquid)
+```
+
+The different markers are collected at different times. In the dataset the timescale is $age$.
+
+&nbsp;
+
+For obtaining a quick summary of the data:
+
+&nbsp;
+
+```{r,comment=''}
+summary(paquid)
+```
+
+Some variables have missing values. This is not a problem when using lcmm package as missing values are systematically removed. 
+
+&nbsp;
+
+## MMSE outcome
+
+In the lcmm examples, MMSE is usually considered as the outcome. MMSE is a very common neuropsychological test to measure global cognitive functioning in the elderly. It has a very asymmetric distribution so that it is usually normalized to be applied with methods for Gaussian variables. This is done using a pre-normalization function dedicated to MMSE provided in NormPsy package:   
+
+
+```{r, results='hide',message=FALSE,warning=FALSE, echo=FALSE}
+library(lcmm)
+```
+
+&nbsp;
+
+```{r,comment='', results='hide'}
+library(NormPsy)
+``` 
+
+```{r,comment='', fig.height=4, fig.width=6}
+paquid$normMMSE <- normMMSE(paquid$MMSE)
+par(mfrow=c(1,2))
+hist(paquid$MMSE, cex.main=0.8, cex.lab=0.8)
+hist(paquid$normMMSE, cex.main=0.8, cex.lab=0.8)
+```
+
+&nbsp;
+
+The individual repeated measures of MMSE to be modelled are:
+
+&nbsp;
+
+```{r,comment='', fig.height=4, fig.width=6}
+library(lattice)
+color <- paquid$ID
+xyplot(normMMSE ~ age, paquid, groups = ID, col=color, lwd=2, type="l")
+```
+
+&nbsp;
+
+

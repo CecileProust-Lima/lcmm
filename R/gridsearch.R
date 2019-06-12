@@ -24,16 +24,16 @@
 #' 4. running the optimization algorithm from these estimates for the final
 #' estimation.
 #' 
-#' @param m a call of \code{hlme}, \code{lcmm}, \code{multlcmm} or
-#' \code{Jointlcmm} corresponding to the model to estimate
+#' @param m a call of \code{hlme}, \code{lcmm}, \code{multlcmm}, 
+#' \code{Jointlcmm} or \code{mpjlcmm} corresponding to the model to estimate
 #' @param rep the number of departures from random initial values
 #' @param maxiter the number of iterations in the optimization algorithm
-#' @param minit an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
-#' \code{Jointlcmm} corresponding to the same model as specified in m except
-#' for the number of classes (it should be one). This object is used to
+#' @param minit an object of class \code{hlme}, \code{lcmm}, \code{multlcmm},
+#' \code{Jointlcmm} or \code{mpjlcmm} corresponding to the same model as specified
+#' in m except for the number of classes (it should be one). This object is used to
 #' generate random initial values
-#' @return an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
-#' \code{Jointlcmm} corresponding to the call specified in m.
+#' @return an object of class \code{hlme}, \code{lcmm}, \code{multlcmm},
+#' \code{Jointlcmm} or \code{mpjlcmm} corresponding to the call specified in m.
 #' @author Cecile Proust-Lima and Viviane Philipps
 #' @references Biernacki C, Celeux G, Govaert G (2003). Choosing Starting
 #' Values for the EM Algorithm for Getting the Highest Likelihood in

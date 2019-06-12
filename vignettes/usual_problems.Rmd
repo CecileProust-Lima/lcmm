@@ -1,0 +1,100 @@
+---
+title: "Usual problems encountered when using lcmm package"
+output: 
+  rmarkdown::html_vignette:
+    toc: true # table of content true
+    toc_depth : 1  
+    
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+
+```{r setup, include = FALSE}
+library(stringr)
+library(lcmm)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+  
+)
+```
+
+&nbsp;
+
+We list here some recurrent problems reported by users. Other issues, questions, concerns may have been reported in github: https://github.com/CecileProust-Lima/lcmm/issues/
+.
+
+**Please refer to github, both closed and opened issues, before sending any question. And please ask the questions via github only.**
+
+
+&nbsp;
+
+# Why my model did not converge?
+
+It sometimes happens that a model does not converge correctly. This is due most of the time to the very stringent criterion based on the "derivatives". This criterion uses both the first derivatives and the inverse of the matrix of the second derivatives (Hessian). It ensures that the program converges at a maximum. When it can't be computed correctly (most of the time because the Hessian is not definite positive), the program reports "second derivatives = 1". 
+
+**There are several reasons that may induce a non convergence, e.g.:**
+
+1. When the time variable (or more generally a variable with random effects) is in a unit which induces too small associated parameters (for very small changes per day). In that case, changing the scale (for instance with months or years) may solve the problem.
+
+2. In models with splines in the link function (lcmm, multlcmm, Jointlcmm) or with splines in the baseline risk function (Jointlcmm), a parameter associated with splines very close to zero may prevent for correct convergence as it is at the border of the parameter space. In that case, this parameter can be fixed to 0 and convergence should be reached immediately.
+   
+3. When the data are not rich enough and/or the model is too complicated. In that case, this is a problem of numerical non identifiability. There are not many solutions (other than simplifying the model) but some directions may be :
+    * Be patient, it happens that after some iterations the derivatives might be inversible and the model converges (you can change maxiter or rerun the program from the estimates at the non convergence point). But this is usually no necessary to specify more than 100 or 200 iterations. The iterative algorithm is used to converge in a few dozen of iterations. 
+    * You can try to assume a less stringent threshold (e.g., 0.01) but be careful, convergence might be of lower quality.   
+    * Run the model from different initial values.
+
+
+&nbsp;
+
+# How to choose the number of latent classes?
+
+Selection of the number of latent classes is a complex question. In some cases, the number is known. When not, different tools can be used to guide the decision:
+
+* Several statistical criteria such as BIC, SABIC or Entropy
+* Statistical tests when available: score test for conditional independence in joint models
+* Discrimination power as described by the classification table using the command postprob
+* Size of the classes (we can consider that classes should be larger than 1% or 5% depending on the context)
+* Clinical aspects and interpretation should also be taken into account
+
+Finally, it can be useful to present and contrast models with different numbers of latent classes.
+
+The complexity of the selection of the optimal number of latent classes is illustrated in vignette: 
+https://cran.r-project.org/web/packages/lcmm/vignettes/latent_class_model_with_hlme.html
+. Indeed, all the criteria may not be concordant in practice.  
+
+
+&nbsp;
+
+
+# How to evaluate the quality of a classification ?
+
+Good discrimination of classes is usually sought when fitting latent class mixed models. Discriminatory power can be assessed using the entropy criterion (provided in summarytable) but also using the classification table (with command postprob). The description of the classes may also help comprehend the latent class structure. 
+
+(see vignette 
+https://cran.r-project.org/web/packages/lcmm/vignettes/latent_class_model_with_hlme.html
+for further details)
+
+
+&nbsp;
+
+# How to evaluate the fit of a model ? 
+
+Different techniques can be used in this package to evaluate the goodness of fit. As in mixed models, one can compare the subject-specific predictions with the observations or plot the subject-specific residuals.
+
+The comparison with more flexible models can also be useful (more flexible link functions, more flexible baseline risk functions, more flexible functions of time, etc.)
+
+Each vignette includes a section on the evaluation of the model. 
+
+
+&nbsp;
+
+# How to pre-normalize a variable using lcmm ? 
+  
+This is detailed in vignette on pre-normalizing:  https://cran.r-project.org/web/packages/lcmm/vignettes/pre-normalizing.html
+

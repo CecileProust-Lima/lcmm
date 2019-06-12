@@ -535,8 +535,8 @@
       
       
       if (npmtot.ne.npmtot0) then
-         print*,"npmtot",npmtot,"npmtot0",npmtot0
-         print*,nprob,nrisqtot,nvarxevt,nef,ncontr,nvc,nw,ncor,nerr,nalea,ntrtot
+         !print*,"npmtot",npmtot,"npmtot0",npmtot0
+         !print*,nprob,nrisqtot,nvarxevt,nef,ncontr,nvc,nw,ncor,nerr,nalea,ntrtot
          istop=4
          goto 1236
       end if
@@ -1805,7 +1805,7 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
            CALL dsinv(Vi,nmesparK(i,k),eps,ier,det)
            if (ier.eq.-1) then
               vrais_mpj_i=-1.d9
-              print*,"-1.d9 dsinv"
+             ! print*,"-1.d9 dsinv"
              ! print*,"i=",i, "nmespark=",nmesparK(i,k)
              ! print*,"Vi=",Vi
              ! print*,"b=",b
@@ -2007,7 +2007,7 @@ double precision function vrais_mpj(b,m,id,thi,jd,thj)
      !print*,"vrais_mpj=",vrais_mpj
      !if (temp.ne.-1.d9 .or. temp/temp.ne.1) then 
      if (abs(temp+1.d9).lt.1.d-6 .or. temp.ne.temp) then 
-        write(*,*)"i=",i,"vrais= ",temp," id=",id," jd=",jd
+        !write(*,*)"i=",i,"vrais= ",temp," id=",id," jd=",jd
         vrais_mpj = -1.d9
         ! if(verbose==1) write(*,*)"i=",i,"vrais= ",temp
         goto 541
@@ -3049,7 +3049,7 @@ subroutine postprob_mpj(b,npm,ppi,ppiy)
            CALL dsinv(Vi,nmesparK(i,k),eps,ier,det)
            if (ier.eq.-1) then
               !vrais_mpj_i=-1.d9
-              print*,"-1.d9 dsinv"
+              !print*,"-1.d9 dsinv"
               ! print*,"i=",i, "nmespark=",nmesparK(i,k)
               ! print*,"Vi=",Vi
               ! print*,"b=",b
@@ -3852,7 +3852,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
 
               CALL dsinv(Vi,nmesparK(i,k),eps,ier,det)
               if (ier.eq.-1) then
-                 print*,"-1.d9 dsinv i=",i,"g=",g
+                 !print*,"-1.d9 dsinv i=",i,"g=",g
                  do j=1,nmesparK(i,k)
                     resid_m(it+sumparK+j)=9999.d0
                     pred_m_g(nobs*(g-1)+it+sumparK+j)=9999.d0

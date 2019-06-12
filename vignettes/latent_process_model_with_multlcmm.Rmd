@@ -1,0 +1,321 @@
+---
+title: "How to estimate a latent process mixed model for multivariate markers using multlcmm function"
+output: 
+  rmarkdown::html_vignette:
+    toc: true # table of content true
+    toc_depth : 3  
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include = FALSE}
+library(stringr)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>")
+```
+
+```{r, include=FALSE}
+library(lcmm)
+
+```
+
+# Background and definitions
+
+<p align="justify">Each dynamic phenomenon can be characterized by a latent process $(\Lambda(t))$ which evolves in continuous time $t$. Sometimes, this latent process is measured through several markers so that the latent process is their common factor. 
+
+Function multlcmm treats this idea and extend the linear mixed model theory to several markers measuring the same underlying quantity, these markers not being necessarily Gaussian.
+
+
+## The latent process mixed model for multivariate markers 
+
+<p align="justify">The latent process mixed model is introduced in Proust-Lima et al. (2006 - https://doi.org/10.1111/j.1541-0420.2006.00573.x
+and 2013 - https://doi.org/10.1111/bmsp.12000
+). 
+
+The quantity of interest defined as a latent process is modeled according to time using a linear mixed model:
+
+$$\Lambda(t) = X(t) \beta + Z(t)u_i +w_i(t)$$
+
+where:
+
+- $X(t)$ and $Z(t)$ are vectors of covariates ($Z(t)$ is included in $X(t)$);
+- $\beta$ are the fixed effects (i.e., population mean effects);
+- $u_i$ are the random effects (i.e., individual effects); they are distributed according to a zero-mean multivariate normal distribution with covariance matrix $B$;
+- $(w_i(t))$ is a Gaussian process that might be added in the model to relax the intra-subject correlation structure.
+
+This structural model for $\Lambda(t)$ according to time and covariates is exactly the same as in the univariate case (see 
+https://cran.r-project.org/web/packages/lcmm/vignettes/latent_process_model_with_lcmm.html
+). 
+
+Now, instead of defining one equation of observation, we define K equations of observation for the K different markers with $Y_{ijk}$ the observation for subject $i$, marker $k$ and occasion $j$. As in the univariate case, several types of markers can be handled by defining a marker-specific link function $H_{k}$. The marker-specific equation of observation also includes potentially some contrasts $\gamma_k$ on covariates and a marker and subject specific random intercept so that:</p> 
+
+$$Y_{ijk} = H_{k}(~  \Lambda(t_{ijk})+ X_{cijk}\gamma_{k} + \alpha_{ik} + \epsilon_{ijk} ~ ; \eta_{k}) $$   
+
+
+where: 
+
+- $\alpha_{ik} \tilde{} N(0,\sigma_k^2)$ 
+- $X_{cijk}$ vector of covariates 
+- $\gamma_k$ are contrasts (with the sum over $k$ equal to 0)
+- $t_{ijk}$ the time of measurement for subject $i$, marker $k$ and occasion $j$;
+- $\epsilon_{ijk}$ an independent Gaussian error with mean zero and variance $\sigma_{\epsilon_k}^2$;
+- $H_k$ the link function (parameterized by $\eta_k$) that transforms the latent process into the scale and metric of marker $k$. 
+
+**Only continuous link functions are considered in multlcmm for the moment**. These are the same as in the univariate case (in lcmm). $H^{-1}$ is a parametric family of increasing monotonic functions among:
+
+- the linear transformation: this reduces to the linear mixed model (2 parameters)
+- the Beta cumulative distribution family rescaled (4 parameters)
+- the basis of quadratic I-splines with m knots (m+2 parameters)
+
+
+## Identifiability
+
+As in any latent variable model, the metric of the latent variable has to be defined. In contrast with lcmm function, here the variance of the first random effect $u_i$ is set to 1 and the mean intercept (in $\beta$) is set to 0. 
+
+
+&nbsp;
+
+# Example with cognitive process
+
+<p align="justify">In this example, we study cognitive trajectory over time when cognition is defined as the common factor underlying three psychometric tests: **MMSE**, **BVRT** and **IST**. Here the timescale is years since entry into the cohort, the trajectory is assumed quadratic in time (both at individual and population level) and the model is adjusted for $age$ at entry. To further investigate the effect of gender, both mean effects on the common factor and differential effects (contrasts) on each marker are included (not in interaction with time in this example).</p>
+
+## Model considered :   
+
+<p align="justify">
+
+&nbsp; 
+
+$$Y_{ijk} = H_k(~ \beta_{1}t_{ij} + \beta_{2}t_{ij}^2 +\beta_{3}age75_{i} + \beta_{4}male_{i} +\gamma_{k}male_{i} \\ +u_{0i}+u_{1i}t_{ij}+u_{2i}t_{ij}^2+ \alpha_{ik} + \omega_i(t_{ijk}) +\epsilon_{ijk} ~~, \eta_k)$$  
+
+&nbsp;
+
+*Where :  * 
+
+$u_{i}\tilde{}N(0,B)$ and V($u_{0i}$)=1, $\omega_i(t)$ is a Brownian process, $\alpha_{ik}\tilde{}N(0,\sigma_k^2)$ and for k = 1,2,3: $Y_{ij1}= MMSE_{ij}$ , $Y_{ij2}= IST_{ij}$  and $Y_{ij3}= BVRT_{ij})$
+
+
+&nbsp;
+
+## Estimation with different link functions
+
+We first  create the variable time and recenter and scale age to avoid numerical problems
+```{r,message=FALSE}
+paquid$time <- (paquid$age - paquid$age_init)/10
+paquid$age75 <- (paquid$age_init - 75)/10
+```
+
+
+### linear link functions
+
+By default, all the link functions are set to linear:
+
+```{r ,message=FALSE, results='hide'}
+mult_lin <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male)
+, random =~ time +I(time^2 / 10), subject='ID', data = paquid, randomY = T, cor = BM(time))
+```
+
+&nbsp;
+
+### nonlinear link functions
+
+Depending on the nature of the data, some nonlinear link functions may be necessary. Here for instance, the MMSE is highly skewed: 
+
+```{r hist,message=FALSE,fig.height=6,fig.width=7}
+par(mfrow=c(2,2))
+hist(paquid$MMSE, breaks =31,main="MMSE distribution")
+hist(paquid$IST, breaks =41,main="IST distribution")
+hist(paquid$BVRT, breaks =16, main="BVRT distribution")
+```
+
+
+As in the univariate case, Beta CDF or splines can be considered. The link function family can either be the same for all the markers (even if the parameters will be different):
+
+```{r test2,message=FALSE, results='hide'}
+# Example with Beta
+mult_beta <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male), random =~ time + I(time^2/10), subject='ID', data = paquid, randomY = T, cor = BM(time), link = 'beta')
+```
+
+Or the link functions can be chosen differently. For instance,
+
+```{r test73,message=FALSE, results='hide'}
+# different number of knots in splines
+mult_betaspl <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male)
+, random =~time + I(time^2/10), subject='ID', data = paquid, randomY = T, cor = BM(time), link = c('beta','3-quant-splines','3-quant-splines'))
+```
+
+### Fixing some transformation parameters
+
+Note that the splines transformation may sometimes involve parameters so close to 0 that it entails a lack of convergence (since the parameter is at the boundary of the parameter space). This often happens 
+with MMSE. For instance, in the example below, convergence cannot be reached easily because the third parameter of MMSE transformation is lower than $10^{-4}$.
+
+```{r test71,message=FALSE, results='hide'}
+# with splines
+mult_splines <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male)
+, random =~time + I(time^2/10), subject='ID', data = paquid, randomY = T, cor = BM(time), maxiter=50, link = c('3-quant-splines'))
+```
+
+This problem can be easily dealt with by fixing this parameter with posfix option. To do so, the position of the parameter can be identified from the vector of estimates (21st parameter here):
+```{r test27,message=FALSE}
+mult_splines$best
+```
+
+And the model can be refitted from these estimates and the newly fixed parameter:
+```{r test72,message=FALSE, results='hide'}
+# with splines
+mult_splines2 <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male)
+, random =~time + I(time^2/10), subject='ID', data = paquid, randomY = T, cor = BM(time), maxiter=50, link = c('3-quant-splines'),posfix=21,B=mult_splines$best)
+```
+
+With this constraint, the model converges correctly. 
+
+&nbsp;
+
+## Comparison of the models 
+
+<p align="justify">Objects  `mult_lin`, `mult_beta`, `mult_betaspl`,  'mult_splines2'  are multivariate latent process mixed models that assume the exact same trajectory for the underlying latent process but different link functions. As in the univariate case, the models can be compared using information criteria. The `summarytable` give us such information.  
+
+```{r test5,message=FALSE,comment=''}
+summarytable(mult_lin,mult_beta,mult_betaspl,mult_splines2, which =c("loglik", "conv", "npm", "AIC"))
+```
+
+&nbsp;
+
+Models involving Beta transformations and splines transformations seem to fit a lot better in terms of AIC than the linear transformations showing the departure from normality. 
+
+&nbsp;
+
+The transformations can be plotted and compared between models:
+          
+```{r testprint2,message=FALSE, fig.height=3, fig.width=5}
+par(mfrow=c(1,1))
+col <- rainbow(4)
+plot(mult_splines2, which = "linkfunction", col = c(col[2],col[3],col[4]), lwd =1,lty=4)
+plot(mult_lin,which="linkfunction", col = c(col[2],col[3],col[4]), lwd = 1,lty=2,add=TRUE)
+plot(mult_beta,which="linkfunction", col = c(col[2],col[3],col[4]), lwd = 2,lty=3,add=TRUE)
+plot(mult_betaspl,which="linkfunction", col = c(col[2],col[3],col[4]), lwd = 1,lty=1,add=TRUE)
+legend(x="bottomright",lty=c(2,3,4,1),legend=c("linear","beta","splines","beta/splines"),bty="n")
+```
+&nbsp;
+
+Except from the linear transformations, all the estimation transformations are really close. 
+
+&nbsp;
+
+
+## Postfit outputs
+
+
+### Estimated link functions: 
+
+&nbsp;
+          
+```{r testprint,message=FALSE, fig.height=3, fig.width=5}
+col <- rainbow(4)
+plot(mult_betaspl, which = "linkfunction", col = c(col[2],col[3],col[4]), lwd = 2)
+```
+
+&nbsp;
+
+Confidence intervals of the link functions can be obtained by the Monte Carlo method:
+
+&nbsp;                         
+     
+```{r,message=FALSE,echo=FALSE,  fig.height=3, fig.width=5}
+col <- rainbow(5)
+CIlink <- predictlink(mult_betaspl)
+plot(CIlink, col = c(col[2],col[3],col[4]), lwd = 2, shades = TRUE)
+```                    
+
+&nbsp;
+
+### Summary
+
+The summary of the model includes convergence, goodness of fit criteria and estimated parameters. 
+
+```{r,message=FALSE, comment=''}
+summary(mult_betaspl) 
+```
+
+From the estimates, the underlying cognition has a quadratic trajectory over time, older subjects at baseline have systematically lower cognitive level. There is no difference according to gender. However, there are significantly differential effects of gender on psychometric tests (p=0.0003) with a systematically higher BVRT for men and higher IST levels for women. 
+
+
+### Variance explained  
+
+For multivariate data, the latent process is the common underlying factor of the different markers. Thus, we can compute the residual variance of each marker explained the latent process. This variance explained is conditional on the covariates and computed for a specific time. 
+
+```{r, comment=''}
+VarExpl(mult_betaspl, data.frame(time=0))
+```
+
+For example, the common factor explained 42% of MMSE residual variation while it explained 26% of the BVRT residual variation at time 0. 
+
+### Graph of predicted trajectories for the markers 
+
+As with lcmm function, predicted trajectories of the markers can be computed according to a covariate profile and then plotted. 
+
+```{r,message=FALSE,eval=TRUE,  fig.height=6, fig.width=7}
+datnew <- data.frame(time=seq(0.08,2.2,length=100))
+datnew$age_init<-seq(65,95, length=100)
+datnew$age75 <- ((datnew$age_init - 75)/10)
+datnew$male <- 0
+predict_women<-predictY(mult_betaspl,newdata=datnew,var.time='time',draws=TRUE)
+
+datnew$male <- 1
+predict_men<-predictY(mult_betaspl,newdata=datnew,var.time='time',draws=TRUE) 
+par(mfrow=c(2,2))
+plot(predict_women,lwd=c(2,1),type='l',col=6,ylim=c(0,30),xlab='time since entry (in decades)',ylab='Marker',bty='l',legend=NULL,shades=TRUE, outcome = 1, main='Mean predicted trajectory for MMSE')
+plot(predict_men,lwd=c(2,1),type='l',col=3,shades=TRUE, outcome = 1, add=TRUE)
+legend(1.5, 30, legend=c("Women", "Men"), col=c(6,3), lty=1:2, cex=0.8,bty="n")
+plot(predict_women,lwd=c(2,1),type='l',col=6,ylim=c(0,40),xlab='time since entry (in decades)',ylab='Marker',bty='l',legend=NULL, shades=TRUE, outcome = 2, main='Mean predicted trajectory for IST') 
+plot(predict_men,lwd=c(2,1),type='l',col=3,shades=TRUE, outcome = 2, add=TRUE)
+plot(predict_women,lwd=c(2,1),type='l',col=6,ylim=c(0,15),xlab='time since entry (in decades)',ylab='Marker',bty='l',legend=NULL,shades=TRUE, outcome = 3, main='Mean predicted trajectory for BVRT') 
+plot(predict_men,lwd=c(2,1),type='l',col=3,shades=TRUE, outcome = 3, add=TRUE)
+```
+
+
+&nbsp;
+
+### Goodness of fit: graph of the residuals
+
+As in any mixed model, we expect the subject-specicif residuals (bottom right panel) to be Gaussian. 
+
+```{r,message=FALSE,eval=TRUE,  fig.height=6, fig.width=7}
+plot(mult_betaspl, cex.main=0.8)
+```
+
+### Goodness of fit: graph of the predictions versus observations 
+
+The mean predictions and observations can be plotted according to time. Note that the predictions and observations are in the scale of the latent process (observations are transformed with the estimated link functions): 
+
+
+```{r,message=FALSE,eval=TRUE,  fig.height=6, fig.width=7}
+par(mfrow=c(2,2))
+plot(mult_betaspl, which="fit", var.time="time", bty="l", xlab="time since entry (in decades)", cex.lab=1.1, break.times=8, ylab="latent process", lwd=2, marg=F, ylim=c(-2,0.0), xlim=c(0.1,2), shades = TRUE, outcome = 1, col=2, main="MMSE predictions vs observations" ) 
+
+plot(mult_betaspl, which="fit", var.time="time", bty="l", xlab="time since entry (in decades)", break.times=8, ylab="latent process", lwd=2,marg=F, ylim=c(-2,0.3), xlim=c(0.1,2), shades = TRUE, outcome = 2, col=3, cex.lab=1.1, main="IST predictions vs observations" )
+
+plot(mult_betaspl, which="fit", var.time="time", bty="l", xlab="time since entry (in decades)", break.times=8, ylab="latent process", lwd=2, marg=F, ylim=c(-1.5,0.5), xlim=c(0.1,2), shades = TRUE, outcome = 3, col=4, cex.lab=1.1, main="BVRT predictions vs observations" ) 
+
+```
+
+&nbsp;
+
+
+# To go further ... 
+
+## heterogeneous profiles of trajectories
+
+The latent process mixed model for multivariate markers extends to the heterogeneous case with latent classes. The same strategy as explained with hlme (see https://cran.r-project.org/web/packages/lcmm/vignettes/latent_class_model_with_hlme.html
+) can be used.  
+
+
+## joint analysis of a time to event
+
+The latent process mixed model for multivariate markers extends to the case of a joint model. This is done in Jointlcmm (see
+https://cran.r-project.org/web/packages/lcmm/vignettes/joint_latent_class_model_with_Jointlcmm.html
+).
+

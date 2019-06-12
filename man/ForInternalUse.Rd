@@ -25,6 +25,7 @@
 \alias{C_postprob2}
 \alias{C_cvpl}
 \alias{C_calculustransfo}
+\alias{Brandom}
 \title{For internal use only ...}
 \description{
 For internal use only ...

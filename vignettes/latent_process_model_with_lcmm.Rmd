@@ -1,0 +1,304 @@
+---
+title: "How to estimate
+a latent process mixed model using lcmm function"
+output: 
+  rmarkdown::html_vignette:
+    toc: true # table of content true
+    toc_depth : 3
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+
+```{r setup, include = FALSE}
+library(stringr)
+library(lcmm)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+  
+)
+```
+&nbsp;
+
+
+# Background on the model 
+
+<p align="justify"> Each dynamic phenomenon can be characterized by a latent process $(\Lambda(t))$ which evolves in continuous time $t$. When modeling repeated measures of marker, we usually don't think of it as a latent process measured with error. Yet, this is the underlying assumption made by the mixed model theory. Function lcmm exploits this framework to extend the linear mixed model theory to any type of outcome (ordinal, binary, continuous with any distribution). 
+
+
+## The latent process mixed model
+
+The latent process mixed model is introduced in Proust-Lima et al. (2006 - https://doi.org/10.1111/j.1541-0420.2006.00573.x
+and 2013 - https://doi.org/10.1111/bmsp.12000
+). 
+
+The quantity of interest defined as a latent process is modeled according to time using a linear mixed model:
+
+$$\Lambda(t) = X(t) \beta + Z(t)u_i +w_i(t)$$
+
+where:
+
+- $X(t)$ and $Z(t)$ are vectors of covariates ($Z(t)$ is included in $X(t)$);
+- $\beta$ are the fixed effects (i.e., population mean effects);
+- $u_i$ are the random effects (i.e., individual effects); they are distributed according to a zero-mean multivariate normal distribution with covariance matrix $B$;
+- $(w_i(t))$ is a Gaussian process that might be added in the model to relax the intra-subject correlation structure.
+
+
+The relationship between the latent process of interest and the observations of the marker $Y_{ij}$ (for subject $i$ and occasion $j$) is simultaneously defined in an equation of observation: 
+
+$$Y_{ij}  = H( ~ \Lambda(t_{ij})+\epsilon_{ij} ~ ; \eta)$$ 
+
+where: 
+
+- $t_{ij}$ is the time of measurement for subject $i$ and occasion $j$;
+- $\epsilon_{ij}$ is an independent zero-mean Gaussian error;
+- $H$ is the link function (parameterized by $\eta$) that transforms the latent process into the scale and metric of the marker. 
+
+Different parametric families are used. **When the marker is continuous**, $H^{-1}$ is a parametric family of increasing monotonic functions among:
+
+- the linear transformation: this reduces to the linear mixed model (2 parameters)
+- the Beta cumulative distribution family rescaled (4 parameters)
+- the basis of quadratic I-splines with m knots (m+2 parameters)
+
+**When the marker is discrete (binary or ordinal):** $H$ is a threshold function, that is each level of Y corresponds to an interval of $\Lambda(t_{ij})+\epsilon_{ij}$ which boundaries are to be estimated.
+
+## Identifiability
+
+As in any latent variable model, the metric of the latent variable has to be defined. In lcmm, the variance of the errors is 1 and the mean intercept (in $\beta$) is 0.
+
+
+&nbsp;
+
+# Example  with CES-D
+
+<p align="justify">In this vignette, the latent process mixed models implemented in `lcmm` are illustrated by the study of the linear trajectory of depressive symptoms (as measured by CES-D scale) according to $age65$ and adjusted for male. Correlated random effects for the intercept and $age65$ are included.</p> 
+
+
+## Model considered: 
+
+$$CESD_{ij} = H(~  \beta_{1}age65_{ij}+\beta_{2}male_{i}+\beta_{3}age65_{ij}male_{i} +u_{0i}+u_{1i}age65_{ij}+\epsilon_{ij} ~ ; ~ \eta)$$ 
+
+&nbsp;
+
+*Where :*  $u_{i} \sim \mathcal{N}(0,B)$ and $\epsilon_{ij}  \sim \mathcal{N}(0,1)$
+
+&nbsp;
+
+The *Fixed part* is $\beta_{1}age65_{ij}+\beta_{2}male_{i}+\beta_{3}age65_{ij}male_{i}$ ; the *random part* is $u_{0i}+u_{1i}age65_{ij}$. 
+
+&nbsp;
+
+## Estimate the model for different continuous link functions $H$ 
+
+We use the age variable recentered around 65 years old and in decades:
+
+```{r, include=FALSE,echo=FALSE}
+library(lcmm)
+paquid$age65 <- (paquid$age - 65)/10
+```
+
+The latent process mixed model can be fitted with different link functions as shown below. This is done with argument link. 
+
+
+### Linear link function
+
+When defining the linear link function, the model reduces to a standard linear mixed model. The model can be fitted with lcmm function (with the linear link function by default):
+
+```{r,message=FALSE, results='hide'}
+mlin <- lcmm(CESD ~ age65*male, random=~ age65, subject='ID', data=paquid) #link= linear
+```
+
+
+<p align="justify">It is the exact same model as one fitted by hlme. The only difference with a hlme object is the parameterization for the intercept and the residual standard error that are considered as rescaling parameters.</p>
+
+
+```{r,message=FALSE, results='hide'}
+mlin2 <- hlme(CESD ~ age65*male, random=~ age65, subject='ID', data=paquid) #link= linear
+```
+
+The log likelihood are the same but the estimated parameters $\beta$ are not in the same scale
+
+```{r, comment=''}
+mlin$loglik
+mlin2$loglik
+mlin$best
+mlin2$best
+```
+
+
+### Nonlinear link function 1: Beta cumulative distribution function
+
+The rescaled cumulative distribution function (CDF) of a Beta distribution provides concave, convex or sigmoïd transformations between the marker and its underlying latent process. 
+
+
+```{r test2,message=FALSE, results='hide'}
+mbeta <- lcmm(CESD ~ age65*male, random=~ age65, subject='ID', data=paquid, link='beta')
+```
+
+### Nonlinear link function 2: Quadratic I-splines 
+
+The family of quadratic I-splines approximates any continuous increasing link function. It involves nodes that are distributed within the range of the marker. By default, 5 equidistant knots located in the marker range are used :
+
+```{r test7,message=FALSE, results='hide'}
+mspl <- lcmm(CESD ~ age65*male, random=~ age65, subject='ID', data=paquid, link='splines')
+```
+
+The number of knots and their location may be specified. The number of nodes is first entered followed by `-`, then the location is specified with `equi`, `quant` or `manual` for respectively equidistant knots, knots at quantiles of the marker distribution or interior knots entered manually in argument intnodes. For example, `7-equi-splines` means I-splines with 7 equidistant nodes, `6-quant-splines` means I-splines with 6 nodes located at the quantiles of the marker distribution. The shortcut `splines` stands for `5-equi-splines`.</p>
+
+For an example with 5 knots placed at the quantiles:
+
+```{r test8,message=FALSE, results='hide'}
+mspl5q <- lcmm(CESD ~ age65*male, random=~ age65, subject='ID', data=paquid, link='5-quant-splines')
+```
+
+&nbsp;
+
+
+
+##  Select the best model
+
+<p align="justify">Objects  `mlin`, `mbeta`, `mspl` and `mspl5q` are latent process mixed models that assume the exact same trajectory for the underlying latent process but different link functions: `linear`,`BetaCDF`, `I-splines with 5 equidistant knots` (default with link='splines') and `I-splines with 5 knots at percentiles`, respectively. To select the most appropriate link function, one can compare these different models. Usually this is achieved by comparing the models in terms of goodness-of-fit using measures such as **AIC** or **UACV**.</p>
+
+The `summarytable` command gives the AIC (the UACV is in the output of each model):  
+
+&nbsp;
+
+```{r test5,message=FALSE,comment=''}
+summarytable(mlin,mbeta,mspl,mspl5q,which = c("loglik", "conv", "npm", "AIC"))
+```
+
+
+&nbsp;
+
+<p align="justify">In this case, the model with a link function approximated by `I-splines with 5 knots` placed at the quantiles provides the best fit according to the AIC criterion.</p> 
+
+&nbsp; 
+
+The different estimated link functions can be compared in a plot:  
+          
+```{r testprint,message=FALSE, fig.height=4, fig.width=6}
+col <- rainbow(5)
+plot(mlin,which="linkfunction",bty='l',ylab="CES-D",col=col[1],lwd=2, xlab="underlying latent process")
+plot(mbeta,which="linkfunction",add=TRUE,col=col[2],lwd=2)
+plot(mspl,which="linkfunction",add=TRUE,col=col[3],lwd=2)
+plot(mspl5q,which="linkfunction",add=TRUE,col=col[4],lwd=2)
+legend(x="topleft",legend=c("linear", "beta","splines (5equidistant)","splines (5 at quantiles)"), lty=1, col=col, bty="n", lwd=2)
+```
+
+&nbsp;
+
+<p align="justify">We see that the 2 splines transformations are very close. The linear model does not seem to be appropriate, as shown by the gap betwwen the linear curve and the splines curves. The beta transformation departs from the splines only in the high values of the latent process.</p>
+
+&nbsp; 
+
+Confidence bands of the transformations can be obtained by the Monte Carlo method :
+
+&nbsp;                         
+     
+```{r,message=FALSE,  fig.height=4, fig.width=6}
+linkspl5q <- predictlink(mspl5q,ndraws=2000)
+plot(linkspl5q,col=col[4],lty=2, shades = TRUE)
+legend(x="left",legend=c("95% confidence bands","for splines at quantiles"),lty=c(2,NA), col=c(col[4],NA), bty="n", lwd=1, cex = 0.8)
+```             
+
+&nbsp;
+
+
+##  Estimate the model with a discrete link function $H$ 
+
+Sometimes, with markers that have only a restricted number of different levels, continuous link functions are not appropriate and the ordinal nature of the marker has to be handled. lcmm function handles such a case by considering threshold link function. However, one has to know that numerical complexity of the model with threshold link function is much more important (due to a numerical integration over the random effect distribution). This has to be kept in mind when fitting this model and the number of random effects is to be chosen parcimoniously. 
+
+**Note that this model becomes a cumulative probit mixed model**. 
+
+Here is an example with $HIER$ variable (4 levels) as considering a threshold link function for CESD would involve too many parameters given the range in 0-52 (e.g., 52 threshold parameters).
+
+```{r, results='hide'}
+mthresholds <- lcmm(HIER ~ age65*male, random=~ age65, subject='ID', data=paquid, link='thresholds')
+```
+
+
+
+## Postfit outputs
+
+### Summary
+
+The summary of the model includes convergence, goodness of fit criteria and estimated parameters. 
+
+```{r,message=FALSE, comment=''}
+summary(mspl5q) 
+```
+
+### Graph of predicted trajectories according to a profile of covariates
+
+The predicted trajectories can be computed in the natural scale of the dependent variable and according to a profile of covariates:
+
+&nbsp;
+
+```{r,message=FALSE,eval=TRUE}
+datnew <- data.frame(age=seq(65,95,length=100))
+datnew$age65 <- (datnew$age - 65)/10
+datnew$male <- 0
+women <- predictY(mspl5q,newdata=datnew,var.time="age",draws=TRUE)
+datnew$male <- 1
+men <- predictY(mspl5q,newdata=datnew,var.time="age",draws=TRUE)
+```
+
+&nbsp;
+
+And then plotted:
+
+&nbsp;
+```{r,message=FALSE,  fig.height=4, fig.width=6}
+plot(women,lwd=c(2,1),type="l",col=6,ylim=c(0,20),xlab="age in year",ylab="CES-D",bty="l", legend=NULL, shades = TRUE)
+plot(men,add=TRUE,col=4,lwd=c(2,1), shades = TRUE)
+legend(x="topleft",bty="n",ncol=2,lty=c(1,1,2,2),col=c(6,4,6,4), legend=c("women","men", "95% CI", "95% CI"), lwd=c(2,2,1,1)) 
+```
+
+&nbsp;
+
+### Goodness of fit 1: plot of residuals 
+
+The subject-specific residuals (qqplot in bottom right panel) should be Gaussian.
+
+```{r,message=FALSE,eval=TRUE,  fig.height=5, fig.width=8}
+plot(mspl5q, cex.main=0.9)
+```
+&nbsp;
+
+## Goodness of fit 2: plot of predictions versus observations 
+
+The mean predictions and observations can be plotted according to time. Note that the predictions and observations are in the scale of the latent process (observations are transformed with the estimated link function): 
+
+```{r,message=FALSE,eval=TRUE,  fig.height=4, fig.width=6}
+plot(mspl5q,which="fit",var.time="age65",bty="l",xlab="(age-65)/10",break.times=8, ylab="latent process", lwd=2, marg=F, ylim=c(-1,2), shades = TRUE, col=2)
+```
+
+&nbsp;
+
+
+
+# To go further ... 
+
+## heterogeneous profiles of trajectories
+
+The latent process mixed model extends to the  heterogeneous case with latent classes. The same strategy as explained with hlme (see https://cran.r-project.org/web/packages/lcmm/vignettes/latent_class_model_with_hlme.html
+) can be used.  
+
+
+## joint analysis of a time to event
+
+The latent process mixed model extends to the case of a joint model. This is done in Jointlcmm (see
+https://cran.r-project.org/web/packages/lcmm/vignettes/joint_latent_class_model_with_Jointlcmm.html
+).
+
+## multiple markers of the same latent process
+
+In some cases, several markers of the same underlying latent process may be measured. The latent process mixed model extends to that case. This is the purpose of multlcmm (see
+https://cran.r-project.org/web/packages/lcmm/vignettes/latent_process_model_with_multlcmm.html
+).
+

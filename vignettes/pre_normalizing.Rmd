@@ -1,0 +1,184 @@
+---
+title: "Pre-normalizing a dependent variable using lcmm"
+output: 
+  rmarkdown::html_vignette:
+    toc: true # table of content true
+    toc_depth : 3  
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include = FALSE}
+library(stringr)
+library(lcmm)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+  
+)
+```
+&nbsp;
+
+Functions lcmm, multlcmm and jointlcmm handle dependent variables that are not necessarily Gaussian. These functions rely on the simultaneous normalization of the variable and estimation of the regression parameters using parameterized link functions (argument "link=").
+
+However in some cases, one may want to pre-normalize once for all a dependent variable so that standard methods for Gaussian outcomes can then be used without caution. 
+
+The methodology has been fully described and validated for MMSE in Philipps et al. (2014) (see https://doi.org/10.1159/000365637
+)
+
+We describe here how this can be done using CES-D example. 
+
+
+## CES-D example
+
+CES-D is the scale of depressive symptomatology in the Paquid dataset made of 20 items. Its sumscore is extremely skewed with a large proportion of small values: 
+
+```{r, comment='' }
+summary(paquid$CESD)
+```
+
+```{r, fig.height=4, fig.width=6}
+hist(paquid$CESD, breaks =50)
+```
+
+## Normalizing a variable with lcmm
+
+The first step is to normalize the variable by estimating a latent process mixed model. 
+This model should roughly fit the data but does not need to be the perfect model or the exact same model as planned for the future complete analysis. One possibility is to define an "empty model" for the covariates (but not the time functions and random effects) :
+
+&nbsp;
+
+```{r, comment='' }
+#We recenter and scale the time variable "age" in order to avoid numerical problems
+paquid$age65 <- (paquid$age-65)/10
+```
+
+```{r, results='hide'}
+mpreH <- lcmm(CESD ~ age65 + I(age65^2), random = ~ age65 + I(age65^2), subject = 'ID', data=paquid, link = '5-quant-splines') 
+```
+&nbsp;
+
+Here a splines link function with 5 knots placed at the quantiles is used. 
+
+The variable "obs" of output table "mpreH$pred" includes the normalized values of CES-D for all the observations of the dataset: 
+
+&nbsp;
+
+```{r, comment='' }
+head(mpreH$pred)
+```
+
+&nbsp;
+
+The normalized variable (to be called for instance "normCESD") can now be added to the dataset 
+
+&nbsp;
+
+```{r, comment='' }
+paquid$normCESD <- NULL 
+paquid$normCESD[!is.na(paquid$CESD)] <- mpreH$pred$obs
+```
+
+for further analysis.
+
+```{r, comment='' }
+summary(paquid[,c("CESD","normCESD")])
+```
+
+
+## Comparison before and after normalization
+
+The transformation does not change the structure of the data. In particular, the spike at 0 is still present. 
+
+```{r, fig.height=4, fig.width=7, comment='' }
+par(mfrow=c(1,2))
+hist(paquid$CESD, breaks = 50, cex.main=0.9, main="Distribution of CESD")
+hist(paquid$normCESD, breaks = 50, cex.main=0.9, main="Distribution of normCESD") 
+```
+
+&nbsp;
+
+From the histogram, this is not clear that the normalized CESD has a Gaussian distribution. Yet, this normalization makes the use of methods for Gaussian outcomes correct. 
+
+For instance, when fitting a linear mixed model including the variable male, the subject-specific residuals plots become correct (right part): 
+
+&nbsp;
+
+```{r, results='hide'}
+normCESD <- hlme(normCESD ~ age65*male, random = ~ age65, subject = 'ID', data=paquid)
+```
+```{r, fig.height=5, fig.width=7, comment='' }
+plot(normCESD, cex.main=0.8)
+```
+
+In comparison, without the normalization step, the subject-specific residuals exhibited a departure from normality. 
+
+```{r, results='hide'}
+CESD <- hlme(CESD ~ age65*male, random = ~ age65, subject = 'ID', data=paquid)
+```
+```{r, fig.height=5, fig.width=7, comment='' }
+plot(CESD, cex.main=0.8)
+```
+
+## To go further  
+
+For future use, it can be interesting to define the metric of normCESD. Indeed, for now, its scale in not easy to understand as it depends on the data structure. Two options are possible:  
+
+### 1. Standardizing normCESD 
+
+The variable can be standardized (like for a Z-score) by removing the mean at a time and dividing by the standard deviation at the same time. This can be done if many data are observed at the same time, like at baseline. Here, with age as the time scale, we could not use that easily.  
+
+Unfortunately, baseline data is not available in the dataset! So here is a theoretical example of the computation:
+
+&nbsp;
+
+```{r, comment='' }
+m <- mean(paquid$normCESD[(paquid$visit==0) & (!is.na(paquid$normCESD))])
+s <- sd(paquid$normCESD[(paquid$visit==0) & (!is.na(paquid$normCESD))])
+paquid$ZnormCESD <- (paquid$normCESD - m)/s
+```
+
+### 2. Rescaling normCESD into 0 - 100 
+
+The variable can be scaled in 0-100 with 0 corresponding to the minimum value observed in the sample (usually 0) and 100 the maximum observed value. This works whatever the timescale under study:
+
+&nbsp;
+
+```{r, comment='' }
+min <- min(paquid$normCESD[!is.na(paquid$normCESD)])
+max <- max(paquid$normCESD[!is.na(paquid$normCESD)])
+paquid$normCESD100 <- (paquid$normCESD - min)/(max-min)*100
+summary(paquid$normCESD100)
+```
+
+### Example of model with normCESD100
+
+The statistical analysis can now be performed using one of the normalized variables, normCESD, ZnormCESD or normCESD100. 
+
+With normCESD100 for example, a linear mixed model with a linear trajectory according to age with adjustment for male, education and their interaction with time as well as the birth cohort effect (age at entry) can be fitted: 
+
+&nbsp;
+
+```{r, results='hide', comment=''}
+m1 <- hlme(normCESD100 ~ age65*male +CEP*age65 + age_init, random=~age65, subject='ID',data=paquid)
+summary(m1)
+``` 
+
+&nbsp;
+
+Or a linear mixed model with a linear trajectory according to time since entry with adjustment for male, education and their interaction with time as well as the birth cohort effect (age at entry):
+
+&nbsp;
+
+```{r, results='hide', comment=''}
+paquid$time <- paquid$age - paquid$age_init
+m2 <- hlme(normCESD100 ~ time*male +CEP*time + age_init, random=~time, subject='ID', data=paquid)
+summary(m2)
+```
+
+Or any other statistical method assuming normality for the outcome!
+
+
