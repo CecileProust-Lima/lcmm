@@ -12,6 +12,6 @@ Suggests: knitr,lattice
 BugReports: https://github.com/CecileProust-Lima/lcmm/issues
 LazyLoad: yes
 LazyData: true
-VignetteBuilder: knitr,rmarkdown
+VignetteBuilder: knitr
 NeedsCompilation: yes
 RoxygenNote: 6.1.1

@@ -2040,7 +2040,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
 
         temp <- paste("pred_m",1:ng,sep="")
         temp1 <- paste("pred_ss",1:ng,sep="")
-        colnames(pred)<-c(nom.subject,"Ynames","pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1)
+        colnames(pred) <- c(nom.subject,"Yname","pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1)
 
 
         ## risques
