@@ -9,6 +9,19 @@ Proust-Lima C, Philipps V, Liquet B. Estimation of Extended Mixed Models Using L
 https://www.jstatsoft.org/article/view/v078i02
 
 
+Changes in Version 1.8.0 :
+
+* new function mpjlcmm for estimating joint models with multiple latent processes
+* various post-fit functions for mpjlcmm objects
+* new functions permut and xclass
+* creation of vignettes, thanks to Samy Youbi
+* variable 'subject' must be numeric
+* in plot(which='fit'), time intervals does not depend on subset
+* add score test result in summarytable
+* bug fixed in lcmm with prior
+* bug fixed in Jointlcmm with infinite score test
+* bug fixed in dynpred with TimeDepVar
+
 Changes in Version 1.7.9 :
 
 * bug in summary when the model did not converge
