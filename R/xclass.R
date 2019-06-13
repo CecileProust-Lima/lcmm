@@ -2,8 +2,8 @@
 #'
 #' This function crosses the posterior classifications of two estimated models
 #'
-#' @param m1 an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}
-#' @param m2 an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}
+#' @param m1 an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm} or \code{mpjlcmm}
+#' @param m2 an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm} or \code{mpjlcmm}
 #' @return the contingency table of the two classifications
 #' @author Viviane Philipps and Cecile Proust-Lima
 #'
@@ -27,8 +27,8 @@
 
 xclass <- function(m1,m2)
 {
-    if(!(class(m1) %in% c("hlme","lcmm","multlcmm","Jointlcmm"))) stop("Please use this function only with hlme, lcmm, multlcmm or Jointlcmm models")
-    if(!(class(m2) %in% c("hlme","lcmm","multlcmm","Jointlcmm"))) stop("Please use this function only with hlme, lcmm, multlcmm or Jointlcmm models")
+    if(!(class(m1) %in% c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("Please use this function only with hlme, lcmm, multlcmm, Jointlcmm or mpjlcmm models")
+    if(!(class(m2) %in% c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("Please use this function only with hlme, lcmm, multlcmm, Jointlcmm or mpjlcmm models")
 
     table(m1$pprob[,2],m2$pprob[,2])
 }
