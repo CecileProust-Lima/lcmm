@@ -203,29 +203,39 @@ permut <- function(m,order,estim=TRUE)
 
         ## coef nw:
         if(class(m) %in% c("hlme","lcmm"))
-            {
-                avtnw <- m$N[1]+m$N[2]+m$N[3]
-                nw <- m$N[4]
-            }
+        {
+            avtnw <- m$N[1]+m$N[2]+m$N[3]
+            nw <- m$N[4]
+            nvc <- m$N[3]
+        }
         if(class(m)=="multlcmm")
-            {
-                avtnw <- m$N[3]+m$N[4]
-                nw <- m$N[5]
-            }
+        {
+            avtnw <- m$N[3]+m$N[4]
+            nw <- m$N[5]
+            nvc <- m$N[4]
+        }
         if(class(m)=="Jointlcmm")
-            {
-                avtnw <- m$N[1]+m$N[2]+m$N[3]+m$N[4]+m$N[5]
-                nw <- m$N[6]
-            }
+        {
+            avtnw <- m$N[1]+m$N[2]+m$N[3]+m$N[4]+m$N[5]
+            nw <- m$N[6]
+            nvc <- m$N[5]
+        }
         if(nw>0)
+        {
+            if(nvc>0)
             {
-                coefold <- c(m$best[avtnw+1:(ng-1)],1)
-                coeford <- coefold[order]
-                coefref <- coeford/coeford[ng]
-                coefnew <- coefref[1:(ng-1)]
-                bnew[avtnw+1:(ng-1)] <- coefnew
+                reold <- m$best[(avtnw-nvc+1):avtnw]
+                renew <- reold*m$best[avtnw+order[ng]]^2
+                bnew[(avtnw-nvc+1):avtnw] <- renew
             }
-
+            
+            coefold <- c(m$best[avtnw+1:(ng-1)],1)
+            coeford <- coefold[order]
+            coefref <- coeford/coeford[ng]
+            coefnew <- coefref[1:(ng-1)]
+            bnew[avtnw+1:(ng-1)] <- coefnew
+        }
+        
         ## modele avec les nouveaux coef
         if(estim==TRUE)
             {
