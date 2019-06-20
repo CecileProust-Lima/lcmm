@@ -29,7 +29,6 @@
             attributes(data)$terms <- NULL
         }
 
-    timeInterv <- data[,var.time]
     
     if(class(x) %in% c("hlme","lcmm","Jointlcmm"))
         {
@@ -52,6 +51,8 @@
             if(length(linesNA)) data <- data[-linesNA,]
         }
 
+    timeInterv <- data[,var.time]
+    
     subset2 <- try(as.numeric(subset),silent=TRUE)
     
     #if(!is.null(subset))

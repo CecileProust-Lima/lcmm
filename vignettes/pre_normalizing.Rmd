@@ -5,14 +5,13 @@ output:
     toc: true # table of content true
     toc_depth : 3  
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Pre-normalizing}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 
 ```{r setup, include = FALSE}
-library(stringr)
 library(lcmm)
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -41,7 +40,7 @@ summary(paquid$CESD)
 ```
 
 ```{r, fig.height=4, fig.width=6}
-hist(paquid$CESD, breaks =50)
+hist(paquid$CESD, breaks=50)
 ```
 
 ## Normalizing a variable with lcmm
@@ -57,7 +56,8 @@ paquid$age65 <- (paquid$age-65)/10
 ```
 
 ```{r, results='hide'}
-mpreH <- lcmm(CESD ~ age65 + I(age65^2), random = ~ age65 + I(age65^2), subject = 'ID', data=paquid, link = '5-quant-splines') 
+mpreH <- lcmm(CESD ~ age65 + I(age65^2), random = ~ age65 + I(age65^2), subject = 'ID',
+ data=paquid, link = '5-quant-splines') 
 ```
 &nbsp;
 
@@ -95,8 +95,8 @@ The transformation does not change the structure of the data. In particular, the
 
 ```{r, fig.height=4, fig.width=7, comment='' }
 par(mfrow=c(1,2))
-hist(paquid$CESD, breaks = 50, cex.main=0.9, main="Distribution of CESD")
-hist(paquid$normCESD, breaks = 50, cex.main=0.9, main="Distribution of normCESD") 
+hist(paquid$CESD, breaks=50, cex.main=0.9, main="Distribution of CESD")
+hist(paquid$normCESD, breaks=50, cex.main=0.9, main="Distribution of normCESD") 
 ```
 
 &nbsp;
@@ -163,7 +163,7 @@ With normCESD100 for example, a linear mixed model with a linear trajectory acco
 &nbsp;
 
 ```{r, results='hide', comment=''}
-m1 <- hlme(normCESD100 ~ age65*male +CEP*age65 + age_init, random=~age65, subject='ID',data=paquid)
+m1 <- hlme(normCESD100 ~ age65*male + CEP*age65 + age_init, random=~age65, subject='ID',data=paquid)
 summary(m1)
 ``` 
 
@@ -175,7 +175,7 @@ Or a linear mixed model with a linear trajectory according to time since entry w
 
 ```{r, results='hide', comment=''}
 paquid$time <- paquid$age - paquid$age_init
-m2 <- hlme(normCESD100 ~ time*male +CEP*time + age_init, random=~time, subject='ID', data=paquid)
+m2 <- hlme(normCESD100 ~ time*male + CEP*time + age_init, random=~time, subject='ID', data=paquid)
 summary(m2)
 ```
 

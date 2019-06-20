@@ -11,12 +11,12 @@ https://www.jstatsoft.org/article/view/v078i02
 
 Changes in Version 1.8.0 :
 
-* new function mpjlcmm for estimating joint models with multiple latent processes
+* new function mpjlcmm for estimating joint latent class models with multiple markers and/or latent processes
 * various post-fit functions for mpjlcmm objects
 * new functions permut and xclass
-* creation of vignettes, thanks to Samy Youbi
+* creation of vignettes, thanks to Samy Youbi for his help
 * variable 'subject' must be numeric
-* in plot(which='fit'), time intervals does not depend on subset
+* in plot(which='fit'), time intervals do not depend on subset
 * add score test result in summarytable
 * bug fixed in lcmm with prior
 * bug fixed in Jointlcmm with infinite score test

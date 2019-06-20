@@ -3,16 +3,15 @@ title: "How to estimate a latent class mixed model using hlme function"
 output: 
   rmarkdown::html_vignette:
     toc: true # table of content true
-    toc_depth : 3  
+    toc_depth : 3
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Latent class model with hlme}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 
 ```{r setup, include = FALSE}
-library(stringr)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -93,7 +92,7 @@ set.seed(1)
 ```
 &nbsp;
 
-<p align="justify"> As MMSE has a very skewed distribution, we use its normalized version easily obtained from NormPsy package (see Introduction vignette: https://cran.r-project.org/web/packages/lcmm/vignettes/introduction.html
+<p align="justify"> As MMSE has a very skewed distribution, we use its normalized version easily obtained from NormPsy package (see Introduction vignette: https://cran.r-project.org/web/package=lcmm/vignettes/introduction.html
 ).</p>
 
 &nbsp;
@@ -144,7 +143,8 @@ m1 <- hlme(normMMSE ~ age65+I(age65^2)+CEP,random =~ age65+I(age65^2), subject =
 
 ```{r,comment='', results='hide'}
 #Estimation considering 2 classes : 
-m2 <- hlme(normMMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject = 'ID', data = paquid, ng = 2, mixture=~age65+I(age65^2), B=m1)
+m2 <- hlme(normMMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject = 'ID', data = paquid,
+ ng = 2, mixture=~age65+I(age65^2), B=m1)
 ```
 
 ## Be careful with initial values ! 
@@ -160,7 +160,9 @@ m2 <- hlme(normMMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject 
 &nbsp;
 
 ```{r, comment='', results='hide'}
-m2b <- hlme(normMMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), mixture =~ age65+I(age65^2), subject = 'ID', ng = 2, data = paquid, B = c(0, 60, 40, 0, -4, 0, -10, 10, 212.869397, -216.421323,456.229910, 55.713775, -145.715516, 59.351000, 10.072221))
+m2b <- hlme(normMMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject = 'ID',data = paquid,
+ ng = 2, mixture =~ age65+I(age65^2), B = c(0, 60, 40, 0, -4, 0, -10, 10,
+ 212.869397, -216.421323,456.229910, 55.713775, -145.715516, 59.351000, 10.072221))
 ```
 
 ### Values randomly generated 
@@ -170,23 +172,30 @@ m2b <- hlme(normMMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), mixture
 &nbsp;
 
 ```{r, results='hide'}
-m2c <- hlme(normMMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), mixture =~ age65+I(age65^2), subject = 'ID', ng = 2, data = paquid, B = random(m1))
+m2c <- hlme(normMMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2),subject = 'ID', data = paquid,
+ ng = 2, mixture =~ age65+I(age65^2),  B = random(m1))
 ```
 
 
 ### Grid search
 
-<p align="justify">Finally, gridsearch function can be used to run an automatic grid search. In the next examples with $G=2$ and $G=3$ classes (`m2d`and `m3b`, respectively), `hlme` is run for a maximum of 50 iterations from 100 random vectors of initial values. The estimation procedure is then finalized only for the departure that provided the best log-likelihood after 30 iterations.</p>
+<p align="justify">Finally, gridsearch function can be used to run an automatic grid search. In the next examples with $G=2$ and $G=3$ classes (`m2d` and `m3b`, respectively), `hlme` is run for a maximum of 30 iterations from 100 random vectors of initial values. The estimation procedure is then finalized only for the departure that provided the best log-likelihood after 30 iterations.</p>
 
 &nbsp;
 
-```{r, results='hide'}
-m2d <- gridsearch(hlme(normMMSE ~ age65+I(age65^2)+CEP,  random =~ age65+I(age65^2), subject = 'ID', data=paquid, ng = 2, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
+```{r, results='hide', eval=FALSE}
+m2d <- gridsearch(hlme(normMMSE ~ age65+I(age65^2)+CEP,  random =~ age65+I(age65^2), subject = 'ID', data=paquid,
+ ng = 2, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
 ```
 
 
-```{r, comment='', results='hide'}
-m3g <- gridsearch(hlme(normMMSE ~ age65+I(age65^2)+CEP,  random =~ age65+I(age65^2), subject = 'ID', data=paquid, ng = 3, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
+```{r, comment='', results='hide', eval=FALSE}
+m3g <- gridsearch(hlme(normMMSE ~ age65+I(age65^2)+CEP,  random =~ age65+I(age65^2), subject = 'ID', data=paquid,
+ ng = 3, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
+```
+
+```{r, comment='', results='hide', echo=FALSE}
+load("gridsearch_hlme.RData")
 ```
 
 This method is recommended as it enables to better explore the parameter space when the number of replicates is large enough and the number of iterations is fairly large. 
@@ -201,7 +210,8 @@ This method is recommended as it enables to better explore the parameter space w
 &nbsp;
 
 ```{r, comment=''}
-summarytable(m1,m2,m2b,m2c, m2d, m3g, which = c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "%class"))
+summarytable(m1,m2,m2b,m2c, m2d, m3g,
+ which = c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "%class"))
 ```
 
 &nbsp; 
@@ -252,9 +262,11 @@ Predictions can then be plotted:
 &nbsp;
 
 ```{r,comment='', fig.height=4, fig.width=6}
-plot(pred0, col=c("red","navy"), lty=1,lwd=5,ylab="normMMSE",legend=NULL,main="Predicted trajectories for normMMSE ",ylim=c(0,100))
+plot(pred0, col=c("red","navy"), lty=1,lwd=5,ylab="normMMSE",legend=NULL,
+  main="Predicted trajectories for normMMSE ",ylim=c(0,100))
 plot(pred1, col=c("red","navy"), lty=2,lwd=3,legend=NULL,add=TRUE)
-legend(x="topright",legend=c("class1 :","CEP-","CEP+","class2:","CEP-","CEP+"), col=c("red","navy"), lwd=2, lty=c(0,1,2,0,1,2), ncol=2, bty="n", cex = 0.7)
+legend(x="topright",legend=c("class1 :","CEP-","CEP+","class2:","CEP-","CEP+"),
+ col=c("red","navy"), lwd=2, lty=c(0,1,2,0,1,2), ncol=2, bty="n", cex = 0.7)
 ```
 
 &nbsp;
@@ -266,8 +278,10 @@ If we want to have a sense of the variability, we can compute the predictions wi
 ```{r,comment='', fig.height=4, fig.width=6}
 predIC0 <- predictY(m2d, data_pred0, var.time = "age",draws=TRUE)
 predIC1 <- predictY(m2d, data_pred1, var.time = "age",draws=TRUE)
-plot(predIC0, col=c("deeppink","deepskyblue"), lty=1, lwd=2, ylab="normMMSE", main="Predicted trajectories for normMMSE", ylim=c(0,100), shades=TRUE)
-plot(predIC1, col=c("deeppink","deepskyblue"), lty=2, lwd=2, ylab="normMMSE", main="Predicted trajectories for normMMSE", legend=NULL, ylim=c(0,100), shades=TRUE, add=TRUE)
+plot(predIC0, col=c("deeppink","deepskyblue"), lty=1, lwd=2, ylab="normMMSE",
+ main="Predicted trajectories for normMMSE", ylim=c(0,100), shades=TRUE)
+plot(predIC1, col=c("deeppink","deepskyblue"), lty=2, lwd=2, ylab="normMMSE",
+ main="Predicted trajectories for normMMSE", legend=NULL, ylim=c(0,100), shades=TRUE, add=TRUE)
 ```
 
 &nbsp;
@@ -276,14 +290,17 @@ Finally, the predicted trajectories for 1-, 2- and 3-class models can be represe
 
 &nbsp;
 
-```{r,comment='',fig.height=6, fig.width=8}
+```{r,comment='',fig.height=4, fig.width=10}
 predG1 <- predictY(m1, data_pred0, var.time = "age")
 predG3 <- predictY(m3g, data_pred0, var.time = "age")
 
 par(mfrow=c(1,3))
-plot(predG1, col=1, lty=1, lwd=2, ylab="normMMSE", legend=NULL, main="Predicted trajectories G=1",ylim=c(0,100))
-plot(pred0, col=c("red","navy"), lty=1, lwd=2,ylab="normMMSE", legend=NULL, main="Predicted trajectories G=2", ylim=c(0,100))
-plot(predG3, col=2:4, lty=1, lwd=2, ylab="normMMSE", legend=NULL, main="Predicted trajectories G=3", ylim=c(0,100))
+plot(predG1, col=1, lty=1, lwd=2, ylab="normMMSE", legend=NULL,
+ main="Predicted trajectories G=1",ylim=c(0,100))
+plot(pred0, col=c("red","navy"), lty=1, lwd=2,ylab="normMMSE", legend=NULL,
+ main="Predicted trajectories G=2", ylim=c(0,100))
+plot(predG3, col=2:4, lty=1, lwd=2, ylab="normMMSE", legend=NULL,
+ main="Predicted trajectories G=3", ylim=c(0,100))
 ```
 
 &nbsp; 

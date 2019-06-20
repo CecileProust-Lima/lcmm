@@ -6,16 +6,13 @@ output:
     toc: true # table of content true
     toc_depth : 3
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Latent process model with lcmm}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 
-
-
 ```{r setup, include = FALSE}
-library(stringr)
 library(lcmm)
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -183,11 +180,12 @@ The different estimated link functions can be compared in a plot:
           
 ```{r testprint,message=FALSE, fig.height=4, fig.width=6}
 col <- rainbow(5)
-plot(mlin,which="linkfunction",bty='l',ylab="CES-D",col=col[1],lwd=2, xlab="underlying latent process")
-plot(mbeta,which="linkfunction",add=TRUE,col=col[2],lwd=2)
-plot(mspl,which="linkfunction",add=TRUE,col=col[3],lwd=2)
-plot(mspl5q,which="linkfunction",add=TRUE,col=col[4],lwd=2)
-legend(x="topleft",legend=c("linear", "beta","splines (5equidistant)","splines (5 at quantiles)"), lty=1, col=col, bty="n", lwd=2)
+plot(mlin, which="linkfunction", bty='l', ylab="CES-D", col=col[1], lwd=2, xlab="underlying latent process")
+plot(mbeta, which="linkfunction", add=TRUE, col=col[2], lwd=2)
+plot(mspl, which="linkfunction", add=TRUE, col=col[3], lwd=2)
+plot(mspl5q, which="linkfunction", add=TRUE, col=col[4], lwd=2)
+legend(x="topleft", legend=c("linear", "beta","splines (5equidistant)","splines (5 at quantiles)"),
+ lty=1, col=col, bty="n", lwd=2)
 ```
 
 &nbsp;
@@ -202,8 +200,9 @@ Confidence bands of the transformations can be obtained by the Monte Carlo metho
      
 ```{r,message=FALSE,  fig.height=4, fig.width=6}
 linkspl5q <- predictlink(mspl5q,ndraws=2000)
-plot(linkspl5q,col=col[4],lty=2, shades = TRUE)
-legend(x="left",legend=c("95% confidence bands","for splines at quantiles"),lty=c(2,NA), col=c(col[4],NA), bty="n", lwd=1, cex = 0.8)
+plot(linkspl5q, col=col[4], lty=2, shades=TRUE)
+legend(x="left", legend=c("95% confidence bands","for splines at quantiles"),lty=c(2,NA), col=c(col[4],NA),
+ bty="n", lwd=1, cex=0.8)
 ```             
 
 &nbsp;
@@ -217,7 +216,7 @@ Sometimes, with markers that have only a restricted number of different levels, 
 
 Here is an example with $HIER$ variable (4 levels) as considering a threshold link function for CESD would involve too many parameters given the range in 0-52 (e.g., 52 threshold parameters).
 
-```{r, results='hide'}
+```{r, results='hide', eval=FALSE}
 mthresholds <- lcmm(HIER ~ age65*male, random=~ age65, subject='ID', data=paquid, link='thresholds')
 ```
 
@@ -243,9 +242,9 @@ The predicted trajectories can be computed in the natural scale of the dependent
 datnew <- data.frame(age=seq(65,95,length=100))
 datnew$age65 <- (datnew$age - 65)/10
 datnew$male <- 0
-women <- predictY(mspl5q,newdata=datnew,var.time="age",draws=TRUE)
+women <- predictY(mspl5q, newdata=datnew, var.time="age", draws=TRUE)
 datnew$male <- 1
-men <- predictY(mspl5q,newdata=datnew,var.time="age",draws=TRUE)
+men <- predictY(mspl5q, newdata=datnew, var.time="age", draws=TRUE)
 ```
 
 &nbsp;
@@ -254,9 +253,11 @@ And then plotted:
 
 &nbsp;
 ```{r,message=FALSE,  fig.height=4, fig.width=6}
-plot(women,lwd=c(2,1),type="l",col=6,ylim=c(0,20),xlab="age in year",ylab="CES-D",bty="l", legend=NULL, shades = TRUE)
-plot(men,add=TRUE,col=4,lwd=c(2,1), shades = TRUE)
-legend(x="topleft",bty="n",ncol=2,lty=c(1,1,2,2),col=c(6,4,6,4), legend=c("women","men", "95% CI", "95% CI"), lwd=c(2,2,1,1)) 
+plot(women, lwd=c(2,1), type="l", col=6, ylim=c(0,20), xlab="age in year",ylab="CES-D",bty="l",
+ legend=NULL, shades = TRUE)
+plot(men, add=TRUE, col=4, lwd=c(2,1), shades=TRUE)
+legend(x="topleft", bty="n", ncol=2, lty=c(1,1,2,2), col=c(6,4,6,4),
+ legend=c("women","men", "95% CI", "95% CI"), lwd=c(2,2,1,1)) 
 ```
 
 &nbsp;
@@ -275,7 +276,8 @@ plot(mspl5q, cex.main=0.9)
 The mean predictions and observations can be plotted according to time. Note that the predictions and observations are in the scale of the latent process (observations are transformed with the estimated link function): 
 
 ```{r,message=FALSE,eval=TRUE,  fig.height=4, fig.width=6}
-plot(mspl5q,which="fit",var.time="age65",bty="l",xlab="(age-65)/10",break.times=8, ylab="latent process", lwd=2, marg=F, ylim=c(-1,2), shades = TRUE, col=2)
+plot(mspl5q, which="fit", var.time="age65", bty="l", xlab="(age-65)/10", break.times=8, ylab="latent process",
+ lwd=2, marg=FALSE, ylim=c(-1,2), shades=TRUE, col=2)
 ```
 
 &nbsp;
@@ -286,19 +288,18 @@ plot(mspl5q,which="fit",var.time="age65",bty="l",xlab="(age-65)/10",break.times=
 
 ## heterogeneous profiles of trajectories
 
-The latent process mixed model extends to the  heterogeneous case with latent classes. The same strategy as explained with hlme (see https://cran.r-project.org/web/packages/lcmm/vignettes/latent_class_model_with_hlme.html
+The latent process mixed model extends to the  heterogeneous case with latent classes. The same strategy as explained with hlme (see https://cran.r-project.org/web/package=lcmm/vignettes/latent_class_model_with_hlme.html
 ) can be used.  
 
 
 ## joint analysis of a time to event
 
-The latent process mixed model extends to the case of a joint model. This is done in Jointlcmm (see
-https://cran.r-project.org/web/packages/lcmm/vignettes/joint_latent_class_model_with_Jointlcmm.html
-).
+The latent process mixed model extends to the case of a joint model. This is done in Jointlcmm.
+<!--(see https://cran.r-project.org/web/package=lcmm/vignettes/joint_latent_class_model_with_Jointlcmm.html).-->
 
 ## multiple markers of the same latent process
 
 In some cases, several markers of the same underlying latent process may be measured. The latent process mixed model extends to that case. This is the purpose of multlcmm (see
-https://cran.r-project.org/web/packages/lcmm/vignettes/latent_process_model_with_multlcmm.html
+https://cran.r-project.org/web/package=lcmm/vignettes/latent_process_model_with_multlcmm.html
 ).
 
