@@ -117,8 +117,7 @@ load("models_mult.RData")
 By default, all the link functions are set to linear:
 
 ```{r ,message=FALSE, results='hide',eval=FALSE}
-mult_lin <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male),
- random =~ time +I(time^2 / 10), subject='ID', data = paquid, randomY = TRUE, cor = BM(time))
+mult_lin <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male), random =~ time +I(time^2 / 10), subject='ID', data = paquid, randomY = TRUE, cor = BM(time))
 ```
 
 &nbsp;
@@ -139,17 +138,14 @@ As in the univariate case, Beta CDF or splines can be considered. The link funct
 
 ```{r test2,message=FALSE, results='hide',eval=FALSE}
 # Example with Beta
-mult_beta <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male),
- random =~ time + I(time^2/10), subject='ID', data = paquid, randomY = TRUE, cor = BM(time), link = 'beta')
+mult_beta <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male), random =~ time + I(time^2/10), subject='ID', data = paquid, randomY = TRUE, cor = BM(time), link = 'beta')
 ```
 
 Or the link functions can be chosen differently. For instance,
 
 ```{r test73,message=FALSE, results='hide',eval=FALSE}
 # different number of knots in splines
-mult_betaspl <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male),
- random =~time + I(time^2/10), subject='ID', data = paquid, randomY = TRUE, cor = BM(time),
- link = c('beta','3-quant-splines','3-quant-splines'))
+mult_betaspl <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male), random =~time + I(time^2/10), subject='ID', data = paquid, randomY = TRUE, cor = BM(time), link = c('beta','3-quant-splines','3-quant-splines'))
 ```
 
 ### Fixing some transformation parameters
@@ -159,9 +155,7 @@ with MMSE. For instance, in the example below, convergence cannot be reached eas
 
 ```{r test71,message=FALSE, results='hide',eval=FALSE}
 # with splines
-mult_splines <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male),
- random =~time + I(time^2/10), subject='ID', data = paquid, randomY = TRUE, cor = BM(time),
- maxiter=50, link = c('3-quant-splines'))
+mult_splines <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male), random =~time + I(time^2/10), subject='ID', data = paquid, randomY = TRUE, cor = BM(time), maxiter=50, link = c('3-quant-splines'))
 ```
 
 This problem can be easily dealt with by fixing this parameter with posfix option. To do so, the position of the parameter can be identified from the vector of estimates (21st parameter here):
@@ -172,9 +166,7 @@ mult_splines$best
 And the model can be refitted from these estimates and the newly fixed parameter:
 ```{r test72,message=FALSE, results='hide',eval=FALSE}
 # with splines
-mult_splines2 <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male),
- random =~time + I(time^2/10), subject='ID', data = paquid, randomY = TRUE, cor = BM(time),
- maxiter=50, link = c('3-quant-splines'), posfix=21, B=mult_splines$best)
+mult_splines2 <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + contrast(male), random =~time + I(time^2/10), subject='ID', data = paquid, randomY = TRUE, cor = BM(time), maxiter=50, link = c('3-quant-splines'), posfix=21, B=mult_splines$best)
 ```
 
 With this constraint, the model converges correctly. 
@@ -274,15 +266,12 @@ predict_women<-predictY(mult_betaspl,newdata=datnew,var.time='time',draws=TRUE)
 datnew$male <- 1
 predict_men <- predictY(mult_betaspl,newdata=datnew,var.time='time',draws=TRUE) 
 par(mfrow=c(2,2))
-plot(predict_women, lwd=c(2,1), type='l', col=6, ylim=c(0,30), xlab='time since entry (in decades)', ylab='Marker',
- bty='l', legend=NULL, shades=TRUE, outcome = 1, main='Mean predicted trajectory for MMSE')
+plot(predict_women, lwd=c(2,1), type='l', col=6, ylim=c(0,30), xlab='time since entry (in decades)', ylab='Marker', bty='l', legend=NULL, shades=TRUE, outcome = 1, main='Mean predicted trajectory for MMSE')
 plot(predict_men, lwd=c(2,1), type='l', col=3, shades=TRUE, outcome = 1, add=TRUE)
 legend(1.5, 30, legend=c("Women", "Men"), col=c(6,3), lty=1:2, cex=0.8,bty="n")
-plot(predict_women, lwd=c(2,1), type='l', col=6, ylim=c(0,40), xlab='time since entry (in decades)', ylab='Marker',
- bty='l', legend=NULL, shades=TRUE, outcome = 2, main='Mean predicted trajectory for IST') 
+plot(predict_women, lwd=c(2,1), type='l', col=6, ylim=c(0,40), xlab='time since entry (in decades)', ylab='Marker', bty='l', legend=NULL, shades=TRUE, outcome = 2, main='Mean predicted trajectory for IST') 
 plot(predict_men, lwd=c(2,1), type='l', col=3, shades=TRUE, outcome = 2, add=TRUE)
-plot(predict_women, lwd=c(2,1), type='l', col=6, ylim=c(0,15), xlab='time since entry (in decades)', ylab='Marker',
- bty='l', legend=NULL, shades=TRUE, outcome = 3, main='Mean predicted trajectory for BVRT') 
+plot(predict_women, lwd=c(2,1), type='l', col=6, ylim=c(0,15), xlab='time since entry (in decades)', ylab='Marker', bty='l', legend=NULL, shades=TRUE, outcome = 3, main='Mean predicted trajectory for BVRT') 
 plot(predict_men, lwd=c(2,1), type='l', col=3, shades=TRUE, outcome = 3, add=TRUE)
 ```
 
@@ -304,17 +293,11 @@ The mean predictions and observations can be plotted according to time. Note tha
 
 ```{r,message=FALSE,eval=TRUE,  fig.height=6, fig.width=7}
 par(mfrow=c(2,2))
-plot(mult_betaspl, which="fit", var.time="time", bty="l", xlab="time since entry (in decades)", cex.lab=1.1,
- break.times=8, ylab="latent process", lwd=2, marg=FALSE, ylim=c(-2,0.0), xlim=c(0.1,2), shades = TRUE,
- outcome = 1, col=2, main="MMSE predictions vs observations") 
+plot(mult_betaspl, which="fit", var.time="time", bty="l", xlab="time since entry (in decades)", cex.lab=1.1, break.times=8, ylab="latent process", lwd=2, marg=FALSE, ylim=c(-2,0.0), xlim=c(0.1,2), shades = TRUE, outcome = 1, col=2, main="MMSE predictions vs observations") 
 
-plot(mult_betaspl, which="fit", var.time="time", bty="l", xlab="time since entry (in decades)", cex.lab=1.1,
- break.times=8, ylab="latent process", lwd=2, marg=FALSE, ylim=c(-2,0.3), xlim=c(0.1,2), shades = TRUE,
- outcome = 2, col=3, main="IST predictions vs observations")
+plot(mult_betaspl, which="fit", var.time="time", bty="l", xlab="time since entry (in decades)", cex.lab=1.1, break.times=8, ylab="latent process", lwd=2, marg=FALSE, ylim=c(-2,0.3), xlim=c(0.1,2), shades = TRUE, outcome = 2, col=3, main="IST predictions vs observations")
 
-plot(mult_betaspl, which="fit", var.time="time", bty="l", xlab="time since entry (in decades)", cex.lab=1.1,
- break.times=8, ylab="latent process", lwd=2, marg=FALSE, ylim=c(-1.5,0.5), xlim=c(0.1,2), shades = TRUE,
- outcome = 3, col=4, main="BVRT predictions vs observations") 
+plot(mult_betaspl, which="fit", var.time="time", bty="l", xlab="time since entry (in decades)", cex.lab=1.1, break.times=8, ylab="latent process", lwd=2, marg=FALSE, ylim=c(-1.5,0.5), xlim=c(0.1,2), shades = TRUE, outcome = 3, col=4, main="BVRT predictions vs observations") 
 
 ```
 

@@ -49,9 +49,7 @@ Each function is precisely introduced in the companion paper (Proust-Lima, JSS 2
 This function is used for standard linear mixed models and their extension to multiple profiles of trajectory : the latent class linear mixed models 
 
 ```{r, eval=FALSE}
-hlme(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALSE, cor = NULL, data,
- B, convB = 0.0001, convL = 0.0001, convG = 0.0001, prior, maxiter = 500, subset = NULL,
- na.action = 1, posfix = NULL)
+hlme(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALSE, cor = NULL, data, B, convB = 0.0001, convL = 0.0001, convG = 0.0001, prior, maxiter = 500, subset = NULL, na.action = 1, posfix = NULL)
 ```
 
 
@@ -60,10 +58,7 @@ hlme(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALS
 This function is used to estimate mixed models when the outcome does not have a Gaussian distribution. The method is called "latent process model". As hlme, the method also handles heterogeneous profiles of trajectories in a "latent process and latent class mixed model". 
 
 ```
-lcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALSE, link = "linear",
- intnodes = NULL, epsY = 0.5, cor = NULL, data, B, convB = 1e-04, convL = 1e-04, convG = 1e-04,
-  maxiter = 100, nsim = 100, prior, range = NULL, subset = NULL, na.action = 1, posfix = NULL,
-  partialH = FALSE)
+lcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALSE, link = "linear", intnodes = NULL, epsY = 0.5, cor = NULL, data, B, convB = 1e-04, convL = 1e-04, convG = 1e-04,  maxiter = 100, nsim = 100, prior, range = NULL, subset = NULL, na.action = 1, posfix = NULL,  partialH = FALSE)
 ``` 
 
 ## multlcmm
@@ -71,10 +66,7 @@ lcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALS
 This function extends lcmm function when more than one marker measures the same underlying construct of interest. Again the function handles either homogeneous or heterogeneous profiles of trajectories.
 
 ```
-multlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALSE, randomY = FALSE,
- link = "linear", intnodes = NULL, epsY = 0.5, cor = NULL, data, B, convB = 1e-04, convL = 1e-04,
- convG = 1e-04, maxiter = 100, nsim = 100, prior, range = NULL, subset = NULL, na.action = 1,
- posfix = NULL, partialH = FALSE)
+multlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALSE, randomY = FALSE, link = "linear", intnodes = NULL, epsY = 0.5, cor = NULL, data, B, convB = 1e-04, convL = 1e-04, convG = 1e-04, maxiter = 100, nsim = 100, prior, range = NULL, subset = NULL, na.action = 1, posfix = NULL, partialH = FALSE)
 ``` 
 
 
@@ -83,11 +75,7 @@ multlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = 
 This function extends hlme, lcmm and multlcmm to jointly analyze times to event (in a competing setting). The latent structure shared between the longitudinal outcome(s) and the time(s) to event is latent classes. 
 
 ```
-Jointlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALSE, survival,
- hazard = "Weibull", hazardtype = "Specific", hazardnodes = NULL, TimeDepVar = NULL, link = NULL,
- intnodes = NULL, epsY = 0.5, range = NULL, cor = NULL, data, B, convB = 1e-4, convL = 1e-4,
- convG = 1e-4, maxiter = 100, nsim = 100, prior, logscale = FALSE, subset = NULL, na.action = 1,
- posfix = NULL, partialH = FALSE)
+Jointlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALSE, survival, hazard = "Weibull", hazardtype = "Specific", hazardnodes = NULL, TimeDepVar = NULL, link = NULL, intnodes = NULL, epsY = 0.5, range = NULL, cor = NULL, data, B, convB = 1e-4, convL = 1e-4, convG = 1e-4, maxiter = 100, nsim = 100, prior, logscale = FALSE, subset = NULL, na.action = 1, posfix = NULL, partialH = FALSE)
 ``` 
 
 

@@ -184,8 +184,7 @@ plot(mlin, which="linkfunction", bty='l', ylab="CES-D", col=col[1], lwd=2, xlab=
 plot(mbeta, which="linkfunction", add=TRUE, col=col[2], lwd=2)
 plot(mspl, which="linkfunction", add=TRUE, col=col[3], lwd=2)
 plot(mspl5q, which="linkfunction", add=TRUE, col=col[4], lwd=2)
-legend(x="topleft", legend=c("linear", "beta","splines (5equidistant)","splines (5 at quantiles)"),
- lty=1, col=col, bty="n", lwd=2)
+legend(x="topleft", legend=c("linear", "beta","splines (5equidistant)","splines (5 at quantiles)"), lty=1, col=col, bty="n", lwd=2)
 ```
 
 &nbsp;
@@ -201,8 +200,7 @@ Confidence bands of the transformations can be obtained by the Monte Carlo metho
 ```{r,message=FALSE,  fig.height=4, fig.width=6}
 linkspl5q <- predictlink(mspl5q,ndraws=2000)
 plot(linkspl5q, col=col[4], lty=2, shades=TRUE)
-legend(x="left", legend=c("95% confidence bands","for splines at quantiles"),lty=c(2,NA), col=c(col[4],NA),
- bty="n", lwd=1, cex=0.8)
+legend(x="left", legend=c("95% confidence bands","for splines at quantiles"),lty=c(2,NA), col=c(col[4],NA), bty="n", lwd=1, cex=0.8)
 ```             
 
 &nbsp;
@@ -253,11 +251,9 @@ And then plotted:
 
 &nbsp;
 ```{r,message=FALSE,  fig.height=4, fig.width=6}
-plot(women, lwd=c(2,1), type="l", col=6, ylim=c(0,20), xlab="age in year",ylab="CES-D",bty="l",
- legend=NULL, shades = TRUE)
+plot(women, lwd=c(2,1), type="l", col=6, ylim=c(0,20), xlab="age in year",ylab="CES-D",bty="l", legend=NULL, shades = TRUE)
 plot(men, add=TRUE, col=4, lwd=c(2,1), shades=TRUE)
-legend(x="topleft", bty="n", ncol=2, lty=c(1,1,2,2), col=c(6,4,6,4),
- legend=c("women","men", "95% CI", "95% CI"), lwd=c(2,2,1,1)) 
+legend(x="topleft", bty="n", ncol=2, lty=c(1,1,2,2), col=c(6,4,6,4), legend=c("women","men", "95% CI", "95% CI"), lwd=c(2,2,1,1)) 
 ```
 
 &nbsp;
@@ -276,8 +272,7 @@ plot(mspl5q, cex.main=0.9)
 The mean predictions and observations can be plotted according to time. Note that the predictions and observations are in the scale of the latent process (observations are transformed with the estimated link function): 
 
 ```{r,message=FALSE,eval=TRUE,  fig.height=4, fig.width=6}
-plot(mspl5q, which="fit", var.time="age65", bty="l", xlab="(age-65)/10", break.times=8, ylab="latent process",
- lwd=2, marg=FALSE, ylim=c(-1,2), shades=TRUE, col=2)
+plot(mspl5q, which="fit", var.time="age65", bty="l", xlab="(age-65)/10", break.times=8, ylab="latent process", lwd=2, marg=FALSE, ylim=c(-1,2), shades=TRUE, col=2)
 ```
 
 &nbsp;

@@ -31,7 +31,7 @@ The methodology has been fully described and validated for MMSE in Philipps et a
 We describe here how this can be done using CES-D example. 
 
 
-## CES-D example
+# CES-D example
 
 CES-D is the scale of depressive symptomatology in the Paquid dataset made of 20 items. Its sumscore is extremely skewed with a large proportion of small values: 
 
@@ -43,7 +43,7 @@ summary(paquid$CESD)
 hist(paquid$CESD, breaks=50)
 ```
 
-## Normalizing a variable with lcmm
+# Normalizing a variable with lcmm
 
 The first step is to normalize the variable by estimating a latent process mixed model. 
 This model should roughly fit the data but does not need to be the perfect model or the exact same model as planned for the future complete analysis. One possibility is to define an "empty model" for the covariates (but not the time functions and random effects) :
@@ -56,8 +56,7 @@ paquid$age65 <- (paquid$age-65)/10
 ```
 
 ```{r, results='hide'}
-mpreH <- lcmm(CESD ~ age65 + I(age65^2), random = ~ age65 + I(age65^2), subject = 'ID',
- data=paquid, link = '5-quant-splines') 
+mpreH <- lcmm(CESD ~ age65 + I(age65^2), random = ~ age65 + I(age65^2), subject = 'ID', data=paquid, link = '5-quant-splines') 
 ```
 &nbsp;
 
@@ -89,7 +88,7 @@ summary(paquid[,c("CESD","normCESD")])
 ```
 
 
-## Comparison before and after normalization
+# Comparison before and after normalization
 
 The transformation does not change the structure of the data. In particular, the spike at 0 is still present. 
 
@@ -123,11 +122,11 @@ CESD <- hlme(CESD ~ age65*male, random = ~ age65, subject = 'ID', data=paquid)
 plot(CESD, cex.main=0.8)
 ```
 
-## To go further  
+# To go further  
 
 For future use, it can be interesting to define the metric of normCESD. Indeed, for now, its scale in not easy to understand as it depends on the data structure. Two options are possible:  
 
-### 1. Standardizing normCESD 
+## 1. Standardizing normCESD 
 
 The variable can be standardized (like for a Z-score) by removing the mean at a time and dividing by the standard deviation at the same time. This can be done if many data are observed at the same time, like at baseline. Here, with age as the time scale, we could not use that easily.  
 
@@ -141,7 +140,7 @@ s <- sd(paquid$normCESD[(paquid$visit==0) & (!is.na(paquid$normCESD))])
 paquid$ZnormCESD <- (paquid$normCESD - m)/s
 ```
 
-### 2. Rescaling normCESD into 0 - 100 
+## 2. Rescaling normCESD into 0 - 100 
 
 The variable can be scaled in 0-100 with 0 corresponding to the minimum value observed in the sample (usually 0) and 100 the maximum observed value. This works whatever the timescale under study:
 
@@ -154,7 +153,7 @@ paquid$normCESD100 <- (paquid$normCESD - min)/(max-min)*100
 summary(paquid$normCESD100)
 ```
 
-### Example of model with normCESD100
+## Example of model with normCESD100
 
 The statistical analysis can now be performed using one of the normalized variables, normCESD, ZnormCESD or normCESD100. 
 
