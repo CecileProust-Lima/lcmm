@@ -65,7 +65,7 @@ VarExpl.Jointlcmm <- function(x,values)
 
 
    #values
-   if (!is.null(name.cor)) values1 <- model.matrix(formula(paste("~",paste(call_random[2],name.cor,sep="+"))),data=values)
+   if (!is.null(name.cor)) values1 <- model.matrix(formula(paste("~",paste(call_random,name.cor,sep="+"))),data=values)
    else values1 <- model.matrix(formula(paste("~",call_random,sep="")),data=values)
 
    if (colnames(values1)[1]=="(Intercept)") colnames(values1)[1] <- "intercept"
