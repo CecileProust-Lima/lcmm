@@ -9,7 +9,7 @@ Proust-Lima C, Philipps V, Liquet B. Estimation of Extended Mixed Models Using L
 https://www.jstatsoft.org/article/view/v078i02
 
 
-Changes in Version 1.8.0 :
+Changes in Version 1.8.1 :
 
 * new function mpjlcmm for estimating joint latent class models with multiple markers and/or latent processes
 * various post-fit functions for mpjlcmm objects

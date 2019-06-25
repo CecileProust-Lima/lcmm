@@ -15,9 +15,9 @@ if (!inherits(newdata, "data.frame")) stop("newdata should be a data.frame objec
 #if(!(var.time %in% colnames(newdata))) stop("'var.time' should be included in newdata")
 
 call_fixed <- x$call$fixed[3]
-if(is.null(x$call$random)) {call_random <- ~-1} else call_random <- x$call$random
-if(is.null(x$call$classmb)) {call_classmb <- ~-1} else call_classmb <- x$call$classmb
-if(is.null(x$call$mixture)) {call_mixture <- ~-1} else call_mixture <- x$call$mixture
+if(is.null(x$call$random)) {call_random <- -1} else call_random <- x$call$random[2]
+if(is.null(x$call$classmb)) {call_classmb <- -1} else call_classmb <- x$call$classmb[2]
+if(is.null(x$call$mixture)) {call_mixture <- -1} else call_mixture <- x$call$mixture[2]
 
 
 if (x$conv==1|x$conv==2|x$conv==3)

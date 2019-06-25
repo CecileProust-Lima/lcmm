@@ -48,7 +48,7 @@ VarExpl.Jointlcmm <- function(x,values)
    }
 
    #cas ou on a factor() dans l'appel
-   call_random <- x$call$random
+   call_random <- x$call$random[2]
    z <- all.names(call_random)
    ind_factor <- which(z=="factor")
    if (length(ind_factor))
@@ -66,7 +66,7 @@ VarExpl.Jointlcmm <- function(x,values)
 
    #values
    if (!is.null(name.cor)) values1 <- model.matrix(formula(paste("~",paste(call_random[2],name.cor,sep="+"))),data=values)
-   else values1 <- model.matrix(formula(call_random),data=values)
+   else values1 <- model.matrix(formula(paste("~",call_random,sep="")),data=values)
 
    if (colnames(values1)[1]=="(Intercept)") colnames(values1)[1] <- "intercept"
 

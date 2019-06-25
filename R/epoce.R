@@ -140,10 +140,10 @@ epoce <- function(model,pred.times,var.time,fun.time=identity,newdata=NULL,subse
 
 
     call_fixed <- model$call$fixed[3]
-    if(is.null(model$call$random)) {call_random <- ~-1} else call_random <- model$call$random
-    if(is.null(model$call$classmb)) {call_classmb <- ~-1} else call_classmb <- model$call$classmb
-    if(is.null(model$call$mixture)) {call_mixture <- ~-1} else call_mixture <- model$call$mixture
-    if(is.null(model$call$survival)) {call_survival <- ~-1} else call_survival <- model$call$survival[3]
+    if(is.null(model$call$random)) {call_random <- -1} else call_random <- model$call$random[2]
+    if(is.null(model$call$classmb)) {call_classmb <- -1} else call_classmb <- model$call$classmb[2]
+    if(is.null(model$call$mixture)) {call_mixture <- -1} else call_mixture <- model$call$mixture[2]
+    if(is.null(model$call$survival)) {call_survival <- -1} else call_survival <- model$call$survival[3]
 
     nbevt <- length(model$hazard[[1]])
     call_survival <- gsub("mixture","",call_survival)

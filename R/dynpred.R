@@ -157,9 +157,9 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                 }
             
             call_fixed <- model$call$fixed[3]
-            if(is.null(model$call$random)) {call_random <- ~-1} else call_random <- model$call$random
-            if(is.null(model$call$classmb)) {call_classmb <- ~-1} else call_classmb <- model$call$classmb
-            if(is.null(model$call$survival)) {call_survival <- ~-1} else call_survival <- model$call$survival[3]
+            if(is.null(model$call$random)) {call_random <- -1} else call_random <- model$call$random[2]
+            if(is.null(model$call$classmb)) {call_classmb <- -1} else call_classmb <- model$call$classmb[2]
+            if(is.null(model$call$survival)) {call_survival <- -1} else call_survival <- model$call$survival[3]
 
             call_survival <- gsub("mixture","",call_survival)
             for(ke in 1:nbevt)

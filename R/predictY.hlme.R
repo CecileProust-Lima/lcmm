@@ -18,9 +18,9 @@ if (!inherits(newdata, "data.frame")) stop("newdata should be a data.frame objec
 
 
 call_fixed <- x$call$fixed[3]
-if(is.null(x$call$random)) {call_random <- ~-1} else call_random <- x$call$random
-if(is.null(x$call$classmb)) {call_classmb <- ~-1} else call_classmb <- x$call$classmb
-if(is.null(x$call$mixture)) {call_mixture <- ~-1} else call_mixture <- x$call$mixture
+if(is.null(x$call$random)) {call_random <- -1} else call_random <- x$call$random[2]
+if(is.null(x$call$classmb)) {call_classmb <- -1} else call_classmb <- x$call$classmb[2]
+if(is.null(x$call$mixture)) {call_mixture <- -1} else call_mixture <- x$call$mixture[2]
 
 
 if(x$conv==1|x$conv==2) {
@@ -131,9 +131,9 @@ if(na.action==1){
  }
  call_mixture <- gsub("factor","",call_mixture)   
  
-call_mixture <- formula(call_mixture)
-call_random <- formula(call_random)
-call_classmb <- formula(call_classmb)
+call_mixture <- formula(paste("~",call_mixture,sep=""))
+call_random <- formula(paste("~",call_random,sep=""))
+call_classmb <- formula(paste("~",call_classmb,sep=""))
 
 ### Traitement des donnees manquantes
 

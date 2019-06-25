@@ -52,10 +52,10 @@ predictY.Jointlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALS
             b2 <- NULL
 
             call_fixed <- x$call$fixed[3]
-            if(is.null(x$call$random)) {call_random <- ~-1} else call_random <- x$call$random
-            if(is.null(x$call$classmb)) {call_classmb <- ~-1} else call_classmb <- x$call$classmb
-            if(is.null(x$call$mixture)) {call_mixture <- ~-1} else call_mixture <- x$call$mixture
-            if(is.null(x$call$survival)) {call_survival <- ~-1} else call_survival <- x$call$survival[3]
+            if(is.null(x$call$random)) {call_random <- -1} else call_random <- x$call$random[2]
+            if(is.null(x$call$classmb)) {call_classmb <- -1} else call_classmb <- x$call$classmb[2]
+            if(is.null(x$call$mixture)) {call_mixture <- -1} else call_mixture <- x$call$mixture[2]
+            if(is.null(x$call$survival)) {call_survival <- -1} else call_survival <- x$call$survival[3]
 
             nbevt <- length(x$hazard[[1]])
             call_survival <- gsub("mixture","",call_survival)
@@ -173,9 +173,9 @@ predictY.Jointlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALS
                 }
             call_survival <- gsub("factor","",call_survival)
             
-call_mixture <- formula(call_mixture)
-call_random <- formula(call_random)
-call_classmb <- formula(call_classmb)
+call_mixture <- formula(paste("~",call_mixture,sep=""))
+call_random <- formula(paste("~",call_random,sep=""))
+call_classmb <- formula(paste("~",call_classmb,sep=""))
 call_survival <- formula(paste("~",call_survival,sep=""))   
             
 ### Traitement des donnees manquantes
