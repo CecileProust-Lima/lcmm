@@ -92,7 +92,7 @@ set.seed(1)
 ```
 &nbsp;
 
-<p align="justify"> As MMSE has a very skewed distribution, we use its normalized version easily obtained from NormPsy package (see Introduction vignette: https://cran.r-project.org/web/package=lcmm/vignettes/introduction.html
+<p align="justify"> As MMSE has a very skewed distribution, we use its normalized version easily obtained from NormPsy package (see Introduction vignette: https://cran.r-project.org/package=lcmm/vignettes/introduction.html
 ).</p>
 
 &nbsp;

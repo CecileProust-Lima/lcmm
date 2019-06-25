@@ -778,47 +778,6 @@
 !   Local variables.
 !
 
-
-
-      if (restar .eq. 0) rule = 1
-      neval= 0
-
- 10   if (neval + rule**ndim .le. maxpts .and. rule .lt. maxrul) then
-                do i = 1,rule/2
-                        point(i) = -t(i,rule)
-                        weight(i) =  w(i,rule)
-                        point(rule-i+1) = t(i,rule)
-                        weight(rule-i+1) = w(i,rule)
-                end do
-
-                if (mod(rule, 2) .eq. 1) then
-                        point(rule/2 + 1 ) = 0
-                        weight(rule/2 + 1 ) = w(rule/2 + 1,rule)
-                end if
-
-                call mltrul(ndim,numfun,funsub,rule,point,weight,result,work,&
-                work(numfun+1),work(numfun+ndim+1))
-
-                neval = neval + rule**ndim
-                ifail = 0
-
-                do i = 1,numfun
-
-                        if (rule .gt. 1) then
-                                abserr(i) = abs(result(i) - work(2*ndim+numfun+i))
-                        else
-                                abserr(i) = abs(result(i))
-                        end if
-
-                        work(2*ndim+numfun+i) = result(i)
-                        if (abserr(i) .gt. max(espabs,epsrel*abs(result(i)))) then
-                                 ifail = 1
-                        end if
-                end do
-
-                rule = rule + 1
-                if (ifail .gt. 0 .or. neval .lt. minpts) goto 10
-        end if
 !
 !     Gauss Hermite Weights and Points, N = 1,50
 !
@@ -1524,7 +1483,49 @@
 !
 !***END HERMIT
 !
-        end subroutine hermit
+
+
+      if (restar .eq. 0) rule = 1
+      neval= 0
+
+ 10   if (neval + rule**ndim .le. maxpts .and. rule .lt. maxrul) then
+                do i = 1,rule/2
+                        point(i) = -t(i,rule)
+                        weight(i) =  w(i,rule)
+                        point(rule-i+1) = t(i,rule)
+                        weight(rule-i+1) = w(i,rule)
+                end do
+
+                if (mod(rule, 2) .eq. 1) then
+                        point(rule/2 + 1 ) = 0
+                        weight(rule/2 + 1 ) = w(rule/2 + 1,rule)
+                end if
+
+                call mltrul(ndim,numfun,funsub,rule,point,weight,result,work,&
+                work(numfun+1),work(numfun+ndim+1))
+
+                neval = neval + rule**ndim
+                ifail = 0
+
+                do i = 1,numfun
+
+                        if (rule .gt. 1) then
+                                abserr(i) = abs(result(i) - work(2*ndim+numfun+i))
+                        else
+                                abserr(i) = abs(result(i))
+                        end if
+
+                        work(2*ndim+numfun+i) = result(i)
+                        if (abserr(i) .gt. max(espabs,epsrel*abs(result(i)))) then
+                                 ifail = 1
+                        end if
+                end do
+
+                rule = rule + 1
+                if (ifail .gt. 0 .or. neval .lt. minpts) goto 10
+        end if
+
+      end subroutine hermit
 
 
 

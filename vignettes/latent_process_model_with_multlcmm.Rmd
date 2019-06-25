@@ -47,7 +47,7 @@ where:
 - $(w_i(t))$ is a Gaussian process that might be added in the model to relax the intra-subject correlation structure.
 
 This structural model for $\Lambda(t)$ according to time and covariates is exactly the same as in the univariate case (see 
-https://cran.r-project.org/web/package=lcmm/vignettes/latent_process_model_with_lcmm.html
+https://cran.r-project.org/package=lcmm/vignettes/latent_process_model_with_lcmm.html
 ). 
 
 Now, instead of defining one equation of observation, we define K equations of observation for the K different markers with $Y_{ijk}$ the observation for subject $i$, marker $k$ and occasion $j$. As in the univariate case, several types of markers can be handled by defining a marker-specific link function $H_{k}$. The marker-specific equation of observation also includes potentially some contrasts $\gamma_k$ on covariates and a marker and subject specific random intercept so that:</p> 
@@ -308,12 +308,12 @@ plot(mult_betaspl, which="fit", var.time="time", bty="l", xlab="time since entry
 
 ## heterogeneous profiles of trajectories
 
-The latent process mixed model for multivariate markers extends to the heterogeneous case with latent classes. The same strategy as explained with hlme (see https://cran.r-project.org/web/package=lcmm/vignettes/latent_class_model_with_hlme.html
+The latent process mixed model for multivariate markers extends to the heterogeneous case with latent classes. The same strategy as explained with hlme (see https://cran.r-project.org/package=lcmm/vignettes/latent_class_model_with_hlme.html
 ) can be used.  
 
 
 ## joint analysis of a time to event
 
 The latent process mixed model for multivariate markers extends to the case of a joint model. This is done in Jointlcmm.
-<!--(see https://cran.r-project.org/web/package=lcmm/vignettes/joint_latent_class_model_with_Jointlcmm.html).-->
+<!--(see https://cran.r-project.org/package=lcmm/vignettes/joint_latent_class_model_with_Jointlcmm.html).-->
 

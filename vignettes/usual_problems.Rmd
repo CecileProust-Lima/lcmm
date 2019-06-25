@@ -64,7 +64,7 @@ Selection of the number of latent classes is a complex question. In some cases, 
 Finally, it can be useful to present and contrast models with different numbers of latent classes.
 
 The complexity of the selection of the optimal number of latent classes is illustrated in vignette: 
-https://cran.r-project.org/web/package=lcmm/vignettes/latent_class_model_with_hlme.html
+https://cran.r-project.org/package=lcmm/vignettes/latent_class_model_with_hlme.html
 . Indeed, all the criteria may not be concordant in practice.  
 
 
@@ -76,7 +76,7 @@ https://cran.r-project.org/web/package=lcmm/vignettes/latent_class_model_with_hl
 Good discrimination of classes is usually sought when fitting latent class mixed models. Discriminatory power can be assessed using the entropy criterion (provided in summarytable) but also using the classification table (with command postprob). The description of the classes may also help comprehend the latent class structure. 
 
 (see vignette 
-https://cran.r-project.org/web/package=lcmm/vignettes/latent_class_model_with_hlme.html
+https://cran.r-project.org/package=lcmm/vignettes/latent_class_model_with_hlme.html
 for further details)
 
 
@@ -95,5 +95,5 @@ Each vignette includes a section on the evaluation of the model.
 
 # How to pre-normalize a variable using lcmm ? 
   
-This is detailed in vignette on pre-normalizing:  https://cran.r-project.org/web/package=lcmm/vignettes/pre_normalizing.html
+This is detailed in vignette on pre-normalizing:  https://cran.r-project.org/package=lcmm/vignettes/pre_normalizing.html
 
