@@ -23,7 +23,7 @@ cat(" \n")
 posfix <- eval(cl$posfix)
 
 cat("Statistical Model:", "\n")
-cat(paste("     Dataset:", x$dataset),"\n")
+cat(paste("     Dataset:", as.character(as.expression(x$call$data))),"\n")
 cat(paste("     Number of subjects:", x$ns),"\n")
 cat(paste("     Number of observations:", length(x$pred[,1])),"\n")
 if(length(x$na.action))cat(paste("     Number of observations deleted:",length(x$na.action)),"\n")

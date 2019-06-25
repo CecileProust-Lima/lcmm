@@ -174,7 +174,7 @@
 #' of convergence: =1 if the convergence criteria were satisfied, =2 if the
 #' maximum number of iterations was reached, =4 or 5 if a problem occured
 #' during optimisation} \item{call}{the matched call} \item{niter}{number of
-#' Marquardt iterations} \item{dataset}{dataset} \item{N}{internal information
+#' Marquardt iterations} \item{N}{internal information
 #' used in related functions} \item{idiag}{internal information used in related
 #' functions} \item{pred}{table of individual predictions and residuals; it
 #' includes marginal predictions (pred_m), marginal residuals (resid_m),
@@ -1243,7 +1243,7 @@ hlme <-
 ### ad 2/04/2012
         if (!("intercept" %in% nom.X0)) X0.names2 <- X0.names2[-1]
 ### ad
-        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,dataset=args$data,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random)
+        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random)
         class(res) <-c("hlme") 
         cost<-proc.time()-ptm
         if(verbose==TRUE) cat("The program took", round(cost[3],2), "seconds \n")

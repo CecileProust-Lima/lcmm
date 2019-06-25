@@ -122,7 +122,7 @@ parameters, 2. on the likelihood, 3. on the derivatives} \item{conv}{status
 of convergence: =1 if the convergence criteria were satisfied, =2 if the
 maximum number of iterations was reached, =4 or 5 if a problem occured
 during optimisation} \item{call}{the matched call} \item{niter}{number of
-Marquardt iterations} \item{dataset}{dataset} \item{N}{internal information
+Marquardt iterations} \item{N}{internal information
 used in related functions} \item{idiag}{internal information used in related
 functions} \item{pred}{table of individual predictions and residuals; it
 includes marginal predictions (pred_m), marginal residuals (resid_m),
