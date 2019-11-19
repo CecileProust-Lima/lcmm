@@ -602,6 +602,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     idlink0 <- rep(2,ny0)
     idlink0[which(link=="linear")] <- 0
     idlink0[which(link=="beta")] <- 1
+    idlink0[which(link=="thresholds")] <- 0 #!**
 
     
     spl <- strsplit(link[which(idlink0==2)],"-")
@@ -801,8 +802,9 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     IND <- matYXord[,1]
     outcome <- matYXord[,5]
     indiceY0 <- as.numeric(matYXord[,4])
-    prior0 <- as.numeric(matYXord[,2])
-
+    prior0 <- as.numeric(unique(matYXord[,c(1,2)])[,2])
+    if(length(prior0)!=length(unique(IND))) stop("Please check 'prior' argument. Subjects can not have multiple assigned classes.")
+        
 
 ###parametres pour hetmixContMult
     ns0 <- length(unique(IND))
@@ -1282,7 +1284,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     ##initialisation pour ng>1
     if(missing(B) & ng0>1)
         {
-            prior02 <- rep(0,nobs0)
+            prior02 <- rep(0,ns0)
             idprob02 <- rep(0,nv0)
             idg02 <- idg0
             idg02[idg02==2] <- 1
@@ -1464,6 +1466,29 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                     rlindiv=as.double(rlindiv),
                     as.integer(pbH0),
                     as.integer(fix0))
+
+
+    ## ajouter les thresholds en attendant de l estimer correctement !**
+    nbmod <- rep(0,ny0)
+    b_old <- b
+    for(k in 1:ny0)
+    {
+        if(link[k]=="thresholds")
+        {
+            idlink0[k] <- 3
+            nbmod[k] <- length(unique(get(dataY[k])[,nomsY[k]]))
+            b <- c(b_old[1:(nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:k])-ntrtot0[k])],-0.5)
+            if(nbmod[k]>2) b <- c(b,rep(1,nbmod[k]-2))
+            
+            if(k<ny0) b <- c(b,b_old[(nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:k])):length(b_old)])
+            ntrtot0[k] <- nbmod[k]-1
+            names(b)[nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:k])-ntrtot0[k]+1:(ntrtot0[k])] <- paste("Thresh.",nomsY[k],"_",0:(ntrtot0[k]-1),sep="")
+
+            b_old <- b
+            out$best <- b
+        }
+    }
+
     
 
 ### mettre NA pour les variances et covariances non calculees et  0 pr les prm fixes
@@ -1601,7 +1626,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,
                call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,
                predRE_Y=predRE_Y,Ynames=nomsY,Xnames=nom.X0,Xnames2=ttesLesVar,cholesky=Cholesky,
-               estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,nbnodes=nbnodes,
+               estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,nbnodes=nbnodes,nbmod=nbmod,
                na.action=nayk,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,
                wRandom=wRandom,b0Random=b0Random)
     

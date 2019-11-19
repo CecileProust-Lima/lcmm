@@ -696,6 +696,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
             {
                 prior <- newdata[,nom.prior]
                 newdata[which(is.na(prior)),nom.prior] <- 0
+                prior[which(is.na(prior))] <- 0
             }
 
         ## remplacer les NA de TimeDepVar par Tevent
@@ -735,7 +736,8 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                 Tentry <- Tentry[-linesNA]  
                 Tevent <- Tevent[-linesNA] 
                 Event <- Event[-linesNA]
-                Tint <- Tint[-linesNA] 
+                Tint <- Tint[-linesNA]
+                prior <- prior[-linesNA]
             }
 
 
@@ -971,7 +973,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
 ###ordonner les mesures par individu
         IND <- newdata[,nom.subject]
         #IDnum <- as.numeric(IND)
-        if(missing(prior)) prior <- rep(0,length(Y0))  
+        if(is.null(nom.prior)) prior <- rep(0,length(Y0))  
         if(!length(indiceY0)) indiceY0 <- rep(0,length(Y0))  
         matYX <- cbind(IND,prior,Y0,indiceY0,Tentry,Tevent,Event,Tint,X0)
         matYXord <- matYX[order(IND),]
@@ -980,14 +982,16 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         #IDnum <- matYXord[,1]
         IND <- matYXord[,1]
         indiceY0 <- as.numeric(matYXord[,4])
-        prior0 <- as.numeric(matYXord[,2])
+        prior0 <- as.numeric(unique(matYXord[,c(1,2)])[,2])
+        if(length(prior0)!=length(unique(IND))) stop("Please check 'prior' argument. Subjects can not have multiple assigned classes.")
 
         ## nombre de sujets
         ns0 <- length(unique(IND))  
         
 ### Tevent, Tentry et Event de dim ns  
         #data.surv <- unique(cbind(IND,matYX[,c(6,7,8,9)]))
-        #if(nrow(data.surv) != ns0) stop("Subjects cannot have several times to event.")
+                                        #if(nrow(data.surv) != ns0) stop("Subjects cannot have several times to event.")
+        
         nmes <- as.vector(table(IND))
         data.surv <- apply(matYXord[cumsum(nmes),c(5,6,7,8)],2,as.numeric)
         
@@ -1862,7 +1866,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
 #cat("B inti pour ng=1 ", b,"\n")
                 if(ng>1)
                     {
-                        prior02 <- rep(0,nobs0)
+                        prior02 <- rep(0,ns0)
                         idprob02 <- rep(0,nv0)
                         idg02 <- idg0
                         idg02[idg02==2] <- 1

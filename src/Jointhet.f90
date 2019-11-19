@@ -2282,35 +2282,40 @@ end subroutine jointhet
          end if
          ! VC ok si non spec aux classes
 
-
-         ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
-         Xprob=0.d0
-         l=0
-         do k=1,nv
-            if (idprob(k).eq.1) then
-               l=l+1
-               Xprob(l)=X(it+1,k)
-            end if
-         end do
-         pi=0.d0
-         temp=0.d0
-         Do g=1,ng-1
-            bprob=0.d0
-            do k=1,nvarprob
-               bprob(k)=b1((k-1)*(ng-1)+g)
+         
+         if (prior(i).ne.0) then
+            pi=0.d0
+            pi(prior(i))=1.d0
+         else
+            ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
+            Xprob=0.d0
+            l=0
+            do k=1,nv
+               if (idprob(k).eq.1) then
+                  l=l+1
+                  Xprob(l)=X(it+1,k)
+               end if
+            end do
+            pi=0.d0
+            temp=0.d0
+            Do g=1,ng-1
+               bprob=0.d0
+               do k=1,nvarprob
+                  bprob(k)=b1((k-1)*(ng-1)+g)
+               end do
+               
+               temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
+               
+               pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
+               
             end do
 
-            temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
-
-            pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
-
-         end do
-
-         pi(ng)=1/(1+temp)
-
-         do g=1,ng-1
-            pi(g)=pi(g)*pi(ng)
-         end do
+            pi(ng)=1/(1+temp)
+            
+            do g=1,ng-1
+               pi(g)=pi(g)*pi(ng)
+            end do
+         end if
          ! pig ok
 
 
