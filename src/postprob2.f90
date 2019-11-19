@@ -26,7 +26,8 @@ subroutine postprob2(Y0,Xdata0,ns0,nmes0,nobs0,ng0,nv0,idiag0,nwg0, &
 
   !Declaration des variables en entree
   integer,intent(in)::nobs0,ns0,nv0,ng0,npm0,nbland,nbevt0,nbzitr0
-  integer,intent(in)::nvalSPL0,idlink0,epsY0
+  integer,intent(in)::nvalSPL0,idlink0
+  double precision,intent(in)::epsY0
   double precision,dimension(nobs0),intent(in):: Y0
   integer,dimension(nobs0),intent(in):: indiceY0
   double precision,dimension(nobs0*nv0),intent(in)::Xdata0
