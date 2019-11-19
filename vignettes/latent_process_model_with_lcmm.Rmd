@@ -283,18 +283,18 @@ plot(mspl5q, which="fit", var.time="age65", bty="l", xlab="(age-65)/10", break.t
 
 ## heterogeneous profiles of trajectories
 
-The latent process mixed model extends to the  heterogeneous case with latent classes. The same strategy as explained with hlme (see https://cran.r-project.org/web/package=lcmm/vignettes/latent_class_model_with_hlme.html
+The latent process mixed model extends to the  heterogeneous case with latent classes. The same strategy as explained with hlme (see https://cran.r-project.org/package=lcmm/vignettes/latent_class_model_with_hlme.html
 ) can be used.  
 
 
 ## joint analysis of a time to event
 
 The latent process mixed model extends to the case of a joint model. This is done in Jointlcmm.
-<!--(see https://cran.r-project.org/web/package=lcmm/vignettes/joint_latent_class_model_with_Jointlcmm.html).-->
+<!--(see https://cran.r-project.org/package=lcmm/vignettes/joint_latent_class_model_with_Jointlcmm.html).-->
 
 ## multiple markers of the same latent process
 
 In some cases, several markers of the same underlying latent process may be measured. The latent process mixed model extends to that case. This is the purpose of multlcmm (see
-https://cran.r-project.org/web/package=lcmm/vignettes/latent_process_model_with_multlcmm.html
+https://cran.r-project.org/package=lcmm/vignettes/latent_process_model_with_multlcmm.html
 ).
 
