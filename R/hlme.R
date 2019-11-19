@@ -1220,9 +1220,15 @@ hlme <-
         }
 
 
-        classif<-apply(ppi,1,which.max)
-        ppi<-data.frame(INDuniq,classif,ppi)
-        temp<-paste("prob",1:ng0,sep="")
+        classif <- apply(ppi,1,which.max)
+        if(any(!is.finite(ppi)))
+        {
+            classif <- rep(NA,ns0)
+            iok <- which(is.finite(ppi[,1]))
+            classif[iok] <- apply(ppi[iok,,drop=FALSE],1,which.max)
+        }
+        ppi <- data.frame(INDuniq,classif,ppi)
+        temp <- paste("prob",1:ng0,sep="")
         colnames(ppi) <- c(nom.subject,"class",temp)
         rownames(ppi) <- 1:ns0
 
