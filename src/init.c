@@ -11,7 +11,7 @@ static R_FortranMethodDef FortRout[] = {
   {"jointhet", (DL_FUNC) &F77_SUB(jointhet), 59},
   {"predictcont", (DL_FUNC) &F77_SUB(predictcont), 21},
   {"predictmult", (DL_FUNC) &F77_SUB(predictmult), 23},
-  {"predictcondmult", (DL_FUNC) &F77_SUB(predictcondmult), 14},
+  {"predictcondmult", (DL_FUNC) &F77_SUB(predictcondmult), 15},
   {"cvpl", (DL_FUNC) &F77_SUB(cvpl), 41},
   {"postprob2", (DL_FUNC) &F77_SUB(postprob2), 40},
   {"calculustransfo", (DL_FUNC) &F77_SUB(calculustransfo), 16},

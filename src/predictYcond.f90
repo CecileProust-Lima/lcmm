@@ -1,12 +1,12 @@
 
-subroutine predictcondmult(X0,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,idlink &
+subroutine predictcondmult(X0,condRE_Y,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,idlink&
      ,nbzitr,zitr0,nsim,Ymarg)  
 
   use optim
   IMPLICIT NONE
 
   ! in input
-  integer,intent(in)::maxmes,npm,nsim,nalea,ny,nerr,debut
+  integer,intent(in)::maxmes,npm,nsim,nalea,ny,nerr,debut,condRE_Y
   double precision,dimension(maxmes*ny),intent(in) ::X0
   integer,dimension(ny),intent(in)::idlink,nbzitr
   double precision,dimension(npm),intent(in)::b1
@@ -68,7 +68,8 @@ subroutine predictcondmult(X0,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,idlink &
   do yk=1,ny
      do j1=1,maxmes
         do j2=1,maxmes  
-           if(nalea.eq.ny) VC(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) = VC(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) +&
+           if(nalea.eq.ny .and. condRE_Y.eq.0) VC(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2)&
+                = VC(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) +&
                 b1(debut+ny+yk)**2 !variance de alpha_k
 
            if(j1.eq.j2) then
@@ -130,7 +131,6 @@ subroutine predictcondmult(X0,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,idlink &
               Ymarg(maxmes*(yk-1)+j) = X0(maxmes*(yk-1)+j)*bb+aa
            end do
 
-           !sumntrtot = sumntrtot +ntrtot(yk) 
 
         else if (idlink(yk).eq.1) then  ! Beta link
 
@@ -165,7 +165,6 @@ subroutine predictcondmult(X0,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,idlink &
               end if
            end do
 
-           !sumntrtot = sumntrtot +ntrtot(yk) 
 
         else if (idlink(yk).eq.2) then ! Splines link
 
@@ -197,7 +196,6 @@ subroutine predictcondmult(X0,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,idlink &
 
            end do
 
-           !sumntrtot = sumntrtot+ntrtot(yk)     
 
         end if
         sumntrtot = sumntrtot+ntrtot(yk) 

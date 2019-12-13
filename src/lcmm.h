@@ -287,6 +287,7 @@ void F77_SUB(predictmult)(double * X0,
 			   double * Ymarg);
 
 void F77_SUB(predictcondmult)(double * X0,
+			      int * condRE_Y,
 			      int * nalea,
 			      int * ny,
 			      int * nerr,
@@ -466,3 +467,4 @@ void F77_SUB(mpjhet)(int * K0,
 		     int * fix0,
 		     int * contrainte);
 		     
+

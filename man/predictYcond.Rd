@@ -6,7 +6,8 @@
 object in the natural scale of the longitudinal outcome(s) for specified
 latent process values.}
 \usage{
-predictYcond(x, lprocess, nsim = 200, draws = FALSE, ndraws = 2000, ...)
+predictYcond(x, lprocess, condRE_Y = FALSE, nsim = 200, draws = FALSE,
+  ndraws = 2000, ...)
 }
 \arguments{
 \item{x}{an object inheriting from class \code{lcmm}, 
@@ -15,6 +16,10 @@ mixed model.}
 
 \item{lprocess}{numeric vector containing the latent process values at which the
 predictions should be computed.}
+
+\item{condRE_Y}{for multlcmm objects only, logical indicating if the predictions
+are conditional to the outcome specific random effects or not. Default to FALSE,
+the predictions are marginal to these random effects.}
 
 \item{nsim}{number of points used in the numerical integration (Monte-Carlo) with
 splines or Beta link functions. nsim should be relatively important

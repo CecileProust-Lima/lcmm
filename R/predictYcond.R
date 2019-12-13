@@ -14,6 +14,9 @@
 #' mixed model.
 #' @param lprocess numeric vector containing the latent process values at which the
 #' predictions should be computed.
+#' @param condRE_Y for multlcmm objects only, logical indicating if the predictions
+#' are conditional to the outcome specific random effects or not. Default to FALSE,
+#' the predictions are marginal to these random effects.
 #' @param nsim  number of points used in the numerical integration (Monte-Carlo) with
 #' splines or Beta link functions. nsim should be relatively important
 #' (nsim=200 by default).
@@ -54,7 +57,7 @@
 #' 
 #' @export
 #' 
-predictYcond <- function(x,lprocess,nsim=200,draws=FALSE,ndraws=2000,...)
+predictYcond <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,...)
 {
     if((!class(x) %in% c("lcmm","multlcmm","Jointlcmm"))) stop("Use only with lcmm, multlcmm or Jointlcmm objects")
     if((class(x)=="lcmm") & any(x$linktype==3)) stop("This function is not available for ordinal outcome")
@@ -65,6 +68,8 @@ predictYcond <- function(x,lprocess,nsim=200,draws=FALSE,ndraws=2000,...)
         cat("No confidence interval will be provided since the program did not converge properly \n")
         draws <- FALSE
     }
+
+    condRE_Y <- as.numeric(condRE_Y)
     
     if(x$conv %in% c(1,2,3))
     {
@@ -115,6 +120,7 @@ predictYcond <- function(x,lprocess,nsim=200,draws=FALSE,ndraws=2000,...)
         {
             out <- .Fortran(C_predictcondmult,
                             as.double(lambdatot),
+                            as.integer(condRE_Y),
                             as.integer(nalea),
                             as.integer(ny),
                             as.integer(nerr),
@@ -177,6 +183,7 @@ predictYcond <- function(x,lprocess,nsim=200,draws=FALSE,ndraws=2000,...)
                 
                 out <- .Fortran(C_predictcondmult,
                                 as.double(lambdatot),
+                                as.integer(condRE_Y),
                                 as.integer(nalea),
                                 as.integer(ny),
                                 as.integer(nerr),
