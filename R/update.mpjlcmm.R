@@ -30,8 +30,6 @@ update.mpjlcmm <- function(object,...)
     Vtot[upper.tri(Vtot,diag=TRUE)] <- object$V
     
     sumnpm <- 0
-    sumV <- (nprob+nrisqtot+nvarxevt)*(nprob+nrisqtot+nvarxevt+1)/2
-    sumnobs <- 0
     for(k in 1:K)
     {
         ## le k-ieme modele mixte avec les estimations du conjoint:
@@ -49,7 +47,15 @@ update.mpjlcmm <- function(object,...)
         m <- eval(mcall)
 
         ## ajouter les variances
-        V <- Vtot[c(1:(ng-1),nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k]),c(1:(ng-1),nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k])]
+        if(ng>1)
+        {
+            V <- Vtot[c(1:(ng-1),nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k]),c(1:(ng-1),nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k])]
+        }
+        else
+        {
+            V <- Vtot[c(nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k]),c(nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k])]
+        }
+        
         m$V <- V[upper.tri(V,diag=TRUE)]
         m$conv <- object$conv
 
@@ -64,8 +70,6 @@ update.mpjlcmm <- function(object,...)
         res[[k]] <- m
 
         sumnpm <- sumnpm + npmtot[k]
-        sumV <- sumV + npmtot[k]*(npmtot[k]+1)/2
-        sumnobs <- sumnobs + object$N[11+k]
     }
 
     return(res)
