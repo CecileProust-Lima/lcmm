@@ -74,6 +74,15 @@ gridsearch <- function(m,rep,maxiter,minit,cl=NULL)
             ncl <- cl
             cl <- makeCluster(ncl)
         }
+        
+        if(mc[[1]]=="mpjlcmm")
+        {
+            for (k in 2:length(mc[[2]]))
+            {
+                clusterExport(cl,list(as.character(mc[[2]][k])))
+            }
+        }
+        
         clusterExport(cl, list("mc", "maxiter", "minit", as.character(as.list(mc[-1])$data)), envir = environment())
 
         cat("Be patient, grid search is running ...\n")
