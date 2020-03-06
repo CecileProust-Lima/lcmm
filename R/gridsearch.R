@@ -32,6 +32,8 @@
 #' \code{Jointlcmm} or \code{mpjlcmm} corresponding to the same model as specified
 #' in m except for the number of classes (it should be one). This object is used to
 #' generate random initial values
+#' @param cl a cluster created by makeCluster from package parallel or an integer
+#' specifying the number of cores to use for parallel computation
 #' @return an object of class \code{hlme}, \code{lcmm}, \code{multlcmm},
 #' \code{Jointlcmm} or \code{mpjlcmm} corresponding to the call specified in m.
 #' @author Cecile Proust-Lima and Viviane Philipps
@@ -54,27 +56,54 @@
 #' 
 #' @export
 #' 
-gridsearch <- function(m,rep,maxiter,minit)
+gridsearch <- function(m,rep,maxiter,minit,cl=NULL)
+{
+    mc <- match.call()$m
+    mc$maxiter <- maxiter
+    
+    models <- vector(mode="list",length=rep)
+    assign("minit",eval(minit))
+
+    ncl <- NULL
+    if(!is.null(cl))
     {
-        mc <- match.call()$m
-        mc$maxiter <- maxiter
-        
-        models <- vector(mode="list",length=rep)
-        assign("minit",eval(minit))
+        if(!inherits(cl,"cluster"))
+        {
+            if(!is.numeric(cl)) stop("argument cl should be either a cluster or a numeric value indicating the number of cores")
 
-        for(k in 1:rep)
-            {
-                mc$B <- substitute(random(minit),environment())
-                models[[k]] <- do.call(as.character(mc[[1]]),as.list(mc[-1]))
-            }
-        llmodels <- sapply(models,function(x){return(x$loglik)})
-        kmax <- which.max(llmodels)
+            ncl <- cl
+            cl <- makeCluster(ncl)
+        }
+        clusterExport(cl, list("mc", "maxiter", "minit", as.character(as.list(mc[-1])$data)), envir = environment())
 
-        mc$B <- models[[kmax]]$best
-        mc$maxiter <- NULL
+        cat("Be patient, grid search is running ...\n")
         
-        return(do.call(as.character(mc[[1]]),as.list(mc[-1])))
+        models <- parLapply(cl, 1:rep, function(X){
+            mc$B <- substitute(random(minit),parent.frame(n=2))
+            return(do.call(as.character(mc[[1]]),as.list(mc[-1])))
+        })
+
+        cat("Search completed, performing final estimation\n")
+
+        if(!is.null(ncl)) stopCluster(cl)
     }
+    else
+    {
+        for(k in 1:rep)
+        {
+            mc$B <- substitute(random(minit),environment())
+            models[[k]] <- do.call(as.character(mc[[1]]),as.list(mc[-1]))
+        }
+    }
+    
+    llmodels <- sapply(models,function(x){return(x$loglik)})
+    kmax <- which.max(llmodels)
+
+    mc$B <- models[[kmax]]$best
+    mc$maxiter <- NULL
+    
+    return(do.call(as.character(mc[[1]]),as.list(mc[-1])))
+}
 
 
 
