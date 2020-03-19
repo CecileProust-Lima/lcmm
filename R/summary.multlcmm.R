@@ -277,7 +277,7 @@ summary.multlcmm <- function(object,...)
 
                     pf <- sort(intersect(c((nprob+1):nef),posfix))
                     p <- rep(0,length(tmp[,1]))
-                    p[which(rownames(tmp) %in% c(x$Xnames,x$Ynames[-length(x$Ynames)]))] <- c((nprob+1):nef)
+                    p[which(rownames(tmp) %in% c(names(x$best)[(nprob+1):nef],x$Ynames[-length(x$Ynames)]))] <- c((nprob+1):nef)
                     col1[which(p %in% pf)] <- paste(col1[which(p %in% pf)],"*",sep="")
                     col2[which(p %in% pf)] <- NA
                     col3[which(p %in% pf)] <- NA
