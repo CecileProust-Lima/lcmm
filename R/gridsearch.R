@@ -65,6 +65,8 @@ gridsearch <- function(m,rep,maxiter,minit,cl=NULL)
     assign("minit",eval(minit))
 
     ncl <- NULL
+    
+    ## parallel version
     if(!is.null(cl))
     {
         if(!inherits(cl,"cluster"))
@@ -75,6 +77,7 @@ gridsearch <- function(m,rep,maxiter,minit,cl=NULL)
             cl <- makeCluster(ncl)
         }
         
+        ## export univariate models if using mpjlcmm
         if(mc[[1]]=="mpjlcmm")
         {
             for (k in 2:length(mc[[2]]))
@@ -83,8 +86,17 @@ gridsearch <- function(m,rep,maxiter,minit,cl=NULL)
             }
         }
         
+        ## export other arguments
         clusterExport(cl, list("mc", "maxiter", "minit", as.character(as.list(mc[-1])$data)), envir = environment())
+        
+        ## get and export loaded packages
+        pck <- .packages()
+        dir0 <- find.package()
+        dir <- sapply(1:length(pck),function(k){gsub(pck[k],"",dir0[k])})
+        clusterExport(cl,list("pck","dir"),envir=environment())
+        clusterEvalQ(cl,sapply(1:length(pck),function(k){require(pck[k],lib.loc=dir[k],character.only=TRUE)}))
 
+        ## fit models
         cat("Be patient, grid search is running ...\n")
         
         models <- parLapply(cl, 1:rep, function(X){
@@ -97,7 +109,7 @@ gridsearch <- function(m,rep,maxiter,minit,cl=NULL)
         if(!is.null(ncl)) stopCluster(cl)
     }
     else
-    {
+    {   ## sequential version
         for(k in 1:rep)
         {
             mc$B <- substitute(random(minit),environment())
@@ -105,6 +117,7 @@ gridsearch <- function(m,rep,maxiter,minit,cl=NULL)
         }
     }
     
+    ## find max
     llmodels <- sapply(models,function(x){return(x$loglik)})
     kmax <- which.max(llmodels)
 
