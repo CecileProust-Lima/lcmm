@@ -77,6 +77,9 @@ gridsearch <- function(m,rep,maxiter,minit,cl=NULL)
             cl <- makeCluster(ncl)
         }
         
+        ## set different seeds
+        clusterSetRNGStream(cl)
+        
         ## export univariate models if using mpjlcmm
         if(mc[[1]]=="mpjlcmm")
         {
