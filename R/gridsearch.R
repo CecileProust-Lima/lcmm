@@ -32,6 +32,8 @@
 #' \code{Jointlcmm} or \code{mpjlcmm} corresponding to the same model as specified
 #' in m except for the number of classes (it should be one). This object is used to
 #' generate random initial values
+#' @param cl a cluster created by makeCluster from package parallel or an integer
+#' specifying the number of cores to use for parallel computation
 #' @return an object of class \code{hlme}, \code{lcmm}, \code{multlcmm},
 #' \code{Jointlcmm} or \code{mpjlcmm} corresponding to the call specified in m.
 #' @author Cecile Proust-Lima and Viviane Philipps
@@ -54,27 +56,79 @@
 #' 
 #' @export
 #' 
-gridsearch <- function(m,rep,maxiter,minit)
+gridsearch <- function(m,rep,maxiter,minit,cl=NULL)
+{
+    mc <- match.call()$m
+    mc$maxiter <- maxiter
+    
+    models <- vector(mode="list",length=rep)
+    assign("minit",eval(minit))
+
+    ncl <- NULL
+    
+    ## parallel version
+    if(!is.null(cl))
     {
-        mc <- match.call()$m
-        mc$maxiter <- maxiter
-        
-        models <- vector(mode="list",length=rep)
-        assign("minit",eval(minit))
+        if(!inherits(cl,"cluster"))
+        {
+            if(!is.numeric(cl)) stop("argument cl should be either a cluster or a numeric value indicating the number of cores")
 
-        for(k in 1:rep)
+            ncl <- cl
+            cl <- makeCluster(ncl)
+        }
+        
+        ## set different seeds
+        clusterSetRNGStream(cl)
+        
+        ## export univariate models if using mpjlcmm
+        if(mc[[1]]=="mpjlcmm")
+        {
+            for (k in 2:length(mc[[2]]))
             {
-                mc$B <- substitute(random(minit),environment())
-                models[[k]] <- do.call(as.character(mc[[1]]),as.list(mc[-1]))
+                clusterExport(cl,list(as.character(mc[[2]][k])))
             }
-        llmodels <- sapply(models,function(x){return(x$loglik)})
-        kmax <- which.max(llmodels)
-
-        mc$B <- models[[kmax]]$best
-        mc$maxiter <- NULL
+        }
         
-        return(do.call(as.character(mc[[1]]),as.list(mc[-1])))
+        ## export other arguments
+        clusterExport(cl, list("mc", "maxiter", "minit", as.character(as.list(mc[-1])$data)), envir = environment())
+        
+        ## get and export loaded packages
+        pck <- .packages()
+        dir0 <- find.package()
+        dir <- sapply(1:length(pck),function(k){gsub(pck[k],"",dir0[k])})
+        clusterExport(cl,list("pck","dir"),envir=environment())
+        clusterEvalQ(cl,sapply(1:length(pck),function(k){require(pck[k],lib.loc=dir[k],character.only=TRUE)}))
+
+        ## fit models
+        cat("Be patient, grid search is running ...\n")
+        
+        models <- parLapply(cl, 1:rep, function(X){
+            mc$B <- substitute(random(minit),parent.frame(n=2))
+            return(do.call(as.character(mc[[1]]),as.list(mc[-1])))
+        })
+
+        cat("Search completed, performing final estimation\n")
+
+        if(!is.null(ncl)) stopCluster(cl)
     }
+    else
+    {   ## sequential version
+        for(k in 1:rep)
+        {
+            mc$B <- substitute(random(minit),environment())
+            models[[k]] <- do.call(as.character(mc[[1]]),as.list(mc[-1]))
+        }
+    }
+    
+    ## find max
+    llmodels <- sapply(models,function(x){return(x$loglik)})
+    kmax <- which.max(llmodels)
+
+    mc$B <- models[[kmax]]$best
+    mc$maxiter <- NULL
+    
+    return(do.call(as.character(mc[[1]]),as.list(mc[-1])))
+}
 
 
 

@@ -4,7 +4,7 @@
 \alias{gridsearch}
 \title{Automatic grid search}
 \usage{
-gridsearch(m, rep, maxiter, minit)
+gridsearch(m, rep, maxiter, minit, cl = NULL)
 }
 \arguments{
 \item{m}{a call of \code{hlme}, \code{lcmm}, \code{multlcmm}, 
@@ -18,6 +18,9 @@ gridsearch(m, rep, maxiter, minit)
 \code{Jointlcmm} or \code{mpjlcmm} corresponding to the same model as specified
 in m except for the number of classes (it should be one). This object is used to
 generate random initial values}
+
+\item{cl}{a cluster created by makeCluster from package parallel or an integer
+specifying the number of cores to use for parallel computation}
 }
 \value{
 an object of class \code{hlme}, \code{lcmm}, \code{multlcmm},
