@@ -27,74 +27,7 @@ if(x$conv==1 | x$conv==2 | x$conv==3)
   if(!(na.action%in%c(1,2)))stop("only 1 for 'na.omit' or 2 for 'na.fail' are required in na.action argument")
   
 
- 
-  ##pour les facteurs
-  ##donnees de l estimation
-  if(!is.null(x$data))
-  {
-      olddata <- x$data
-  }
-  else
-    {
-        olddata <- eval(x$call$data)
-    }
-  termes <- x$Xnames[-1]
-  
-  #cas ou une variable dans le dataset du modele est un facteur
-   for(v in x$Xnames2[-1])
-   {
-    if (is.factor(olddata[,v]))
-    {
-     mod <- levels(olddata[,v])
-     if (!(levels(as.factor(newdata[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-     newdata[,v] <- factor(newdata[,v], levels=mod)
-  
-     for(m in mod)
-     {
-      termes <- gsub(paste(v,m,sep=""),v,termes)
-     }
-     
-    }
-   }
-  
-   #cas ou on a factor() dans l'appel de la fonction
-   dans_appel <- c(all.names(x$call$fixed),all.names(x$call$random),all.names(x$call$mixture),all.names(x$call$classmb))
-   ind_factor <- which(dans_appel=="factor")
-   if(length(ind_factor))
-   {
-    nom.factor <- dans_appel[ind_factor+1]
-    for (v in nom.factor)
-    {
-     mod <- levels(as.factor(olddata[,v]))
-     if (!all(levels(as.factor(newdata[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-     newdata[,v] <- factor(newdata[,v], levels=mod)
-     
-     factorv <- paste("factor(",v,")",sep="")
-     for(m in mod)
-     {
-      termes <- gsub(paste(factorv,m,sep=""),v,termes,fixed=TRUE)  
-     }
-    }
-   }
 
-  ## pour poly()
-  if(any(grep("poly",termes)))
-      {
-          split_termes <- strsplit(termes,split="")
-          for(j in 1:length(split_termes))
-              {
-                  splitj <- split_termes[[j]]
-                  
-                  if(paste(splitj[c(1:5,length(splitj)-1)],collapse="")=="poly()")
-                      {
-                          termes[j] <- paste(splitj[1:(length(splitj)-1)],collapse="")
-                      }
-
-              }
-              
-      }
-  
-  
   ## var.time
   if(!missing( var.time))
       {
@@ -125,21 +58,177 @@ if(x$conv==1 | x$conv==2 | x$conv==3)
   
  
   
-  ###matrice avec toutes les var et toutes les interactions
-  newdata1 <- model.matrix(as.formula(paste("~",paste(termes,collapse="+"))),data=newdata)
-   #remettre les termes dans le bon ordre
-   Xnames <- x$Xnames[-1]
-   z <- grep("factor\\(",Xnames) 
-   if (length(z))
-   {
-    Xnames <- gsub("factor\\(","",Xnames)
-    Xnames[z] <- gsub("\\)","",Xnames[z])
-   }
-   newdata1 <- newdata1[,c("(Intercept)",Xnames),drop=FALSE]
+  fixed <- as.formula(x$call$fixed)
+  random <- as.formula(x$call$random)
+  mixture <- as.formula(x$call$mixture)
+  classmb <- as.formula(x$call$classmb)
+  
+  if(x$ng==1) classmb <- ~-1
+  if(x$ng>1 & is.null(x$call$classmb)) classmb <- ~1
+  if(x$ng==1) mixture <- ~-1
+  
+  ##pour les facteurs
+  ##donnees de l estimation
+  if(!is.null(x$data))
+  {
+    olddata <- x$data
+  }
+  else
+  {
+    olddata <- eval(x$call$data)
+  }
+  
+  #cas ou une variable dans le dataset du modele est un facteur
+  for(v in x$Xnames2)
+  {
+    if (is.factor(olddata[,v]))
+    {
+      mod <- levels(olddata[,v])
+      if (!(levels(as.factor(newdata[,v])) %in% mod)) stop(paste("invalid level in factor", v))
+      newdata[,v] <- factor(newdata[,v], levels=mod)
+      
+    }
+  }
+  
+  #cas ou on a factor() dans l'appel de la fonction
+  dans_appel <- c(all.names(x$call$fixed),all.names(x$call$random),all.names(x$call$mixture),all.names(x$call$classmb))
+  ind_factor <- which(dans_appel=="factor")
+  if(length(ind_factor))
+  {
+    nom.factor <- dans_appel[ind_factor+1]
+    for (v in nom.factor)
+    {
+      mod <- levels(as.factor(olddata[,v]))
+      if (!all(levels(as.factor(newdata[,v])) %in% mod)) stop(paste("invalid level in factor", v))
+      newdata[,v] <- factor(newdata[,v], levels=mod)
+    }
+  }
+  fixed <- gsub("factor","",fixed)
+  
+  z <- all.names(random)
+  ind_factor <- which(z=="factor")
+  if(length(ind_factor))
+  {
+    nom.factor <- z[ind_factor+1]
+    for (v in nom.factor)
+    {
+      mod <- levels(as.factor(olddata[,v]))
+      if (!all(levels(as.factor(newdata[,v])) %in% mod)) stop(paste("invalid level in factor", v))
+      newdata[,v] <- factor(newdata[,v], levels=mod)
+    }
+  }
+  random <- reformulate(gsub("factor","",random))
+  
+  z <- all.names(classmb)
+  ind_factor <- which(z=="factor")
+  if(length(ind_factor))
+  {
+    nom.factor <- z[ind_factor+1]
+    for (v in nom.factor)
+    {
+      mod <- levels(as.factor(olddata[,v]))
+      if (!all(levels(as.factor(newdata[,v])) %in% mod)) stop(paste("invalid level in factor", v))
+      newdata[,v] <- factor(newdata[,v], levels=mod)
+    }
+  }
+  classmb <- reformulate(gsub("factor","",classmb))
+  
+  z <- all.names(mixture)
+  ind_factor <- which(z=="factor")
+  if(length(ind_factor))
+  {
+    nom.factor <- z[ind_factor+1]
+    for (v in nom.factor)
+    {
+      mod <- levels(as.factor(olddata[,v]))
+      if (!all(levels(as.factor(newdata[,v])) %in% mod)) stop(paste("invalid level in factor", v))
+      newdata[,v] <- factor(newdata[,v], levels=mod)
+    }
+  }
+  mixture <- reformulate(gsub("factor","",mixture))
   
   
-  #newdata1 <- model.matrix(as.formula(paste("~",paste(x$Xnames[-1],collapse="+"))),data=newdata)
   
+  afixed <- terms(reformulate(fixed), specials=c("factor","contrast"))
+  
+  
+  ##fixed sans contrast
+  fixed2 <- gsub("contrast","",fixed)
+  fixed2 <- formula(paste(fixed2[2],fixed2[3],sep="~")) 
+  
+  ##contrast
+  contr <- ~-1
+  if(!is.null(attr(afixed,"specials")$contrast))
+  {
+    vcontr <- attr(afixed,"term.labels")[setdiff(attr(afixed,"specials")$contrast-1,untangle.specials(afixed,"contrast",2)$terms)]
+    vcontr <- gsub("contrast","",vcontr)
+    contr <- as.formula(paste("~-1+",paste(vcontr,collapse="+")))
+  }
+  
+  ###creation de X0 ( var + interactions)
+  
+  Xfixed <- model.matrix(fixed2[-2], data=newdata)
+  Xmixture <- model.matrix(mixture, data=newdata)
+  Xrandom <- model.matrix(random, data=newdata)
+  Xclassmb <- model.matrix(classmb, data=newdata)
+  Xcontr <- model.matrix(contr,data=newdata)
+  
+  z.fixed <- strsplit(colnames(Xfixed),split=":",fixed=TRUE)
+  z.fixed <- lapply(z.fixed,sort)
+  
+  z.random <- strsplit(colnames(Xrandom),split=":",fixed=TRUE)
+  z.random <- lapply(z.random,sort)
+  
+  #if(mixture != ~-1)
+  if(ncol(Xmixture)>0)
+  {
+    z.mixture <- strsplit(colnames(Xmixture),split=":",fixed=TRUE)
+    z.mixture <- lapply(z.mixture,sort)
+  }
+  else
+  {
+    z.mixture <- list()
+  }
+  
+  #if(classmb != ~-1)
+  if(ncol(Xclassmb)>0)
+  {
+    z.classmb <- strsplit(colnames(Xclassmb),split=":",fixed=TRUE)
+    z.classmb <- lapply(z.classmb,sort)
+  }
+  else
+  {
+    z.classmb <- list()
+  }
+  
+  if(contr != ~-1)
+  {
+    z.contr <- strsplit(colnames(Xcontr),split=":",fixed=TRUE)
+    z.contr <- lapply(z.contr,sort)
+  }
+  else
+  {
+    z.contr <- list()
+  }
+  
+  X0 <- cbind(Xfixed, Xrandom, Xclassmb)        
+  nom.unique <- unique(colnames(X0))
+  X0 <- X0[,nom.unique,drop=FALSE]
+  
+  if (x$N[7]>0)
+  {
+    cor.var.time <- x$Xnames[which(x$idcor0==1)]
+    if(!(cor.var.time %in% colnames(X0)))
+    {
+      X0 <- cbind(X0, newdata[,cor.var.time])
+      colnames(X0) <- c(nom.unique, cor.var.time)
+      nom.unique <- c(nom.unique,cor.var.time)
+    }
+  }
+  
+  newdata1 <- as.matrix(X0)
+  
+
   #arguments pour predictMult
    maxmes <- dim(newdata1)[1]
    X0 <- as.vector(newdata1)
