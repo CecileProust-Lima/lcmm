@@ -78,9 +78,9 @@
 #' @keywords package
 #' @importFrom graphics axis hist lines matlines matplot mtext par plot points segments polygon
 #' @importFrom grDevices rainbow rgb col2rgb n2mfrow
-#' @importFrom stats as.formula formula get_all_vars integrate median model.frame model.matrix na.fail na.omit na.pass pchisq pnorm qnorm quantile rnorm sd terms residuals vcov fitted coef update
+#' @importFrom stats as.formula formula get_all_vars integrate median model.frame model.matrix na.fail na.omit na.pass pchisq pnorm qnorm quantile rnorm sd terms residuals vcov fitted coef update reformulate
 #' @importFrom survival Surv untangle.specials
-#' @importFrom parallel makeCluster clusterExport stopCluster parLapply
+#' @importFrom parallel makeCluster clusterExport stopCluster parLapply clusterEvalQ clusterSetRNGStream
 #' @useDynLib lcmm, .registration=TRUE, .fixes="C_"
 NULL
 

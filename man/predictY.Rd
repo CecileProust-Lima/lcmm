@@ -6,25 +6,50 @@
 \alias{predictY.Jointlcmm}
 \alias{predictY.hlme}
 \alias{predictY.lcmm}
-\alias{predictY}
 \alias{predictY.multlcmm}
 \title{Marginal predictions (possibly class-specific) of a \code{hlme},
 \code{lcmm}, \code{multlcmm} or \code{Jointlcmm} object in the natural scale
 of the longitudinal outcome(s) for a specified profile of covariates.}
 \usage{
-\method{predictY}{Jointlcmm}(x, newdata, var.time, methInteg = 0, nsim = 20,
-  draws = FALSE, ndraws = 2000, na.action = 1, ...)
+\method{predictY}{Jointlcmm}(
+  x,
+  newdata,
+  var.time,
+  methInteg = 0,
+  nsim = 20,
+  draws = FALSE,
+  ndraws = 2000,
+  na.action = 1,
+  ...
+)
 
-\method{predictY}{hlme}(x, newdata, var.time, draws = FALSE, na.action = 1,
-  ...)
+\method{predictY}{hlme}(x, newdata, var.time, draws = FALSE, na.action = 1, ...)
 
-\method{predictY}{lcmm}(x, newdata, var.time, methInteg = 0, nsim = 20,
-  draws = FALSE, ndraws = 2000, na.action = 1, ...)
+\method{predictY}{lcmm}(
+  x,
+  newdata,
+  var.time,
+  methInteg = 0,
+  nsim = 20,
+  draws = FALSE,
+  ndraws = 2000,
+  na.action = 1,
+  ...
+)
 
 predictY(x, newdata, var.time, ...)
 
-\method{predictY}{multlcmm}(x, newdata, var.time, methInteg = 0, nsim = 20,
-  draws = FALSE, ndraws = 2000, na.action = 1, ...)
+\method{predictY}{multlcmm}(
+  x,
+  newdata,
+  var.time,
+  methInteg = 0,
+  nsim = 20,
+  draws = FALSE,
+  ndraws = 2000,
+  na.action = 1,
+  ...
+)
 }
 \arguments{
 \item{x}{an object inheriting from class \code{lcmm}, \code{hlme},

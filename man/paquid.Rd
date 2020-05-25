@@ -4,7 +4,8 @@
 \name{paquid}
 \alias{paquid}
 \title{Longitudinal data on cognitive and physical aging in the elderly}
-\format{A data frame with 2250 observations over 500 subjects and 12
+\format{
+A data frame with 2250 observations over 500 subjects and 12
 variables: \describe{ \item{ID}{subject identification number}
 \item{MMSE}{score at the Mini-Mental State Examination (MMSE), a
 psychometric test of global cognitive functioning (integer in range 0-30)}
@@ -23,7 +24,8 @@ contact for \code{dem=0}} \item{age_init}{age at entry in the
 cohort} \item{CEP}{binary indicator of educational level
 (\code{CEP=1} for subjects who graduated from primary school; \code{CEP=0}
 otherwise)} \item{male}{binary indicator for gender (\code{male=1}
-for men; \code{male=0} for women)} }}
+for men; \code{male=0} for women)} }
+}
 \description{
 The dataset consists in a subsample of the Paquid prospective cohort study.
 Repeated measures cognitive measures (MMSE, IST, BVRT psychometric tests),

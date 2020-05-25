@@ -6,8 +6,15 @@
 object in the natural scale of the longitudinal outcome(s) for specified
 latent process values.}
 \usage{
-predictYcond(x, lprocess, condRE_Y = FALSE, nsim = 200, draws = FALSE,
-  ndraws = 2000, ...)
+predictYcond(
+  x,
+  lprocess,
+  condRE_Y = FALSE,
+  nsim = 200,
+  draws = FALSE,
+  ndraws = 2000,
+  ...
+)
 }
 \arguments{
 \item{x}{an object inheriting from class \code{lcmm}, 
