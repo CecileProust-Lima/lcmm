@@ -2762,18 +2762,22 @@ subroutine postprob_mpj(b,npm,ppi,ppiy)
         sumparK = sumparK + nmesparK(i,k)
      end do
 
-     ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
-     Xprob=0.d0
-     l=0
-     do k=1,nv2
-        if (idprob(k).eq.1) then
+     if (prior(i).ne.0) then
+            pi=0.d0
+            pi(prior(i))=1.d0
+     else         
+       ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
+       Xprob=0.d0
+       l=0
+       do k=1,nv2
+         if (idprob(k).eq.1) then
            l=l+1
            Xprob(l)=Xns(i,k)
-        end if
-     end do
-     pi=0.d0
-     temp=0.d0
-     do g=1,ng-1
+         end if
+       end do
+       pi=0.d0
+       temp=0.d0
+       do g=1,ng-1
         bprob=0.d0
         do k=1,nvarprob
            bprob(k)=b1((k-1)*(ng-1)+g)
@@ -2783,15 +2787,15 @@ subroutine postprob_mpj(b,npm,ppi,ppiy)
 
         pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
 
-     end do
+       end do
 
-     pi(ng)=1/(1+temp)
+       pi(ng)=1/(1+temp)
 
-     do g=1,ng-1
+       do g=1,ng-1
         pi(g)=pi(g)*pi(ng)
-     end do
-     ! pig ok
-
+       end do
+       ! pig ok
+     end if
 
      ! calcul des proba a posteriori de chaque classe
      fi=0.d0
