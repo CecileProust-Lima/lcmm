@@ -143,7 +143,7 @@ summary.mpjlcmm <- function(object,...)
             ##recuperation des indices de V
             id <- 1:NPM
             indice <- id*(id+1)/2
-            se <-sqrt(x$V[indice])
+            se <- sqrt(x$V[indice])
             wald <- x$best/se
             pwald <- 1-pchisq(wald**2,1)
             coef <- x$best
@@ -360,14 +360,20 @@ summary.mpjlcmm <- function(object,...)
 
                 pf <- sort(intersect(c(nprob+nrisqtot+nvarxevt+sumnpm+1:(nef[k]+ncontr[k])),posfix))
                 p <- rep(0,length(tmp[,1]))
-                p[which(rownames(tmp) %in% c(x$Names$Xnames,Ynames[sumny+1:(ny[k]-1)]))] <- c(nprob+nrisqtot+nvarxevt+sumnpm+1:(nef[k]+ncontr[k]))
+                a0 <- 1:nef[k]
+                if(x$contrainte!=0) a0 <- c(0,1:nef[k])
+                a1 <- rep(c(NA,1:(ny[k]-1),NA),sum(x$idcontr))
+                a2 <- rep(nef[k]+cumsum(c(0:(sum(x$idcontr)-1))),each=ny[k]+1)
+                a <- c(a0,a1+a2)
+                p[which(a>0)] <- c(nprob+nrisqtot+nvarxevt+sumnpm+1:(nef[k]+ncontr[k]))
+                #p[which(rownames(tmp) %in% c(x$Names$Xnames,Ynames[sumny+1:(ny[k]-1)]))] <- c(nprob+nrisqtot+nvarxevt+sumnpm+1:(nef[k]+ncontr[k]))
                 col1[which(p %in% pf)] <- paste(col1[which(p %in% pf)],"*",sep="")
                 col2[which(p %in% pf)] <- NA
                 col3[which(p %in% pf)] <- NA
                 col4[which(p %in% pf)] <- NA
 
                 tmp <- cbind(col1,col2,col3,col4)
-                rownames(tmp) <- rownames(tTable)
+                rownames(tmp) <- rownames(tTable[[k]])
                 maxch <- apply(tmp,2,maxchar)
                 maxch[1] <- maxch[1]-1
 
@@ -438,8 +444,28 @@ summary.mpjlcmm <- function(object,...)
                 Mat.cov[upper.tri(Mat.cov)] <- ""
                 pf <- sort(intersect(c(nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]),posfix))
                 p <- matrix(0,sum(x$idea[sumnv+1:x$nv[k]]),sum(x$idea[sumnv+1:x$nv[k]]))
-                if(x$idiag[k]==FALSE) p[upper.tri(p,diag=TRUE)] <- c(0,nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k])
-                if(x$idiag[k]==TRUE) diag(p) <- c(0,nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k])
+                if(x$idiag[k]==FALSE)
+                {
+                    if(x$contrainte==2)
+                    {
+                      p[upper.tri(p,diag=TRUE)] <- c(0,nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k])
+                    }
+                    else
+                    {
+                      p[upper.tri(p,diag=TRUE)] <- nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]
+                    }
+                }
+                if(x$idiag[k]==TRUE)
+                {
+                    if(x$contrainte==2)
+                    {
+                        diag(p) <- c(0,nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k])
+                    }
+                    else
+                    {
+                        diag(p) <- nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]
+                    }
+                }
                 Mat.cov[which(t(p) %in% pf)] <- paste(Mat.cov[which(t(p) %in% pf)],"*",sep="")
                 print(Mat.cov,quote=FALSE)
             }
