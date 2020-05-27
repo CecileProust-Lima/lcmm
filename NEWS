@@ -9,6 +9,21 @@ Proust-Lima C, Philipps V, Liquet B. Estimation of Extended Mixed Models Using L
 https://www.jstatsoft.org/article/view/v078i02
 
 
+Changes in Version 1.8.2 :
+
+* parallel implementation of gridsearch function. Thanks to Raphael Peter for his suggestion.
+* add condRE_Y option in predictYcond
+* add median options in predictY
+* corrections in Jointlcmm, multlcmm and mpjlcmm when prior is specified
+* bugs fixed in some prediction functions
+* small bugs fixed in the summary when some parameters are not estimated
+* bug fixed in VarExpl with models including BM or AR
+* bug fixed in update.mpjlcmm (variance matrix was not correct)
+* manage infinite ppi in hlme
+* correction of epsY type, URL in vignettes, data statements position
+
+
+
 Changes in Version 1.8.1 :
 
 * new function mpjlcmm for estimating joint latent class models with multiple markers and/or latent processes

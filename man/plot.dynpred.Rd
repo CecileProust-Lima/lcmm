@@ -4,7 +4,8 @@
 \alias{plot.dynpred}
 \title{Plot of individual dynamic predictions}
 \usage{
-\method{plot}{dynpred}(x, subject = NULL, landmark = NULL, horizon = NULL, add = FALSE, ...)
+\method{plot}{dynpred}(x, subject = NULL, landmark = NULL, horizon = NULL,
+  add = FALSE, ...)
 }
 \arguments{
 \item{x}{a dynpred object, containing the predicted probabilities of event

@@ -6,50 +6,25 @@
 \alias{predictY.Jointlcmm}
 \alias{predictY.hlme}
 \alias{predictY.lcmm}
+\alias{predictY}
 \alias{predictY.multlcmm}
 \title{Marginal predictions (possibly class-specific) of a \code{hlme},
 \code{lcmm}, \code{multlcmm} or \code{Jointlcmm} object in the natural scale
 of the longitudinal outcome(s) for a specified profile of covariates.}
 \usage{
-\method{predictY}{Jointlcmm}(
-  x,
-  newdata,
-  var.time,
-  methInteg = 0,
-  nsim = 20,
-  draws = FALSE,
-  ndraws = 2000,
-  na.action = 1,
-  ...
-)
+\method{predictY}{Jointlcmm}(x, newdata, var.time, methInteg = 0, nsim = 20,
+  draws = FALSE, ndraws = 2000, na.action = 1, ...)
 
-\method{predictY}{hlme}(x, newdata, var.time, draws = FALSE, na.action = 1, ...)
+\method{predictY}{hlme}(x, newdata, var.time, draws = FALSE, na.action = 1,
+  ...)
 
-\method{predictY}{lcmm}(
-  x,
-  newdata,
-  var.time,
-  methInteg = 0,
-  nsim = 20,
-  draws = FALSE,
-  ndraws = 2000,
-  na.action = 1,
-  ...
-)
+\method{predictY}{lcmm}(x, newdata, var.time, methInteg = 0, nsim = 20,
+  draws = FALSE, ndraws = 2000, na.action = 1, ...)
 
 predictY(x, newdata, var.time, ...)
 
-\method{predictY}{multlcmm}(
-  x,
-  newdata,
-  var.time,
-  methInteg = 0,
-  nsim = 20,
-  draws = FALSE,
-  ndraws = 2000,
-  na.action = 1,
-  ...
-)
+\method{predictY}{multlcmm}(x, newdata, var.time, methInteg = 0, nsim = 20,
+  draws = FALSE, ndraws = 2000, na.action = 1, ...)
 }
 \arguments{
 \item{x}{an object inheriting from class \code{lcmm}, \code{hlme},
@@ -96,8 +71,10 @@ By default, ndraws=2000.}
 for 'na.omit'. The alternative is 2 for 'na.fail'. Other options such as
 'na.pass' or 'na.exclude' are not implemented in the current version.}
 
-\item{\dots}{further arguments to be passed to or from other methods.  They
-are ignored in this function.}
+\item{\dots}{further arguments to be passed to or from other methods. 
+Only the argument 'median' will be used, other are ignored. 'median' should
+be a logical indicating whether the median should be computed. By 
+default, the mean value is computed.}
 }
 \value{
 An object of class \code{predictY} with values :

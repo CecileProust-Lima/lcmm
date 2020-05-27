@@ -969,8 +969,10 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 #' @param na.action Integer indicating how NAs are managed. The default is 1
 #' for 'na.omit'. The alternative is 2 for 'na.fail'. Other options such as
 #' 'na.pass' or 'na.exclude' are not implemented in the current version.
-#' @param \dots further arguments to be passed to or from other methods.  They
-#' are ignored in this function.
+#' @param \dots further arguments to be passed to or from other methods. 
+#' Only the argument 'median' will be used, other are ignored. 'median' should
+#' be a logical indicating whether the median should be computed. By 
+#' default, the mean value is computed.
 #' @return An object of class \code{predictY} with values :
 #' 
 #' - \code{pred} : a matrix with the same rows (number and order) as in
@@ -1038,4 +1040,16 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 #' 
 #' @export
 #' 
-predictY <- function(x,newdata,var.time,...) UseMethod("predictY")
+predictY <- function(x,newdata,var.time,...){
+  dots <- list(...)
+  median <- FALSE
+  if(length(dots$median)) median <- as.logical(eval(dots$median))
+  if(median==TRUE) 
+  {
+    .predYmedian(m=x,newdata=newdata,var.time=var.time,...)
+  }
+  else
+    {
+       UseMethod("predictY")
+    }
+}
