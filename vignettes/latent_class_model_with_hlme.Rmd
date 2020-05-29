@@ -104,18 +104,6 @@ paquid$normMMSE <- normMMSE(paquid$MMSE)
 
 &nbsp;
 
-Here are the individual trajectories of the repeated measures of normMMSE
-
-&nbsp;
-
-```{r,comment='', fig.height=4, fig.width=6}
-library(lattice)
-color <- paquid$ID
-xyplot(normMMSE ~ age, paquid, groups = ID, col=color, lwd=2, type="l")
-```
-
-&nbsp;
-
 
 
 ## Estimate the model with only one class (G=1)
@@ -295,7 +283,7 @@ plot(predG3, col=2:4, lty=1, lwd=2, ylab="normMMSE", legend=NULL, main="Predicte
 
 ### Plot of the residuals
 
-```{r, fig.height=5, fig.width=8}
+```{r, eval=FALSE}
 plot(m2d, cex.main=0.8)
 ```
 

@@ -17,7 +17,6 @@ library(lcmm)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
-  
 )
 ```
 &nbsp;
@@ -262,7 +261,7 @@ legend(x="topleft", bty="n", ncol=2, lty=c(1,1,2,2), col=c(6,4,6,4), legend=c("w
 
 The subject-specific residuals (qqplot in bottom right panel) should be Gaussian.
 
-```{r,message=FALSE,eval=TRUE,  fig.height=5, fig.width=8}
+```{r,message=FALSE,eval=FALSE}
 plot(mspl5q, cex.main=0.9)
 ```
 &nbsp;

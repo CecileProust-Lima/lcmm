@@ -13,7 +13,7 @@
 #' various post fit functions.
 #' 
 #' \tabular{ll}{ Package: \tab lcmm \cr Type: \tab Package \cr Version: \tab
-#' 1.8.1 \cr Date: \tab 2019-06-25\cr License: \tab GPL (>=2.0) \cr LazyLoad:
+#' 1.9.1 \cr Date: \tab 2020-05-29\cr License: \tab GPL (>=2.0) \cr LazyLoad:
 #' \tab yes \cr } The package includes for the moment the estimation of :
 #' \itemize{ \item latent class mixed models for Gaussian longitudinal outcomes
 #' using \code{hlme} function, \item latent class mixed models for other

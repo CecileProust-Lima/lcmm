@@ -16,7 +16,6 @@ library(lcmm)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
-  
 )
 ```
 &nbsp;
@@ -109,7 +108,7 @@ For instance, when fitting a linear mixed model including the variable male, the
 ```{r, results='hide'}
 normCESD <- hlme(normCESD ~ age65*male, random = ~ age65, subject = 'ID', data=paquid)
 ```
-```{r, fig.height=5, fig.width=7, comment='' }
+```{r, eval=FALSE, comment='' }
 plot(normCESD, cex.main=0.8)
 ```
 
@@ -118,7 +117,7 @@ In comparison, without the normalization step, the subject-specific residuals ex
 ```{r, results='hide'}
 CESD <- hlme(CESD ~ age65*male, random = ~ age65, subject = 'ID', data=paquid)
 ```
-```{r, fig.height=5, fig.width=7, comment='' }
+```{r, eval=FALSE, comment='' }
 plot(CESD, cex.main=0.8)
 ```
 
