@@ -9,7 +9,7 @@ Proust-Lima C, Philipps V, Liquet B. Estimation of Extended Mixed Models Using L
 https://www.jstatsoft.org/article/view/v078i02
 
 
-Changes in Version 1.8.2 :
+Changes in Version 1.9.1 :
 
 * parallel implementation of gridsearch function. Thanks to Raphael Peter for his suggestion.
 * add condRE_Y option in predictYcond

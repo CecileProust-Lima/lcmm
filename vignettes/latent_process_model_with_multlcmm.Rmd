@@ -127,7 +127,7 @@ mult_lin <- multlcmm(MMSE + IST + BVRT ~ age75 + male + time + I(time^2/10) + co
 
 Depending on the nature of the data, some nonlinear link functions may be necessary. Here for instance, the MMSE is highly skewed: 
 
-```{r hist,message=FALSE}
+```{r hist,message=FALSE,fig.width=8, fig.height=3, fig.align = "center"}
 par(mfrow=c(1,3))
 hist(paquid$MMSE, breaks=31,main="MMSE distribution")
 hist(paquid$IST, breaks=41,main="IST distribution")
@@ -190,7 +190,7 @@ Models involving Beta transformations and splines transformations seem to fit a 
 
 The transformations can be plotted and compared between models:
           
-```{r testprint2,message=FALSE, fig.height=3, fig.width=5}
+```{r testprint2,message=FALSE, fig.height=3, fig.width=5, fig.align = "center"}
 par(mfrow=c(1,1))
 col <- rainbow(4)
 plot(mult_splines2, which = "linkfunction", col = c(col[2],col[3],col[4]), lwd =1,lty=4)
@@ -218,7 +218,7 @@ Confidence intervals of the link functions can be obtained by the Monte Carlo me
 
 &nbsp;                         
      
-```{r,message=FALSE, fig.height=3, fig.width=5}
+```{r,message=FALSE, fig.height=3, fig.width=5, fig.align = "center"}
 col <- rainbow(5)
 CIlink <- predictlink(mult_betaspl)
 plot(CIlink, col = c(col[2],col[3],col[4]), lwd = 2, shades = TRUE)
@@ -251,7 +251,7 @@ For example, the common factor explained 42% of MMSE residual variation while it
 
 As with lcmm function, predicted trajectories of the markers can be computed according to a covariate profile and then plotted. 
 
-```{r,message=FALSE,eval=TRUE,fig.height=3, fig.width=5}
+```{r,message=FALSE,eval=TRUE,fig.width=8, fig.height=3, fig.align = "center"}
 datnew <- data.frame(time=seq(0.08,2.2,length=100))
 datnew$age_init<-seq(65,95, length=100)
 datnew$age75 <- ((datnew$age_init - 75)/10)
@@ -286,7 +286,7 @@ plot(mult_betaspl, cex.main=0.8)
 The mean predictions and observations can be plotted according to time. Note that the predictions and observations are in the scale of the latent process (observations are transformed with the estimated link functions): 
 
 
-```{r,message=FALSE,eval=TRUE}
+```{r,message=FALSE,eval=TRUE,fig.width=8,fig.height=3, fig.align = "center"}
 par(mfrow=c(1,3))
 plot(mult_betaspl, which="fit", var.time="time", bty="l", xlab="time since entry (in decades)", cex.lab=1.1, break.times=8, ylab="latent process", lwd=2, marg=FALSE, ylim=c(-2,0.0), xlim=c(0.1,2), shades = TRUE, outcome = 1, col=2, main="MMSE predictions vs observations") 
 

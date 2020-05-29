@@ -1,6 +1,5 @@
 ---
-title: "How to estimate
-a latent process mixed model using lcmm function"
+title: "How to estimate a latent process mixed model using lcmm function"
 output: 
   rmarkdown::html_vignette:
     toc: true # table of content true
