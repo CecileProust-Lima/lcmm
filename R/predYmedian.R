@@ -20,7 +20,7 @@
     doone <- function(m,newdata,nsim,seed){
       f <- function(s){
         set.seed(s)
-        as.vector(predictY(m,newdata=newdata,var.time="age",methInteg=1,nsim=1,draws=TRUE,ndraws=1)$pred[,1:m$ng])
+        as.vector(predictY(m,newdata=newdata,var.time=var.time,methInteg=1,nsim=1,draws=TRUE,ndraws=1)$pred[,1:m$ng])
       }
       predb <- replicate(nsim,f(seed)) 
       medb <- apply(predb,1,median,na.rm=TRUE)
@@ -70,7 +70,7 @@
     
     ## fonction pour faire 1 simu 
     onesim <- function(m,newdata){
-      as.vector(predictY(m,newdata=newdata,var.time="age",methInteg=1,nsim=1,draws=FALSE)$pred[,1:m$ng])
+      as.vector(predictY(m,newdata=newdata,var.time=var.time,methInteg=1,nsim=1,draws=FALSE)$pred[,1:m$ng])
     }
     
     ## faire les nsim simus
