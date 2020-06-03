@@ -11,10 +11,14 @@
 #' latent classes of trajectory). All the models are estimated in a maximum
 #' likelihood framework using an iterative algorithm. The package also provides
 #' various post fit functions.
+#'
 #' 
-#' \tabular{ll}{ Package: \tab lcmm \cr Type: \tab Package \cr Version: \tab
-#' 1.9.1 \cr Date: \tab 2020-05-29\cr License: \tab GPL (>=2.0) \cr LazyLoad:
-#' \tab yes \cr } The package includes for the moment the estimation of :
+#' \Sexpr[stage=build,results=hide]{descr <- packageDescription("lcmm")}
+#' \tabular{ll}{ Package: \tab lcmm \cr Type: \tab Package \cr 
+#' Version: \tab \Sexpr[stage=build]{descr$Version} \cr 
+#' Date: \tab \Sexpr[stage=build]{descr$Date}\cr 
+#' License: \tab GPL (>=2.0) \cr LazyLoad: \tab yes \cr }
+#' The package includes for the moment the estimation of :
 #' \itemize{ \item latent class mixed models for Gaussian longitudinal outcomes
 #' using \code{hlme} function, \item latent class mixed models for other
 #' quantitative, bounded quantitative (curvilinear) and discrete longitudinal
