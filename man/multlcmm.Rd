@@ -354,7 +354,7 @@ summary(m2)
 # posterior classification
 postprob(m2)
 # longitudinal predictions in the outcomes scales for a given profile of covariates 
-newdata <- data.frame(Time=seq(0,5,length=100),X1=rep(0,100),X2=rep(0,100),X3=rep(0,100))
+newdata <- data.frame(Time=seq(0,5,length=100),X1=0,X2=0,X3=0)
 predGH <- predictY(m2,newdata,var.time="Time",methInteg=0,nsim=20) 
 head(predGH)
 }

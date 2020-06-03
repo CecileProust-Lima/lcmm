@@ -180,7 +180,8 @@ plot(m10,which="linkfunction",bty="l")
 plot(m11,which="linkfunction",bty="l",add=TRUE,col=2)
 plot(m12,which="linkfunction",bty="l",add=TRUE,col=3)
 plot(m13,which="linkfunction",bty="l",add=TRUE,col=4)
-legend("topleft",col=1:4,legend=c("linear","beta","3-Isplines","5-Isplines"),lty=1,bty='n')
+legend("topleft",legend=c("linear","beta","3-Isplines","5-Isplines"),
+col=1:4,lty=1,bty='n')
 }
 
 

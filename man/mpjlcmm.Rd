@@ -98,9 +98,10 @@ Estimation of multi-process joint latent class mixed models
 \dontrun{
 paquid$age65 <- (paquid$age-65)/10
 
-###################################################################################
-### EXAMPLE 1 : two outcomes measuring the same latent process along with dementia onset
-###################################################################################
+##############################################################################
+###                          EXAMPLE 1 :                                   ###
+###two outcomes measuring the same latent process along with dementia onset###
+##############################################################################
 
 ## multlcmm model for MMSE and BVRT for 1 class
 mult1 <- multlcmm(MMSE+BVRT~age65+I(age65^2)+CEP+male,random=~age65+I(age65^2),
@@ -124,7 +125,8 @@ mixture=~age65+I(age65^2),data=paquid,B=random(mult1),maxiter=0)
 m2S <- mpjlcmm(longitudinal=list(mult2),subject="ID",ng=2,data=paquid,
 survival=Surv(age_init,agedem,dem)~1)
 
-## estimation by a grid search with 50 replicates, initial values randomly generated from m1S
+## estimation by a grid search with 50 replicates, initial values
+## randomly generated from m1S
 m2S_b <- gridsearch(mpjlcmm(longitudinal=list(mult2),subject="ID",ng=2,
 data=paquid,survival=Surv(age_init,agedem,dem)~1), minit=m1S, rep=50, maxiter=30)
 
@@ -173,8 +175,8 @@ plot(predL,shades=TRUE) # in the latent process scale
 
 predY <- predictY(mult2_post,newdata=dpred,var.time="age65",draws=TRUE)
 
-plot(predY,shades=TRUE,ylim=c(0,30),main="MMSE") # in the 0-30 scale for MMSE
-plot(predY,shades=TRUE,ylim=c(0,15),outcome=2,main="BVRT") # in the 0-15 scale for BVRT
+plot(predY,shades=TRUE,ylim=c(0,30),main="MMSE") #in the 0-30 scale for MMSE
+plot(predY,shades=TRUE,ylim=c(0,15),outcome=2,main="BVRT") #in 0-15 for BVRT
 
 ## baseline hazard and survival curves :
 plot(m2S,"hazard")
@@ -185,9 +187,10 @@ postprob(m2S)
 
 
 
-###################################################################################
-### EXAMPLE 2 : two latent processes measured each by one outcome along with dementia onset
-###################################################################################
+####################################################################################
+###                              EXAMPLE 2 :                                     ###
+### two latent processes measured each by one outcome along with dementia onset  ###
+####################################################################################
 
 ## define the two longitudinal models
 
