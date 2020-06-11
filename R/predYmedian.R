@@ -1,7 +1,7 @@
-.predYmedian <- function(m,newdata,var.time,nsim=1000,ndraws=0,cl=NULL,seed=NULL,...)
+.predYmedian <- function(m,newdata,var.time,nsim=1000,draws=FALSE,ndraws=2000,cl=NULL,seed=NULL,...)
 {
   ## resultat au format predictY
-  res.list <- predictY(m,newdata=newdata,var.time=var.time,methInteg=1,nsim=1,draws=as.logical(ndraws>0),ndraws=1)
+  res.list <- predictY(m,newdata=newdata,var.time=var.time,methInteg=1,nsim=1,draws=draws,ndraws=1)
   
   ##colonnes qui correspondent aux predictions 
   colonne <- 1:m$ng
@@ -12,7 +12,7 @@
     ny <- length(m$Ynames)
   }
   ## avec les IC ##
-  if(ndraws>0)
+  if(draws==TRUE)
   {
     ##graines
     if(!is.null(seed))
