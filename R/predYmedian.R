@@ -3,6 +3,14 @@
   ## resultat au format predictY
   res.list <- predictY(m,newdata=newdata,var.time=var.time,methInteg=1,nsim=1,draws=as.logical(ndraws>0),ndraws=1)
   
+  ##colonnes qui correspondent aux predictions 
+  colonne <- 1:m$ng
+  ny <- 1
+  if(class(m)=="multlcmm")
+  {
+    colonne <- 2:(m$ng+1)
+    ny <- length(m$Ynames)
+  }
   ## avec les IC ##
   if(ndraws>0)
   {
@@ -20,7 +28,7 @@
     doone <- function(m,newdata,nsim,seed){
       f <- function(s){
         set.seed(s)
-        as.vector(predictY(m,newdata=newdata,var.time=var.time,methInteg=1,nsim=1,draws=TRUE,ndraws=1)$pred[,1:m$ng])
+        as.vector(predictY(m,newdata=newdata,var.time=var.time,methInteg=1,nsim=1,draws=TRUE,ndraws=1)$pred[,colonne])
       }
       predb <- replicate(nsim,f(seed)) 
       medb <- apply(predb,1,median,na.rm=TRUE)
@@ -62,7 +70,7 @@
     med_ic <- apply(allpred,1,quantile,probs=c(0.5,0.025,0.975),na.rm=TRUE)
     
     ## remettre en matrice avec ng colonnes
-    pred <- matrix(as.vector(t(med_ic)),nrow=nrow(newdata),ncol=3*m$ng)
+    pred <- matrix(as.vector(t(med_ic)),nrow=ny*nrow(newdata),ncol=3*m$ng)
   }
   else
   {
@@ -70,7 +78,7 @@
     
     ## fonction pour faire 1 simu 
     onesim <- function(m,newdata){
-      as.vector(predictY(m,newdata=newdata,var.time=var.time,methInteg=1,nsim=1,draws=FALSE)$pred[,1:m$ng])
+      as.vector(predictY(m,newdata=newdata,var.time=var.time,methInteg=1,nsim=1,draws=FALSE)$pred[,colonne])
     }
     
     ## faire les nsim simus
@@ -80,8 +88,10 @@
     med <- apply(pred,1,median,na.rm=TRUE)
     
     ## remettre en matrice avec ng colonnes
-    pred <- matrix(med,nrow=nrow(newdata),ncol=m$ng)
+    pred <- matrix(med,nrow=ny*nrow(newdata),ncol=m$ng)
   }
+  
+  if(class(m)=="multlcmm") pred <- data.frame(Yname=rep(m$Ynames,each=nrow(newdata)),pred)
   
   colnames(pred) <- colnames(res.list$pred)  
   res.list$pred <- pred
