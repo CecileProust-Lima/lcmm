@@ -11,17 +11,17 @@ Jointlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE,
   nwg = FALSE, survival, hazard = "Weibull", hazardtype = "Specific",
   hazardnodes = NULL, TimeDepVar = NULL, link = NULL, intnodes = NULL,
   epsY = 0.5, range = NULL, cor = NULL, data, B, convB = 1e-04,
-  convL = 1e-04, convG = 1e-04, maxiter = 100, nsim = 100, prior,
-  logscale = FALSE, subset = NULL, na.action = 1, posfix = NULL,
-  partialH = FALSE, verbose = TRUE, returndata = FALSE)
+  convL = 1e-04, convG = 1e-04, maxiter = 100, nsim = 100,
+  prior = NULL, logscale = FALSE, subset = NULL, na.action = 1,
+  posfix = NULL, partialH = FALSE, verbose = TRUE, returndata = FALSE)
 
 jlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE,
   nwg = FALSE, survival, hazard = "Weibull", hazardtype = "Specific",
   hazardnodes = NULL, TimeDepVar = NULL, link = NULL, intnodes = NULL,
   epsY = 0.5, range = NULL, cor = NULL, data, B, convB = 1e-04,
-  convL = 1e-04, convG = 1e-04, maxiter = 100, nsim = 100, prior,
-  logscale = FALSE, subset = NULL, na.action = 1, posfix = NULL,
-  partialH = FALSE, verbose = TRUE, returndata = FALSE)
+  convL = 1e-04, convG = 1e-04, maxiter = 100, nsim = 100,
+  prior = NULL, logscale = FALSE, subset = NULL, na.action = 1,
+  posfix = NULL, partialH = FALSE, verbose = TRUE, returndata = FALSE)
 }
 \arguments{
 \item{fixed}{two-sided linear formula object for the fixed-effects in the

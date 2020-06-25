@@ -437,7 +437,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                       survival,hazard="Weibull",hazardtype="Specific",
                       hazardnodes=NULL,TimeDepVar=NULL,link=NULL,intnodes=NULL,
                       epsY=0.5,range=NULL,cor=NULL,data,B,convB=0.0001,
-                      convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,
+                      convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior=NULL,
                       logscale=FALSE,subset=NULL,na.action=1,posfix=NULL,
                       partialH=FALSE,verbose=TRUE,returndata=FALSE)
     {
@@ -475,7 +475,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         if(!isTRUE(nom.subject %in% colnames(data))) stop(paste("Data should contain variable",nom.subject))
         
         nom.prior <- NULL
-        if(!missing(prior))
+        if(!is.null(prior))
             {
                 nom.prior <- as.character(prior)
                 if(!isTRUE(nom.prior %in% colnames(data))) stop(paste("Data should contain variable",nom.prior))

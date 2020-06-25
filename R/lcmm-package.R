@@ -29,7 +29,7 @@
 #' (potentially left-truncated and of multiple causes) time-to-event using
 #' \code{Jointlcmm} function.  }
 #' 
-#' Please report to the maintainer any bug or comment regarding the package for
+#' Please report to the maintainer via github any bug or comment regarding the package for
 #' future updates.
 #' 
 #' @name lcmm-package
@@ -72,7 +72,7 @@
 #' for longitudinal and time-to-event data: a review. Statistical Methods in
 #' Medical Research 23, 74-90.
 #' 
-#' Proust-Lima, Amievan Jacqmin-Gadda (2013). Analysis of multivariate mixed
+#' Proust-Lima, Amieva, Jacqmin-Gadda (2013). Analysis of multivariate mixed
 #' longitudinal data: A flexible latent process approach. Br J Math Stat
 #' Psychol 66(3), 470-87.
 #' 
