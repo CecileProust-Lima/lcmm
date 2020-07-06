@@ -567,7 +567,8 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
             }  
         
         ## nombre d'evenement concurrents
-        nbevt <- length(which(names(table(Event))>0))    #length(unique(Event))-1   
+        nbevt <- length(attr(surv,"states"))
+        
         if(nbevt<1) stop("No observed event in the data")
        
         

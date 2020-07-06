@@ -437,7 +437,10 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             }  
             
             ## nombre d'evenement concurrents
-            nbevt <- length(which(names(table(data[,nom.Event]))>0))    #length(unique(Event))-1   
+            Tevent <- getElement(object=data,name=nom.Tevent)
+            Event <- getElement(object=data,name=nom.Event)  
+            nbevt <- length(attr(do.call("Surv",list(time=Tevent,event=Event,type="mstate")),"states"))
+            #nbevt <- length(which(names(table(data[,nom.Event]))>0))    #length(unique(Event))-1   
             if(nbevt<1) stop("No observed event in the data")
             
 
