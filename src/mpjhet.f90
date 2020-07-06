@@ -138,7 +138,7 @@
       !Variables locales
       integer::jtemp,i,g,j,npm,ier,k,ktemp,ig,ke,sumnrisq,dejaspl,nbfix,nytot
       integer::mi,k1,l,neftot,nvctot,ncontrtot,nwtot,ncortot,nerrtot,naleatot
-      integer::tmp,sumny,m,jj,ll
+      integer::tmp,sumny,m,jj,ll,sumntr
       double precision::eps,ca,cb,dd
       double precision,dimension(ns0,ng0)::PPI,ppiy
       double precision,dimension(npmtot0)::mvc,b
@@ -589,6 +589,7 @@
       ! changer prm de B par prm a estimer
       tmp=0
       sumny=0
+      sumntr=0
       do k=1,nbK
          
          if (idiag(k).eq.1) then
@@ -628,9 +629,13 @@
                     abs(btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+nvc(k)+j))
             end do
          end if
+
+         sumntr=0
+         do l=1,ny(k)
+           sumntr = sumntr+ntr(sumny+l)
+         end do
             
-         tmp = tmp+nef(k)+ncontr(k)+nvc(k)+nw(k)+ncor(k)+nerr(k)+nalea(k)+ &
-              sum(ntr(sumny+1:ny(k)))
+         tmp = tmp+nef(k)+ncontr(k)+nvc(k)+nw(k)+ncor(k)+nerr(k)+nalea(k)+sumntr
          sumny = sumny+ny(k)
       end do
 
