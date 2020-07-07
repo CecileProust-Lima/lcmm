@@ -9,6 +9,13 @@ Proust-Lima C, Philipps V, Liquet B. Estimation of Extended Mixed Models Using L
 https://www.jstatsoft.org/article/view/v078i02
 
 
+Changes in Version 1.9.2 :
+
+* event variable in joint models can be logical
+* bug fixed in Jointlcmm with prior when there are missing data
+* bug fixed in mpjlcmm : initial values were badly modified (with at least 3 dimensions)
+* small bugs fixed in predictY with median=TRUE
+
 Changes in Version 1.9.1 :
 
 * parallel implementation of gridsearch function. Thanks to Raphael Peter for his suggestion.
