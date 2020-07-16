@@ -2756,7 +2756,7 @@ subroutine postprob_mpj(b,npm,ppi,ppiy)
               end do
            else if(idlink(sumny+yk).eq.-1) then
               do j=1,nmes(i,sumny+yk)
-                 Y1(sumMesYk+sumparK+j)=Y(sumMesYk+sumparK+j)
+                 Y1(sumMesYk+sumparK+j)=Y(it+sumMesYk+sumparK+j)
               end do
            end if
            sumntr = sumntr + ntr(sumny+yk)
@@ -3373,7 +3373,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
               end do
            else if(idlink(sumny+yk).eq.-1) then
               do j=1,nmes(i,sumny+yk)
-                 Y1(sumMesYk+sumparK+j)=Y(sumMesYk+sumparK+j)
+                 Y1(sumMesYk+sumparK+j)=Y(it+sumMesYk+sumparK+j)
                  Yobs(it+sumparK+sumMesYk+j) = Y1(sumparK+sumMesYk+j)
               end do
            end if
