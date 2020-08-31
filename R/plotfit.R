@@ -131,7 +131,7 @@
             for(i in 1:ntps)
                 {
                     indg <- lapply(1:ng,function(g) which( (pred_complet0[,ng+3]>=break.times[i]) & (pred_complet0[,ng+3]<min(break.times[i+1],maxT[g])) ) )
-                    if(i==(length(break.times)-1)) sapply(1:ng, function(g) indg[[g]] <- c(indg[[g]],which( (pred_complet0[,ng+3]==min(break.times[i+1],maxT[g]))  )))
+                    if(i==(length(break.times)-1)) indg <- lapply(1:ng, function(g){ if(maxT[g]>break.times[i]) c(indg[[g]],which( (pred_complet0[,ng+3]==min(break.times[i+1],maxT[g]))  )) else indg[[g]]})
                     
                     if(any(sapply(indg,length)>0))
                         {
@@ -186,7 +186,7 @@
             for(i in 1:ntps)
                 {
                     indg <- lapply(1:ng,function(g) which( (pred_complet[,ng+3]>=break.times[i]) & (pred_complet[,ng+3]<min(break.times[i+1],maxT[g])) ) )
-                    if(i==(length(break.times)-1)) sapply(1:ng, function(g) indg[[g]] <- c(indg[[g]],which( (pred_complet[,ng+3]==min(break.times[i+1],maxT[g]))  )))
+                    if(i==(length(break.times)-1)) indg <- lapply(1:ng, function(g){ if(maxT[g]>break.times[i]) c(indg[[g]],which( (pred_complet[,ng+3]==min(break.times[i+1],maxT[g]))  )) else indg[[g]]})
                                         
                     if(any(sapply(indg,length)>0))
                         {
