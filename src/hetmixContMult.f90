@@ -180,7 +180,12 @@
       else
          ntotvalSPL=sum(nvalSPL(:))
          allocate(zitr(-1:(maxval(nbzitr0)+2),nySPL))
-         allocate(mm(ntotvalSPL),mm1(ntotvalSPL),mm2(ntotvalSPL),im(ntotvalSPL),im1(ntotvalSPL),im2(ntotvalSPL))
+         allocate(mm(ntotvalSPL))
+         allocate(mm1(ntotvalSPL))
+         allocate(mm2(ntotvalSPL))
+         allocate(im(ntotvalSPL))
+         allocate(im1(ntotvalSPL))
+         allocate(im2(ntotvalSPL))
       end if
 
         
