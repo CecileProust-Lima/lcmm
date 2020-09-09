@@ -4,7 +4,8 @@
 \name{data_lcmm}
 \alias{data_lcmm}
 \title{Simulated dataset for lcmm and Jointlcmm functions}
-\format{A data frame with 1678 observations over 300 different subjects and
+\format{
+A data frame with 1678 observations over 300 different subjects and
 22 variables.  \describe{ \item{ID}{subject identification number}
 \item{Ydep1}{longitudinal continuous outcome}
 \item{Ydep2}{longitudinal ordinal outcome with 31 levels}
@@ -14,7 +15,8 @@
 of event} \item{Event}{indicator that Tevent is the time of event}
 \item{Time}{time of measurement} \item{X1}{binary covariate}
 \item{X2}{binary covariate} \item{X3}{continuous covariate}
-\item{X4}{categorical covariate} }}
+\item{X4}{categorical covariate} }
+}
 \description{
 The data were simulated from a joint latent class mixed model with 3
 classes.  Repeated data of 3 longitudinal outcomes (Ydep1, Ydep2, Ydep3) and

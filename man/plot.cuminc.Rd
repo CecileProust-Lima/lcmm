@@ -4,8 +4,15 @@
 \alias{plot.cuminc}
 \title{Plot of predicted cumulative incidences according to a profile of covariates}
 \usage{
-\method{plot}{cuminc}(x, profil = 1, event = 1, add = FALSE, legend,
-  legend.loc = "topleft", ...)
+\method{plot}{cuminc}(
+  x,
+  profil = 1,
+  event = 1,
+  add = FALSE,
+  legend,
+  legend.loc = "topleft",
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class \code{cuminc}}

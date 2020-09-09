@@ -6,8 +6,15 @@
 evaluating predictive accuracy of joint latent class models estimated using
 \code{Jointlcmm}}
 \usage{
-epoce(model, pred.times, var.time, fun.time = identity, newdata = NULL,
-  subset = NULL, na.action = 1)
+epoce(
+  model,
+  pred.times,
+  var.time,
+  fun.time = identity,
+  newdata = NULL,
+  subset = NULL,
+  na.action = 1
+)
 }
 \arguments{
 \item{model}{an object inheriting from class \code{Jointlcmm}}

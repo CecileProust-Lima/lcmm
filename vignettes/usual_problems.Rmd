@@ -97,3 +97,38 @@ Each vignette includes a section on the evaluation of the model.
   
 This is detailed in vignette on pre-normalizing:  https://cran.r-project.org/package=lcmm/vignettes/pre_normalizing.html
 
+
+
+&nbsp;
+
+# How to change the latent class in reference?
+
+The order of the latent classes can be changed in any function (hlme, lcmm, Jointlcmm, mpjlcmm) using the permut function. 
+Here is an example with the estimation of a two class linear mixed model: 
+
+```{r, , results='hide'}
+mhlme <- hlme(IST ~ I(age-age_init),random=~ I(age-age_init),subject="ID",data=paquid)
+set.seed(1234)
+mhlme2 <- hlme(IST ~ I(age-age_init),random=~ I(age-age_init),subject="ID",data=paquid,ng=2,
+               mixture=~ I(age-age_init),classmb =~ CEP , B=random(mhlme))
+```
+
+```{r, comment='' }
+summary(mhlme2)
+```
+
+The order of the latent classes can be changed by running: 
+
+```{r, , results='hide'}
+mhlme2perm <- permut(mhlme2, order=c(2,1))
+```
+
+```{r, comment='' }
+summary(mhlme2)
+```
+
+The models in objects mhlme2 and mhlme2perm are the same except for the permutation of the classes as shown with the cross-table:
+
+```{r, comment='' }
+table(mhlme2perm$pprob$class,mhlme2$pprob$class)
+```

@@ -4,10 +4,29 @@
 \alias{hlme}
 \title{Estimation of latent class linear mixed models}
 \usage{
-hlme(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE,
-  nwg = FALSE, cor = NULL, data, B, convB = 1e-04, convL = 1e-04,
-  convG = 1e-04, prior, maxiter = 500, subset = NULL, na.action = 1,
-  posfix = NULL, verbose = TRUE, returndata = FALSE)
+hlme(
+  fixed,
+  mixture,
+  random,
+  subject,
+  classmb,
+  ng = 1,
+  idiag = FALSE,
+  nwg = FALSE,
+  cor = NULL,
+  data,
+  B,
+  convB = 1e-04,
+  convL = 1e-04,
+  convG = 1e-04,
+  prior,
+  maxiter = 500,
+  subset = NULL,
+  na.action = 1,
+  posfix = NULL,
+  verbose = TRUE,
+  returndata = FALSE
+)
 }
 \arguments{
 \item{fixed}{two-sided linear formula object for the fixed-effects in the

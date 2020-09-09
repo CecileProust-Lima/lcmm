@@ -9,17 +9,33 @@
 \alias{plot.mpjlcmm}
 \title{Plot of a fitted model}
 \usage{
-\method{plot}{hlme}(x, which = "residuals", var.time, break.times, marg,
-  subset, shades, ...)
+\method{plot}{hlme}(x, which = "residuals", var.time, break.times, marg, subset, shades, ...)
 
-\method{plot}{lcmm}(x, which = "residuals", var.time, break.times, marg,
-  subset, shades, ...)
+\method{plot}{lcmm}(x, which = "residuals", var.time, break.times, marg, subset, shades, ...)
 
-\method{plot}{multlcmm}(x, which = "residuals", var.time, break.times, marg,
-  outcome, subset, shades, ...)
+\method{plot}{multlcmm}(
+  x,
+  which = "residuals",
+  var.time,
+  break.times,
+  marg,
+  outcome,
+  subset,
+  shades,
+  ...
+)
 
-\method{plot}{Jointlcmm}(x, which = "residuals", var.time, break.times, marg,
-  event, subset, shades, ...)
+\method{plot}{Jointlcmm}(
+  x,
+  which = "residuals",
+  var.time,
+  break.times,
+  marg,
+  event,
+  subset,
+  shades,
+  ...
+)
 
 \method{plot}{mpjlcmm}(x, which, event, ...)
 }

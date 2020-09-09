@@ -4,8 +4,18 @@
 \alias{dynpred}
 \title{Individual dynamic predictions from a joint latent class model}
 \usage{
-dynpred(model, newdata, event = 1, landmark, horizon, var.time,
-  fun.time = identity, na.action = 1, draws = FALSE, ndraws = 2000)
+dynpred(
+  model,
+  newdata,
+  event = 1,
+  landmark,
+  horizon,
+  var.time,
+  fun.time = identity,
+  na.action = 1,
+  draws = FALSE,
+  ndraws = 2000
+)
 }
 \arguments{
 \item{model}{an object inheriting from class \code{Jointlcmm}.}

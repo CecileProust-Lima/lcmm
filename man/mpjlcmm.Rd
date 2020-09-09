@@ -4,11 +4,31 @@
 \alias{mpjlcmm}
 \title{Estimation of multi-process joint latent class mixed models}
 \usage{
-mpjlcmm(longitudinal, subject, classmb, ng, survival, hazard = "Weibull",
-  hazardtype = "Specific", hazardnodes = NULL, TimeDepVar = NULL, data, B,
-  convB = 1e-04, convL = 1e-04, convG = 1e-04, maxiter = 100,
-  nsim = 100, prior, logscale = FALSE, subset = NULL, na.action = 1,
-  posfix = NULL, partialH = FALSE, verbose = TRUE)
+mpjlcmm(
+  longitudinal,
+  subject,
+  classmb,
+  ng,
+  survival,
+  hazard = "Weibull",
+  hazardtype = "Specific",
+  hazardnodes = NULL,
+  TimeDepVar = NULL,
+  data,
+  B,
+  convB = 1e-04,
+  convL = 1e-04,
+  convG = 1e-04,
+  maxiter = 100,
+  nsim = 100,
+  prior,
+  logscale = FALSE,
+  subset = NULL,
+  na.action = 1,
+  posfix = NULL,
+  partialH = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{longitudinal}{list of longitudinal models of the type hlme, lcmm or multlcmm}

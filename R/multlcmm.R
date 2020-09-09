@@ -888,7 +888,8 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                 Brandom <- TRUE
                 B <- eval(cl$B[[2]])
 
-                if(length(posfix)) stop("Argument posfix is not compatible with random intial values")
+# CPL 9/9/20
+#                if(length(posfix)) stop("Argument posfix is not compatible with random intial values")
             }
     
 ###valeurs initiales
@@ -1068,20 +1069,30 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                                         up <- vbb[upper.tri(vbb,diag=TRUE)]
                                         vbb <- t(vbb)
                                         vbb[upper.tri(vbb,diag=TRUE)] <- up
-                                        Chol <- chol(vbb)
-                                        Chol <- t(Chol)
+
+                                        # Chol <- chol(vbb)      # CPL 9/9/20
+                                        # Chol <- t(Chol)        # CPL 9/9/20 
 
                                         ## vecteur final b cree a partir de bb et vbb
                                         b <- rep(0,NPM)
                                         
                                         if(idg0[1]>1)
                                             {
-                                                b[c((nprob+ng):(nef+nvc),(nef+nvc+nw+1):NPM)] <- bb + Chol %*% rnorm(length(bb))
+                                            # print(b[c((nprob+ng):(nef+nvc),(nef+nvc+nw+1):NPM)])
+                                            # print(bb)
+                                            # print(length(b[c((nprob+ng):(nef+nvc),(nef+nvc+nw+1):NPM)]))
+                                            # print(length(bb))
+                                                b[c((nprob+ng):(nef+nvc),(nef+nvc+nw+1):NPM)] <- rmvnorm(n=1,mean=bb,sigma = vbb)  # CPL 9/9/20
+                                                # b[c((nprob+ng):(nef+nvc),(nef+nvc+nw+1):NPM)] <- bb + Chol %*% rnorm(length(bb))   # CPL 9/9/20
                                                 b[nprob+1:(ng-1)] <- 0
                                             } 
                                         else
-                                            {                                        
-                                                b[c((nprob+1):(nef+nvc),(nef+nvc+nw+1):NPM)] <- bb + Chol %*% rnorm(NPM-nprob-nw)
+                                            {   
+                                                print(bb)
+                                                print(b[c((nprob+1):(nef+nvc),(nef+nvc+nw+1):NPM)])
+
+                                                b[c((nprob+1):(nef+nvc),(nef+nvc+nw+1):NPM)] <- rmvnorm(n=1,mean=bb,sigma=vbb)  # CPL 9/9/20
+                                                # b[c((nprob+1):(nef+nvc),(nef+nvc+nw+1):NPM)] <- bb + Chol %*% rnorm(NPM-nprob-nw)  # CPL 9/9/20
                                             }
 
                                         ## les prm de classmb et nwg sont toujours initalises a 0 et 1
