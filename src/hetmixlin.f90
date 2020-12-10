@@ -317,7 +317,6 @@
 
         IF (npm.eq.1) then
           istop=12
-          go to 1589
 
         else
 
@@ -404,10 +403,12 @@
 
       end if
 
+      deallocate(pbH)
+
  1589 continue
 
       deallocate(Y,X,idprob,idea,idg,nmes,prior,idcor)
-      deallocate(pbH,fix,bfix)
+      deallocate(fix,bfix)
 
       return
       end subroutine hetmixlin

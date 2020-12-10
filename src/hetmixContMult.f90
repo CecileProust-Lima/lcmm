@@ -404,7 +404,6 @@
 
       IF (npm.eq.1) then
          istop=10
-         go to 1589
       else
          ca=0.d0
          cb=0.d0
@@ -484,6 +483,8 @@
 
      !write(*,*)'avant deallocate'
 
+      deallocate(pbH)
+      
  1589 continue
 
       deallocate(Y,X,idprob,idea,idg,idcor,idcontr,nmes,prior,uniqueY,indiceY,ntrtot)
@@ -491,7 +492,7 @@
 
       deallocate(zitr,mm,mm1,mm2,im,im1,im2,minY,maxY,rangeY,idlink,nvalSPL,epsY)
 
-      deallocate(pbH,fix,bfix)
+      deallocate(fix,bfix)
 
 
      !write(*,*)'fin'

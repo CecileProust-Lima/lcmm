@@ -577,10 +577,6 @@
       end do
 
 
-      if(istop.eq.4 .or. istop.eq.12) then
-         goto 1589
-      end if
-
       ! calculs post-estimation
 
       if(istop.eq.1 .or. istop.eq.2 .or. istop.eq.3) then 
@@ -722,7 +718,7 @@
 
 
 
-      end if
+     end if
 
 
  1589 continue
@@ -738,6 +734,8 @@
               Tmmt2,Tmmt3,Timt,Timt1,Timt2,Timt3)
       endif
 
+      deallocate(pbH)
+
  1236 continue
 
       deallocate(Y,X,idprob,idea,idg,idcor,nmes,Tsurv0,Tsurv,Tsurvint &
@@ -746,7 +744,7 @@
      ,nxevtspec,nevtparx,nxcurr)
 
 
-      deallocate(pbH,bfix,fix)
+      deallocate(bfix,fix)
 
       return
 

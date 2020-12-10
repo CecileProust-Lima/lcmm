@@ -1860,7 +1860,6 @@
 
       IF (npm.eq.1) then
          istop=10
-         go to 1589
       else
          ca=0.d0
          cb=0.d0
@@ -1965,13 +1964,15 @@
 
 !      write(*,*)'avant deallocate'
 
+      deallocate(pbH)
+      
  1589 continue
 
       deallocate(Y,X,idprob,idea,idg,idcor,nmes,prior)
 
       deallocate(zitr,mm,mm1,mm2,im,im1,im2)
 
-      deallocate(pbH,fix,bfix)
+      deallocate(fix,bfix)
 
 
 !      write(*,*)'fin'

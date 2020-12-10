@@ -1820,7 +1820,6 @@
 
       IF (npm.eq.1) then
          istop=10
-         go to 1589
       else
          ca=0.d0
          cb=0.d0
@@ -1914,13 +1913,15 @@
       end if
 
 
-!      write(*,*)'avant deallocate'
+      !      write(*,*)'avant deallocate'
+
+      deallocate(pbH)
 
  1589 continue
 
       deallocate(Y,X,idprob,idea,idg,nmes,prior,ide)
 
-      deallocate(pbH,fix,bfix)
+      deallocate(fix,bfix)
 
       return
       end subroutine hetmixord
