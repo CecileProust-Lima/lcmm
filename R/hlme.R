@@ -310,7 +310,7 @@ hlme <-
         if(missing(data)){ stop("The argument data should be specified and defined as a data.frame")}
         if(nrow(data)==0) stop("Data should not be empty") 
         if(missing(subject)){ stop("The argument subject must be specified in any model even without random-effects")}
-        if(!is.numeric(data[,subject])) stop("The argument subject must be numeric")
+        if(!is.numeric(data[[subject]])) stop("The argument subject must be numeric")
 
         if(!(na.action%in%c(1,2)))stop("only 1 for 'na.omit' or 2 for 'na.fail' are required in na.action argument") 
 

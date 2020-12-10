@@ -466,7 +466,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         if(missing(data)){ stop("The argument data should be specified and defined as a data.frame")}
         if(nrow(data)==0) stop("Data should not be empty")
         if(missing(subject)){ stop("The argument subject must be specified in any model even without random-effects")}
-        if(!is.numeric(data[,subject])) stop("The argument subject must be numeric")
+        if(!is.numeric(data[[subject]])) stop("The argument subject must be numeric")
         if(is.null(link)) link <- "NULL"
         if(any(link=="thresholds"))  stop("The link function thresholds is not available yet")
         if(link %in% c("linear","beta") & !is.null(intnodes)) stop("Intnodes should only be specified with splines links")

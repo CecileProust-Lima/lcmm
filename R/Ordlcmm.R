@@ -30,7 +30,7 @@
 
     if(missing(data)){ stop("The argument data should be specified and defined as a data.frame")} 
     if(missing(subject)){ stop("The argument subject must be specified in any model even without random-effects")} 
-    if(!is.numeric(data[,subject])) stop("The argument subject must be numeric")
+    if(!is.numeric(data[[subject]])) stop("The argument subject must be numeric")
 ### ad 2/04/2012
     X0.names2 <- c("intercept")
 ### ad
