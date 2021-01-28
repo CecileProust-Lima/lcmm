@@ -245,7 +245,7 @@ Predictions can then be plotted:
 ```{r,comment='', fig.height=4, fig.width=6}
 plot(pred0, col=c("red","navy"), lty=1,lwd=5,ylab="normMMSE",legend=NULL,  main="Predicted trajectories for normMMSE ",ylim=c(0,100))
 plot(pred1, col=c("red","navy"), lty=2,lwd=3,legend=NULL,add=TRUE)
-legend(x="topright",legend=c("class1 :","CEP-","CEP+","class2:","CEP-","CEP+"), col=c("red","navy"), lwd=2, lty=c(0,1,2,0,1,2), ncol=2, bty="n", cex = 0.7)
+legend(x="topright",legend=c("class1 :","CEP-","CEP+","class2:","CEP-","CEP+"), col=c(rep("red",3),rep("navy",3)), lwd=2, lty=c(0,1,2,0,1,2), ncol=2, bty="n", cex = 0.7)
 ```
 
 &nbsp;
