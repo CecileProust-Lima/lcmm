@@ -228,6 +228,10 @@
 #' reported. Default to TRUE.
 #' @param returndata logical indicating if data used for computation should be
 #' returned. Default to FALSE, data are not returned.
+#' @param methInteg character indicating the type of integration if ordinal outcomes
+#' are considered. 'MCO' for ordinary Monte Carlo, 'MCA' for antithetic Monte Carlo,
+#' 'QMC' for quasi MonteCarlo.
+#' @param nMC integer, number of Monte Carlo simulations
 #' @return The list returned is: \item{ns}{number of grouping units in the
 #' dataset} \item{ng}{number of latent classes} \item{loglik}{log-likelihood of
 #' the model} \item{best}{vector of parameter estimates in the same order as
@@ -341,7 +345,7 @@
 #' 
 #' @export
 #' 
-multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,randomY=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=TRUE,returndata=FALSE)
+multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,randomY=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=TRUE,returndata=FALSE,methInteg="QMC",nMC=1000,cholesky=TRUE)
 {
     ptm<-proc.time()
     if(verbose==TRUE) cat("Be patient, multlcmm is running ... \n")
@@ -375,8 +379,8 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     if(nrow(data)==0) stop("Data should not be empty")
     if(missing(subject)){ stop("The argument subject must be specified")}
     if(!is.numeric(data[,subject])) stop("The argument subject must be numeric")
-    if(any(link=="thresholds"))  stop("The link function thresholds is not available in multivariate case")
-    if(all(link %in% c("linear","beta")) & !is.null(intnodes)) stop("Intnodes should only be specified with splines links")
+    #if(any(link=="thresholds"))  stop("The link function thresholds is not available in multivariate case")
+    if(all(link %in% c("linear","beta","thresholds")) & !is.null(intnodes)) stop("Intnodes should only be specified with splines links")
 
     if(!(na.action%in%c(1,2)))stop("only 1 for 'na.omit' or 2 for 'na.fail' are required in na.action argument")
 
@@ -602,14 +606,14 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     idlink0 <- rep(2,ny0)
     idlink0[which(link=="linear")] <- 0
     idlink0[which(link=="beta")] <- 1
-    idlink0[which(link=="thresholds")] <- 0 #!**
+    idlink0[which(link=="thresholds")] <- 3
 
-    
     spl <- strsplit(link[which(idlink0==2)],"-")
     if(any(sapply(spl,length)!=3)) stop("Invalid argument 'link'")
 
     nySPL <- length(spl)
     nybeta <- sum(idlink0==1)
+    nyORD <- sum(idlink0==3)
     ##remplir range si pas specifie
     if(!is.null(range) & length(range)!=2*(nySPL+nybeta)) stop("Length of vector range is not correct.")
     if((length(range)==2*(nySPL+nybeta)) & (nySPL+nybeta>0))
@@ -735,7 +739,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     nbspl <- 0
     for (k in 1:ny0)
         {
-            if(idlink0[k]==0) zitr[1:2,k] <- c(min(get(dataY[k])[,nomsY[k]]),max(get(dataY[k])[,nomsY[k]]))
+            if((idlink0[k]==0) | (idlink0[k]==3)) zitr[1:2,k] <- c(min(get(dataY[k])[,nomsY[k]]),max(get(dataY[k])[,nomsY[k]]))
 
             if(idlink0[k]==1)
                 {
@@ -760,11 +764,12 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 ###uniqueY0 et indiceY0
     uniqueY0 <- NULL
     indiceY0 <- NULL
-    nvalSPL0 <- NULL
+    nvalSPLORD0 <- rep(0,ny0)
+    nbmod <- rep(0,ny0)
     nb <- 0
     for (k in 1:ny0)
         {
-            if(idlink0[k]!=2)
+            if((idlink0[k]!=2) & (idlink0[k]!=3))
                 {
                     indiceY0 <- c(indiceY0, rep(0,length(get(dataY[k])[,nomsY[k]])))
                     next
@@ -776,20 +781,31 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
             if(length(as.vector(table(yk)))==length(uniqueTemp))
                 {
                     indice <- rep(1:length(uniqueTemp), as.vector(table(yk)))
-                    indiceTemp <- nb + indice[permut]
-
+                    if(idlink0[k]==2)
+                    {
+                        indiceTemp <- nb + indice[permut]
+                    }
+                    else
+                    {
+                        indiceTemp <- indice[permut]
+                    }
+                    
                     nb <- nb + length(uniqueTemp)
+
                     uniqueY0 <- c(uniqueY0, uniqueTemp)
                     indiceY0 <- c(indiceY0, indiceTemp)
-                    nvalSPL0 <- c(nvalSPL0, length(uniqueTemp))
+                    nvalSPLORD0[k] <- length(uniqueTemp)
                 }
             else
                 {
-                    uniqueY0 <- yk
-                    indiceY0 <- c(1:length(yk))
-                    nvalSPL0 <- length(yk)
+                    uniqueY0 <- c(uniqueY0, yk)
+                    indiceY0 <- c(indiceY0, ifelse(idlink0[k]==2,nb,0)+c(1:length(yk)))
+                    nb <- nb + length(yk)
+                    nvalSPLORD0[k] <- length(yk)
                 }
+            if(idlink0[k]==3) nbmod[k] <- length(na.omit(uniqueTemp))
         }
+    #if(is.null(nvalSPLORD0)) nvalSPLORD0 <- 0
 
 
 ###ordonner les mesures par individu
@@ -814,6 +830,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     idiag0 <- ifelse(idiag==TRUE,1,0)
     nwg0 <- ifelse(nwg==TRUE,1,0)
     nalea0 <- ifelse(randomY==TRUE,ny0,0)
+    chol <- ifelse(cholesky==TRUE,1,0)
 
     loglik <- 0
     ni <- 0
@@ -833,8 +850,9 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     Ydiscrete <- 0
     UACV <- 0
     vraisdiscret <- 0
-
-
+    
+ 
+    
 ###nmes0
     nmes0 <- matrix(0,ns0,ny0)
     for (k in 1:ny0)
@@ -842,6 +860,8 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
             INDpresents <- which(unique(IND) %in% get(dataY[k])[,nom.subject])
             nmes0[INDpresents,k] <- as.vector(table(get(dataY[k])[,nom.subject]))
         }
+    maxmes <- max(apply(nmes0,1,sum))
+
 
 
 ###remplir idprob, etc
@@ -860,11 +880,22 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 
     nea0 <- sum(idea0)
     predRE <- rep(0,ns0*nea0)
+
+    ## parametres MC
+    methInteg <- switch(methInteg,"MCO"=1,"MCA"=2,"QMC"=3)
+    seqMC <- 0
+    dimMC <- 0
+    if(methInteg==3) 
+    {
+        dimMC <- nea0+nalea0
+        if(ncor0>0) dimMC <- dimMC+maxmes
+        if(dimMC>0) seqMC <- randtoolbox::sobol(n=nMC,dim=dimMC,normal=TRUE,scrambling=1) 
+    }
     
     ##nombre total de parametres
     NPM <- (ng0-1)*sum(idprob0) + sum(idg0==1)-1 + ng0*sum(idg0==2) + ncor0 + (ny0-1)*sum(idcontr0) +
         ifelse(idiag0==1,nea0,nea0*(nea0+1)/2)-1 + (ng0-1)*nwg0 + nalea0 + ny0 +
-            2*sum(idlink0==0) + 4*sum(idlink0==1) + sum(nbnodes+2)
+            2*sum(idlink0==0) + 4*sum(idlink0==1) + sum(nbnodes+2) + any(idlink0==3)*sum(nbmod[which(idlink0==3)]-1)
 
     V <- rep(0, NPM*(NPM+1)/2)  #pr variance des parametres
 
@@ -874,7 +905,14 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     nw <- (ng0-1)*nwg0
     ntrtot0 <- nbzitr0+2
     ntrtot0[which(idlink0==0)] <- 2
+    ntrtot0[which(idlink0==3)] <- nbmod[which(idlink0==3)]-1
     nprob <- sum(idprob0)*(ng0-1)
+
+    ntr <- rep(0,ny0)
+    ntr[which(idlink0==0)] <- 2
+    ntr[which(idlink0==1)] <- 4
+    ntr[which(idlink0==2)] <- nbzitr0[which(idlink0==2)]+2
+    ntr[which(idlink0==3)] <- nbmod[which(idlink0==3)]-1
 
     
 ## gestion de B=random(mod)
@@ -898,6 +936,40 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                 {
                     if (length(B)==NPM) b <- B
                     else stop(paste("Vector B should be of length",NPM))
+
+                    if(nvc>0)
+                    {
+                        ## remplacer varcov des EA par les prm a estimer
+                        
+                        if(idiag==1) b[nef+1:nvc] <- sqrt(b[nef+1:nvc])
+
+                        if(idiag==0)
+                        {
+                                varcov <- matrix(0,nrow=nea0,ncol=nea0)
+                                varcov[upper.tri(varcov,diag=TRUE)] <- c(1,b[nef+1:nvc])
+                                varcov <- t(varcov)
+                                varcov[upper.tri(varcov,diag=TRUE)] <- c(1,b[nef+1:nvc])
+                         
+                            if(cholesky==TRUE)
+                            {       
+                                ch <- chol(varcov)
+                                
+                                b[nef+1:nvc] <- (ch[upper.tri(ch,diag=TRUE)])[-1]
+                            }
+                            else
+                            {
+                                corr <- cov2cor(varcov)
+                                corr <- corr[upper.tri(corr)]
+
+                                prmea <- matrix(0,nea0,nea0)
+                                diag(prmea) <- sqrt(diag(varcov))
+                                prmea[upper.tri(prmea)] <- log((1+corr)/(1-corr))                                
+                                
+                                b[nef+1:nvc] <- (prmea[upper.tri(prmea,diag=TRUE)])[-1]
+                                
+                            }
+                        }
+                    }
                 }
             else
                 {
@@ -1140,7 +1212,12 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                         {
                             b[nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:k])-ntrtot0[k]+1] <- -2
                             b[nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:k])-ntrtot0[k]+2:ntrtot0[k]] <- 0.1
-                        }
+                    }
+                    if(idlink0[k]==3)
+                    {
+                        b[nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:k])-ntrtot0[k]+1] <- 0
+                        if(ntrtot0[k]>1) b[nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:k])-ntrtot0[k]+2:ntrtot0[k]] <- 0.1
+                    }
                 }
         }
 
@@ -1194,7 +1271,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
         b0Random <- c(b0Random,rep(1,ng-1))
     }
     
-    wRandom[nef+nvc+nw+1:ncor0] <- (NPM2-ncor0):(NPM2-1)
+    if(ncor0>0) wRandom[nef+nvc+nw+1:ncor0] <- nef2+nvc+1:ncor0
     
     wRandom[nef+nvc+nw+ncor0+1:ny0] <- nef2+nvc+ncor0+1:ny0
 
@@ -1243,6 +1320,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     if(idlink0[1]==0) names(b)[nef+nvc+nw+ncor0+ny0+nalea0+1:ntrtot0[1]]<- c("Linear 1","Linear 2")
     if(idlink0[1]==1) names(b)[nef+nvc+nw+ncor0+ny0+nalea0+1:ntrtot0[1]]<- paste("Beta",c(1:ntrtot0[1]),sep="")
     if(idlink0[1]==2) names(b)[nef+nvc+nw+ncor0+ny0+nalea0+1:ntrtot0[1]]<- paste("I-splines",c(1:ntrtot0[1]),sep="")
+    if(idlink0[1]==3) names(b)[nef+nvc+nw+ncor0+ny0+nalea0+1:ntrtot0[1]]<- paste("Thresh",c(1:ntrtot0[1]),sep="")
     if(ny0>1)
         {
             for (yk in 2:ny0)
@@ -1250,6 +1328,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                     if(idlink0[yk]==0) names(b)[nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:(yk-1)])+1:ntrtot0[yk]]<- c("Linear 1","Linear 2")
                     if(idlink0[yk]==1) names(b)[nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:(yk-1)])+1:ntrtot0[yk]]<- paste("Beta",c(1:ntrtot0[yk]),sep="")
                     if(idlink0[yk]==2) names(b)[nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:(yk-1)])+1:ntrtot0[yk]]<- paste("I-splines",c(1:ntrtot0[yk]),sep="")
+                    if(idlink0[yk]==3) names(b)[nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:(yk-1)])+1:ntrtot0[yk]]<- paste("Thresh",c(1:ntrtot0[yk]),sep="")
                 }
         }
     if(nvc!=0)names(b)[nef+1:nvc] <- paste("varcov",c(1:nvc))
@@ -1357,7 +1436,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                              as.double(zitr),
                              as.double(uniqueY0),
                              as.integer(indiceY0),
-                             as.integer(nvalSPL0),
+                             as.integer(nvalSPLORD0),
                              marker=as.double(marker),
                              transfY=as.double(transfY),
                              as.integer(nsim),
@@ -1367,7 +1446,11 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                              UACV=as.double(UACV),
                              rlindiv=as.double(rlindiv),
                              as.integer(pbH0),
-                             as.integer(fix0))
+                             as.integer(fix0),
+                             as.integer(methInteg),
+                             as.integer(nMC),
+                             as.integer(dimMC),
+                             as.double(seqMC))
 
 
             l <- 0
@@ -1409,9 +1492,67 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
             b[(nef+nvc+nw+ncor0+ny0+nalea0+1):NPM] <-init$best[(nef2+nvc+ncor0+ny0+1):NPM2]
 
         }
-
+#browser()
 ###estimation
-    out <- .Fortran(C_hetmixcontmult,
+    ## if(all(idlink0!=3)) {
+    ## out <- .Fortran(C_hetmixcontmult,
+    ##                 as.double(Y0),
+    ##                 as.double(X0),
+    ##                 as.integer(prior0),
+    ##                 as.integer(idprob0),
+    ##                 as.integer(idea0),
+    ##                 as.integer(idg0),
+    ##                 as.integer(idcor0),
+    ##                 as.integer(idcontr0),
+    ##                 as.integer(ny0),
+    ##                 as.integer(ns0),
+    ##                 as.integer(ng0),
+    ##                 as.integer(nv0),
+    ##                 as.integer(nobs0),
+    ##                 as.integer(nea0),
+    ##                 as.integer(nmes0),
+    ##                 as.integer(idiag0),
+    ##                 as.integer(nwg0),
+    ##                 as.integer(ncor0),
+    ##                 as.integer(nalea0),
+    ##                 as.integer(NPM),
+    ##                 best=as.double(b),
+    ##                 V=as.double(V),
+    ##                 loglik=as.double(loglik),
+    ##                 niter=as.integer(ni),
+    ##                 conv=as.integer(istop),
+    ##                 gconv=as.double(gconv),
+    ##                 ppi2=as.double(ppi0),
+    ##                 resid_m=as.double(resid_m),
+    ##                 resid_ss=as.double(resid_ss),
+    ##                 pred_m_g=as.double(pred_m_g),
+    ##                 pred_ss_g=as.double(pred_ss_g),
+    ##                 predRE=as.double(predRE),
+    ##                 predRE_Y=as.double(predRE_Y),
+    ##                 as.double(convB),
+    ##                 as.double(convL),
+    ##                 as.double(convG),
+    ##                 as.integer(maxiter),
+    ##                 as.double(epsY),
+    ##                 as.integer(idlink0),
+    ##                 as.integer(nbzitr0),
+    ##                 as.double(zitr),
+    ##                 as.double(uniqueY0),
+    ##                 as.integer(indiceY0),
+    ##                 as.integer(nvalSPLORD0),
+    ##                 marker=as.double(marker),
+    ##                 transfY=as.double(transfY),
+    ##                 as.integer(nsim),
+    ##                 Yobs=as.double(Yobs),
+    ##                 as.integer(Ydiscrete),
+    ##                 vraisdiscret=as.double(vraisdiscret),
+    ##                 UACV=as.double(UACV),
+    ##                 rlindiv=as.double(rlindiv),
+    ##                 as.integer(pbH0),
+    ##                 as.integer(fix0))
+    ## }else{
+        
+    out <- .Fortran(C_hetmixmult,
                     as.double(Y0),
                     as.double(X0),
                     as.integer(prior0),
@@ -1455,7 +1596,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                     as.double(zitr),
                     as.double(uniqueY0),
                     as.integer(indiceY0),
-                    as.integer(nvalSPL0),
+                    as.integer(nvalSPLORD0),
                     marker=as.double(marker),
                     transfY=as.double(transfY),
                     as.integer(nsim),
@@ -1465,83 +1606,92 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                     UACV=as.double(UACV),
                     rlindiv=as.double(rlindiv),
                     as.integer(pbH0),
-                    as.integer(fix0))
-
+                    as.integer(fix0),
+                    as.integer(methInteg),
+                    as.integer(nMC),
+                    as.integer(dimMC),
+                    as.double(seqMC),
+                    as.integer(chol))
+#}
 
     ## ajouter les thresholds en attendant de l estimer correctement !**
-    nbmod <- rep(0,ny0)
-    b_old <- b
-    for(k in 1:ny0)
-    {
-        if(link[k]=="thresholds")
-        {
-            idlink0[k] <- 3
-            nbmod[k] <- length(unique(get(dataY[k])[,nomsY[k]]))
-            b <- c(b_old[1:(nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:k])-ntrtot0[k])],-0.5)
-            if(nbmod[k]>2) b <- c(b,rep(1,nbmod[k]-2))
+    ## nbmod <- rep(0,ny0)
+    ## b_old <- b
+    ## for(k in 1:ny0)
+    ## {
+    ##     if(link[k]=="thresholds")
+    ##     {
+    ##         idlink0[k] <- 3
+    ##         nbmod[k] <- length(unique(get(dataY[k])[,nomsY[k]]))
+    ##         b <- c(b_old[1:(nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:k])-ntrtot0[k])],-0.5)
+    ##         if(nbmod[k]>2) b <- c(b,rep(1,nbmod[k]-2))
             
-            if(k<ny0) b <- c(b,b_old[(nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:k])):length(b_old)])
-            ntrtot0[k] <- nbmod[k]-1
-            names(b)[nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:k])-ntrtot0[k]+1:(ntrtot0[k])] <- paste("Thresh.",nomsY[k],"_",0:(ntrtot0[k]-1),sep="")
+    ##         if(k<ny0) b <- c(b,b_old[(nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:k])):length(b_old)])
+    ##         ntrtot0[k] <- nbmod[k]-1
+    ##         names(b)[nef+nvc+nw+ncor0+ny0+nalea0+sum(ntrtot0[1:k])-ntrtot0[k]+1:(ntrtot0[k])] <- paste("Thresh.",nomsY[k],"_",0:(ntrtot0[k]-1),sep="")
 
-            b_old <- b
-            out$best <- b
+    ##         b_old <- b
+    ##         out$best <- b
+    ##     }
+    ## }
+
+    
+
+    ## mettre NA pour les variances et covariances non calculees et  0 pr les prm fixes
+    if(length(posfix))
+    {
+        if(out$conv==3)
+        {
+            mr <- NPM-sum(pbH0)-length(posfix)
+            Vr <- matrix(0,mr,mr)
+            Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
+            Vr <- t(Vr)
+            Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
+            V <- matrix(NA,NPM,NPM)
+            V[setdiff(1:NPM,c(which(pbH0==1),posfix)),setdiff(1:NPM,c(which(pbH0==1),posfix))] <- Vr
+            V[,posfix] <- 0
+            V[posfix,] <- 0
+            V <- V[upper.tri(V,diag=TRUE)]
+        }
+        else
+        {
+            mr <- NPM-length(posfix)
+            Vr <- matrix(0,mr,mr)
+            Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
+            Vr <- t(Vr)
+            Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
+            V <- matrix(0,NPM,NPM)
+            V[setdiff(1:NPM,posfix),setdiff(1:NPM,posfix)] <- Vr
+            V <- V[upper.tri(V,diag=TRUE)]
         }
     }
-
-    
-
-### mettre NA pour les variances et covariances non calculees et  0 pr les prm fixes
-    if(length(posfix))
-        {
-            if(out$conv==3)
-                {
-                    mr <- NPM-sum(pbH0)-length(posfix)
-                    Vr <- matrix(0,mr,mr)
-                    Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
-                    Vr <- t(Vr)
-                    Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
-                    V <- matrix(NA,NPM,NPM)
-                    V[setdiff(1:NPM,c(which(pbH0==1),posfix)),setdiff(1:NPM,c(which(pbH0==1),posfix))] <- Vr
-                    V[,posfix] <- 0
-                    V[posfix,] <- 0
-                    V <- V[upper.tri(V,diag=TRUE)]
-                }
-            else
-                {
-                    mr <- NPM-length(posfix)
-                    Vr <- matrix(0,mr,mr)
-                    Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
-                    Vr <- t(Vr)
-                    Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
-                    V <- matrix(0,NPM,NPM)
-                    V[setdiff(1:NPM,posfix),setdiff(1:NPM,posfix)] <- Vr
-                    V <- V[upper.tri(V,diag=TRUE)]
-                }
-        }
     else
+    {
+        if(out$conv==3)
         {
-            if(out$conv==3)
-                {
-                    mr <- NPM-sum(pbH0)
-                    Vr <- matrix(0,mr,mr)
-                    Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
-                    Vr <- t(Vr)
-                    Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
-                    V <- matrix(NA,NPM,NPM)
-                    V[setdiff(1:NPM,which(pbH0==1)),setdiff(1:NPM,which(pbH0==1))] <- Vr
-                    V <- V[upper.tri(V,diag=TRUE)]
-                }
-            else
-                {
-                    V <- out$V
-                }
+            mr <- NPM-sum(pbH0)
+            Vr <- matrix(0,mr,mr)
+            Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
+            Vr <- t(Vr)
+            Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
+            V <- matrix(NA,NPM,NPM)
+            V[setdiff(1:NPM,which(pbH0==1)),setdiff(1:NPM,which(pbH0==1))] <- Vr
+            V <- V[upper.tri(V,diag=TRUE)]
         }
+        else
+        {
+            V <- out$V
+        }
+    }
     
-
-### Creation du vecteur cholesky
+    
+    ## Creation du vecteur cholesky
     Cholesky <- rep(0,(nea0*(nea0+1)/2))
-    if(idiag0==0 & nvc>0)
+    CorrEA <- rep(0,(nea0*(nea0+1)/2))
+    if(nvc>0){
+    if(cholesky==TRUE)
+    {
+        if(idiag0==0 & nvc>0)
         {
             Cholesky[1:(nvc+1)] <- c(1,out$best[nef+1:nvc])
             ## Construction de la matrice U
@@ -1550,15 +1700,46 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
             z <- t(U) %*% U
             out$best[nef+1:nvc] <- z[upper.tri(z,diag=TRUE)][-1]
         }
-    if(idiag0==1 & nvc>0)
+        if(idiag0==1 & nvc>0)
         {
             id <- 1:nea0
             indice <- rep(id+id*(id-1)/2)
             Cholesky[indice] <- c(1,out$best[nef+1:nvc])
             out$best[nef+1:nvc] <- out$best[nef+1:nvc]**2
         }
+    }
+    else
+    {
+        if(idiag0==0)
+        {
+            CorrEA <- c(1,out$best[nef+1:nvc])
+            
+            prmea <- matrix(0,nea0,nea0)
+            prmea[upper.tri(prmea,diag=TRUE)] <- c(1,out$best[nef+1:nvc])
+            prmea <- t(prmea)
+            prmea[upper.tri(prmea,diag=TRUE)] <- c(1,out$best[nef+1:nvc])
+            
+            sea <- abs(diag(prmea))
+            
+            corr <- (exp(prmea)-1)/(exp(prmea)+1)
+            diag(corr) <- 1
+            covea <- sweep(corr,1,sea,"*")
+            covea <- sweep(covea,2,sea,"*")
 
-###predictions
+            out$best[nef+1:nvc] <- (covea[upper.tri(covea,diag=TRUE)])[-1]
+        }
+        else
+        {
+            id <- 1:nea0
+            indice <- rep(id+id*(id-1)/2)
+            CorrEA[indice] <- c(1,out$best[nef+1:nvc])
+            out$best[nef+1:nvc] <- out$best[nef+1:nvc]^2
+        }
+    }
+    }
+
+    
+    ##predictions
     predRE <- matrix(out$predRE,ncol=nea0,byrow=T)
     predRE <- data.frame(unique(IND),predRE)
     colnames(predRE) <- c(nom.subject,nom.X0[idea0!=0])
@@ -1622,18 +1803,19 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 
     nom.X0[nom.X0=="(Intercept)"] <- "Intercept"
 
+    cost <- proc.time()-ptm
+    
     res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcontr0=idcontr0,
                idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,
                call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,
                predRE_Y=predRE_Y,Ynames=nomsY,Xnames=nom.X0,Xnames2=ttesLesVar,cholesky=Cholesky,
                estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,nbnodes=nbnodes,nbmod=nbmod,
                na.action=nayk,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,
-               wRandom=wRandom,b0Random=b0Random)
+               wRandom=wRandom,b0Random=b0Random,CPUtime=cost[3],CorrEA=CorrEA)
     
     names(res$best) <- names(b)
     class(res) <-c("multlcmm")
 
-    cost<-proc.time()-ptm
     if(verbose==TRUE) cat("The program took", round(cost[3],2), "seconds \n")
 
     res

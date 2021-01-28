@@ -2,7 +2,7 @@ PKG_LIBS = $(BLAS_LIBS) $(FLIBS)
 
 CSRC = init.c
 FMODSRC = AOptim.f90
-FSRC =  hetmixOrd.f90 hetmixlin.f90 hetmixCont.f90 hetmixContMult.f90 Jointhet.f90 calculusTransfo.f90 predictCont.f90 predictMult.f90 postprob2.f90 cvpl.f90 predictYcond.f90 mpjhet.f90
+FSRC =  hetmixOrd.f90 hetmixlin.f90 hetmixCont.f90 hetmixContMult.f90 Jointhet.f90 calculusTransfo.f90 predictCont.f90 predictMult.f90 postprob2.f90 cvpl.f90 predictYcond.f90 mpjhet.f90 hetmixMult.f90 mpjord.f90 irtsre.f90
 
 # Define order of compilation
 OBJECTS = $(CSRC:.c=.o) $(FMODSRC:.f90=.o) $(FSRC:.f90=.o) 
@@ -23,4 +23,7 @@ postprob2.o: AOptim.o Jointhet.o hetmixCont.o
 cvpl.o: AOptim.o Jointhet.o
 calculusTransfo.o: hetmixCont.o
 mpjhet.o: AOptim.o hetmixCont.o
+hetmixMult.o: AOptim.o hetmixCont.o hetmixOrd.o predictCont.o
+mpjord.o: AOptim.o hetmixCont.o hetmixOrd.o predictCont.o
+irtsre.o: AOptim.o hetmixOrd.o 
 

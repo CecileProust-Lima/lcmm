@@ -484,6 +484,8 @@
 
      !write(*,*)'avant deallocate'
 
+      deallocate(pbH)
+      
  1589 continue
 
       deallocate(Y,X,idprob,idea,idg,idcor,idcontr,nmes,prior,uniqueY,indiceY,ntrtot)
@@ -491,7 +493,7 @@
 
       deallocate(zitr,mm,mm1,mm2,im,im1,im2,minY,maxY,rangeY,idlink,nvalSPL,epsY)
 
-      deallocate(pbH,fix,bfix)
+      deallocate(fix,bfix)
 
 
      !write(*,*)'fin'
@@ -807,7 +809,8 @@
 !     debut du calcul de la vraisemblance
        vrais=vrais-sum(nmes(i,:))*dlog(dble(2*3.14159265))
 ! contribution individuelle a la vraisemblance
-
+      ! print*,"i=",i," -ni*log(2pi)=",-sum(nmes(i,:))*dlog(dble(2*3.14159265)), " log(det)=",det
+      ! print*,"Vi=",VC
 ! cas 1 : ng=1
 
        if (ng.eq.1) then
@@ -864,7 +867,7 @@
             Y2=Y1-mu
             Y3=matmul(VC,Y2)
             Y4=DOT_PRODUCT(Y2,Y3)
-
+!print*,"Y4=",Y4
             vrais=vrais-Y4
             !if (verbose==1) write(*,*)"vrais",vrais
 ! cas 2 :  ng>1  composantes
@@ -1116,6 +1119,7 @@
               goto 541
            end iF
            nmescur = nmescur + sum(nmes(i,:))
+          ! print*,"i=",i," vrais_mult=",vrais_mult
         end do
         541 continue
         return

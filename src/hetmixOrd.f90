@@ -2028,7 +2028,7 @@
 
       Ut1=Ut
 
-
+!print*,"U=",Ut
 ! ----------- boucle sur les individus -------------
       it=0
       vrais=0.d0
@@ -2081,7 +2081,7 @@
 
             mu=0.d0
             mu=matmul(X00,b0)
-
+!print*,"i=",i, " Xb=",mu
                         
                         
             if (nea.gt.0) then 
@@ -2243,7 +2243,7 @@
             vrais=vrais+log(expo)
 
          end if
-
+         !print*,"vrais=",vrais
          it=it+nmes(i)
        end do
 
@@ -2748,14 +2748,17 @@
 !      write(*,*)'mu1',mu1
 
       upper=.false.
+      !print*,"mu=",mu1
 
 
       do j=1,nmes(i)
+         !print*,"Y=",Y(nmescur+j)
          ind=0
          if (Y(nmescur+j).eq.minY) then
             gamma0=(b1(nef+nvc+nwg+1)-mu1(j)  )
             vraisind=vraisind*(alnorm(gamma0,upper))
             ind=1
+          !  print*,"gamma=",gamma0
          else
             sup=b1(nef+nvc+nwg+1)
             inf=sup
@@ -2767,6 +2770,7 @@
                   vraisind=vraisind*(alnorm(gamma1,upper) &
                  -alnorm(gamma0,upper))
                   ind=1
+           ! print*,"gamma=",gamma0
                end if
                inf=sup
             end do
@@ -2774,6 +2778,7 @@
                gamma0=(sup-mu1(j))
                vraisind=vraisind*(1.d0-alnorm(gamma0,upper))
                ind=1
+            !print*,"gamma=",gamma0
             end if
 
          end if

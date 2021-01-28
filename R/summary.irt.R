@@ -1,11 +1,10 @@
 #' @export
 #'
-summary.multlcmm <- function(object,...)
+summary.irt <- function(object,...)
 {
     x <- object
-    if (!inherits(x, "multlcmm")) stop("use only with \"multlcmm\" objects")
 
-    cat("General latent class mixed model", "\n")
+    cat("IRT model with shared random effects", "\n")
     cat("     fitted by maximum likelihood method", "\n")
 
     cl <- x$call
@@ -25,40 +24,75 @@ summary.multlcmm <- function(object,...)
     cat(paste("     Dataset:", as.character(as.expression(x$call$data))),"\n")
     cat(paste("     Number of subjects:", x$ns),"\n")
 
-    cat(paste("     Number of observations:", x$N[9]),"\n")
-    cat(paste("     Number of latent classes:", x$ng), "\n")
+    cat(paste("     Number of observations:", x$N[13]),"\n")
     cat(paste("     Number of parameters:", length(x$best))," \n")
     if(length(posfix)) cat(paste("     Number of estimated parameters:", length(x$best)-length(posfix))," \n")
 
-    ntrtot <- rep(NA,x$N[8])
+
+    nbevt <- x$N[14]
+    if(nbevt>0)
+    {
+        nprisq <- rep(NA,nbevt)
+        nrisq <- rep(NA,nbevt)
+        for(ke in 1:nbevt)
+        {
+            if(x$typrisq[ke]==1) nprisq[ke] <- x$nz[ke]-1
+            if(x$typrisq[ke]==2) nprisq[ke] <- 2
+            if(x$typrisq[ke]==3) nprisq[ke] <- x$nz[ke]+2
+
+            
+            cat(paste("     Event",ke,": \n"))
+            cat(paste("        Number of events: ", x$nevent[ke],"\n",sep=""))
+            
+            if (x$typrisq[ke]==2)
+            {
+                cat("        Weibull baseline risk function \n")
+            }
+            if (x$typrisq[ke]==1)
+            {
+                cat("        Piecewise constant baseline risk function with nodes \n")
+                cat("        ",x$hazardnodes[1:x$nz[ke],ke]," \n")
+            }
+            if (x$typrisq[ke]==3)
+            {
+                cat("        M-splines constant baseline risk function with nodes \n")
+                cat("        ",x$hazardnodes[1:x$nz[ke],ke]," \n")
+            }
+                        
+        }
+    }
+
+    
+    ny <- x$N[12]
+    ntr <- rep(NA,ny)
     numSPL <- 0
     cat("     Link functions: ")
-    for (yk in 1:x$N[8])
+    for (yk in 1:ny)
         {
             if (x$linktype[yk]==0)
                 {
-                    ntrtot[yk] <- 2
+                    ntr[yk] <- 2
                     if (yk>1) cat("                     ")
-                    cat("Linear for",x$Ynames[yk]," \n")
+                    cat("Linear for",x$Names$Ynames[yk]," \n")
                 }
             if (x$linktype[yk]==1)
                 {
-                    ntrtot[yk] <- 4
+                    ntr[yk] <- 4
                     if (yk>1) cat("                     ")
-                    cat("Standardised Beta CdF for",x$Ynames[yk]," \n")
+                    cat("Standardised Beta CdF for",x$Names$Ynames[yk]," \n")
                 }
             if (x$linktype[yk]==2) 
                 {
                     numSPL <- numSPL+1
-                    ntrtot[yk] <- x$nbnodes[numSPL]+2
+                    ntr[yk] <- x$nbnodes[numSPL]+2
                     if (yk>1) cat("                     ")
-                    cat("Quadratic I-splines with nodes", x$linknodes[1:x$nbnodes[numSPL],yk],"for",x$Ynames[yk], "\n")
+                    cat("Quadratic I-splines with nodes", x$linknodes[1:x$nbnodes[numSPL],yk],"for",x$Names$Ynames[yk], "\n")
                 }
             if (x$linktype[yk]==3) 
                 {
-                    ntrtot[yk] <- x$nbmod[yk]-1
+                    ntr[yk] <- x$nbmod[yk]-1
                     if (yk>1) cat("                     ")
-                    cat("Thresholds for",x$Ynames[yk], "\n")
+                    cat("Thresholds for",x$Names$Ynames[yk], "\n")
                 }
         }
 
@@ -89,15 +123,20 @@ summary.multlcmm <- function(object,...)
 
             cat("Maximum Likelihood Estimates:", "\n")
             cat(" \n")
-            
+
             nprob <- x$N[1]
-            ncontr <- x$N[2]
-            nef <- x$N[3]
-            nvc <- x$N[4]
-            nw <- x$N[5]
-            nalea <- x$N[6]
-            ncor <- x$N[7]
-            ny <- x$N[8]
+            nrisqtot <- x$N[2]
+            nvarxevt <- x$N[3]
+            nasso <- x$N[4]
+            nef <- x$N[5]
+            ncontr <- x$N[6]
+            nvc <- x$N[7]
+            nw <- x$N[8]
+            ncor <- x$N[9]
+            ntrtot <- x$N[10]
+            nalea <- x$N[11]
+            ny <- x$N[12]
+            nbevt <- x$N[13]
             NPM <- length(x$best)
             
             
@@ -125,10 +164,9 @@ summary.multlcmm <- function(object,...)
                     pwaldch <- rep(NA,length(coef))
                 }
 
-            if(nw>0) coef[nef+nvc+1:nw] <- abs(coef[nef+nvc+1:nw])
-            if(ncor>0) coef[nef+nvc+nw+ncor] <- abs(coef[nef+nvc+nw+ncor])
-            coef[nef+nvc+nw+ncor+1:ny] <- abs(coef[nef+nvc+nw+ncor+1:ny])
-            if(nalea>0) coef[nef+nvc+nw+ncor+ny+1:ny] <- abs(coef[nef+nvc+nw+ncor+ny+1:ny])
+            if(ncor>0) coef[nrisqtot+nvarxevt+nef+ncontr+nvc+ncor] <- abs(coef[nrisqtot+nvarxevt+nef+ncontr+nvc+ncor])
+            coef[nrisqtot+nvarxevt+nef+ncontr+nvc+ncor+ntrtot+nalea+1:ny] <- abs(coef[nrisqtot+nvarxevt+nef+ncontr+nvc+ncor+ntrtot+nalea+1:ny])
+            if(nalea>0) coef[nrisqtot+nvarxevt+nef+ncontr+nvc+ncor+ntrtot+1:ny] <- abs(coef[nrisqtot+nvarxevt+nef+ncontr+nvc+ncor+ntrtot+1:ny])
 
             if(x$conv!=2)
                 {
@@ -168,58 +206,54 @@ summary.multlcmm <- function(object,...)
                 }
 
 #browser()
-            
-            if(nprob>0)
-                {
-                    cat("Fixed effects in the class-membership model:\n" )
-                    cat("(the class of reference is the last class) \n")
 
-                    tmp <- cbind(coefch[1:nprob],sech[1:nprob],waldch[1:nprob],pwaldch[1:nprob])
-                    maxch <- apply(tmp,2,maxchar)
-                    if(any(c(1:nprob) %in% posfix)) maxch[1] <- maxch[1]-1
-                    dimnames(tmp) <- list(names(coef)[1:nprob],
-                                          c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
-                                            paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""),
-                                            paste(paste(rep(" ",max(maxch[3]-4,0)),collapse=""),"Wald",sep=""),
-                                            paste(paste(rep(" ",max(maxch[4]-7,0)),collapse=""),"p-value",sep="")))
-                    
-                    cat("\n")
-                    print(tmp,quote=FALSE,na.print="")
-                    cat("\n")
-                }
-            
-                    
+            if(nbevt>0)
+            {
+                cat("\n")
+                cat("Parameters in the proportional hazard model:\n" )
+                cat("\n")
+                
+                tmp <- cbind(coefch[c(1:(nrisqtot+nvarxevt), nrisqtot+nvarxevt+1:nasso)],
+                             sech[c(1:(nrisqtot+nvarxevt), nrisqtot+nvarxevt+1:nasso)],
+                             waldch[c(1:(nrisqtot+nvarxevt), nrisqtot+nvarxevt+1:nasso)],
+                             pwaldch[c(1:(nrisqtot+nvarxevt), nrisqtot+nvarxevt+1:nasso)])
+                maxch <- apply(tmp,2,maxchar)
+                if(any(c(1:(nrisqtot+nvarxevt), nrisqtot+nvarxevt+1:nasso) %in% posfix)) maxch[1] <- maxch[1]-1
+                dimnames(tmp) <- list(names(coef)[1:(nrisqtot+nvarxevt+nasso)],
+                                      c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
+                                        paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""),
+                                        paste(paste(rep(" ",max(maxch[3]-4,0)),collapse=""),"Wald",sep=""),
+                                        paste(paste(rep(" ",max(maxch[4]-7,0)),collapse=""),"p-value",sep="")))
+                cat("\n")
+                print(tmp,quote=FALSE,na.print="")
+                cat("\n")
+            }
+
+
+
             cat("Fixed effects in the longitudinal model:\n" )
 
             tmp <- matrix(c(0,NA,NA,NA),nrow=1,ncol=4)
             
-            if ((nef-ncontr-nprob)>0)
+            if (nef>0)
                 {
-                    tmp2 <- cbind(round(coef[(nprob+1):(nef-ncontr)],5),round(se[(nprob+1):(nef-ncontr)],5),round(wald[(nprob+1):(nef-ncontr)],3),round(pwald[(nprob+1):(nef-ncontr)],5))
+                    tmp2 <- cbind(round(coef[nrisqtot+nvarxevt+nasso+1:nef],5),round(se[nrisqtot+nvarxevt+nasso+1:nef],5),round(wald[nrisqtot+nvarxevt+nasso+1:nef],3),round(pwald[nrisqtot+nvarxevt+nasso+1:nef],5))
                     tmp <- rbind(tmp,tmp2)
                 }
-            
-            if (x$ng>1)
-                {
-                    interc <- "intercept class1 (not estimated)"
-                }
-            else
-                {
-                    interc <- "intercept (not estimated)"
-                }
+            interc <- "intercept (not estimated)"
 
-            if((nef-ncontr)>0) dimnames(tmp) <- list(c(interc,names(coef)[(nprob+1):(nef-ncontr)]), c("coef", "Se", "Wald", "p-value"))
+            if(nef>0) dimnames(tmp) <- list(c(interc,names(coef)[nrisqtot+nvarxevt+nasso+1:nef]), c("coef", "Se", "Wald", "p-value"))
             else dimnames(tmp) <- list(interc, c("coef", "Se", "Wald", "p-value"))
             cat("\n")
             
             if(ncontr>0)
                 {
                     indice2 <- 1:NPM*(1:NPM+1)/2
-                    nom.contr <- x$Xnames[as.logical(x$idcontr0)]
-                    for (i in 1:sum(x$idcontr0))
+                    nom.contr <- x$Xnames[as.logical(x$idcontr)]
+                    for (i in 1:sum(x$idcontr))
                         {
                             ##matrice de variance pour test et se du dernier coef
-                            indtmp <- indice2[(nef-ncontr+(i-1)*(ny-1)+1):(nef-ncontr+i*(ny-1))]
+                            indtmp <- indice2[(nrisqtot+nvarxevt+nasso+nef+(i-1)*(ny-1)+1):(nrisqtot+nvarxevt+nasso+nef+i*(ny-1))]
                             indtmp <- cbind(indtmp-0:(length(indtmp)-1),indtmp)
                             indV <- NULL
                             for (j in 1:dim(indtmp)[1])
@@ -231,8 +265,8 @@ summary.multlcmm <- function(object,...)
                             Vcontr <- t(Vcontr)
                             Vcontr[upper.tri(Vcontr)] <- Vcontr[lower.tri(Vcontr)]
                             
-                            vect.gamma <- coef[(nef-ncontr+(i-1)*(ny-1)+1):(nef-ncontr+i*(ny-1))]
-                            if(any(c((nef-ncontr+(i-1)*(ny-1)+1):(nef-ncontr+i*(ny-1))) %in% posfix))
+                            vect.gamma <- coef[(nrisqtot+nvarxevt+nasso+nef+(i-1)*(ny-1)+1):(nrisqtot+nvarxevt+nasso+nef+i*(ny-1))]
+                            if(any(c((nrisqtot+nvarxevt+nasso+nef+(i-1)*(ny-1)+1):(nrisqtot+nvarxevt+nasso+nef+i*(ny-1))) %in% posfix))
                                 {
                                     wald.contr <- NA
                                     p.wald.contr <- NA
@@ -243,7 +277,10 @@ summary.multlcmm <- function(object,...)
                                     p.wald.contr <- 1-pchisq(wald.contr,ny-1)
                                 }
                             
-                            tmp2 <- cbind(round(vect.gamma,5),round(se[(nef-ncontr+(i-1)*(ny-1)+1):(nef-ncontr+i*(ny-1))],5),round(wald[(nef-ncontr+(i-1)*(ny-1)+1):(nef-ncontr+i*(ny-1))],3),round(pwald[(nef-ncontr+(i-1)*(ny-1)+1):(nef-ncontr+i*(ny-1))],5))
+                            tmp2 <- cbind(round(vect.gamma,5),
+                                          round(se[(nrisqtot+nvarxevt+nasso+nef+(i-1)*(ny-1)+1):(nrisqtot+nvarxevt+nasso+nef+i*(ny-1))],5),
+                                          round(wald[(nrisqtot+nvarxevt+nasso+nef+(i-1)*(ny-1)+1):(nrisqtot+nvarxevt+nasso+nef+i*(ny-1))],3),
+                                          round(pwald[(nrisqtot+nvarxevt+nasso+nef+(i-1)*(ny-1)+1):(nrisqtot+nvarxevt+nasso+nef+i*(ny-1))],5))
                             tmp2 <- rbind(rep(NA,4),tmp2)
                             
                             if(x$conv %in% c(1,3))
@@ -270,7 +307,7 @@ summary.multlcmm <- function(object,...)
             
             tTable <- tmp
 
-            if(nef>0 & any(c((nprob+1):nef) %in% posfix))
+            if((nef>0) & any(c(nrisqtot+nvarxevt+nasso+1:nef) %in% posfix))
                 {      
                     col1 <- rep(NA,length(tmp[,1]))
                     col1[which(!is.na(tmp[,1]))] <- format(as.numeric(sprintf("%.5f",na.omit(tmp[,1]))),nsmall=5,scientific=FALSE)
@@ -281,9 +318,9 @@ summary.multlcmm <- function(object,...)
                     col4 <- rep(NA,length(tmp[,4]))
                     col4[which(!is.na(tmp[,4]))] <- format(as.numeric(sprintf("%.5f",na.omit(tmp[,4]))),nsmall=5,scientific=FALSE)
 
-                    pf <- sort(intersect(c((nprob+1):nef),posfix))
+                    pf <- sort(intersect(c(nrisqtot+nvarxervt+1:(nef+ncontr)),posfix))
                     p <- rep(0,length(tmp[,1]))
-                    p[which(rownames(tmp) %in% c(x$Xnames,x$Ynames[-length(x$Ynames)]))] <- c((nprob+1):nef)
+                    p[which(rownames(tmp) %in% c(x$Names$Xnames,x$Names$Ynames[-ny]))] <- c(nrisqtot+nvarxervt+1:(nef+ncontr))
                     col1[which(p %in% pf)] <- paste(col1[which(p %in% pf)],"*",sep="")
                     col2[which(p %in% pf)] <- NA
                     col3[which(p %in% pf)] <- NA
@@ -317,7 +354,7 @@ summary.multlcmm <- function(object,...)
                 {
                     if (nvc>0) 
                         {
-                            Mat.cov <- diag(c(1,coef[(nef+1):(nef+nvc)]))
+                            Mat.cov <- diag(c(1,coef[nrisqtot+nvarxevt+nasso+nef+ncontr+1:nvc]))
                         }
                     else
                         {
@@ -328,26 +365,26 @@ summary.multlcmm <- function(object,...)
                 }
             if(x$idiag==0)
                 {
-                    Mat.cov<-matrix(0,ncol=sum(x$idea0),nrow=sum(x$idea0))
+                    Mat.cov<-matrix(0,ncol=sum(x$idea),nrow=sum(x$idea))
                     if(nvc>0) 
                         {
-                            Mat.cov[upper.tri(Mat.cov,diag=TRUE)]<-c(1,coef[(nef+1):(nef+nvc)])
+                            Mat.cov[upper.tri(Mat.cov,diag=TRUE)]<-c(1,coef[nrisqtot+nvarxevt+nasso+nef+ncontr+1:nvc])
                             Mat.cov <-t(Mat.cov)
                             Mat.cov[upper.tri(Mat.cov)] <- NA
                         }
                     else Mat.cov[1,1] <- 1
                 }
-            colnames(Mat.cov) <-x$Xnames[x$idea0==1]
-            rownames(Mat.cov) <-x$Xnames[x$idea0==1]
+            colnames(Mat.cov) <-x$Names$Xnames[x$idea==1]
+            rownames(Mat.cov) <-x$Names$Xnames[x$idea==1]
             
-            if(any(posfix %in% c(nef+1:nvc)))
+            if(any(posfix %in% c(nrisqtot+nvarxevt+nasso+nef+ncontr+1:nvc)))
                 {
                     Mat.cov <- apply(Mat.cov,2,format,digits=5,nsmall=5)
                     Mat.cov[upper.tri(Mat.cov)] <- ""
-                    pf <- sort(intersect(c(nef+1:nvc),posfix))
+                    pf <- sort(intersect(c(nrisqtot+nvarxevt+nasso+nef+ncontr+1:nvc),posfix))
                     p <- matrix(0,sum(x$idea),sum(x$idea))
-                    if(x$idiag==FALSE) p[upper.tri(p,diag=TRUE)] <- c(0,nef+1:nvc)
-                    if(x$idiag==TRUE) diag(p) <- c(0,nef+1:nvc)
+                    if(x$idiag==FALSE) p[upper.tri(p,diag=TRUE)] <- c(0,nrisqtot+nvarxevt+nasso+nef+ncontr+1:nvc)
+                    if(x$idiag==TRUE) diag(p) <- c(0,nrisqtot+nvarxevt+nasso+nef+ncontr+1:nvc)
                     Mat.cov[which(t(p) %in% pf)] <- paste(Mat.cov[which(t(p) %in% pf)],"*",sep="")
                     print(Mat.cov,quote=FALSE)
                 }
@@ -359,26 +396,21 @@ summary.multlcmm <- function(object,...)
             
             std <- NULL
             nom <- NULL
-            if(nw>=1) 
-                {
-                    nom <- paste("Proportional coefficient class",c(1:(x$ng-1)),sep="")
-                    std <-cbind(coefch[nef+nvc+1:nw],sech[nef+nvc+1:nw])
-                }
             if(ncor==2)
                 {
                     nom <- c(nom,"AR correlation parameter:","AR standard error:")
-                    std <-rbind(std,c(coefch[nef+nvc+nw+1],sech[nef+nvc+nw+1]),c(coefch[nef+nvc+nw+2],sech[nef+nvc+nw+2]))
+                    std <-rbind(std,c(coefch[nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+1],sech[nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+1]),c(coefch[nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+2],sech[nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+2]))
                 }
             if(ncor==1) 
                 {
                     nom <- c(nom,"BM standard error:")
-                    std <-rbind(std,c(coefch[nef+nvc+nw+1],sech[nef+nvc+nw+1]))
+                    std <-rbind(std,c(coefch[nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+1],sech[nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+1]))
                 }
             if (!is.null(std)) 
                 {
                     rownames(std) <- nom
                     maxch <- apply(std,2,maxchar)
-                    if(any(c(nef+nvc+1:(nw+ncor)) %in% posfix)) maxch[1] <- maxch[1]-1
+                    if(any(c(nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+1:ncor) %in% posfix)) maxch[1] <- maxch[1]-1
                     colnames(std) <- c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
                                        paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""))
 
@@ -389,17 +421,17 @@ summary.multlcmm <- function(object,...)
             
             std.err <- NULL
             nom <- NULL
-            std.err <- rbind(std.err,coefch[nef+nvc+nw+ncor+1:ny])
+            std.err <- rbind(std.err,coefch[nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+ncor+ntrtot+nalea+1:ny])
             nom <- c(nom, "Residual standard error:")
             if(nalea>0)
                 {
-                    std.err <- rbind(std.err,coefch[nef+nvc+nw+ncor+ny+1:nalea])
+                    std.err <- rbind(std.err,coefch[nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+ncor+ntrtot+1:nalea])
                     nom <- c(nom, "Standard error of the random effect:")
                 }  
 
             rownames(std.err) <- nom
             maxch <- apply(std.err,2,maxchar)
-            if(any(c(nef+nvc+nw+ncor+1:(ny+nalea)) %in% posfix))
+            if(any(c(nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+ncor+ntrtot+1:(nalea+ny)) %in% posfix))
                 {
                     if(nalea>0)
                         {
@@ -417,18 +449,18 @@ summary.multlcmm <- function(object,...)
             
             cat("Parameters of the link functions:\n" )
             
-            tmp <- cbind(coefch[(nef+nvc+nw+ncor+ny+nalea+1):NPM],
-                         sech[(nef+nvc+nw+ncor+ny+nalea+1):NPM],
-                         waldch[(nef+nvc+nw+ncor+ny+nalea+1):NPM],
-                         pwaldch[(nef+nvc+nw+ncor+ny+nalea+1):NPM])
+            tmp <- cbind(coefch[nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+ncor+1:ntrtot],
+                         sech[nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+ncor+1:ntrtot],
+                         waldch[nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+ncor+1:ntrtot],
+                         pwaldch[nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+ncor+1:ntrtot])
             tmp.rownames <- NULL
             for (yk in 1:ny)
                 {
-                    tmp.rownames <- c(tmp.rownames, paste(rep(x$Ynames[yk],ntrtot[yk]),names(coef[(nef+nvc+nw+ncor+ny+nalea+sum(ntrtot[1:yk])-ntrtot[yk]+1):(nef+nvc+nw+ncor+ny+nalea+sum(ntrtot[1:yk]))]),sep="-"))
+                    tmp.rownames <- c(tmp.rownames, paste(rep(x$Names$Ynames[yk],ntr[yk]),names(coef[(nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+ncor+sum(ntr[1:yk])-ntr[yk]+1):(nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+ncor+sum(ntr[1:yk]))]),sep="-"))
                 }
             rownames(tmp) <- tmp.rownames
             maxch <- apply(tmp,2,maxchar)
-            if(any(c((nef+nvc+nw+ncor+ny+nalea+1):NPM) %in% posfix)) maxch[1] <- maxch[1]-1
+            if(any(c(nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+ncor+1:ntrtot) %in% posfix)) maxch[1] <- maxch[1]-1
             colnames(tmp) <- c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
                                paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""),
                                paste(paste(rep(" ",max(maxch[3]-4,0)),collapse=""),"Wald",sep=""),

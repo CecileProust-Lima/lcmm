@@ -124,9 +124,20 @@ predictL.multlcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE,...)
    z <- grep("factor\\(",Xnames) 
    if (length(z))
    {
-    Xnames <- gsub("factor\\(","",Xnames)
-    Xnames[z] <- gsub("\\)","",Xnames[z])
+    #Xnames <- gsub("factor\\(","",Xnames)
+    #Xnames[z] <- gsub("\\)","",Xnames[z])
+
+    for(k in z)
+    {
+        q <- strsplit(Xnames[k],split="factor\\(")[[1]]
+        charq <- strsplit(q[-1],split="")
+        parenth <- sapply(charq,function(x){which(x==")")[1]})
+        newcharq <- lapply(1:length(charq),function(x){ charq[[x]][-parenth[x]] })
+        newq <- sapply(newcharq,paste,collapse="")
+        Xnames[k] <- paste(q[1],newq,sep="")
+    }
    }
+
    newdata1 <- newdata1[,c("(Intercept)",Xnames),drop=FALSE]
   
   ###calcul des predictions

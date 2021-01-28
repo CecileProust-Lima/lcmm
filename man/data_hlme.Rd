@@ -4,11 +4,13 @@
 \name{data_hlme}
 \alias{data_hlme}
 \title{Simulated dataset for hlme function}
-\format{A data frame with 326 observations on the following 9 variables.
+\format{
+A data frame with 326 observations on the following 9 variables.
 \describe{ \item{ID}{subject identification number}
 \item{Y}{longitudinal outcome} \item{Time}{time of
 measurement} \item{X1}{binary covariate} \item{X2}{binary
-covariate} \item{X3}{binary covariate} }}
+covariate} \item{X3}{binary covariate} }
+}
 \description{
 The data were simulated from a 3-latent class linear mixed model. Repeated
 data for 100 subjects were simulated. The three latent classes are predicted

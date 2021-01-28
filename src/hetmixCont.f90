@@ -2281,7 +2281,6 @@
             Y2=Y1-mu
             Y3=matmul(VC,Y2)
             Y4=DOT_PRODUCT(Y2,Y3)
-
             vrais=vrais-Y4
 ! if(i<9) then
 ! print*, "i=",i

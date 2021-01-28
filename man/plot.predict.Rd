@@ -12,23 +12,26 @@
 \alias{plot.predictL.lcmm}
 \alias{plot.predictL.Jointlcmm}
 \alias{plot.predictL.multlcmm}
-\alias{plot.predictL}
 \alias{plot.predictlink.lcmm}
 \alias{plot.predictlink.Jointlcmm}
 \alias{plot.predictlink.multlcmm}
 \alias{plot.predictlink}
-\alias{plot.predict}
 \alias{plot.predictYcond}
 \title{Plot of predicted trajectories and link functions}
 \usage{
-\method{plot}{predictL}(x, legend.loc = "topright", legend, add = FALSE,
-  shades = FALSE, ...)
+\method{plot}{predictL}(x, legend.loc = "topright", legend, add = FALSE, shades = FALSE, ...)
 
-\method{plot}{predictY}(x, outcome = 1, legend.loc = "topright", legend,
-  add = FALSE, shades = FALSE, ...)
+\method{plot}{predictY}(
+  x,
+  outcome = 1,
+  legend.loc = "topright",
+  legend,
+  add = FALSE,
+  shades = FALSE,
+  ...
+)
 
-\method{plot}{predictYcond}(x, legend.loc = "topleft", legend, add = FALSE,
-  shades = TRUE, ...)
+\method{plot}{predictYcond}(x, legend.loc = "topleft", legend, add = FALSE, shades = TRUE, ...)
 }
 \arguments{
 \item{x}{an object inheriting from classes \code{predictL}, \code{predictY}

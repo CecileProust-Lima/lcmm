@@ -339,7 +339,7 @@
          if (idpos.ne.0) then
            ncount=ncount+1
            if (ncount.gt.3000) then 
-              !print*,"ncount=",ncount
+              print*,"ncount=",ncount
               istop=4 
               rl=-1.d9
               goto 110
@@ -381,7 +381,7 @@
          rl=-fi
          if(rl.eq.-1.D9) then
                istop=4
- !             write(*,*)'searpas problem' ,ni  !**
+              write(*,*)'searpas problem' ,ni  !**
                goto 110
           end if
 
