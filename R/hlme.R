@@ -1220,7 +1220,13 @@ hlme <-
         }
 
 
-        classif <- apply(ppi,1,which.max)
+        chooseClass <- function(ppi)
+        {
+            res <- which.max(ppi)
+            if(!length(res)) res <- 0
+            return(res)
+        }
+        classif <- apply(ppi,1,chooseClass)
         if(any(!is.finite(ppi)))
         {
             classif <- rep(NA,ns0)
