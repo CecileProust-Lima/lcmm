@@ -1244,6 +1244,7 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
      sumparK=0
      sumnv=0
      do k=1,nbK
+        
         sumntr=0
 
         !! variance des effets aleatoires
@@ -1365,6 +1366,10 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
            sumntr = sumntr + ntr(sumny+yk) ! sert a incrementer tmp
         end do
 
+
+        if(nmesparK(i,k).eq.0) goto 100
+
+        
         ! matrice de variance de Yik
         P=0.d0
         P=MATMUL(Z,Ut)
@@ -1477,6 +1482,8 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
         !if(k.eq.1) vrais_Y1 = vrais_Y1 -nmesparK(i,k)*dlog(dble(2*3.14159265))-det-Y4
         !if(k.eq.2) vrais_Y2 = vrais_Y2 -nmesparK(i,k)*dlog(dble(2*3.14159265))-det-Y4
 
+100 continue
+        
         sumny = sumny + ny(k)
         tmp = tmp + nef(k)+ncontr(k)+nvc(k)+nw(k)+ncor(k)+nerr(k)+nalea(k)+sumntr
         sumparK = sumparK + nmesparK(i,k)

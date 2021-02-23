@@ -933,15 +933,22 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         indiceY0 <- as.numeric(matYXord[,5])
   
         nmes <- as.vector(table(matYXord[,1]))
-        nmesM <- matrix(NA,ns,sum(ny))
+        #nmesM <- matrix(NA,ns,sum(ny))
+        nmesM <- data.frame(id=unique(IND))
         for  (k in 1:K)
         {
             for (m in 1:ny[k])
             {
-                nmesM[,sum(ny[1:k])-ny[k]+m] <- table(matYXord[which(matYXord$processK==k & matYXord$outcomeM==m),1])
+                ##nmesM[,sum(ny[1:k])-ny[k]+m] <- table(matYXord[which(matYXord$processK==k & matYXord$outcomeM==m),1]) # va pas si nb sujets differents par outcome
+                temp <- rle(matYXord[which(matYXord$processK==k & matYXord$outcomeM==m),1])
+                tempnmesm <- data.frame(id=temp[[2]], nm=temp[[1]])
+                old <- colnames(nmesM)
+                nmesM <- merge(nmesM, tempnmesm, by="id", all=TRUE)
+                colnames(nmesM) <- c(old, paste("k", k, "m", m, sep=""))
             }
         }
-
+        nmesM <- as.matrix(nmesM[,-1])
+        nmesM[which(is.na(nmesM))] <- 0
 
 
         if(nbevt>0)
@@ -2025,7 +2032,6 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         colnames(ppitest) <- c(subject,"class",temp)
         rownames(ppitest) <- 1:ns  
   
-
         ## predictions marginales et subject-specifiques
         pred_m_g <- matrix(out$pred_m_g,nrow=nobs0,ncol=ng)
         pred_ss_g <- matrix(out$pred_ss_g,nrow=nobs0,ncol=ng)
