@@ -21,6 +21,8 @@ update.mpjlcmm <- function(object,...)
 
     npmtot <- nef+ncontr+nvc+nw+ncor+nerr+nalea+ntrtotK
 
+    posfix <- eval(object$call$posfix)
+
     ##liste des modeles longitudinaux
     lK <- eval(object$call$longitudinal)
     res <- vector("list",K)
@@ -34,14 +36,34 @@ update.mpjlcmm <- function(object,...)
     {
         ## le k-ieme modele mixte avec les estimations du conjoint:
         mcall <- lK[[k]]$call
+        fixk <- NULL
         if(ng>1)
         {
             mcall$B <- c(object$best[1:(ng-1)],object$best[nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k]])
+            if(length(posfix))
+            {
+                if(any(posfix %in% c(1:(ng-1))))
+                {
+                    fixk <- posfix[which(posfix %in% c(1:(ng-1)))]
+                }
+                if(any(posfix %in% c(nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k])))
+                {
+                    fixk <- c(fixk, posfix[which(posfix %in% c(nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k]))] - (nrisqtot+nvarxevt+sumnpm))
+                }
+            }
         }
         else
         {
             mcall$B <- c(object$best[nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k]])
+            if(length(posfix))
+            {
+                if(any(posfix %in% c(nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k])))
+                {
+                    fixk <- c(fixk, posfix[which(posfix %in% c(nprob+nrisqtot+nvarxevt+sumnpm+1:npmtot[k]))] - (nrisqtot+nvarxevt+sumnpm))
+                }
+            }
         }
+        mcall$posfix <- fixk
         mcall$maxiter <- 0
         mcall$verbose <- FALSE
         m <- eval(mcall)
