@@ -423,7 +423,7 @@ subroutine irtsre(Y0,X0,Tentr0,Tevt0,Devt0,ind_survint0 &
 
   if (idiag.eq.1) then
      DO j=1,nvc
-        btot(nef+ncontr+j)=dsqrt(abs(btot(nef+ncontr+j)))
+        btot(nrisqtot+nvarxevt+nasso+nef+ncontr+j)=dsqrt(abs(btot(nrisqtot+nvarxevt+nasso+nef+ncontr+j)))
      END DO
   end if
 
@@ -434,12 +434,12 @@ subroutine irtsre(Y0,X0,Tentr0,Tevt0,Devt0,ind_survint0 &
 
      mvc(1)=1.d0
      DO j=1,nvc
-        mvc(1+j)=btot(nef+ncontr+j)
+        mvc(1+j)=btot(nrisqtot+nvarxevt+nasso+nef+ncontr+j)
      END DO
 
      CALL dmfsd(mvc,nea,EPS,IER)
      DO j=1,nvc
-        btot(nef+ncontr+j)=mvc(1+j)
+        btot(nrisqtot+nvarxevt+nasso+nef+ncontr+j)=mvc(1+j)
      END DO
   end if
 
@@ -1353,6 +1353,7 @@ double precision function vrais_irtsre_i(b,npm,id,thi,jd,thj,i)
 
         ! vrais totale 
         som = som + vrais_Y * vrais_surv
+        !print*, "vrais_Y=",vrais_Y, " vrais_surv=", vrais_surv
 
      else !  pas de survie
 
