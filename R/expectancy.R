@@ -196,7 +196,7 @@ expectancy <- function(x, event, cond=NULL, newdata, var.time, start=0, nMC=1000
                         as.integer(idlink),
                         as.integer(nbzitr),
                         as.double(zitr),
-                        as.integer(uniqueY),
+                        as.double(uniqueY),
                         as.integer(indiceY),
                         as.integer(nvalSPLORD),
                         as.integer(fix),
