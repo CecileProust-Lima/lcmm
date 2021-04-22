@@ -105,8 +105,8 @@
         !D claration des variables en entree
       integer,intent(in):: nv0,maxiter0,nea0
       integer, intent(in) :: ns0, ng0, nobs0, idiag0, nwg0, npmtot0,ncor0
-      integer, dimension(nv0), intent(in) :: idea0,idg0,idprob0
-      integer, dimension(ns0), intent(in) :: nmes0,Prior0,idcor0
+      integer, dimension(nv0), intent(in) :: idea0,idg0,idprob0,idcor0
+      integer, dimension(ns0), intent(in) :: nmes0,Prior0
       double precision, dimension(nobs0), intent(in) :: Y0
       double precision, dimension(nobs0*nv0), intent(in) :: X0
       double precision, intent(in) :: convB, convL, convG
@@ -531,9 +531,9 @@
             do j2=1,nmes(i)
                if (j1.eq.j2) Corr(j1,j2) = b1(npmtot)*b1(npmtot)
                if (ncor.eq.1) then 
-                  Corr(j1,j2) = Corr(j1,j2)+b1(npmtot-1)*b1(npmtot-1)*min(tcor(j1),tcor(j2))
+                  Corr(j1,j2) = Corr(j1,j2)+b1(nef+nvc+nwg+ncor)*b1(nef+nvc+nwg+ncor)*min(tcor(j1),tcor(j2))
                else if (ncor.eq.2) then
-                  Corr(j1,j2) = Corr(j1,j2)+b1(npmtot-1)*b1(npmtot-1)*exp(-b1(npmtot-2)*abs(tcor(j1)-tcor(j2)))
+                  Corr(j1,j2) = Corr(j1,j2)+b1(nef+nvc+nwg+2)*b1(nef+nvc+nwg+2)*exp(-b1(nef+nvc+nwg+1)*abs(tcor(j1)-tcor(j2)))
                end if
             end do
          end do        
