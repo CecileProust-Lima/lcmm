@@ -125,7 +125,7 @@ gridsearch <- function(m,rep,maxiter,minit,cl=NULL)
     kmax <- which.max(llmodels)
 
     mc$B <- models[[kmax]]$best
-    mc$maxiter <- NULL
+    mc$maxiter <- match.call()$m$maxiter
     
     return(do.call(as.character(mc[[1]]),as.list(mc[-1])))
 }

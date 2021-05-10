@@ -714,11 +714,11 @@ hlme <-
         PRIOR <-as.integer(as.vector(PRIOR))
 ####
 
-        X0<-as.numeric(as.matrix(X0))
-        Y0<-as.numeric(as.matrix(Y0))
+        X0 <- as.numeric(as.matrix(X0))
+        Y0 <- as.numeric(as.matrix(Y0))
         #nmes0<-as.vector(table(IDnum))
-        nmes0<-as.vector(table(IND))
-        ns0<-length(nmes0)
+        nmes0 <- as.vector(table(IND))
+        ns0 <- length(nmes0)
 
 
 
@@ -1255,7 +1255,60 @@ hlme <-
 ### ad 2/04/2012
         if (!("intercept" %in% nom.X0)) X0.names2 <- X0.names2[-1]
 ### ad
-        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random)
+
+        ## levels = modalites des variables dans X0 (si facteurs)
+        levelsdata <- vector("list", length(X0.names2))
+        levelsfixed <- vector("list", length(X0.names2))
+        levelsrandom <- vector("list", length(X0.names2))
+        levelsmixture <- vector("list", length(X0.names2))
+        levelsclassmb <- vector("list", length(X0.names2))
+        names(levelsdata) <- X0.names2
+        names(levelsfixed) <- X0.names2
+        names(levelsrandom) <- X0.names2
+        names(levelsmixture) <- X0.names2
+        names(levelsclassmb) <- X0.names2
+        for(v in X0.names2)
+        {
+            if(v == "intercept") next
+            
+            if(is.factor(data[,v]))
+            {
+                levelsdata[[v]] <- levels(data[,v])
+            }
+            #else
+            #{
+                if(length(grep(paste("factor\\(",v,"\\)",sep=""), fixed)))
+                {
+                    levelsfixed[[v]] <- levels(as.factor(data[,v]))
+                }
+            #    else
+            #    {
+                    if(length(grep(paste("factor\\(",v,"\\)",sep=""), random)))
+                    {
+                        levelsrandom[[v]] <- levels(as.factor(data[,v]))
+                    }
+             #       else
+             #       {
+                        if(length(grep(paste("factor\\(",v,"\\)",sep=""), mixture)))
+                        {
+                            levelsmixture[[v]] <- levels(as.factor(data[,v]))
+                        }
+              #          else
+              #          {
+                            if(length(grep(paste("factor\\(",v,"\\)",sep=""), classmb)))
+                            {
+                                levelsclassmb[[v]] <- levels(as.factor(data[,v]))
+                            }
+               #         }
+               #     }
+               # }
+            #}
+            
+        }
+        levels <- list(levelsdata=levelsdata, levelsfixed=levelsfixed, levelsrandom=levelsrandom,
+                       levelsmixture=levelsmixture, levelsclassmb=levelsclassmb)
+        
+        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random, levels=levels)
         class(res) <-c("hlme") 
         cost<-proc.time()-ptm
         if(verbose==TRUE) cat("The program took", round(cost[3],2), "seconds \n")
