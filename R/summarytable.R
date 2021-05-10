@@ -3,6 +3,18 @@
 #' This function provides a table summarizing the results of different models
 #' fitted by \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}.
 #' 
+#' Can be reported the usual criteria used to assess the fit and the clustering
+#'  of the data:
+#'  - maximum log-likelihood L (the higher the better)
+#'  - number of parameters P, number of classes G, convergence criterion (1 = converged)
+#'  - AIC (the lower the better) computed as -2L+2P 
+#'  - BIC (the lower the better) computed as -2L+ P log(N) where N is the number of subjects
+#'  - SABIC (the lower the better) computed as 
+#'  - Entropy (the closer to one the better) computed as 1-sum[pi_ig*log(pi_ig)]/(N*log(G))
+#'    where pi_ig is the posterior probability that subject i belongs to class g
+#'  - ICL (the lower the better) computed as BIC -2*sum[c_ig*log(pi_ig)]
+#'    where c_ig is the posterior class membership
+#'  - %Class computed as the proportion of each class based on c_ig
 #' 
 #' @param m1 an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
 #' \code{Jointlcmm}
@@ -10,7 +22,7 @@
 #' \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}
 #' @param which character vector indicating which results should be returned.
 #' Possible values are "G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
-#' "entropy", "\%class".
+#' "entropy", "ICL", "\%class".
 #' @return a matrix giving for each model the values of the requested indexes.
 #' By default, the number a latent classes, the
 #' log-likelihood, the number of parameters, the BIC and the posterior
@@ -25,7 +37,7 @@ summarytable <- function(m1,...,which=c("G","loglik","npm","BIC","%class"))
     {
         if(missing(m1)) stop("At least one model should be specified")
         if(!(class(m1) %in% c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("Use with 'hlme', 'lcmm' , 'multlcmm', 'Jointlcmm' or 'mpjlcmm' objects only")
-        if(any(!(which %in% c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "scoretest", "%class")))) stop(paste("which should contain elements among",paste(c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "scoretest", "%class"),collapse=", ")))
+        if(any(!(which %in% c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "scoretest","ICL","%class")))) stop(paste("which should contain elements among",paste(c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "scoretest", "%class"),collapse=", ")))
 
         dots <- list(...)
 
@@ -76,19 +88,42 @@ summarytable <- function(m1,...,which=c("G","loglik","npm","BIC","%class"))
             if(x$ng==1) res <- 1
             return(res)
         }
+        
+        
+        ICL <- function(x)
+        {
+# Entropy with assignement to class (original ICL)
+            z <- rep(0,length=length(x$pprob[,1]))
+            for(g in 1:x$ng)
+            {
+                z[which(x$pprob[,2]==g)] <- x$pprob[which(x$pprob[,2]==g),2+g]
+            }
+# Entropy with posterior proba (modified one)
+            # z <- as.matrix(log(x$pprob[,c(3:(x$ng+2))])*x$pprob[,c(3:(x$ng+2))])
+            # if(any(!is.finite(z)))
+            # {
+            #     z[which(!is.finite(z))] <- 0
+            # }
+            
+            res <- x$BIC - 2*sum(z)
+            if(x$ng==1) res <- x$BIC
+            return(res)
+        }
+        
+        
 
         ## tous les indicateurs pour le modele m1
         pscoretest <- NA
         if(class(m1)=="Jointlcmm") pscoretest <- round((1-pchisq(m1$scoretest[1],sum(m1$idea))),4)
-        tmp <- c(m1$ng,m1$loglik,m1$conv,length(m1$best)-length(eval(m1$call$posfix)),m1$AIC,m1$BIC,sabic(m1),entropy(m1),pscoretest)
+        tmp <- c(m1$ng,m1$loglik,m1$conv,length(m1$best)-length(eval(m1$call$posfix)),m1$AIC,m1$BIC,sabic(m1),entropy(m1),pscoretest,ICL(m1))
         for(g in 1:m1$ng)
             {
                 tmp <- c(tmp,length(which(m1$pprob[,2]==g))/m1$ns*100)
             }
         if(m1$ng<max(ng)) tmp <- c(tmp,rep(NA,max(ng)-m1$ng))
         
-        res <- matrix(tmp,nrow=1,ncol=9+max(ng))
-        colnames(res) <- c("G","loglik","conv","npm","AIC","BIC","SABIC","entropy","scoretest",paste("%class",1:max(ng),sep=""))
+        res <- matrix(tmp,nrow=1,ncol=10+max(ng))
+        colnames(res) <- c("G","loglik","conv","npm","AIC","BIC","SABIC","entropy","scoretest","ICL",paste("%class",1:max(ng),sep=""))
 
         ## tous les indicateurs pour les autres modeles
         if(nbmodels>0)
@@ -98,7 +133,7 @@ summarytable <- function(m1,...,which=c("G","loglik","npm","BIC","%class"))
                         m <- get(paste("m",i,sep=""))
                         pscoretest <- NA
                         if(class(m)=="Jointlcmm") pscoretest <- round((1-pchisq(m$scoretest[1],sum(m$idea))),4)
-                        tmp <- c(m$ng,m$loglik,m$conv,length(m$best)-length(eval(m$call$posfix)),m$AIC,m$BIC,sabic(m),entropy(m),pscoretest)
+                        tmp <- c(m$ng,m$loglik,m$conv,length(m$best)-length(eval(m$call$posfix)),m$AIC,m$BIC,sabic(m),entropy(m),pscoretest,ICL(m))
                         
                         for(g in 1:m$ng)
                             {

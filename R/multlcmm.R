@@ -1,4 +1,4 @@
-#' Estimation of mutlivariate mixed-effect models and multivariate latent class
+#' Estimation of multivariate mixed-effect models and multivariate latent class
 #' mixed-effect models for multivariate longitudinal outcomes of possibly
 #' multiple types (continuous Gaussian, continuous non-Gaussian - curvilinear)
 #' that measure the same underlying latent process.
