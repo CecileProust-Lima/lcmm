@@ -1082,7 +1082,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                                             # print(bb)
                                             # print(length(b[c((nprob+ng):(nef+nvc),(nef+nvc+nw+1):NPM)]))
                                             # print(length(bb))
-                                            #    b[c((nprob+ng):(nef+nvc),(nef+nvc+nw+1):NPM)] <- rmvnorm(n=1,mean=bb,sigma = vbb)  # CPL 9/9/20
+                                                b[c((nprob+ng):(nef+nvc),(nef+nvc+nw+1):NPM)] <- rmvnorm(n=1,mean=bb,sigma = vbb)  # CPL 9/9/20
                                                 # b[c((nprob+ng):(nef+nvc),(nef+nvc+nw+1):NPM)] <- bb + Chol %*% rnorm(length(bb))   # CPL 9/9/20
                                                 b[nprob+1:(ng-1)] <- 0
                                             } 
@@ -1091,7 +1091,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                                                 print(bb)
                                                 print(b[c((nprob+1):(nef+nvc),(nef+nvc+nw+1):NPM)])
 
-                   #                             b[c((nprob+1):(nef+nvc),(nef+nvc+nw+1):NPM)] <- rmvnorm(n=1,mean=bb,sigma=vbb)  # CPL 9/9/20
+                                                b[c((nprob+1):(nef+nvc),(nef+nvc+nw+1):NPM)] <- rmvnorm(n=1,mean=bb,sigma=vbb)  # CPL 9/9/20
                                                 # b[c((nprob+1):(nef+nvc),(nef+nvc+nw+1):NPM)] <- bb + Chol %*% rnorm(NPM-nprob-nw)  # CPL 9/9/20
                                             }
 
