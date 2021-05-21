@@ -33,7 +33,7 @@
 #' \code{\link{multlcmm}}, \code{\link{Jointlcmm}}
 #' 
 #' @export
-#' 
+#'  
 summarytable <- function(m1,...,which=c("G","loglik","npm","BIC","%class"),display=TRUE)
     {
         if(missing(m1)) stop("At least one model should be specified")

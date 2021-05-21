@@ -29,7 +29,7 @@
 #' @seealso \code{\link{summary}}, \code{\link{summarytable}} 
 #' 
 #' @export
-#' @examples  
+#' @examples   
 # paquid$age65 <- (paquid$age - 65)/10
 # m1 <- hlme(MMSE ~ age65+I(age65^2)+CEP,random =~ age65+I(age65^2), subject = 'ID', data = paquid) # ng=1
 # m2 <- hlme(MMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject = 'ID', data = paquid, ng = 2, mixture=~age65+I(age65^2), B=m1)
