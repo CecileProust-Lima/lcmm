@@ -191,8 +191,11 @@ This method is recommended as it enables to better explore the parameter space w
 
 &nbsp;
 
+
 ```{r, comment=''}
-summarytable(m1,m2,m2b,m2c, m2d, m3g, which = c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "%class"))
+summarytable(m1,m2,m2b,m2c, m2d  , m3g, which = c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy","ICL", "%class"))
+
+summaryplot(m1,m2, m3g,width = 3,height = 3, which = c("G", "BIC", "entropy","ICL"))
 ```
 
 &nbsp; 
