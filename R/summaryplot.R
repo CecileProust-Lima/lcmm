@@ -30,11 +30,11 @@
 #' 
 #' @export
 #' @examples   
-paquid$age65 <- (paquid$age - 65)/10
-m1 <- hlme(MMSE ~ age65+I(age65^2)+CEP,random =~ age65+I(age65^2), subject = 'ID', data = paquid) # ng=1
-m2 <- hlme(MMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject = 'ID', data = paquid, ng = 2, mixture=~age65+I(age65^2), B=m1)
-m3g <- gridsearch(hlme(MMSE ~ age65+I(age65^2)+CEP,  random =~ age65+I(age65^2), subject = 'ID', data=paquid, ng = 3, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
-summaryplot(m1,m2,m3g,which=c("G","BIC","entropy","ICL","loglik"))
+# paquid$age65 <- (paquid$age - 65)/10
+# m1 <- hlme(MMSE ~ age65+I(age65^2)+CEP,random =~ age65+I(age65^2), subject = 'ID', data = paquid) # ng=1
+# m2 <- hlme(MMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject = 'ID', data = paquid, ng = 2, mixture=~age65+I(age65^2), B=m1)
+# m3g <- gridsearch(hlme(MMSE ~ age65+I(age65^2)+CEP,  random =~ age65+I(age65^2), subject = 'ID', data=paquid, ng = 3, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
+# summaryplot(m1,m2,m3g,which=c("G","BIC","entropy","ICL","loglik"))
 
 
 
