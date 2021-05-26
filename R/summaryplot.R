@@ -30,11 +30,11 @@
 #' 
 #' @export
 #' @examples   
-# paquid$age65 <- (paquid$age - 65)/10
-# m1 <- hlme(MMSE ~ age65+I(age65^2)+CEP,random =~ age65+I(age65^2), subject = 'ID', data = paquid) # ng=1
-# m2 <- hlme(MMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject = 'ID', data = paquid, ng = 2, mixture=~age65+I(age65^2), B=m1)
-# m3g <- gridsearch(hlme(MMSE ~ age65+I(age65^2)+CEP,  random =~ age65+I(age65^2), subject = 'ID', data=paquid, ng = 3, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
-# summaryplot(m1,m2,m3g,which=c("G","BIC","entropy","ICL","loglik"))
+paquid$age65 <- (paquid$age - 65)/10
+m1 <- hlme(MMSE ~ age65+I(age65^2)+CEP,random =~ age65+I(age65^2), subject = 'ID', data = paquid) # ng=1
+m2 <- hlme(MMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject = 'ID', data = paquid, ng = 2, mixture=~age65+I(age65^2), B=m1)
+m3g <- gridsearch(hlme(MMSE ~ age65+I(age65^2)+CEP,  random =~ age65+I(age65^2), subject = 'ID', data=paquid, ng = 3, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
+summaryplot(m1,m2,m3g,which=c("G","BIC","entropy","ICL","loglik"))
 
 
 
@@ -43,7 +43,7 @@ summaryplot <- function(m1,...,which,width=length(which),height=1,xaxis="G",disp
   dots <- list(...)
   names.plot <- c("lty","type","col","pch","xlab","lwd","ylab")
   dots.plot <- dots[intersect(names(dots),names.plot)]
-  print(names(dots.plot))
+  models <- setdiff(dots,dots.plot)
   
   if(!length(dots.plot$xlab))
   {
@@ -79,11 +79,12 @@ summaryplot <- function(m1,...,which,width=length(which),height=1,xaxis="G",disp
     dots.plot$bty<- "l"
   }
 
-  invisible(summ <- summarytable(m1,...,which=c(xaxis,which),display= FALSE))
+  summ <- summarytable(m1,...,which=c(xaxis,which),display= FALSE)
   par(mfrow=c(height,width))
   for(x in which){
     if(x!=xaxis){
-      do.call(plot,c(summ[,c(x)] ~ summ[,c(xaxis)],dots.plot,main=x))
+      do.call(plot,c(summ[,c(x)] ~ summ[,c(xaxis)],dots.plot,main=x,xaxt="n"))
+      axis(1, at = 1:(length(models)+1))
       }
   }
   return(invisible(NULL))
