@@ -4,7 +4,15 @@
 \alias{summaryplot}
 \title{Summary of models}
 \usage{
-summaryplot(m1, ..., which, width = 1, height = length(which), xaxis = "G")
+summaryplot(
+  m1,
+  ...,
+  which,
+  width = length(which),
+  height = 1,
+  xaxis = "G",
+  display = FALSE
+)
 }
 \arguments{
 \item{m1}{an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
@@ -18,6 +26,8 @@ Possible values are "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
 "entropy", "ICL", "\%class".}
 
 \item{xaxis}{the abscissa of the plot, default to "G}
+
+\item{display}{display of the table. By default, False.}
 }
 \description{
 This function provides a plot summarizing the results of different models
@@ -38,12 +48,7 @@ Can be reported the usual criteria used to assess the fit and the clustering
  - %Class computed as the proportion of each class based on c_ig
 }
 \examples{
- 
-paquid$age65 <- (paquid$age - 65)/10
-m1 <- hlme(MMSE ~ age65+I(age65^2)+CEP,random =~ age65+I(age65^2), subject = 'ID', data = paquid) # ng=1
-m2 <- hlme(MMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject = 'ID', data = paquid, ng = 2, mixture=~age65+I(age65^2), B=m1)
-m3g <- gridsearch(hlme(MMSE ~ age65+I(age65^2)+CEP,  random =~ age65+I(age65^2), subject = 'ID', data=paquid, ng = 3, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
-summaryplot(m1,m2,m3g,which=c("G","BIC","entropy","ICL","loglik"))
+  
 }
 \seealso{
 \code{\link{summary}}, \code{\link{summarytable}}

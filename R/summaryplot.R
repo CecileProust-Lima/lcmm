@@ -86,6 +86,7 @@ summaryplot <- function(m1,...,which,width=length(which),height=1,xaxis="G",disp
       do.call(plot,c(summ[,c(x)] ~ summ[,c(xaxis)],dots.plot,main=x))
       }
   }
+  return(invisible(NULL))
 }
 
 

@@ -4,7 +4,12 @@
 \alias{summarytable}
 \title{Summary of models}
 \usage{
-summarytable(m1, ..., which = c("G", "loglik", "npm", "BIC", "\%class"))
+summarytable(
+  m1,
+  ...,
+  which = c("G", "loglik", "npm", "BIC", "\%class"),
+  display = TRUE
+)
 }
 \arguments{
 \item{m1}{an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
@@ -16,6 +21,8 @@ summarytable(m1, ..., which = c("G", "loglik", "npm", "BIC", "\%class"))
 \item{which}{character vector indicating which results should be returned.
 Possible values are "G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
 "entropy", "ICL", "\%class".}
+
+\item{display}{display of the table. By default, True.}
 }
 \value{
 a matrix giving for each model the values of the requested indexes.
