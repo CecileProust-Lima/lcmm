@@ -23,7 +23,7 @@
 #' @param which character vector indicating which results should be returned.
 #' Possible values are "G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
 #' "entropy", "ICL", "\%class".
-#' @param display display of the table. By default, True.
+#' @param display display of the table. By default: True.
 #' @return a matrix giving for each model the values of the requested indexes.
 #' By default, the number a latent classes, the
 #' log-likelihood, the number of parameters, the BIC and the posterior

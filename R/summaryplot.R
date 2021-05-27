@@ -23,7 +23,7 @@
 #' @param which character vector indicating which results should be returned.
 #' Possible values are "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
 #' "entropy", "ICL", "\%class".
-#' @param xaxis the abscissa of the plot, default to "G
+#' @param xaxis the abscissa of the plot, default to "G".
 #' @param display display of the table. By default, False.
 #' @author Cecile Proust-Lima, Viviane Philipps, Sasha Cuau
 #' @seealso \code{\link{summary}}, \code{\link{summarytable}} 
