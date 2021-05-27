@@ -25,7 +25,7 @@ summaryplot(
 Possible values are "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
 "entropy", "ICL", "\%class".}
 
-\item{xaxis}{the abscissa of the plot, default to "G}
+\item{xaxis}{the abscissa of the plot, default to "G".}
 
 \item{display}{display of the table. By default, False.}
 }

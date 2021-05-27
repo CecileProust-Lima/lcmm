@@ -22,7 +22,7 @@ summarytable(
 Possible values are "G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
 "entropy", "ICL", "\%class".}
 
-\item{display}{display of the table. By default, True.}
+\item{display}{display of the table. By default: True.}
 }
 \value{
 a matrix giving for each model the values of the requested indexes.
