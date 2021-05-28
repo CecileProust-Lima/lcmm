@@ -32,4 +32,4 @@ predictRE <- function(model, newdata,subject=NULL,verbose = FALSE){
   }
   newmodel <- do.call(argfunction , c(arguments,verbose = verbose))
   return(newmodel$predRE)
-}
+} 
