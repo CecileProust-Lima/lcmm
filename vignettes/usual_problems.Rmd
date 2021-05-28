@@ -55,7 +55,7 @@ It sometimes happens that a model does not converge correctly. This is due most 
 
 Selection of the number of latent classes is a complex question. In some cases, the number is known. When not, different tools can be used to guide the decision:
 
-* Several statistical criteria such as BIC, SABIC or Entropy
+* Several statistical criteria such as BIC, SABIC, ICL or Entropy
 * Statistical tests when available: score test for conditional independence in joint models
 * Discrimination power as described by the classification table using the command postprob
 * Size of the classes (we can consider that classes should be larger than 1% or 5% depending on the context)
