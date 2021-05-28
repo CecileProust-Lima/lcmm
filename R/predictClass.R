@@ -31,3 +31,4 @@ predictClass <- function(model, newdata,subject=NULL){
   newmodel <- do.call(argfunction , arguments)
   return(newmodel$pprob)
 }
+ 
