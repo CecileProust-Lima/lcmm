@@ -7,6 +7,8 @@
 #' mixed model.
 #' @param newdata data frame containing the data from which predictions are computed. The data frame should include at least all the covariates listed in model$Xnames2. Names in the data frame should be exactly model$Xnames2 that are the names of covariates specified in lcmm, hlme, Jointlcmm or multlcmm calls.
 #' @param subject choice of subject, by default: NULL, meaning the subject identifier is the same as in the model.
+#' @param verbose logical indicating if information about computation should be
+#' reported. Default to FALSE.
 #' @return dataframe containing the subject identifier, the predicted class and the posterior probabilities.
 #' @author Cecile Proust-Lima, Viviane Philipps, Sasha Cuau
 #' @export 
@@ -19,7 +21,7 @@
 
 
 
-predictClass <- function(model, newdata,subject=NULL){
+predictClass <- function(model, newdata,subject=NULL,verbose = FALSE){
   arguments<-as.list(model$call)
   argfunction <- as.character(arguments[[1]]) 
   arguments[[1]]<- NULL
@@ -29,7 +31,6 @@ predictClass <- function(model, newdata,subject=NULL){
   if(!is.null(subject)){
     arguments[['subject']]<- subject
   }
-  newmodel <- do.call(argfunction , c(arguments,verbose=FALSE))
+  newmodel <- do.call(argfunction , c(arguments,verbose=verbose))
   return(newmodel$pprob)
 }
- 
