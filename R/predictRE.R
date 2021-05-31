@@ -34,4 +34,3 @@ predictRE <- function(model, newdata,subject=NULL,verbose = FALSE){
   return(newmodel$predRE)
 } 
 
-getwd()
