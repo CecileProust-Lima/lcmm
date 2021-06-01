@@ -92,7 +92,8 @@ cuminc <- function(x,time,draws=FALSE,ndraws=2000,...)
         
         ## matrice avec 1 profil par ligne
         Xprofil <- do.call("expand.grid",Xdots)
-
+        if(nrow(Xprofil)==0) Xprofil <- matrix(0,1,1)
+        
         ## fonction d'integration
         integrate2 <- function(...) return(integrate(...)$value)
 
@@ -125,12 +126,12 @@ cuminc <- function(x,time,draws=FALSE,ndraws=2000,...)
                         bdraw <- x$best + Chol %*% bdraw
 
                         brisqtot <- as.vector(bdraw[x$N[1]+1:x$N[2]])
-                        bvarxevt <- as.vector(bdraw[sum(x$N[1:2])+1:x$N[3]]) 
+                        if(x$N[3]>0) bvarxevt <- as.vector(bdraw[sum(x$N[1:2])+1:x$N[3]]) 
                     }
                 else
                     {
                         brisqtot <- as.vector(x$best[x$N[1]+1:x$N[2]])
-                        bvarxevt <- as.vector(x$best[sum(x$N[1:2])+1:x$N[3]])
+                        if(x$N[3]>0) bvarxevt <- as.vector(x$best[sum(x$N[1:2])+1:x$N[3]])
                     }
                 
 
