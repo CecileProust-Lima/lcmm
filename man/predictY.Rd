@@ -23,7 +23,16 @@ of the longitudinal outcome(s) for a specified profile of covariates.}
   ...
 )
 
-\method{predictY}{hlme}(x, newdata, var.time, draws = FALSE, na.action = 1, ...)
+\method{predictY}{hlme}(
+  x,
+  newdata,
+  var.time,
+  draws = FALSE,
+  na.action = 1,
+  marg = TRUE,
+  subject = NULL,
+  ...
+)
 
 \method{predictY}{lcmm}(
   x,
@@ -100,6 +109,12 @@ for 'na.omit'. The alternative is 2 for 'na.fail'. Other options such as
 Only the argument 'median' will be used, other are ignored. 'median' should
 be a logical indicating whether the median should be computed. By 
 default, the mean value is computed.}
+
+\item{marg}{For a \code{hlme}, optional boolean specifying wether the
+prediction must be marginal or not (subject specific). By default, marg=TRUE}
+
+\item{subject}{choice of subject, by default: NULL, meaning the subject 
+identifier is the same as in the model.}
 }
 \value{
 An object of class \code{predictY} with values :
@@ -126,6 +141,11 @@ matrix with ng*3+1 columns: the first column indicates the name of the
 outcome which is predicted and the ng*3 subsequent columns correspond to the
 ng class-specific 50\%, 2.5\% and 97.5\% percentiles of the approximated
 posterior distribution of the class-specific predicted values.
+
+For objects of class \class{hlme} with \code{marg=FALSE}, returns a dataframe 
+of the subject identifier, subject-specific predictions (pred_ss) averaged 
+over classes and the class-specific subject-specific predictions (with the
+number of the latent class: pred_ss_1,pred_ss_2,...)
 
 - \code{times} : the \code{var.time} variable from \code{newdata}
 }

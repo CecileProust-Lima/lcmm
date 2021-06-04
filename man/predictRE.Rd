@@ -4,7 +4,7 @@
 \alias{predictRE}
 \title{individual predictions of the random-effects}
 \usage{
-predictRE(model, newdata, subject = NULL, verbose = FALSE)
+predictRE(model, newdata, subject = NULL)
 }
 \arguments{
 \item{model}{an object inheriting from class \code{lcmm}, 
@@ -13,9 +13,7 @@ mixed model.}
 
 \item{newdata}{data frame containing the data from which predictions are computed. The data frame should include at least all the covariates listed in model$Xnames2. Names in the data frame should be exactly model$Xnames2 that are the names of covariates specified in lcmm, hlme, Jointlcmm or multlcmm calls.}
 
-\item{subject}{choice of subject, by default: NULL, meaning the subject identifier is the same as in the model.}
-
-\item{verbose}{logical indicating if information about computation should be
+\item{subject}{choice of subject, by default: NULL, meaning the subject identifier is the same as in the model.
 reported. Default to FALSE.}
 }
 \value{
