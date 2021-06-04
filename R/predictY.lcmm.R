@@ -966,6 +966,10 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 #' only; if draws=TRUE, ndraws specifies the number of draws that should be
 #' generated to approximate the posterior distribution of the predicted values.
 #' By default, ndraws=2000.
+#' @param marg For a \code{hlme}, optional boolean specifying wether the      
+#' prediction must be marginal or not (subject specific). By default, marg=TRUE
+#' @param subject choice of subject, by default: NULL, meaning the subject 
+#' identifier is the same as in the model.
 #' @param na.action Integer indicating how NAs are managed. The default is 1
 #' for 'na.omit'. The alternative is 2 for 'na.fail'. Other options such as
 #' 'na.pass' or 'na.exclude' are not implemented in the current version.
@@ -997,6 +1001,11 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 #' outcome which is predicted and the ng*3 subsequent columns correspond to the
 #' ng class-specific 50\%, 2.5\% and 97.5\% percentiles of the approximated
 #' posterior distribution of the class-specific predicted values.
+#' 
+#' For objects of class \class{hlme} with \code{marg=FALSE}, returns a dataframe 
+#' of the subject identifier, subject-specific predictions (pred_ss) averaged 
+#' over classes and the class-specific subject-specific predictions (with the
+#' number of the latent class: pred_ss_1,pred_ss_2,...)
 #' 
 #' - \code{times} : the \code{var.time} variable from \code{newdata}
 #' @author Cecile Proust-Lima, Viviane Philipps

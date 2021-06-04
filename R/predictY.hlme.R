@@ -1,7 +1,7 @@
 #' @rdname predictY
 #' @export
 #'
-predictY.hlme <- function(x,newdata,var.time,draws=FALSE,na.action=1,...){
+predictY.hlme <- function(x,newdata,var.time,draws=FALSE,na.action=1,marg =TRUE,subject=NULL ,...){
 
 if(missing(newdata)) stop("The argument newdata should be specified")
 if(missing(x)) stop("The argument x should be specified")
@@ -42,6 +42,7 @@ X1 <- NULL
 X2 <- NULL
 b1 <- NULL
 b2 <- NULL
+Z <- NULL
 
 
 if(!(na.action%in%c(1,2)))stop("only 1 for 'na.omit' or 2 for 'na.fail' are required in na.action argument") 
@@ -241,7 +242,7 @@ if(length(na.action)){
     ## create one data frame for each formula (useful with factors)
     newdata1fixed <- newdata1
     for(v in colnames(newdata1fixed))
-    {
+    {0
         if(v %in% names(x$levels$levelsfixed))
         {
             if(!is.null(x$levels$levelsfixed[[v]]))
@@ -380,20 +381,20 @@ if(length(x$N)>4)
   {
    placeV[paste("class",i,sep="")] <- NA
   }
-  
+
   kk<-0
-  for(k in 1:length(x$idg0))
+  for(k in 1:length(x$idg0)) 
   {
    if(x$idg0[k]==1)
    {
-    X1 <- cbind(X1,newdata1[,k])
+    X1 <- cbind(X1,newdata1[,k])  
     place <- x$N[1]+kk
     b1 <- c(b1,x$best[place+1])
     placeV$commun <- c(placeV$commun,place+1)
     kk <- kk+1
    }
    
-   if(x$idg0[k]==2)
+   if(x$idg0[k]==2) 
    {
     X2 <- cbind(X2,newdata1[,k])
     place1 <- x$N[1]+kk+1
@@ -406,9 +407,10 @@ if(length(x$N)>4)
     kk <- kk+x$ng
    }
   }
+  
 
 
-Y<-matrix(0,length(newdata1[,1]),x$ng)
+Y<-matrix(0,length(newdata1[,1]),x$ng) 
 for(g in 1:x$ng){
 if(length(b1) != 0){
 Y[,g]<- X1 %*% b1 
@@ -417,6 +419,34 @@ if(length(b2) != 0){
 Y[,g]<- Y[,g] + X2 %*% b2[,g]
 }
 }
+  
+
+
+if(!marg){
+
+
+  
+  
+  arguments<-as.list(x$call)
+  argfunction <- as.character(arguments[[1]]) 
+  arguments[[1]]<- NULL
+  arguments[["data"]]<-newdata
+  arguments[["B"]]<-x$best 
+  arguments[["maxiter"]]<- 0
+  if(arguments[["verbose"]]){
+    arguments[["verbose"]]<- FALSE
+  }
+  if(!is.null(subject)){
+    arguments[['subject']]<- subject
+  }
+  newmodel <- do.call(argfunction , c(arguments))
+  return(newmodel$pred[,c(1,4,(7+x$ng):(6+2*x$ng))])
+  
+
+
+
+}
+
 
 if(draws==TRUE)
     {

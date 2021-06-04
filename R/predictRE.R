@@ -20,7 +20,7 @@
 #' predictRE(m2b,newdata)
 
 
-predictRE <- function(model, newdata,subject=NULL,verbose = FALSE){
+predictRE <- function(model, newdata,subject=NULL){
   arguments<-as.list(model$call)
   argfunction <- as.character(arguments[[1]]) 
   arguments[[1]]<- NULL
@@ -30,7 +30,10 @@ predictRE <- function(model, newdata,subject=NULL,verbose = FALSE){
   if(!is.null(subject)){
     arguments[['subject']]<- subject
   }
-  newmodel <- do.call(argfunction , c(arguments,verbose = verbose))
+  if(arguments[['verbose']]){
+    arguments[["verbose"]]<- FALSE
+  }
+  newmodel <- do.call(argfunction , c(arguments))
   return(newmodel$predRE)
 } 
 

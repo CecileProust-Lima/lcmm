@@ -70,7 +70,7 @@ https://cran.r-project.org/package=lcmm/vignettes/latent_class_model_with_hlme.h
 
 &nbsp;
 
-
+ 
 # How to evaluate the quality of a classification ?
 
 Good discrimination of classes is usually sought when fitting latent class mixed models. Discriminatory power can be assessed using the entropy criterion (provided in summarytable) but also using the classification table (with command postprob). The description of the classes may also help comprehend the latent class structure. 
@@ -131,4 +131,42 @@ The models in objects mhlme2 and mhlme2perm are the same except for the permutat
 
 ```{r, comment='' }
 table(mhlme2perm$pprob$class,mhlme2$pprob$class)
+```
+
+# How to make predictions on external data ?
+&nbsp;
+
+<p align="justify"> We can obtain a new classification and posterior probabilities with the function `predictClass`
+</p>
+
+&nbsp;
+
+```{r, comment='',message = FALSE}
+m2b <- hlme(normMMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject = 'ID',data = paquid, ng = 2, mixture =~ age65+I(age65^2), B = c(0, 60, 40, 0, -4, 0, -10, 10, 212.869397, -216.421323,456.229910, 55.713775, -145.715516, 59.351000, 10.072221),verbose=FALSE)
+newdata <- data.frame(ID=c(0,0,0), age65=c(0.5, 1, 1.5), CEP=0, normMMSE=c(80,70,60))
+predictClass(m2b, newdata)
+```
+&nbsp;
+
+<p align="justify"> We can also obtain new individual predictions of the random-effects with the function `predictRE`
+</p>
+
+&nbsp;
+
+```{r, comment='',message = FALSE}
+newdata <- data.frame(ID=c(0,0,0), age65=c(0.5, 1, 1.5), CEP=0, normMMSE=c(80,70,60))
+predictRE(m2b, newdata)
+```
+
+
+&nbsp;
+
+<p align="justify"> For hlme only we obtain subject specific predictions using the `predictY` function with otion marg=FALSE.
+</p>
+
+&nbsp;
+ 
+ 
+```{r, comment=''}
+predictY(m2,paquid[2:6,],var.time="age65",CEP=0,marg=FALSE)
 ```
