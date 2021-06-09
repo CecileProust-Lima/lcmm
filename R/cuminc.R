@@ -39,7 +39,7 @@
 #' @seealso
 #' \code{\link{Jointlcmm}}, \code{\link{plot.Jointlcmm}}, \code{\link{plot.cuminc}}
 #' @export
-cuminc <- function(x,time,draws=FALSE,ndraws=2000,integrateOptions=list(subdivisions=100L, rel.tol=.Machine$double.eps^0.25, stop.on.error=TRUE),...)
+cuminc <- function(x,time,draws=FALSE,ndraws=2000,integrateOptions=NULL,...)
     {   
         if(!inherits(x,"Jointlcmm")) stop("The argument 'x' must be a'Jointlcmm' object")
         if(isTRUE(draws) & x$conv!=1) stop("No confidence interval can be provided since the model did not converge properly") 
@@ -97,7 +97,9 @@ cuminc <- function(x,time,draws=FALSE,ndraws=2000,integrateOptions=list(subdivis
         if(nrow(Xprofil)==0) Xprofil <- matrix(0,1,1)
         
         ## fonction d'integration
-        integrate2 <- function(...) return(integrate(..., subdivisions=integrateOptions$subdivisions, rel.tol=integrateOptions$rel.tol, stop.on.error=integrateOptions$stop.on.error)$value)
+        io <- list(subdivisions=100L, rel.tol=.Machine$double.eps^0.25, stop.on.error=TRUE)
+        io[names(integrateOptions)] <- integrateOptions
+        integrate2 <- function(...) return(integrate(..., subdivisions=io$subdivisions, rel.tol=io$rel.tol, stop.on.error=io$stop.on.error)$value)
 
         calculincid <- function(idraw)
             { 

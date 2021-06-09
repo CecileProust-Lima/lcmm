@@ -4,15 +4,7 @@
 \alias{cuminc}
 \title{Predicted cumulative incidence of event according to a profile of covariates}
 \usage{
-cuminc(
-  x,
-  time,
-  draws = FALSE,
-  ndraws = 2000,
-  integrateOptions = list(subdivisions = 100L, rel.tol = .Machine$double.eps^0.25,
-    stop.on.error = TRUE),
-  ...
-)
+cuminc(x, time, draws = FALSE, ndraws = 2000, integrateOptions = NULL, ...)
 }
 \arguments{
 \item{x}{an object inheriting from class \code{Jointlcmm}}
