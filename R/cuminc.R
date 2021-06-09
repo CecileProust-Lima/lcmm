@@ -95,7 +95,7 @@ cuminc <- function(x,time,draws=FALSE,ndraws=2000,...)
         if(nrow(Xprofil)==0) Xprofil <- matrix(0,1,1)
         
         ## fonction d'integration
-        integrate2 <- function(...) return(integrate(...)$value)
+        integrate2 <- function(...) return(integrate(..., stop.on.error=FALSE)$value)
 
         calculincid <- function(idraw)
             { 
