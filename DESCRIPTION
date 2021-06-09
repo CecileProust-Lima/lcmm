@@ -14,4 +14,4 @@ LazyLoad: yes
 LazyData: true
 VignetteBuilder: knitr
 NeedsCompilation: yes
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1

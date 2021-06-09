@@ -16,6 +16,8 @@
 #' @param ndraws if draws=TRUE, ndraws specifies the number of draws that
 #' should be generated to approximate the posterior distribution of the
 #' predicted cumulative incidence. By default, ndraws=2000.
+#' @param integrateOptions optional list specifying the subdivisions, rel.tol
+#' and stop.on.error options (see ?integrate).
 #' @param \dots further arguments, in particular values of the covariates
 #' specified in the survival part of the joint model.
 #' @return An object of class \code{cuminc} containing as many matrices as
@@ -37,7 +39,7 @@
 #' @seealso
 #' \code{\link{Jointlcmm}}, \code{\link{plot.Jointlcmm}}, \code{\link{plot.cuminc}}
 #' @export
-cuminc <- function(x,time,draws=FALSE,ndraws=2000,...)
+cuminc <- function(x,time,draws=FALSE,ndraws=2000,integrateOptions=list(subdivisions=100L, rel.tol=.Machine$double.eps^0.25, stop.on.error=TRUE),...)
     {   
         if(!inherits(x,"Jointlcmm")) stop("The argument 'x' must be a'Jointlcmm' object")
         if(isTRUE(draws) & x$conv!=1) stop("No confidence interval can be provided since the model did not converge properly") 
@@ -95,7 +97,7 @@ cuminc <- function(x,time,draws=FALSE,ndraws=2000,...)
         if(nrow(Xprofil)==0) Xprofil <- matrix(0,1,1)
         
         ## fonction d'integration
-        integrate2 <- function(...) return(integrate(..., stop.on.error=FALSE)$value)
+        integrate2 <- function(...) return(integrate(..., subdivisions=integrateOptions$subdivisions, rel.tol=integrateOptions$rel.tol, stop.on.error=integrateOptions$stop.on.error)$value)
 
         calculincid <- function(idraw)
             { 
