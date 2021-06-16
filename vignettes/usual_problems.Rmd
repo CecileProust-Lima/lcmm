@@ -130,43 +130,32 @@ summary(mhlme2)
 The models in objects mhlme2 and mhlme2perm are the same except for the permutation of the classes as shown with the cross-table:
 
 ```{r, comment='' }
-table(mhlme2perm$pprob$class,mhlme2$pprob$class)
+xclass(mhlme2perm,mhlme2)
 ```
+&nbsp;
 
 # How to make predictions on external data ?
-&nbsp;
 
-<p align="justify"> We can obtain a new classification and posterior probabilities with the function `predictClass`
-</p>
+We can obtain the classification and posterior class-membership probabilities using the predictClass function.
+Using the 2-classes model estimated above, the posterior probabilities and classfication of the second subject of the paquid sample are obtained like that :
 
-&nbsp;
-
-```{r, comment='',message = FALSE}
-m2b <- hlme(normMMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject = 'ID',data = paquid, ng = 2, mixture =~ age65+I(age65^2), B = c(0, 60, 40, 0, -4, 0, -10, 10, 212.869397, -216.421323,456.229910, 55.713775, -145.715516, 59.351000, 10.072221),verbose=FALSE)
-newdata <- data.frame(ID=c(0,0,0), age65=c(0.5, 1, 1.5), CEP=0, normMMSE=c(80,70,60))
-predictClass(m2b, newdata)
+```{r, comment='', message = FALSE}
+predictClass(mhlme2, newdata=paquid[2:6,])
 ```
-&nbsp;
-
-<p align="justify"> We can also obtain new individual predictions of the random-effects with the function `predictRE`
-</p>
 
 &nbsp;
+
+We can also obtain the predictions of the random-effects with the predictRE function :
 
 ```{r, comment='',message = FALSE}
-newdata <- data.frame(ID=c(0,0,0), age65=c(0.5, 1, 1.5), CEP=0, normMMSE=c(80,70,60))
-predictRE(m2b, newdata)
+predictRE(mhlme2, newdata=paquid[2:6,])
 ```
 
 
 &nbsp;
 
-<p align="justify"> For hlme only we obtain subject specific predictions using the `predictY` function with otion marg=FALSE.
-</p>
-
-&nbsp;
- 
- 
+For hlme models only we obtain subject specific predictions using the predictY function with option marg=FALSE :
+  
 ```{r, comment=''}
-predictY(m2,paquid[2:6,],var.time="age65",CEP=0,marg=FALSE)
+predictY(mhlme2, paquid[2:6,], marg=FALSE)
 ```

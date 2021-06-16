@@ -917,7 +917,7 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 
 
 
-#' Marginal predictions (possibly class-specific) of a \code{hlme},
+#' Class-specific predictions (marginal and possibly subject-specific) of a \code{hlme},
 #' \code{lcmm}, \code{multlcmm} or \code{Jointlcmm} object in the natural scale
 #' of the longitudinal outcome(s) for a specified profile of covariates.
 #' 
@@ -940,7 +940,8 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 #' computed. The data frame should include at least all the covariates listed
 #' in x$Xnames2. Names in the data frame should be exactly x$Xnames2 that are
 #' the names of covariates specified in \code{lcmm}, \code{hlme},
-#' \code{Jointlcmm} or \code{multlcmm} calls.
+#' \code{Jointlcmm} or \code{multlcmm} calls. For \code{hlme} object and marg=FALSE,
+#' the grouping structure and values for the outcome should also be specified.
 #' @param var.time A character string containing the name of the variable that
 #' corresponds to time in the data frame (x axis in the plot).
 #' @param methInteg optional integer specifying the type of numerical
@@ -966,10 +967,11 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 #' only; if draws=TRUE, ndraws specifies the number of draws that should be
 #' generated to approximate the posterior distribution of the predicted values.
 #' By default, ndraws=2000.
-#' @param marg For a \code{hlme}, optional boolean specifying wether the      
-#' prediction must be marginal or not (subject specific). By default, marg=TRUE
-#' @param subject choice of subject, by default: NULL, meaning the subject 
-#' identifier is the same as in the model.
+#' @param marg For a \code{hlme} object only, optional boolean specifying whether the      
+#' predictions are marginal (the default) or subject-specific (marg=FALSE).
+#' @param subject For a \code{hlme} object with marg=FALSE only, character specifying
+#' the name of the grouping strucuture. If NULL (the default), the same as in the model
+#' (argument x) will be used.
 #' @param na.action Integer indicating how NAs are managed. The default is 1
 #' for 'na.omit'. The alternative is 2 for 'na.fail'. Other options such as
 #' 'na.pass' or 'na.exclude' are not implemented in the current version.
@@ -1002,13 +1004,13 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 #' ng class-specific 50\%, 2.5\% and 97.5\% percentiles of the approximated
 #' posterior distribution of the class-specific predicted values.
 #' 
-#' For objects of class \class{hlme} with \code{marg=FALSE}, returns a dataframe 
-#' of the subject identifier, subject-specific predictions (pred_ss) averaged 
+#' For objects of class \code{hlme} with \code{marg=FALSE}, returns a matrix
+#' with 2+ng columns : the grouping structure, subject-specific predictions (pred_ss) averaged 
 #' over classes and the class-specific subject-specific predictions (with the
 #' number of the latent class: pred_ss_1,pred_ss_2,...)
 #' 
 #' - \code{times} : the \code{var.time} variable from \code{newdata}
-#' @author Cecile Proust-Lima, Viviane Philipps
+#' @author Cecile Proust-Lima, Viviane Philipps, Sasha Cuau
 #' @seealso \code{\link{lcmm}}, \code{\link{multlcmm}}, \code{\link{hlme}},
 #' \code{\link{Jointlcmm}}
 #' @examples

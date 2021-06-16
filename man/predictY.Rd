@@ -7,7 +7,7 @@
 \alias{predictY.hlme}
 \alias{predictY.lcmm}
 \alias{predictY.multlcmm}
-\title{Marginal predictions (possibly class-specific) of a \code{hlme},
+\title{Class-specific predictions (marginal and possibly subject-specific) of a \code{hlme},
 \code{lcmm}, \code{multlcmm} or \code{Jointlcmm} object in the natural scale
 of the longitudinal outcome(s) for a specified profile of covariates.}
 \usage{
@@ -69,7 +69,8 @@ mixed model.}
 computed. The data frame should include at least all the covariates listed
 in x$Xnames2. Names in the data frame should be exactly x$Xnames2 that are
 the names of covariates specified in \code{lcmm}, \code{hlme},
-\code{Jointlcmm} or \code{multlcmm} calls.}
+\code{Jointlcmm} or \code{multlcmm} calls. For \code{hlme} object and marg=FALSE,
+the grouping structure and values for the outcome should also be specified.}
 
 \item{var.time}{A character string containing the name of the variable that
 corresponds to time in the data frame (x axis in the plot).}
@@ -110,11 +111,12 @@ Only the argument 'median' will be used, other are ignored. 'median' should
 be a logical indicating whether the median should be computed. By 
 default, the mean value is computed.}
 
-\item{marg}{For a \code{hlme}, optional boolean specifying wether the
-prediction must be marginal or not (subject specific). By default, marg=TRUE}
+\item{marg}{For a \code{hlme} object only, optional boolean specifying whether the
+predictions are marginal (the default) or subject-specific (marg=FALSE).}
 
-\item{subject}{choice of subject, by default: NULL, meaning the subject 
-identifier is the same as in the model.}
+\item{subject}{For a \code{hlme} object with marg=FALSE only, character specifying
+the name of the grouping strucuture. If NULL (the default), the same as in the model
+(argument x) will be used.}
 }
 \value{
 An object of class \code{predictY} with values :
@@ -142,8 +144,8 @@ outcome which is predicted and the ng*3 subsequent columns correspond to the
 ng class-specific 50\%, 2.5\% and 97.5\% percentiles of the approximated
 posterior distribution of the class-specific predicted values.
 
-For objects of class \class{hlme} with \code{marg=FALSE}, returns a dataframe 
-of the subject identifier, subject-specific predictions (pred_ss) averaged 
+For objects of class \code{hlme} with \code{marg=FALSE}, returns a matrix
+with 2+ng columns : the grouping structure, subject-specific predictions (pred_ss) averaged 
 over classes and the class-specific subject-specific predictions (with the
 number of the latent class: pred_ss_1,pred_ss_2,...)
 
@@ -203,5 +205,5 @@ pred1MC <- predictY(m,newdata,draws=TRUE,var.time="Time")
 \code{\link{Jointlcmm}}
 }
 \author{
-Cecile Proust-Lima, Viviane Philipps
+Cecile Proust-Lima, Viviane Philipps, Sasha Cuau
 }

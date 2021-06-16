@@ -16,78 +16,92 @@
 #'    where c_ig is the posterior class membership
 #'  - %Class computed as the proportion of each class based on c_ig
 #' 
-#' @param m1 an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
-#' \code{Jointlcmm}
+#' @param m1 an object of class \code{hlme}, \code{lcmm}, \code{multlcmm},
+#' \code{Jointlcmm} or \code{mpjlcmm}
 #' @param \dots  further arguments, in particular other objects of class
-#' \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}
-#' @param which character vector indicating which results should be returned.
+#' \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm} or \code{mpjlcmm}, and
+#' graphical parameters.
+#' @param which character vector indicating which results should be plotted.
 #' Possible values are "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
-#' "entropy", "ICL", "\%class".
-#' @param xaxis the abscissa of the plot, default to "G".
-#' @param display display of the table. By default, False.
+#' "entropy", "ICL".
+#' @param mfrow for multiple plots, number of rows and columns to split the graphical device.
+#' Default to one line and length(which) columns. 
+#' @param xaxis the abscissa of the plot. Default to "G", the number of latent classes.
 #' @author Cecile Proust-Lima, Viviane Philipps, Sasha Cuau
 #' @seealso \code{\link{summary}}, \code{\link{summarytable}} 
 #' 
 #' @export
-#' @examples   
-# paquid$age65 <- (paquid$age - 65)/10
-# m1 <- hlme(MMSE ~ age65+I(age65^2)+CEP,random =~ age65+I(age65^2), subject = 'ID', data = paquid) # ng=1
-# m2 <- hlme(MMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject = 'ID', data = paquid, ng = 2, mixture=~age65+I(age65^2), B=m1)
-# m3g <- gridsearch(hlme(MMSE ~ age65+I(age65^2)+CEP,  random =~ age65+I(age65^2), subject = 'ID', data=paquid, ng = 3, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
-# summaryplot(m1,m2,m3g,which=c("G","BIC","entropy","ICL","loglik"))
+#' @examples
+#' \dontrun{
+#' library(NormPsy)
+#' paquid$normMMSE <- normMMSE(paquid$MMSE)
+#' paquid$age65 <- (paquid$age - 65)/10
+#' m1 <- hlme(normMMSE~age65+I(age65^2)+CEP, random=~age65+I(age65^2), subject='ID', data=paquid)
+#' m2 <- hlme(normMMSE~age65+I(age65^2)+CEP, random=~age65+I(age65^2), subject='ID', data=paquid,
+#' ng = 2, mixture=~age65+I(age65^2), B=m1)
+#' m3g <- gridsearch(hlme(normMMSE~age65+I(age65^2)+CEP, random=~age65+I(age65^2), subject='ID',
+#' data=paquid, ng=3, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
+#' summaryplot(m1, m2, m3g, which=c("BIC","entropy","ICL"))
+#'}
 
 
 
-
-summaryplot <- function(m1,...,which,width=length(which),height=1,xaxis="G",display=FALSE){
-  dots <- list(...)
-  names.plot <- c("lty","type","col","pch","xlab","lwd","ylab")
-  dots.plot <- dots[intersect(names(dots),names.plot)]
-  models <- setdiff(dots,dots.plot)
+summaryplot <- function(m1, ..., which=c("BIC", "entropy", "ICL"), mfrow=c(1,length(which)), xaxis="G")
+{
+    if(!all(which %in% c("loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "ICL"))) stop("Argument which should only contain elements among loglik, conv, npm, AIC, BIC, SABIC, entropy, ICL")
+    
+    dots <- list(...)
+    names.plot <- c("adj","ann","asp","axes","bg","bty","cex","cex.axis","cex.lab",
+                    "cex.main","cex.sub","col","col.axis","col.lab","col.main",
+                    "col.sub","crt","err","family","fig","fin","font","font.axis",
+                    "font.lab","font.main","font.sub","frame.plot","lab","las","lend",
+                    "lheight","ljoin","lmitre","lty","lwd","mai","main","mar","mex",
+                    "mgp","mkh","oma","omd","omi","pch","pin","plt","ps","pty","smo",
+                    "srt","sub","tck","tcl","type","usr","xaxp","xaxs","xaxt","xlab",
+                    "xlim","xpd","yaxp","yaxs","yaxt","ylab","ylbias","ylim") 
+    dots.plot <- dots[intersect(names(dots),names.plot)]
+    models <- setdiff(dots,dots.plot)
   
-  if(!length(dots.plot$xlab))
-  {
-    dots.plot$xlab <- "#classes"
-  }
-  
-  if(!length(dots.plot$ylab))
-  {
-    dots.plot$ylab <- ""
-  }
-  if(!length(dots.plot$col))
-  {
-    dots.plot$col <- "orchid4"
-  }
-  if(!length(dots.plot$type))
-  {
-    dots.plot$type<- "o"
-  }
-  if(!length(dots.plot$pch))
-  {
-    dots.plot$pch<- 10
-  }
-  if(!length(dots.plot$lty))
-  {
-    dots.plot$lty<- 1
-  }
-  if(!length(dots.plot$lwd))
-  {
-    dots.plot$lwd<- 3
-  }
-  if(!length(dots.plot$bty))
-  {
-    dots.plot$bty<- "l"
-  }
+    if(!length(dots.plot$xlab))
+    {
+        dots.plot$xlab <- "#classes"
+    }    
+    if(!length(dots.plot$ylab))
+    {
+        dots.plot$ylab <- ""
+    }
+    if(!length(dots.plot$col))
+    {
+        dots.plot$col <- "black"
+    }
+    if(!length(dots.plot$type))
+    {
+        dots.plot$type <- "o"
+    }
+    if(!length(dots.plot$lty))
+    {
+        dots.plot$lty <- 1
+    }
 
-  summ <- summarytable(m1,...,which=c(xaxis,which),display= FALSE)
-  par(mfrow=c(height,width))
-  for(x in which){
-    if(x!=xaxis){
-      do.call(plot,c(summ[,c(x)] ~ summ[,c(xaxis)],dots.plot,main=x,xaxt="n"))
-      axis(1, at = 1:(length(models)+1))
-      }
-  }
-  return(invisible(NULL))
+    main <- which
+    if(length(dots.plot$main))
+    {
+        main <- rep(dots.plot$main, length.out=length(which))
+        dots.plot <- dots.plot[setdiff(names(dots.plot),"main")]
+    }
+    
+    summ <- summarytable(m1, ..., which=c(xaxis,which), display=FALSE)
+
+    par(mfrow=mfrow)
+    on.exit(par(mfrow=c(1,1)))
+
+    k <- 1
+    for(x in which){
+        do.call("plot",c(summ[,c(x)] ~ summ[,c(xaxis)], dots.plot, main=main[k], xaxt="n"))
+        axis(1, at = 1:(length(models)+1))
+        k <- k+1
+    }
+    return(invisible(NULL))
 }
 
 

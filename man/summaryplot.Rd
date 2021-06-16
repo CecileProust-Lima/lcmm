@@ -7,27 +7,27 @@
 summaryplot(
   m1,
   ...,
-  which,
-  width = length(which),
-  height = 1,
-  xaxis = "G",
-  display = FALSE
+  which = c("BIC", "entropy", "ICL"),
+  mfrow = c(1, length(which)),
+  xaxis = "G"
 )
 }
 \arguments{
-\item{m1}{an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
-\code{Jointlcmm}}
+\item{m1}{an object of class \code{hlme}, \code{lcmm}, \code{multlcmm},
+\code{Jointlcmm} or \code{mpjlcmm}}
 
 \item{\dots}{further arguments, in particular other objects of class
-\code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}}
+\code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm} or \code{mpjlcmm}, and
+graphical parameters.}
 
-\item{which}{character vector indicating which results should be returned.
+\item{which}{character vector indicating which results should be plotted.
 Possible values are "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
-"entropy", "ICL", "\%class".}
+"entropy", "ICL".}
 
-\item{xaxis}{the abscissa of the plot, default to "G".}
+\item{mfrow}{for multiple plots, number of rows and columns to split the graphical device.
+Default to one line and length(which) columns.}
 
-\item{display}{display of the table. By default, False.}
+\item{xaxis}{the abscissa of the plot. Default to "G", the number of latent classes.}
 }
 \description{
 This function provides a plot summarizing the results of different models
@@ -48,7 +48,17 @@ Can be reported the usual criteria used to assess the fit and the clustering
  - %Class computed as the proportion of each class based on c_ig
 }
 \examples{
-  
+\dontrun{
+library(NormPsy)
+paquid$normMMSE <- normMMSE(paquid$MMSE)
+paquid$age65 <- (paquid$age - 65)/10
+m1 <- hlme(normMMSE~age65+I(age65^2)+CEP, random=~age65+I(age65^2), subject='ID', data=paquid)
+m2 <- hlme(normMMSE~age65+I(age65^2)+CEP, random=~age65+I(age65^2), subject='ID', data=paquid,
+ng = 2, mixture=~age65+I(age65^2), B=m1)
+m3g <- gridsearch(hlme(normMMSE~age65+I(age65^2)+CEP, random=~age65+I(age65^2), subject='ID',
+data=paquid, ng=3, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
+summaryplot(m1, m2, m3g, which=c("BIC","entropy","ICL"))
+}
 }
 \seealso{
 \code{\link{summary}}, \code{\link{summarytable}}

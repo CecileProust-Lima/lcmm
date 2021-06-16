@@ -18,12 +18,12 @@
 #' 
 #' @param m1 an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
 #' \code{Jointlcmm}
-#' @param \dots  further arguments, in particular other objects of class
+#' @param \dots further arguments, in particular other objects of class
 #' \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}
 #' @param which character vector indicating which results should be returned.
 #' Possible values are "G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
 #' "entropy", "ICL", "\%class".
-#' @param display display of the table. By default: True.
+#' @param display logical indicating whether the table should be printed (the default) or not (display=FALSE)
 #' @return a matrix giving for each model the values of the requested indexes.
 #' By default, the number a latent classes, the
 #' log-likelihood, the number of parameters, the BIC and the posterior
@@ -34,7 +34,7 @@
 #' 
 #' @export
 #'  
-summarytable <- function(m1,...,which=c("G","loglik","npm","BIC","%class"),display=TRUE)
+summarytable <- function(m1, ..., which=c("G","loglik","npm","BIC","%class"), display=TRUE)
     {
         if(missing(m1)) stop("At least one model should be specified")
         if(!(class(m1) %in% c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("Use with 'hlme', 'lcmm' , 'multlcmm', 'Jointlcmm' or 'mpjlcmm' objects only")
