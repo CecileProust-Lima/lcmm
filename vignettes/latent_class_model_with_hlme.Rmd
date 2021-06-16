@@ -187,12 +187,15 @@ This method is recommended as it enables to better explore the parameter space w
 
 &nbsp;
 
-<p align="justify">The estimation process of a set of models (usually with a varying number of latent classes) can be summarized with `summarytable`. Different information can be displayed:</p>
+<p align="justify">The estimation process of a set of models (usually with a varying number of latent classes) can be summarized with `summarytable` and plotted with `summaryplot`. Different information can be displayed:</p>
 
 &nbsp;
 
-```{r, comment=''}
-summarytable(m1,m2,m2b,m2c, m2d, m3g, which = c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "%class"))
+
+```{r, comment='', fig.height=3, fig.width=7}
+summarytable(m1,m2,m2b,m2c, m2d  , m3g, which = c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy","ICL", "%class"))
+
+summaryplot(m1, m2, m3g, which = c("BIC", "entropy","ICL"))
 ```
 
 &nbsp; 
@@ -212,7 +215,7 @@ In this example, depending on the statistical and clinical criteria, either the 
 summary(m2d)
 ```
 
-### Predictions of the model 
+### Predictions of the trajectories
 
 <p align="justify">Class-specific predictions can be computed for any data contained in a dataframe as soon as all the covariates specified in the model are included in the dataframe. In the next lines, such a dataframe is created by generating a vector of $age$ values between 65 and 95 and defining $CEP$ at 1 or 0. The predictions are computed with `predictY` and plotted with the associated `plot` functionality or by using standard R tools.</p>
 
@@ -278,6 +281,9 @@ plot(predG3, col=2:4, lty=1, lwd=2, ylab="normMMSE", legend=NULL, main="Predicte
 ```
 
 &nbsp; 
+
+
+
 
 ## Evaluation of the final latent class mixed model 
 

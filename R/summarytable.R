@@ -18,11 +18,12 @@
 #' 
 #' @param m1 an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
 #' \code{Jointlcmm}
-#' @param \dots  further arguments, in particular other objects of class
+#' @param \dots further arguments, in particular other objects of class
 #' \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}
 #' @param which character vector indicating which results should be returned.
 #' Possible values are "G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
 #' "entropy", "ICL", "\%class".
+#' @param display logical indicating whether the table should be printed (the default) or not (display=FALSE)
 #' @return a matrix giving for each model the values of the requested indexes.
 #' By default, the number a latent classes, the
 #' log-likelihood, the number of parameters, the BIC and the posterior
@@ -32,8 +33,8 @@
 #' \code{\link{multlcmm}}, \code{\link{Jointlcmm}}
 #' 
 #' @export
-#' 
-summarytable <- function(m1,...,which=c("G","loglik","npm","BIC","%class"))
+#'  
+summarytable <- function(m1, ..., which=c("G","loglik","npm","BIC","%class"), display=TRUE)
     {
         if(missing(m1)) stop("At least one model should be specified")
         if(!(class(m1) %in% c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("Use with 'hlme', 'lcmm' , 'multlcmm', 'Jointlcmm' or 'mpjlcmm' objects only")
@@ -104,7 +105,9 @@ summarytable <- function(m1,...,which=c("G","loglik","npm","BIC","%class"))
             # {
             #     z[which(!is.finite(z))] <- 0
             # }
-            
+            # if(display){
+            #     prmatrix(res,na.print="")
+            # }
             res <- x$BIC - 2*sum(z)
             if(x$ng==1) res <- x$BIC
             return(res)
@@ -153,7 +156,8 @@ summarytable <- function(m1,...,which=c("G","loglik","npm","BIC","%class"))
         
 
         rownames(res) <- noms.mod
-        prmatrix(res,na.print="")
-
+        if(display){
+            prmatrix(res,na.print="")
+        }
         return(invisible(res))
     }

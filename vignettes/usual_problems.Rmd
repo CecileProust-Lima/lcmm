@@ -55,7 +55,7 @@ It sometimes happens that a model does not converge correctly. This is due most 
 
 Selection of the number of latent classes is a complex question. In some cases, the number is known. When not, different tools can be used to guide the decision:
 
-* Several statistical criteria such as BIC, SABIC or Entropy
+* Several statistical criteria such as BIC, SABIC, ICL or Entropy
 * Statistical tests when available: score test for conditional independence in joint models
 * Discrimination power as described by the classification table using the command postprob
 * Size of the classes (we can consider that classes should be larger than 1% or 5% depending on the context)
@@ -70,7 +70,7 @@ https://cran.r-project.org/package=lcmm/vignettes/latent_class_model_with_hlme.h
 
 &nbsp;
 
-
+ 
 # How to evaluate the quality of a classification ?
 
 Good discrimination of classes is usually sought when fitting latent class mixed models. Discriminatory power can be assessed using the entropy criterion (provided in summarytable) but also using the classification table (with command postprob). The description of the classes may also help comprehend the latent class structure. 
@@ -130,5 +130,32 @@ summary(mhlme2)
 The models in objects mhlme2 and mhlme2perm are the same except for the permutation of the classes as shown with the cross-table:
 
 ```{r, comment='' }
-table(mhlme2perm$pprob$class,mhlme2$pprob$class)
+xclass(mhlme2perm,mhlme2)
+```
+&nbsp;
+
+# How to make predictions on external data ?
+
+We can obtain the classification and posterior class-membership probabilities using the predictClass function.
+Using the 2-classes model estimated above, the posterior probabilities and classfication of the second subject of the paquid sample are obtained like that :
+
+```{r, comment='', message = FALSE}
+predictClass(mhlme2, newdata=paquid[2:6,])
+```
+
+&nbsp;
+
+We can also obtain the predictions of the random-effects with the predictRE function :
+
+```{r, comment='',message = FALSE}
+predictRE(mhlme2, newdata=paquid[2:6,])
+```
+
+
+&nbsp;
+
+For hlme models only we obtain subject specific predictions using the predictY function with option marg=FALSE :
+  
+```{r, comment=''}
+predictY(mhlme2, paquid[2:6,], marg=FALSE)
 ```

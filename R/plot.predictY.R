@@ -76,7 +76,7 @@ plot.predictY <- function(x,outcome=1,legend.loc="topright",legend,add=FALSE,sha
     {
         if(missing(x)) stop("The argument \'x\' is missing.")
         if(!inherits(x,"predictY")) stop("use only with \'predictY\' object")
-
+        if(all(is.na(x$times))) stop("No results can be provided for this type of object")
 
 ### determiner si mult, draws et ng
 
