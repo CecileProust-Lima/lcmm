@@ -11,19 +11,21 @@ predictRE(model, newdata, subject = NULL)
 \code{Jointlcmm} or \code{multlcmm} representing a general latent class
 mixed model.}
 
-\item{newdata}{data frame containing the data from which predictions are computed. The data frame should include at least all the covariates listed in model$Xnames2, the marker(s) and the
-grouping structure. Names should match exactly the names of the variables in the model.}
+\item{newdata}{data frame containing the data from which predictions are to be computed. 
+The data frame should include at least all the covariates listed in model$Xnames2, 
+the marker(s) values and the grouping structure. Names should match exactly the names 
+of the variables in the model.}
 
-\item{subject}{character specifying the name of the grouping strucuture.
+\item{subject}{character specifying the name of the grouping structure.
 If NULL (the default), the same as in the model will be used.}
 }
 \value{
-a matrix containing the grouoing structure and the predicted random-effects.
+a matrix containing the grouping structure and the predicted random-effects.
 }
 \description{
-The function computed the predicted random-effects given the observed values of the marker
-for external data. With multiple latent classes, these predictions are averaged over classes
-using the posterior class-membership probabilities.
+The function computes the predicted values of the random effects given observed data
+provided in input. With multiple latent classes, these predictions are averaged over 
+classes using the posterior class-membership probabilities.
 }
 \examples{
 library(NormPsy)
@@ -35,5 +37,5 @@ data = paquid, ng = 2, mixture =~ age65+I(age65^2), B = c(0, 60, 40, 0, -4, 0, -
 predictRE(m2b,newdata=paquid[1:6,])
 }
 \author{
-Cecile Proust-Lima, Viviane Philipps, Sasha Cuau
+Sasha Cuau, Viviane Philipps, Cecile Proust-Lima
 }

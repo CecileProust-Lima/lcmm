@@ -917,12 +917,13 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 
 
 
-#' Class-specific predictions (marginal and possibly subject-specific) of a \code{hlme},
+#' Predictions (marginal and possibly subject-specific in some cases) of a \code{hlme},
 #' \code{lcmm}, \code{multlcmm} or \code{Jointlcmm} object in the natural scale
-#' of the longitudinal outcome(s) for a specified profile of covariates.
+#' of the longitudinal outcome(s) computed from a profile of covariates (marginal) or
+#' individual data (subject specific in case of \code{hlme}).
 #' 
 #' For \code{hlme} and \code{Jointlcmm} objects, the function computes the
-#' predicted values of the longitudinal marker in each latent class for a
+#' predicted values of the longitudinal marker (in each latent class of ng>1) for a
 #' specified profile of covariates.  For \code{lcmm} and \code{multlcmm}
 #' objects, the function computes predicted values in the natural scale of the
 #' outcomes for a specified profile of covariates. For linear and threshold
@@ -936,7 +937,7 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 #' @param x an object inheriting from class \code{lcmm}, \code{hlme},
 #' \code{Jointlcmm} or \code{multlcmm} representing a general latent class
 #' mixed model.
-#' @param newdata data frame containing the data from which predictions are
+#' @param newdata data frame containing the data from which predictions are to be
 #' computed. The data frame should include at least all the covariates listed
 #' in x$Xnames2. Names in the data frame should be exactly x$Xnames2 that are
 #' the names of covariates specified in \code{lcmm}, \code{hlme},
@@ -967,8 +968,9 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 #' only; if draws=TRUE, ndraws specifies the number of draws that should be
 #' generated to approximate the posterior distribution of the predicted values.
 #' By default, ndraws=2000.
-#' @param marg For a \code{hlme} object only, optional boolean specifying whether the      
-#' predictions are marginal (the default) or subject-specific (marg=FALSE).
+#' @param marg Optional boolean specifying whether the      
+#' predictions are marginal (the default) or subject-specific (marg=FALSE). marge=FALSE 
+#' only works with \code{hlme} objects.
 #' @param subject For a \code{hlme} object with marg=FALSE only, character specifying
 #' the name of the grouping strucuture. If NULL (the default), the same as in the model
 #' (argument x) will be used.

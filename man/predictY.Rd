@@ -7,9 +7,10 @@
 \alias{predictY.hlme}
 \alias{predictY.lcmm}
 \alias{predictY.multlcmm}
-\title{Class-specific predictions (marginal and possibly subject-specific) of a \code{hlme},
+\title{Predictions (marginal and possibly subject-specific in some cases) of a \code{hlme},
 \code{lcmm}, \code{multlcmm} or \code{Jointlcmm} object in the natural scale
-of the longitudinal outcome(s) for a specified profile of covariates.}
+of the longitudinal outcome(s) computed from a profile of covariates (marginal) or
+individual data (subject specific in case of \code{hlme}).}
 \usage{
 \method{predictY}{Jointlcmm}(
   x,
@@ -65,7 +66,7 @@ predictY(x, newdata, var.time, ...)
 \code{Jointlcmm} or \code{multlcmm} representing a general latent class
 mixed model.}
 
-\item{newdata}{data frame containing the data from which predictions are
+\item{newdata}{data frame containing the data from which predictions are to be
 computed. The data frame should include at least all the covariates listed
 in x$Xnames2. Names in the data frame should be exactly x$Xnames2 that are
 the names of covariates specified in \code{lcmm}, \code{hlme},
@@ -111,8 +112,9 @@ Only the argument 'median' will be used, other are ignored. 'median' should
 be a logical indicating whether the median should be computed. By 
 default, the mean value is computed.}
 
-\item{marg}{For a \code{hlme} object only, optional boolean specifying whether the
-predictions are marginal (the default) or subject-specific (marg=FALSE).}
+\item{marg}{Optional boolean specifying whether the
+predictions are marginal (the default) or subject-specific (marg=FALSE). marge=FALSE 
+only works with \code{hlme} objects.}
 
 \item{subject}{For a \code{hlme} object with marg=FALSE only, character specifying
 the name of the grouping strucuture. If NULL (the default), the same as in the model
@@ -153,7 +155,7 @@ number of the latent class: pred_ss_1,pred_ss_2,...)
 }
 \description{
 For \code{hlme} and \code{Jointlcmm} objects, the function computes the
-predicted values of the longitudinal marker in each latent class for a
+predicted values of the longitudinal marker (in each latent class of ng>1) for a
 specified profile of covariates.  For \code{lcmm} and \code{multlcmm}
 objects, the function computes predicted values in the natural scale of the
 outcomes for a specified profile of covariates. For linear and threshold

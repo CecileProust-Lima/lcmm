@@ -41,7 +41,7 @@ Can be reported the usual criteria used to assess the fit and the clustering
  - number of parameters P, number of classes G, convergence criterion (1 = converged)
  - AIC (the lower the better) computed as -2L+2P 
  - BIC (the lower the better) computed as -2L+ P log(N) where N is the number of subjects
- - SABIC (the lower the better) computed as 
+ - SABIC (the lower the better) computed as -2L+ P log((N+2)/24)
  - Entropy (the closer to one the better) computed as 1-sum[pi_ig*log(pi_ig)]/(N*log(G))
    where pi_ig is the posterior probability that subject i belongs to class g
  - ICL (the lower the better) computed as BIC -2*sum[c_ig*log(pi_ig)]

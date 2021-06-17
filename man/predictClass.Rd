@@ -11,19 +11,20 @@ predictClass(model, newdata, subject = NULL)
 \code{Jointlcmm} or \code{multlcmm} representing a general latent class
 mixed model.}
 
-\item{newdata}{data frame containing the data from which predictions are computed.
+\item{newdata}{data frame containing the data from which predictions are to be computed.
 The data frame should include at least all the covariates listed in model$Xnames2,
 the outcome(s) and the grouping structure. Names should match exactly.}
 
-\item{subject}{character specifying the name of the grouping strucuture.
+\item{subject}{character specifying the name of the grouping structure.
 If NULL (the default), the same as in the model will be used.}
 }
 \value{
-a matrix with 2+ng columns : the grouping structure, the predicted class and the
-posterior class-membership probabilities.
+a matrix with 2+ng columns: the grouping structure, the predicted class and the
+ng posterior class-membership probabilities.
 }
 \description{
-This function provides the posterior classification and posterior individual class-membership probabilities for external data.
+This function provides the posterior classification and posterior individual 
+class-membership probabilities for external data.
 }
 \examples{
 library(NormPsy)
@@ -35,5 +36,5 @@ data = paquid, ng = 2, mixture =~ age65+I(age65^2), B = c(0, 60, 40, 0, -4, 0, -
 predictClass(m2b, newdata=paquid[1:6,])
 }
 \author{
-Cecile Proust-Lima, Viviane Philipps, Sasha Cuau
+Sasha Cuau, Viviane Philipps, Cecile Proust-Lima
 }

@@ -98,7 +98,6 @@ Each vignette includes a section on the evaluation of the model.
 This is detailed in vignette on pre-normalizing:  https://cran.r-project.org/package=lcmm/vignettes/pre_normalizing.html
 
 
-
 &nbsp;
 
 # How to change the latent class in reference?
@@ -134,10 +133,17 @@ xclass(mhlme2perm,mhlme2)
 ```
 &nbsp;
 
-# How to make predictions on external data ?
+# How to make predictions on external data?
 
-We can obtain the classification and posterior class-membership probabilities using the predictClass function.
-Using the 2-classes model estimated above, the posterior probabilities and classfication of the second subject of the paquid sample are obtained like that :
+An object stemmed from a estimation function of lcmm package (hlme, lcmm, Jointlcmm, mpjlcmm) provides predictions on the data on which the model was estimated. 
+
+Different functions allows the same type of computations but on external data: 
+
+### Classification with PredictClass
+
+predictClass function computes the posterior classification and the posterior class-membership probabilities from any latent class model estimated in package lcmm. 
+
+For instance, using the 2-class model estimated above, the posterior probabilities and classification can be computed for the newdata, here the data of the second subject of paquid dataset:
 
 ```{r, comment='', message = FALSE}
 predictClass(mhlme2, newdata=paquid[2:6,])
@@ -145,17 +151,27 @@ predictClass(mhlme2, newdata=paquid[2:6,])
 
 &nbsp;
 
-We can also obtain the predictions of the random-effects with the predictRE function :
+### Random-effects with predictRE
+
+predictRE function computes the predicted random-effects of any model estimated within lcmm package for a new subject whose data (i.e., covariates and outcomes) are provided in newdata:
 
 ```{r, comment='',message = FALSE}
 predictRE(mhlme2, newdata=paquid[2:6,])
 ```
 
-
 &nbsp;
 
-For hlme models only we obtain subject specific predictions using the predictY function with option marg=FALSE :
-  
+### Predictions of outcomes in their natural scale using predictY and predictYcond
+
+The function predictY provides by default the mean outcome value predicted for a profile of covariates (provided in newdata). This prediction (with marg=TRUE by default) is a marginal prediction. 
+
+Subject-specific predictions can be obtained only for hlme right now. In that case, it should be indicated option marg=FALSE and newdata should include the outcome data so that the predicted random-effects can be included. 
+
 ```{r, comment=''}
 predictY(mhlme2, paquid[2:6,], marg=FALSE)
 ```
+
+Predictions of the outcomes can also be also directly computed for a latent process value. This is useful when nonlinear link functions are used in the models. This is obtained with function predictYcond. 
+
+
+

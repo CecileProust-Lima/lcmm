@@ -14,5 +14,5 @@ LaTeX: pdfLaTeX
 
 BuildType: Package
 PackageUseDevtools: Yes
-PackageInstallArgs: --no-multiarch --with-keep.source --clean -l "/autofs/unityaccount/cremi/scuau/R/x86_64-pc-linux-gnu-library/4.0"
+PackageInstallArgs: --no-multiarch --with-keep.source --clean
 PackageRoxygenize: rd,collate,namespace

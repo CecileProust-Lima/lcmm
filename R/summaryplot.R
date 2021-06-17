@@ -9,7 +9,7 @@
 #'  - number of parameters P, number of classes G, convergence criterion (1 = converged)
 #'  - AIC (the lower the better) computed as -2L+2P 
 #'  - BIC (the lower the better) computed as -2L+ P log(N) where N is the number of subjects
-#'  - SABIC (the lower the better) computed as 
+#'  - SABIC (the lower the better) computed as -2L+ P log((N+2)/24)
 #'  - Entropy (the closer to one the better) computed as 1-sum[pi_ig*log(pi_ig)]/(N*log(G))
 #'    where pi_ig is the posterior probability that subject i belongs to class g
 #'  - ICL (the lower the better) computed as BIC -2*sum[c_ig*log(pi_ig)]
@@ -27,7 +27,7 @@
 #' @param mfrow for multiple plots, number of rows and columns to split the graphical device.
 #' Default to one line and length(which) columns. 
 #' @param xaxis the abscissa of the plot. Default to "G", the number of latent classes.
-#' @author Cecile Proust-Lima, Viviane Philipps, Sasha Cuau
+#' @author Sasha Cuau, Viviane Philipps, Cecile Proust-Lima
 #' @seealso \code{\link{summary}}, \code{\link{summarytable}} 
 #' 
 #' @export
@@ -41,7 +41,7 @@
 #' ng = 2, mixture=~age65+I(age65^2), B=m1)
 #' m3g <- gridsearch(hlme(normMMSE~age65+I(age65^2)+CEP, random=~age65+I(age65^2), subject='ID',
 #' data=paquid, ng=3, mixture=~age65+I(age65^2)), rep=100, maxiter=30, minit=m1)
-#' summaryplot(m1, m2, m3g, which=c("BIC","entropy","ICL"))
+#' summaryplot(m1, m2, m3g, which=c("BIC","entropy","ICL"),bty="l",pch=20,col=2)
 #'}
 
 
