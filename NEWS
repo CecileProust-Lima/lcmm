@@ -8,15 +8,31 @@ Proust-Lima C, Philipps V, Liquet B. Estimation of Extended Mixed Models Using L
 
 https://www.jstatsoft.org/article/view/v078i02
 
+And specific statistical models estimated are described in various statistical papers of the authors. 
 
-Changes in Version 1.9.2 :
+
+Changes in Version 1.9.3 (2021-06-17):
+
+* new functions predictClass, predictRE and summaryplot
+* ICL computation in summaryplot
+* use of rmvnorm in multlcmm to generate random initial values
+* maxiter is used in the estimation of the final model in gridsearch
+* fix bug in cuminc without covariates
+* fix bug in the check for numeric type for argument subject with tibbles
+* fix bug in predictY with hlme object when the dataset is named "x"
+* fix bug in the update function when the model has unestimated parameters (posfix)
+* fix bug in hlme when posterior probabilities are NA
+* fix bug in plot with option which="fit" (observations at the maximum time measurement where not systematically included)
+* correction in the outputs (ppi and resid) of the mpjlcmm function
+
+Changes in Version 1.9.2:
 
 * event variable in joint models can be logical
 * bug fixed in Jointlcmm with prior when there are missing data
 * bug fixed in mpjlcmm : initial values were badly modified (with at least 3 dimensions)
 * small bugs fixed in predictY with median=TRUE
 
-Changes in Version 1.9.1 :
+Changes in Version 1.9.1:
 
 * parallel implementation of gridsearch function. Thanks to Raphael Peter for his suggestion.
 * add condRE_Y option in predictYcond
@@ -29,9 +45,7 @@ Changes in Version 1.9.1 :
 * manage infinite ppi in hlme
 * correction of epsY type, URL in vignettes, data statements position
 
-
-
-Changes in Version 1.8.1 :
+Changes in Version 1.8.1:
 
 * new function mpjlcmm for estimating joint latent class models with multiple markers and/or latent processes
 * various post-fit functions for mpjlcmm objects
@@ -44,7 +58,7 @@ Changes in Version 1.8.1 :
 * bug fixed in Jointlcmm with infinite score test
 * bug fixed in dynpred with TimeDepVar
 
-Changes in Version 1.7.9 :
+Changes in Version 1.7.9:
 
 * bug in summary when the model did not converge
 * bug in dynpred when draws=TRUE and only 1 horizon or 1 landmark, or when o covariates are included in the survival model, or when using factor
@@ -53,7 +67,7 @@ Changes in Version 1.7.9 :
 * bug in Jointlcmm when B=random(m1)
 
 
-Changes in Version 1.7.8 :
+Changes in Version 1.7.8:
 
 * shades in plot.predictlink/L/Y
 * subset in plot, which="fit"
