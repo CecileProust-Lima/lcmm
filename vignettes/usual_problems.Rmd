@@ -163,15 +163,16 @@ predictRE(mhlme2, newdata=paquid[2:6,])
 
 ### Predictions of outcomes in their natural scale using predictY and predictYcond
 
-The function predictY provides by default the mean outcome value predicted for a profile of covariates (provided in newdata). This prediction (with marg=TRUE by default) is a marginal prediction. 
+predictY function provides by default the mean outcome value predicted for a profile of covariates (provided in newdata). This prediction (with marg=TRUE by default) is a marginal prediction. 
 
 Subject-specific predictions can be obtained only for hlme right now. In that case, it should be indicated option marg=FALSE and newdata should include the outcome data so that the predicted random-effects can be included. 
 
 ```{r, comment=''}
-predictY(mhlme2, paquid[2:6,], marg=FALSE)
+predss <- predictY(mhlme2, paquid[2:6,], marg=FALSE)
+predss$pred
 ```
 
-Predictions of the outcomes can also be also directly computed for a latent process value. This is useful when nonlinear link functions are used in the models. This is obtained with function predictYcond. 
+Predictions of the outcomes can also be directly computed for a latent process value. This is useful when nonlinear link functions are used in the models. This is obtained with function predictYcond. 
 
 
 
