@@ -36,6 +36,26 @@ predictClass <- function(model, newdata, subject=NULL){
   if(!is.null(subject)){
     arguments[['subject']] <- subject
   }
+  if(length(arguments[["link"]])){
+      if(grepl("-quant-", arguments[["link"]]) | grepl("-equi-", arguments[["link"]])){
+          arguments[["link"]] <- gsub("-quant-", "-manual-", arguments[["link"]])
+          arguments[["link"]] <- gsub("-equi-", "-manual-", arguments[["link"]])
+          arguments[["intnodes"]] <- model$linknodes[-c(1, length(model$linknodes))]
+          arguments[["range"]] <- model$linknodes[c(1, length(model$linknodes))]
+      }
+  }
+  if(length(arguments[["hazard"]])){
+      if(grepl("-quant-", arguments[["hazard"]]) | grepl("-equi-", arguments[["hazard"]])){
+          arguments[["hazard"]] <- gsub("-quant-", "-manual-", arguments[["hazard"]])
+          arguments[["hazard"]] <- gsub("-equi-", "-manual-", arguments[["hazard"]])
+          hnodes <- model$hazard[[3]]
+          arguments[["hazardnodes"]] <- as.numeric(hnodes[-c(1, nrow(hnodes)),])
+          arguments[["hazardrange"]] <- as.numeric(hnodes[c(1, nrow(hnodes)),])
+      }
+  }
+  w <- options()$warn
+  options(warn=-1)
+  on.exit(options(warn=w))
   newmodel <- do.call(argfunction , c(arguments))
   return(newmodel$pprob)
 }

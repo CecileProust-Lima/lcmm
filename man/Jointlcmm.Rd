@@ -19,6 +19,7 @@ Jointlcmm(
   hazard = "Weibull",
   hazardtype = "Specific",
   hazardnodes = NULL,
+  hazardrange = NULL,
   TimeDepVar = NULL,
   link = NULL,
   intnodes = NULL,
@@ -55,6 +56,7 @@ jlcmm(
   hazard = "Weibull",
   hazardtype = "Specific",
   hazardnodes = NULL,
+  hazardrange = NULL,
   TimeDepVar = NULL,
   link = NULL,
   intnodes = NULL,
@@ -166,6 +168,11 @@ of hazardtypes should be given.}
 \item{hazardnodes}{optional vector containing interior nodes if
 \code{splines} or \code{piecewise} is specified for the baseline hazard
 function in \code{hazard}.}
+
+\item{hazardrange}{optional vector indicating the range of the survival times (that is
+the minimum and maximum). By default, the range is defined according to the
+minimum and maximum observed values of the survival times. The option should be
+used only for piecewise constant and Splines hazard functions.}
 
 \item{TimeDepVar}{optional vector containing an intermediate time
 corresponding to a change in the risk of event. This time-dependent

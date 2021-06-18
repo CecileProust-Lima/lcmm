@@ -722,7 +722,7 @@ if (all.equal(idlink0,2)==T){
 
  #verifier s'il y a des obs entre les noeuds
  hcounts <- hist(Y0,breaks=zitr,plot=FALSE,include.lowest=TRUE,right=TRUE)$counts
- if(any(hcounts==0)) stop("Link function can not be estimated since some intervals defined by the nodes do not contain any observation.")  
+ if(any(hcounts==0) & (maxiter != 0)) stop("Link function can not be estimated since some intervals defined by the nodes do not contain any observation.")  
 }      
 
 
