@@ -578,8 +578,36 @@
             {
                 if(is.vector(B))
                     {
-                        if(length(B)!=NPM) stop(paste("Vector B should be of length",NPM))
-                        else {b <- B}
+                        if(length(B)!=NPM)
+                        {
+                            stop(paste("Vector B should be of length",NPM))
+                        }
+                        else
+                        {
+                            b <- B
+
+                            if(NVC>0)
+                            {
+                                ## remplacer varcov des EA par les prm a estimer
+                                
+                                if(idiag==1)
+                                {
+                                    b[NPROB+NEF+1:NVC] <- sqrt(b[NPROB+NEF+1:NVC])
+                                }
+                                else
+                                {
+                                    varcov <- matrix(0,nrow=nea0,ncol=nea0)
+                                    varcov[upper.tri(varcov,diag=TRUE)] <- b[NPROB+NEF+1:NVC]
+                                    varcov <- t(varcov)
+                                    varcov[upper.tri(varcov,diag=TRUE)] <- b[NPROB+NEF+1:NVC]
+                                    
+                                    ch <- chol(varcov)
+                                    
+                                    b[NPROB+NEF+1:NVC] <- ch[upper.tri(ch,diag=TRUE)]
+                                    
+                                }
+                            }                                               
+                        }
                     }
                 else
                     {

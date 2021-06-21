@@ -1793,27 +1793,27 @@
 
 
 
-      if (idiag.eq.1) then
-         DO j=1,nvc
-            btot(nef+j)=dsqrt(abs(btot(nef+j)))
-         END DO
-      end if
+!      if (idiag.eq.1) then
+!         DO j=1,nvc
+!            btot(nef+j)=dsqrt(abs(btot(nef+j)))
+!         END DO
+!      end if
 
 ! si idiag=0, on met dans le vecteur des parms, les parms
 ! de la transformee de Cholesky
 
-      if (idiag.eq.0) then
+      ! if (idiag.eq.0) then
 
-         DO j=1,nvc
-            mvc(j)=btot(nef+j)
-         END DO
-            !print*,"avant dmfsd"
-         CALL dmfsd(mvc,nea,EPS,IER)
-         !print*,"apres dmfsd"
-         DO j=1,nvc
-            btot(nef+j)=mvc(j)
-         END DO
-      end if
+      !    DO j=1,nvc
+      !       mvc(j)=btot(nef+j)
+      !    END DO
+      !       !print*,"avant dmfsd"
+      !    CALL dmfsd(mvc,nea,EPS,IER)
+      !    !print*,"apres dmfsd"
+      !    DO j=1,nvc
+      !       btot(nef+j)=mvc(j)
+      !    END DO
+      ! end if
       if (nwg.gt.0) then
          do i=1,nwg
             btot(nef+nvc+i)=abs(btot(nef+nvc+i))

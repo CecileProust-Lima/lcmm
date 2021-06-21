@@ -899,6 +899,28 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                 {
                     if (length(B)==NPM) b <- B
                     else stop(paste("Vector B should be of length",NPM))
+
+                    if(nvc>0)
+                    {
+                        ## remplacer varcov des EA par les prm a estimer
+                        
+                        if(idiag==1)
+                        {
+                            b[nef+1:nvc] <- sqrt(b[nef+1:nvc])
+                        }
+                        else
+                        {
+                            varcov <- matrix(0,nrow=nea0,ncol=nea0)
+                            varcov[upper.tri(varcov,diag=TRUE)] <- c(1,b[nef+1:nvc])
+                            varcov <- t(varcov)
+                            varcov[upper.tri(varcov,diag=TRUE)] <- c(1,b[nef+1:nvc])
+                            
+                            ch <- chol(varcov)
+                            
+                            b[nef+1:nvc] <- (ch[upper.tri(ch,diag=TRUE)])[-1]
+                            
+                        }
+                    }                   
                 }
             else
                 {

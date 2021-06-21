@@ -27,6 +27,7 @@ This function provides the posterior classification and posterior individual
 class-membership probabilities for external data.
 }
 \examples{
+\dontrun{
 library(NormPsy)
 paquid$normMMSE <- normMMSE(paquid$MMSE)
 paquid$age65 <- (paquid$age - 65)/10
@@ -34,6 +35,7 @@ m2b <- hlme(normMMSE ~ age65+I(age65^2)+CEP, random =~ age65+I(age65^2), subject
 data = paquid, ng = 2, mixture =~ age65+I(age65^2), B = c(0, 60, 40, 0, -4, 0, -10, 10,
 212.869397, -216.421323,456.229910, 55.713775, -145.715516, 59.351000, 10.072221))
 predictClass(m2b, newdata=paquid[1:6,])
+}
 }
 \author{
 Sasha Cuau, Viviane Philipps, Cecile Proust-Lima

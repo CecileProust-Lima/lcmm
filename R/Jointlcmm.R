@@ -1003,7 +1003,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                                         #if(nrow(data.surv) != ns0) stop("Subjects cannot have several times to event.")
         
         nmes <- as.vector(table(IND))
-        data.surv <- apply(matYXord[cumsum(nmes),c(5,6,7,8)],2,as.numeric)
+        data.surv <- sweep(matYXord[cumsum(nmes),c(5,6,7,8), drop=FALSE], MARGIN=1, STATS=0, FUN=function(x,y){as.numeric(x)+y})
         
         tsurv0 <- data.surv[,1] 
         tsurv <- data.surv[,2]
@@ -1434,8 +1434,36 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
             {
                 if(is.vector(B))
                     {
-                        if (length(B)==NPM) b <- B
-                        else stop(paste("Vector B should be of length",NPM))
+                        if (length(B)==NPM)
+                        {
+                            b <- B
+
+                            if(nvc>0)
+                            {
+                                ## remplacer varcov des EA par les prm a estimer
+                                
+                                if(idiag==1)
+                                {
+                                    b[nprob+nrisqtot+nvarxevt+nef+1:nvc] <- sqrt(b[nprob+nrisqtot+nvarxevt+nef+1:nvc])
+                                }
+                                else
+                                {
+                                    varcov <- matrix(0,nrow=nea0,ncol=nea0)
+                                    varcov[upper.tri(varcov,diag=TRUE)] <- b[nprob+nrisqtot+nvarxevt+nef+1:nvc]
+                                    varcov <- t(varcov)
+                                    varcov[upper.tri(varcov,diag=TRUE)] <- b[nprob+nrisqtot+nvarxevt+nef+1:nvc]
+                                    
+                                    ch <- chol(varcov)
+                                    
+                                    b[nprob+nrisqtot+nvarxevt+nef+1:nvc] <- ch[upper.tri(ch,diag=TRUE)]
+                                    
+                                }
+                            }                                               
+                        }
+                        else
+                        {
+                            stop(paste("Vector B should be of length",NPM))
+                        }
                     }
                 else
                     {
