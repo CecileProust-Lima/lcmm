@@ -191,6 +191,7 @@
 #' the minimum and maximum). By default, the range is defined according to the
 #' minimum and maximum observed values of the outcome. The option should be
 #' used only for Beta and Splines transformations.
+#' @param rangeSurv optional vector indicating the range of the survival curve(s).
 #' @param subset optional vector giving the subset of observations in
 #' \code{data} to use. By default, all lines.
 #' @param na.action Integer indicating how NAs are managed. The default is 1
@@ -263,7 +264,7 @@ irt <- function(fixed,random,subject,idiag=FALSE,cor=NULL,link="linear",intnodes
                 survival=NULL,hazard="Weibull",hazardnodes=NULL,TimeDepVar=NULL,logscale=FALSE,startWeibull=0,
                 methInteg="QMC",nMC=1000,data,subset=NULL,na.action=1,
                 B,posfix=NULL,maxiter=100,convB=0.0001,convL=0.0001,convG=0.0001,partialH=FALSE,
-                nsim=100,range=NULL,verbose=TRUE,returndata=FALSE)
+                nsim=100,range=NULL,rangeSurv=NULL,verbose=TRUE,returndata=FALSE)
 {
     ptm <- proc.time()
     if(verbose==TRUE) cat("Be patient, irt is running ... \n")
@@ -955,6 +956,15 @@ irt <- function(fixed,random,subject,idiag=FALSE,cor=NULL,link="linear",intnodes
     if(maxT1>maxT2) maxT2 <- maxT2+0.001
     maxT <- maxT2
     
+    if(length(rangeSurv))
+    {
+        if(rangeSurv[1] > minT) stop(paste("rangeSurv[1] should be <=", minT))
+        if(rangeSurv[2] < maxT) stop(paste("rangeSurv[2] should be >=", maxT))
+        minT <- rangeSurv[1]
+        maxT <- rangeSurv[2]
+    }
+    
+    
     startWeib <- rep(0,nbevt)
     startWeib[which(typrisq==2)] <- rep(startWeibull, length.out=length(which(typrisq==2)))
     ii <- 0  
@@ -1114,6 +1124,23 @@ irt <- function(fixed,random,subject,idiag=FALSE,cor=NULL,link="linear",intnodes
     else ## B missing
         {
             b <- rep(0,NPM)
+            
+            if(nbevt>0)
+            { #si Weibull et prms au carre pr positivite -> valeurs par defaut = 1
+                if((any(hazard!="Weibull")==FALSE) & (isFALSE(logscale)==TRUE))
+                {
+                    for(i in 1:nbevt)
+                    {
+                        if(typrisq[i]==2)
+                        {
+                            b[sum(nprisq[1:i])-nprisq[i]+1:nprisq[i]] <- 1
+                        }
+                    }
+                }
+            }
+            
+
+            
             if (nvc>0)
                 {
                     if(idiag==1) b[nrisqtot+nvarxevt+nasso+nef+ncontr+1:nvc] <- rep(1,nvc)
