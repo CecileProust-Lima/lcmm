@@ -345,7 +345,7 @@
 #' 
 #' @export
 #' 
-multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,randomY=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=TRUE,returndata=FALSE,methInteg="QMC",nMC=1000,cholesky=TRUE)
+multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,randomY=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=TRUE,returndata=FALSE,methInteg="QMC",nMC=NULL,cholesky=TRUE)
 {
     ptm<-proc.time()
     if(verbose==TRUE) cat("Be patient, multlcmm is running ... \n")
@@ -882,6 +882,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     predRE <- rep(0,ns0*nea0)
 
     ## parametres MC
+    nMC <- ifelse(all(idlink0 != 3), 0, 1000)
     methInteg <- switch(methInteg,"MCO"=1,"MCA"=2,"QMC"=3)
     seqMC <- 0
     dimMC <- 0
