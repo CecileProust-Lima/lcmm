@@ -379,18 +379,18 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
   ! si idiag=0, on met dans le vecteur des parms, les parms
   ! de la transformee de Cholesky
 
-  if (idiag.eq.0) then
-
-     mvc(1)=1.d0
-     DO j=1,nvc
-        mvc(1+j)=btot(nprob+nef+ncontr+j)
-     END DO
-
-     CALL dmfsd(mvc,nea,EPS,IER)
-     DO j=1,nvc
-        btot(nprob+nef+ncontr+j)=mvc(1+j)
-     END DO
-  end if
+!  if (idiag.eq.0) then
+!
+!     mvc(1)=1.d0
+!     DO j=1,nvc
+!        mvc(1+j)=btot(nprob+nef+ncontr+j)
+!     END DO
+!
+!     CALL dmfsd(mvc,nea,EPS,IER)
+!     DO j=1,nvc
+!        btot(nprob+nef+ncontr+j)=mvc(1+j)
+!     END DO
+!  end if
   if (nwg.gt.0) then
      do i=1,nwg
         btot(nprob+nef+ncontr+nvc+i)=abs(btot(nprob+nef+ncontr+nvc+i))
