@@ -86,6 +86,7 @@
 #' @importFrom survival Surv untangle.specials
 #' @importFrom mvtnorm rmvnorm
 #' @importFrom parallel makeCluster clusterExport stopCluster parLapply clusterEvalQ clusterSetRNGStream parSapply
+#' @importFrom nlme ranef fixef
 #' @useDynLib lcmm, .registration=TRUE, .fixes="C_"
 NULL
 

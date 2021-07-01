@@ -10,8 +10,8 @@
 #'
 #' 
 #' @aliases coef.hlme coef.lcmm coef.Jointlcmm coef.multlcmm vcov.hlme
-#' vcov.lcmm vcov.Jointlcmm vcov.multlcmm fixef fixef.hlme fixef.lcmm
-#' fixef.Jointlcmm fixef.multlcmm ranef ranef.hlme ranef.lcmm ranef.Jointlcmm
+#' vcov.lcmm vcov.Jointlcmm vcov.multlcmm fixef.hlme fixef.lcmm
+#' fixef.Jointlcmm fixef.multlcmm ranef.hlme ranef.lcmm ranef.Jointlcmm
 #' ranef.multlcmm fitted.hlme fitted.lcmm fitted.Jointlcmm fitted.multlcmm
 #' residuals.hlme residuals.lcmm residuals.Jointlcmm residuals.multlcmm
 #' @param object an object of class \code{hlme}, \code{lcmm}, \code{multlcmm}
@@ -131,9 +131,6 @@ fixef.Jointlcmm <- function(object,...)
         return(res)
     }
 
-#' @export
-fixef <- function(object,...) UseMethod("fixef")
-
 
 # random effects
 #' @export
@@ -163,9 +160,6 @@ ranef.Jointlcmm <- function(object,...)
         if(object$N[5]>0) return(object$predRE[,-1,drop=FALSE])
         else return(NA)
     }
-
-#' @export
-ranef <- function(object,...) UseMethod("ranef")
 
 
 

@@ -10,12 +10,10 @@
 \alias{vcov.lcmm}
 \alias{vcov.Jointlcmm}
 \alias{vcov.multlcmm}
-\alias{fixef}
 \alias{fixef.hlme}
 \alias{fixef.lcmm}
 \alias{fixef.Jointlcmm}
 \alias{fixef.multlcmm}
-\alias{ranef}
 \alias{ranef.hlme}
 \alias{ranef.lcmm}
 \alias{ranef.Jointlcmm}
