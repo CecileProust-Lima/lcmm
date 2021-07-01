@@ -1130,28 +1130,40 @@ double precision function vrais_irtsre_i(b,npm,id,thi,jd,thj,i)
               binf = (binf - mu(sumMesYk+j))/abs(b1(nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+ncor+ntrtot+nalea+yk))
               bsup = (bsup - mu(sumMesYk+j))/abs(b1(nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+ncor+ntrtot+nalea+yk))
 
-              !if(i.lt.4) print*,"j=",j," nvalORD=",nvalORD(ykord)," binf=",binf," bsup=",bsup
+              !if(i.lt.4) print*,"nmescur=", nmescur, "sumMesYk=", sumMesYk,"j=",j
+              !if(i.lt.4) print*," nvalORD=",nvalORD(ykord)," binf=",binf," bsup=",bsup
               
               if(indiceY(nmescur+sumMesYk+j).eq.1) then
                  !! si Y=minY
                  vrais_Y = vrais_Y * alnorm(binf,.false.)
+                 !if(expectancy.eq.1) then
+                 !   print*,"Y=minY, P(Y=y)=",alnorm(binf,.false.)
+                 !   print*,"t=",X00(sumMesYk+j,2), " mu=", mu(sumMesYk+j)
+                 !   print*,"binf=", binf
+                 !end if
                  ! P(y=ymin) = P(y<=ymin) donc pareil si vrais ou expect
               else if(indiceY(nmescur+sumMesYk+j).eq.nvalORD(ykord)) then
                  !! si Y=maxY
-                 if(expectancy.eq.0) vrais_Y = vrais_Y * (1.d0-alnorm(bsup,.false.))
+                 if(expectancy.eq.0) then
+                    vrais_Y = vrais_Y * (1.d0-alnorm(bsup,.false.))
+                 end if
                  ! si expectancy, P(y<=ymax)=1 donc on n a rien a calculer 
 
               else
                  !! minY < Y < maxY
                  if(expectancy.eq.0) then
                     vrais_Y = vrais_Y * (alnorm(bsup,.false.)-alnorm(binf,.false.))
+!                    print*,"<Y<"
                  else
                     vrais_Y = vrais_Y * alnorm(bsup,.false.)
                  end if
 
               end if
-              !if(i.lt.4) print*,"vrais_Y=",vrais_Y
-
+              !if(expectancy.eq.1) then
+              !   print*, "indiceY=",indiceY(nmescur+sumMesYk+j)
+              !   print*,"bsup=", bsup, " binf=", binf
+              !   print*,"vrais_Y=",vrais_Y
+              !end if
            end do
 
 
@@ -1216,7 +1228,7 @@ double precision function vrais_irtsre_i(b,npm,id,thi,jd,thj,i)
               Y3=matmul(VC,Y2)
               Y4=DOT_PRODUCT(Y2,Y3)
               
-              div = (dble(2*3.14159265)**(nmes(i,yk)/2))*sqrt(exp(det))
+              div = (dble(2*3.14159265)**(dble(nmes(i,yk)/2)))*sqrt(exp(det))
               
               vrais_Y = vrais_Y * exp(-Y4/2.d0)/div
 
@@ -1366,7 +1378,7 @@ double precision function vrais_irtsre_i(b,npm,id,thi,jd,thj,i)
 
   vrais_irtsre_i = vrais_irtsre_i + log(som) - log(dble(nMC)) + jacobien
   !print*,"i=",i," vrais_Y=",vrais_Y,"jac=",jacobien," vrais_surv=",vrais_surv," vrais_irtsre_i=",vrais_irtsre_i
-  ! print*,"vrais_irtsre_i=",vrais_irtsre_i
+!  if(expectancy.eq.1) print*,"vrais_surv= ", vrais_surv, "vrais_irtsre_i=",vrais_irtsre_i
 654 continue
 
   return
@@ -2276,6 +2288,7 @@ subroutine proba_irtsre(Y0,X0,Tentr0,Tevt0,Devt0,ind_survint0 &
 
   !! on a un seul sujet donc maxmes=ni
   maxmes=sum(nmes0(1,:))
+  nmescur=0
 
     allocate(rangeY(ny0),minY(ny0),maxY(ny0),idlink(ny0),ntr(ny0),epsY(ny0))
 
@@ -2550,7 +2563,7 @@ subroutine proba_irtsre(Y0,X0,Tentr0,Tevt0,Devt0,ind_survint0 &
      nvc=(nea+1)*nea/2-1
   end if
 
-  npmtot = nrisqtot+nvarxevt+nef+ncontr+nvc+ncor+ntrtot+nalea+ny+nasso
+  npmtot = nrisqtot+nvarxevt+nasso+nef+ncontr+nvc+ncor+ntrtot+nalea+ny
   !print*,nrisqtot,nvarxevt,nef,ncontr,nvc,ncor,ntrtot,nalea,ny,nasso
   !print*,"npmtot=",npmtot
   !print*,"btot=",btot
@@ -2559,29 +2572,6 @@ subroutine proba_irtsre(Y0,X0,Tentr0,Tevt0,Devt0,ind_survint0 &
   !  write(*,*)'idlink',idlink
   !  write(*,*)'idea',idea
   !  write(*,*)'NVC',nvc
-
-
-  if (idiag.eq.1) then
-     DO j=1,nvc
-        btot(nef+ncontr+j)=dsqrt(abs(btot(nef+ncontr+j)))
-     END DO
-  end if
-
-  ! si idiag=0, on met dans le vecteur des parms, les parms
-  ! de la transformee de Cholesky
-
-  if (idiag.eq.0) then
-
-     mvc(1)=1.d0
-     DO j=1,nvc
-        mvc(1+j)=btot(nef+ncontr+j)
-     END DO
-
-     CALL dmfsd(mvc,nea,EPS,IER)
-     DO j=1,nvc
-        btot(nef+ncontr+j)=mvc(1+j)
-     END DO
-  end if
 
 
   ! points qmc
@@ -2630,7 +2620,7 @@ subroutine proba_irtsre(Y0,X0,Tentr0,Tevt0,Devt0,ind_survint0 &
   if (any(idlink.eq.2)) then 
      call design_splines_irtsre(ier)
      if (ier.eq.-1) then
-        proba=99
+        proba=-1.d9
         go to 1589
      end if
   end if
@@ -2645,6 +2635,10 @@ subroutine proba_irtsre(Y0,X0,Tentr0,Tevt0,Devt0,ind_survint0 &
   thi=0.d0
   thj=0.d0
   i=1
+
+  !print*,"dans proba Y=",Y, " nobs=", nobs, " nmes=", nmes
+  !print*," indiceY=", indiceY, " minY=",minY, " maxY=", maxY, " nvalORD=", nvalORD
+  
   proba = vrais_irtsre_i(b,npm,id,thi,jd,thj,i)
   
 1589 continue
