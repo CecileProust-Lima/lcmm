@@ -37,6 +37,7 @@ irt(
   partialH = FALSE,
   nsim = 100,
   range = NULL,
+  rangeSurv = NULL,
   verbose = TRUE,
   returndata = FALSE
 )
@@ -153,6 +154,8 @@ default, nsim=100.}
 the minimum and maximum). By default, the range is defined according to the
 minimum and maximum observed values of the outcome. The option should be
 used only for Beta and Splines transformations.}
+
+\item{rangeSurv}{optional vector indicating the range of the survival curve(s).}
 
 \item{verbose}{logical indicating if information about computation should be
 reported. Default to TRUE.}
