@@ -383,6 +383,7 @@ irt <- function(fixed,random,subject,idiag=FALSE,cor=NULL,link="linear",intnodes
     if(is.null(survival))
     {
         nbevt <- 0
+        Tevent <- NULL
         idtrunc <- 0
         nprisq <- 0
         nrisqtot <- 0
