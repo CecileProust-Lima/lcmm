@@ -187,6 +187,8 @@ if(x$conv==1 | x$conv==2 | x$conv==3)
                       as.integer(x$linktype),
                       as.integer(nbzitr),
                       as.double(x$linknodes),
+                      as.integer(unlist(x$modalites)),
+                      as.integer(x$nbmod),
                       as.integer(nsim),
                       as.integer(methInteg),
                       Ymarg=as.double(Ymarg))
@@ -254,6 +256,8 @@ if(x$conv==1 | x$conv==2 | x$conv==3)
                     as.integer(x$linktype),
                     as.integer(nbzitr),
                     as.double(x$linknodes),
+                    as.integer(unlist(x$modalites)),
+                    as.integer(x$nbmod),
                     as.integer(nsim),
                     as.integer(methInteg),
                     Ymarg=as.double(Ymarg))

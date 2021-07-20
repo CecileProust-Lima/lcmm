@@ -2,7 +2,7 @@
 
 subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
      ,ng,ncor,nalea,nv,ny,maxmes,idiag,nwg,npm,b1,epsY,idlink &
-     ,nbzitr,zitr0,nsim,methInteg,Ymarg)  
+     ,nbzitr,zitr0,modalite,nbmod,nsim,methInteg,Ymarg)  
 
   use optim
   IMPLICIT NONE
@@ -11,13 +11,14 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
   integer,intent(in)::ng,ncor,nv,maxmes,idiag,nwg,npm,nsim,methInteg,nalea,ny
   double precision,dimension(maxmes*nv),intent(in) ::X0
   integer,dimension(nv),intent(in)::idprob,idea,idg,idcor,idcontr
-  integer,dimension(ny),intent(in)::idlink,nbzitr
+  integer,dimension(ny),intent(in)::idlink,nbzitr,nbmod
   double precision,dimension(npm),intent(in)::b1
   double precision,dimension(ny),intent(in) ::epsY
   double precision,dimension(maxval(nbzitr),ny),intent(in)::zitr0
+  integer, dimension(sum(nbmod)),intent(in)::modalite
 
   ! for computation
-  integer ::j,k,l,m,g,l2,m2,jj,npm2,j1,j2,yk,sumntrtot,q
+  integer ::j,k,l,m,g,l2,m2,jj,npm2,j1,j2,yk,sumntrtot,q,sumnbmod
   integer ::ier,nmoins,kk,nrisq,nvarxevt,niter,nvarprob,ncg,ncssg,nea,nef,nvc,nprob,ncontr
 !  double precision,dimension(nv) ::Xprob,  bprob
 !  double precision::temp
@@ -64,6 +65,7 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
   if (idlink(yk).eq.0) ntrtot(yk)=2
   if (idlink(yk).eq.1) ntrtot(yk)=4
   if (idlink(yk).eq.2) ntrtot(yk)=nbzitr(yk)+2
+  if (idlink(yk).eq.3) ntrtot(yk)=nbmod(yk)-1
   end do
   
 !  if(verbose==1) print*,"ntrtot=",ntrtot
@@ -344,94 +346,121 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
              ysim=mu+MATMUL(VC,usim)
           end if
 
-    sumntrtot=0
-    do yk=1,ny
-!          print*,"boucle sur idlink, yk=",yk, "nsim=",l
-     if (idlink(yk).eq.0 .and. l.eq.1) then  ! Linear link
-     
-         aa = b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
-         bb = b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2)
-         do j=1,maxmes
-           Ymarg(maxmes*(yk-1)+j,1) = mu(maxmes*(yk-1)+j)*bb+aa
-         end do
-         
-         !sumntrtot = sumntrtot +ntrtot(yk) 
-         
-     else if (idlink(yk).eq.1) then  ! Beta link
-
-        aa1=exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1))/ &
-             (1+exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)))
-        bb1=exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2))/ &
-             (1+exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2)))
-        bb1=aa1*(1.d0-aa1)*bb1
-
-        cc1=abs(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+3))
-
-        dd1=abs(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+4))
-
-        aa=aa1*aa1*(1-aa1)/bb1-aa1
-        bb=aa*(1-aa1)/aa1
-        beta=beta_ln(aa,bb)
-
-
-              do j=1,maxmes
-                 ytemp=ysim(maxmes*(yk-1)+j)*dd1+cc1
-                 if (ytemp.lt.0) then
-                    ytemp=0.d0
-                 end if
+          sumntrtot=0
+          sumnbmod = 0
+          do yk=1,ny
+             !          print*,"boucle sur idlink, yk=",yk, "nsim=",l
+             if (idlink(yk).eq.0 .and. l.eq.1) then  ! Linear link
+                
+                aa = b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
+                bb = b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2)
+                do j=1,maxmes
+                   Ymarg(maxmes*(yk-1)+j,1) = mu(maxmes*(yk-1)+j)*bb+aa
+                end do
+                
+                !sumntrtot = sumntrtot +ntrtot(yk) 
+                
+             else if (idlink(yk).eq.3) then
+                do j=1,maxmes
+                   
+                   aa = b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
+                   ytemp = modalite(sumnbmod+1)
+                   if(ysim(maxmes*(yk-1)+j).gt.aa) then
+                      ytemp = modalite(sumnbmod+2) ! cas binaire 
+                   end if
+                   
+                   if(nbmod(yk).gt.2) then 
+                      do k=2,nbmod(yk)-1
+                         bb = aa + b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+k)* &
+                              b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+k)
+                         if(ysim(maxmes*(yk-1)+j).gt.aa .and. ysim(maxmes*(yk-1)+j).le.bb) then
+                            ytemp = modalite(sumnbmod+k)
+                         end if
+                         aa = bb
+                      end do
+                   end if
+                   
+                   ymarg(maxmes*(yk-1)+j,1) = ymarg(maxmes*(yk-1)+j,1) + ytemp/dble(nsim)
+                   
+                end do
+                
+                sumnbmod = sumnbmod + nbmod(yk)
+                
+             else if (idlink(yk).eq.1) then  ! Beta link
+                
+                aa1=exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1))/ &
+                     (1+exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)))
+                bb1=exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2))/ &
+                     (1+exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2)))
+                bb1=aa1*(1.d0-aa1)*bb1
+                
+                cc1=abs(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+3))
+                
+                dd1=abs(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+4))
+                
+                aa=aa1*aa1*(1-aa1)/bb1-aa1
+                bb=aa*(1-aa1)/aa1
+                beta=beta_ln(aa,bb)
+                
+                
+                do j=1,maxmes
+                   ytemp=ysim(maxmes*(yk-1)+j)*dd1+cc1
+                   if (ytemp.lt.0) then
+                      ytemp=0.d0
+                   end if
                  if (ytemp.gt.1) then
                     ytemp=1.d0
                  end if
                  ymarg(maxmes*(yk-1)+j,1)=ymarg(maxmes*(yk-1)+j,1)+xinbta(aa,bb,beta,ytemp,ier)/dble(nsim)
                  if (ier.ne.0.or.ymarg(maxmes*(yk-1)+j,1).eq.9999.d0) then
                     ymarg(maxmes*(yk-1)+j,1)=9999.d0
-!                    if (verbose==1) print*,"pb beta"
+                    !                    if (verbose==1) print*,"pb beta"
                  end if
               end do
-
-         !sumntrtot = sumntrtot +ntrtot(yk) 
-         
-     else if (idlink(yk).eq.2) then ! Splines link
-     
-        zitr=0.d0
-        zitr(1:nbzitr(yk))=zitr0(1:nbzitr(yk),yk)
-        zitr(-1)=zitr(1)
-        zitr(0)=zitr(1)
-        zitr(ntrtot(yk)-1)=zitr(ntrtot(yk)-2)
-        zitr(ntrtot(yk))=zitr(ntrtot(yk)-1)
-
-!       if(verbose==1 .and. l==1) print*,"yk=",yk,"zitr=",zitr
-
-        bb=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
-        do kk=2,ntrtot(yk)
-           splaa(kk-3)=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)**2
-        end do
-
+              
+              !sumntrtot = sumntrtot +ntrtot(yk) 
+              
+           else if (idlink(yk).eq.2) then ! Splines link
+              
+              zitr=0.d0
+              zitr(1:nbzitr(yk))=zitr0(1:nbzitr(yk),yk)
+              zitr(-1)=zitr(1)
+              zitr(0)=zitr(1)
+              zitr(ntrtot(yk)-1)=zitr(ntrtot(yk)-2)
+              zitr(ntrtot(yk))=zitr(ntrtot(yk)-1)
+              
+              !       if(verbose==1 .and. l==1) print*,"yk=",yk,"zitr=",zitr
+              
+              bb=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
+              do kk=2,ntrtot(yk)
+                 splaa(kk-3)=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)**2
+              end do
+              
               do j=1,maxmes
                  niter=0
                  diff=0.d0
                  ier=0
                  ytemp=INV_ISPLINES(ysim(maxmes*(yk-1)+j),splaa,bb,nbzitr(yk),zitr,ier,niter,diff)
-                    if ((ier.eq.3).or.(ier.ne.1.and.diff.gt.1.d-3).or.ymarg(maxmes*(yk-1)+j,1).eq.9999.d0) then
-                       ymarg(maxmes*(yk-1)+j,1)=9999.d0
-!                       if (verbose==1) print*,"pb inversion splines"
-                    else
-                        ymarg(maxmes*(yk-1)+j,1)=ymarg(maxmes*(yk-1)+j,1)+ytemp/dble(nsim)
-                    end if
-
+                 if ((ier.eq.3).or.(ier.ne.1.and.diff.gt.1.d-3).or.ymarg(maxmes*(yk-1)+j,1).eq.9999.d0) then
+                    ymarg(maxmes*(yk-1)+j,1)=9999.d0
+                    !                       if (verbose==1) print*,"pb inversion splines"
+                 else
+                    ymarg(maxmes*(yk-1)+j,1)=ymarg(maxmes*(yk-1)+j,1)+ytemp/dble(nsim)
+                 end if
+                 
               end do
               
-         !sumntrtot = sumntrtot+ntrtot(yk)     
-
-        end if
-        sumntrtot = sumntrtot+ntrtot(yk) 
+              !sumntrtot = sumntrtot+ntrtot(yk)     
+              
+           end if
+           sumntrtot = sumntrtot+ntrtot(yk) 
+        end do
      end do
- end do
- ! fin MC
-
+     ! fin MC
+     
   else !GH
-!      print*,"debut GH"
-    call gausshermite(gauss,nsim) ! on a les nsim poids et points d'integration dans gauss
+     !      print*,"debut GH"
+     call gausshermite(gauss,nsim) ! on a les nsim poids et points d'integration dans gauss
  
    sumntrtot=0
    do yk=1,ny

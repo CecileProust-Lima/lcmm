@@ -478,7 +478,6 @@ subroutine irtsre(Y0,X0,Tentr0,Tevt0,Devt0,ind_survint0 &
 
 
 
-
   ! creer base de splines si au moins un hazard splines
   if(any(typrisq.eq.3)) then
      allocate(Tmm(ns*nbevt),Tmm1(ns*nbevt),Tmm2(ns*nbevt),Tmm3(ns*nbevt),Tim(ns*nbevt)         &
@@ -658,7 +657,7 @@ double precision function vrais_irtsre_i(b,npm,id,thi,jd,thj,i)
   double precision::ai,binf,bsup
   double precision,dimension(nbevt)::risq,surv,surv0,survint
   double precision::SX,x22,div,vrais_Y,vrais_surv,varexpsurv
-  double precision::surv0_glob,surv_glob,fevt,easurv
+  double precision::surv0_glob,surv_glob,fevt,easurv,trunc
   double precision,external::alnorm
 
 
@@ -966,6 +965,7 @@ double precision function vrais_irtsre_i(b,npm,id,thi,jd,thj,i)
   end do
 
 
+  trunc=0
   som=0.d0
   do l=1,nMC
 
@@ -1360,7 +1360,8 @@ double precision function vrais_irtsre_i(b,npm,id,thi,jd,thj,i)
         if(Devt(i).eq.1) vrais_surv = vrais_surv * fevt
 
         if (idtrunc.eq.1) then
-           vrais_surv = vrais_surv / exp(-surv0_glob)
+           ! vrais_surv = vrais_surv / exp(-surv0_glob)
+           trunc = trunc + exp(-surv0_glob)
         end if
 
         ! vrais totale 
@@ -1376,7 +1377,11 @@ double precision function vrais_irtsre_i(b,npm,id,thi,jd,thj,i)
      !if(l.lt.4) print*,"l=", l, " som=",som
   end do ! fin boucle MC
 
-  vrais_irtsre_i = vrais_irtsre_i + log(som) - log(dble(nMC)) + jacobien
+  vrais_irtsre_i = log(som) - log(dble(nMC)) + jacobien
+  
+  if (idtrunc.eq.1) then
+     vrais_irtsre_i = vrais_irtsre_i - log(trunc) + log(dble(nMC))
+  end if
   !print*,"i=",i," vrais_Y=",vrais_Y,"jac=",jacobien," vrais_surv=",vrais_surv," vrais_irtsre_i=",vrais_irtsre_i
 !  if(expectancy.eq.1) print*,"vrais_surv= ", vrais_surv, "vrais_irtsre_i=",vrais_irtsre_i
 654 continue
@@ -1393,7 +1398,7 @@ double precision function vrais_irtsre(b,m,id,thi,jd,thj)
 
 
   use modirtsre,only:ns,nmes,nmescur
-
+  
   implicit none
 
   integer::m,i,id,jd

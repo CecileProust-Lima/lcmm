@@ -766,6 +766,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     indiceY0 <- NULL
     nvalSPLORD0 <- rep(0,ny0)
     nbmod <- rep(0,ny0)
+    modalites <- vector("list",ny0)
     nb <- 0
     for (k in 1:ny0)
         {
@@ -803,7 +804,11 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                     nb <- nb + length(yk)
                     nvalSPLORD0[k] <- length(yk)
                 }
-            if(idlink0[k]==3) nbmod[k] <- length(na.omit(uniqueTemp))
+            if(idlink0[k]==3)
+            {
+                nbmod[k] <- length(na.omit(uniqueTemp))
+                modalites[[k]] <- uniqueTemp
+            }
         }
     #if(is.null(nvalSPLORD0)) nvalSPLORD0 <- 0
 
@@ -1810,7 +1815,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,
                call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,
                predRE_Y=predRE_Y,Ynames=nomsY,Xnames=nom.X0,Xnames2=ttesLesVar,cholesky=Cholesky,
-               estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,nbnodes=nbnodes,nbmod=nbmod,
+               estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,nbnodes=nbnodes,nbmod=nbmod,modalites=modalites,
                na.action=nayk,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,
                wRandom=wRandom,b0Random=b0Random,CPUtime=cost[3],CorrEA=CorrEA)
     

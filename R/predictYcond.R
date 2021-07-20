@@ -132,6 +132,8 @@ predictYcond <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2
                             as.integer(x$linktype),
                             as.integer(nbzitr),
                             as.double(x$linknodes),
+                            as.integer(unlist(x$modalites)),
+                            as.integer(x$nbmod),
                             as.integer(nsim),
                             Ycond=as.double(Ycond))
             
