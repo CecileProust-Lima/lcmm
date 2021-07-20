@@ -37,6 +37,7 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
   double precision,dimension(2,51)::gauss
   double precision,dimension(ny)::minY,maxY
   integer,dimension(ny)::ntrtot
+  double precision::alnorm
 
   ! for output
   double precision,dimension(maxmes*ny,ng),intent(out) ::Ymarg
@@ -361,28 +362,24 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
                 !sumntrtot = sumntrtot +ntrtot(yk) 
                 
              else if (idlink(yk).eq.3) then
+                   
+                aa = b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
                 do j=1,maxmes
-                   
-                   aa = b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
-                   ytemp = modalite(sumnbmod+1)
-                   if(ysim(maxmes*(yk-1)+j).gt.aa) then
-                      ytemp = modalite(sumnbmod+2) ! cas binaire 
-                   end if
-                   
-                   if(nbmod(yk).gt.2) then 
-                      do k=2,nbmod(yk)-1
-                         bb = aa + b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+k)* &
-                              b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+k)
-                         if(ysim(maxmes*(yk-1)+j).gt.aa .and. ysim(maxmes*(yk-1)+j).le.bb) then
-                            ytemp = modalite(sumnbmod+k)
-                         end if
-                         aa = bb
-                      end do
-                   end if
-                   
-                   ymarg(maxmes*(yk-1)+j,1) = ymarg(maxmes*(yk-1)+j,1) + ytemp/dble(nsim)
-                   
+                   ytemp = modalite(sumnbmod + nbmod(yk)) - &
+                        alnorm((aa-ysim(maxmes*(yk-1)+j))/abs(b1(nef+nvc+nwg+ncor+yk)),.false.)
+                   Ymarg(maxmes*(yk-1)+j,1) = Ymarg(maxmes*(yk-1)+j,1) + ytemp / dble(nsim)
                 end do
+
+                if(nbmod(yk).gt.2) then
+                   do jj=2,nbmod(yk)-1
+                      aa = aa + b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+jj)**2
+                      do j=1,maxmes
+                         ytemp = (modalite(sumnbmod + jj) - modalite(sumnbmod + jj+1))* &
+                              alnorm((aa-ysim(maxmes*(yk-1)+j))/abs(b1(nef+nvc+nwg+ncor+yk)),.false.)
+                         Ymarg(maxmes*(yk-1)+j,1) = Ymarg(maxmes*(yk-1)+j,1) + ytemp / dble(nsim)                             
+                      end do
+                   end do
+                end if
                 
                 sumnbmod = sumnbmod + nbmod(yk)
                 
