@@ -26,8 +26,8 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
   double precision,dimension(nv,nv) ::Ut,Ut1
 
   double precision,dimension(:,:),allocatable::VC,Z,P,Corr,X00,X2,X01
-  double precision,dimension(:),allocatable::Vi,ysim,usim,mu,tcor
-  double precision,dimension(nv) :: b0,b2
+  double precision,dimension(:),allocatable::Vi,ysim,usim,mu,tcor,usim2
+  double precision,dimension(nv) :: b0,b2,uu
   double precision,dimension(nv*ny) :: b01 
   double precision :: eps,ytemp2,x22
   double precision ::ytemp,diff,SX,beta
@@ -48,7 +48,7 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
 
   allocate(ysim(maxmes*ny),usim(maxmes*ny),mu(maxmes*ny),tcor(maxmes),Vi(maxmes*ny*(maxmes*ny+1)/2), &
        VC(maxmes*ny,maxmes*ny),Z(maxmes*ny,nv),P(maxmes*ny,nv),Corr(maxmes*ny,maxmes*ny), &
-       X00(maxmes*ny,nv),X2(maxmes*ny,nv),X01(maxmes*ny,nv*ny))
+       X00(maxmes*ny,nv),X2(maxmes*ny,nv),X01(maxmes*ny,nv*ny), usim2(nv))
 
 !       print*,"apres allocate1"
   ! en prevision de l'extension au conjoint
@@ -230,13 +230,14 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
                   Corr(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) = b1(nef+nvc+nwg+ncor)*b1(nef+nvc+nwg+ncor)*&
                   exp(-b1(nef+nvc+nwg+1)*abs(tcor(j1)-tcor(j2)))
                end if
-               
-               if(nalea.eq.ny) Corr(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) = Corr(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) +&
-               b1(nef+nvc+nwg+ncor+ny+yk)**2 !variance de alpha_k
-              
-               if(j1.eq.j2) Corr(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) = Corr(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2)+&
-               b1(nef+nvc+nwg+ncor+yk) **2 ! variance de l'erreur
 
+               if(idlink(yk).ne.3) then
+                  if(nalea.eq.ny) Corr(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) = Corr(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) +&
+                       b1(nef+nvc+nwg+ncor+ny+yk)**2 !variance de alpha_k
+                  
+                  if(j1.eq.j2) Corr(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) = Corr(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2)+&
+                       b1(nef+nvc+nwg+ncor+yk) **2 ! variance de l'erreur
+               end if
             end do
          end do   
         end do   
@@ -244,8 +245,10 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
 
 !      print*,"Corr ok"
 
-! creation de P=Zi*Ut et V=P*P' que si non spec aux classes
+        ! creation de P=Zi*Ut et V=P*P' que si non spec aux classes
+           
 
+        if(all(idlink.ne.3)) then
   if (nwg.eq.0.OR.NG.EQ.1) then
      P=0.d0
      P=MATMUL(Z,Ut)
@@ -279,8 +282,7 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
         end do
      end if
   end if
-     
-
+end if
   ! contribution individuelle a la vraisemblance
 
   ! cas 1 : ng=1
@@ -338,13 +340,29 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
       do l=1,nsim
          
          if(any(idlink.ne.0)) then
+
+            if(all(idlink.eq.3)) then
+               
+              usim2=0.d0
+              ysim=0.d0
+              do m=1,nea
+                 SX=1.d0
+                 call bgos(SX,0,usim2(m),x22,0.d0)
+              end do
+              uu = 0.d0
+              uu = matmul(Ut,usim2)
+              ysim=matmul(X00,b0)+matmul(Z,uu)
+            else
+               
               usim=0.d0
               ysim=0.d0
               do m=1,maxmes*ny
                  SX=1.d0
                  call bgos(SX,0,usim(m),x22,0.d0)
               end do
-             ysim=mu+MATMUL(VC,usim)
+              ysim=mu+MATMUL(VC,usim)
+
+           end if
           end if
 
           sumntrtot=0
@@ -366,7 +384,7 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
                 aa = b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
                 do j=1,maxmes
                    ytemp = modalite(sumnbmod + nbmod(yk)) - &
-                        alnorm((aa-ysim(maxmes*(yk-1)+j))/abs(b1(nef+nvc+nwg+ncor+yk)),.false.)
+                        alnorm((aa-ysim(j))/abs(b1(nef+nvc+nwg+ncor+yk)),.false.)
                    Ymarg(maxmes*(yk-1)+j,1) = Ymarg(maxmes*(yk-1)+j,1) + ytemp / dble(nsim)
                 end do
 
@@ -375,7 +393,7 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
                       aa = aa + b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+jj)**2
                       do j=1,maxmes
                          ytemp = (modalite(sumnbmod + jj) - modalite(sumnbmod + jj+1))* &
-                              alnorm((aa-ysim(maxmes*(yk-1)+j))/abs(b1(nef+nvc+nwg+ncor+yk)),.false.)
+                              alnorm((aa-ysim(j))/abs(b1(nef+nvc+nwg+ncor+yk)),.false.)
                          Ymarg(maxmes*(yk-1)+j,1) = Ymarg(maxmes*(yk-1)+j,1) + ytemp / dble(nsim)                             
                       end do
                    end do
@@ -940,7 +958,7 @@ end do
 654 continue
 !        print*,"avant delocate"
   deallocate(zitr,splaa)
-  deallocate(Z,P,Corr,X00,X2,X01,ysim,usim,mu,tcor,VC,Vi)
+  deallocate(Z,P,Corr,X00,X2,X01,ysim,usim,mu,tcor,VC,Vi,usim2)
 
 
   return
