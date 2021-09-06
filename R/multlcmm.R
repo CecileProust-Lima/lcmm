@@ -1808,7 +1808,54 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     N[9] <- nobs0
 
     nom.X0[nom.X0=="(Intercept)"] <- "Intercept"
+    
+    ## levels = modalites des variables dans X0 (si facteurs)
+    levelsdata <- vector("list", length(ttesLesVar))
+    levelsfixed <- vector("list", length(ttesLesVar))
+    levelsrandom <- vector("list", length(ttesLesVar))
+    levelsmixture <- vector("list", length(ttesLesVar))
+    levelsclassmb <- vector("list", length(ttesLesVar))
+    names(levelsdata) <- ttesLesVar
+    names(levelsfixed) <- ttesLesVar
+    names(levelsrandom) <- ttesLesVar
+    names(levelsmixture) <- ttesLesVar
+    names(levelsclassmb) <- ttesLesVar
+    for(v in ttesLesVar)
+    {
+        if(v == "intercept") next
+        
+        if(is.factor(data[,v]))
+        {
+            levelsdata[[v]] <- levels(data[,v])
+        }
+                                        
+        if(length(grep(paste("factor\\(",v,"\\)",sep=""), fixed)))
+        {
+            levelsfixed[[v]] <- levels(as.factor(data[,v]))
+        }
 
+        if(length(grep(paste("factor\\(",v,"\\)",sep=""), random)))
+        {
+            levelsrandom[[v]] <- levels(as.factor(data[,v]))
+        }
+
+        if(length(grep(paste("factor\\(",v,"\\)",sep=""), mixture)))
+        {
+            levelsmixture[[v]] <- levels(as.factor(data[,v]))
+        }
+                                        
+        if(length(grep(paste("factor\\(",v,"\\)",sep=""), classmb)))
+        {
+            levelsclassmb[[v]] <- levels(as.factor(data[,v]))
+        }
+    }
+    
+    levels <- list(levelsdata=levelsdata,
+                   levelsfixed=levelsfixed,
+                   levelsrandom=levelsrandom,
+                   levelsmixture=levelsmixture,
+                   levelsclassmb=levelsclassmb)
+    
     cost <- proc.time()-ptm
     
     res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcontr0=idcontr0,
@@ -1817,7 +1864,8 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                predRE_Y=predRE_Y,Ynames=nomsY,Xnames=nom.X0,Xnames2=ttesLesVar,cholesky=Cholesky,
                estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,nbnodes=nbnodes,nbmod=nbmod,modalites=modalites,
                na.action=nayk,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,
-               wRandom=wRandom,b0Random=b0Random,CPUtime=cost[3],CorrEA=CorrEA)
+               wRandom=wRandom,b0Random=b0Random,CPUtime=cost[3],CorrEA=CorrEA,
+               levels=levels)
     
     names(res$best) <- names(b)
     class(res) <-c("multlcmm")
