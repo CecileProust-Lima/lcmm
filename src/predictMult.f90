@@ -351,7 +351,7 @@ end if
               end do
               uu = 0.d0
               uu = matmul(Ut,usim2)
-              ysim=matmul(X00,b0)+matmul(Z,uu)
+              ysim=matmul(X00,b0)+matmul(X01,b01)+matmul(Z,uu)
             else
                
               usim=0.d0
