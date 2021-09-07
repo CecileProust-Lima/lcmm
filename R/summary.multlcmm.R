@@ -229,7 +229,7 @@ summary.multlcmm <- function(object,...)
                             Vcontr <- matrix(0,ny-1,ny-1)
                             Vcontr[upper.tri(Vcontr,diag=TRUE)] <- x$V[indV]
                             Vcontr <- t(Vcontr)
-                            Vcontr[upper.tri(Vcontr)] <- Vcontr[lower.tri(Vcontr)]
+                            Vcontr[upper.tri(Vcontr,diag=TRUE)] <- x$V[indV]
                             
                             vect.gamma <- coef[(nef-ncontr+(i-1)*(ny-1)+1):(nef-ncontr+i*(ny-1))]
                             if(any(c((nef-ncontr+(i-1)*(ny-1)+1):(nef-ncontr+i*(ny-1))) %in% posfix))
