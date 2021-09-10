@@ -33,120 +33,7 @@ if(x$conv==1 | x$conv==2 | x$conv==3)
   }
   
   if(!(na.action%in%c(1,2)))stop("only 1 for 'na.omit' or 2 for 'na.fail' are required in na.action argument")
-  
 
-### a enlever 
-  ## ##pour les facteurs
-  ## ##donnees de l estimation
-  ## if(!is.null(x$data))
-  ## {
-  ##     olddata <- x$data
-  ## }
-  ## else
-  ##   {
-  ##       olddata <- eval(x$call$data)
-  ##   }
-  ## termes <- x$Xnames[-1]
-  
-  ## #cas ou une variable dans le dataset du modele est un facteur
-  ##  for(v in x$Xnames2[-1])
-  ##  {
-  ##   if (is.factor(olddata[,v]))
-  ##   {
-  ##    mod <- levels(olddata[,v])
-  ##    if (!(levels(as.factor(newdata[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-  ##    newdata[,v] <- factor(newdata[,v], levels=mod)
-  
-  ##    for(m in mod)
-  ##    {
-  ##     termes <- gsub(paste(v,m,sep=""),v,termes)
-  ##    }
-     
-  ##   }
-  ##  }
-  
-  ##  #cas ou on a factor() dans l'appel de la fonction
-  ##  dans_appel <- c(all.names(x$call$fixed),all.names(x$call$random),all.names(x$call$mixture),all.names(x$call$classmb))
-  ##  ind_factor <- which(dans_appel=="factor")
-  ##  if(length(ind_factor))
-  ##  {
-  ##   nom.factor <- dans_appel[ind_factor+1]
-  ##   for (v in nom.factor)
-  ##   {
-  ##    mod <- levels(as.factor(olddata[,v]))
-  ##    if (!all(levels(as.factor(newdata[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-  ##    newdata[,v] <- factor(newdata[,v], levels=mod)
-     
-  ##    factorv <- paste("factor(",v,")",sep="")
-  ##    for(m in mod)
-  ##    {
-  ##     termes <- gsub(paste(factorv,m,sep=""),v,termes,fixed=TRUE)  
-  ##    }
-  ##   }
-  ##  }
-
-  ## ## pour poly()
-  ## if(any(grep("poly",termes)))
-  ##     {
-  ##         split_termes <- strsplit(termes,split="")
-  ##         for(j in 1:length(split_termes))
-  ##             {
-  ##                 splitj <- split_termes[[j]]
-                  
-  ##                 if(paste(splitj[c(1:5,length(splitj)-1)],collapse="")=="poly()")
-  ##                     {
-  ##                         termes[j] <- paste(splitj[1:(length(splitj)-1)],collapse="")
-  ##                     }
-
-  ##             }
-              
-  ##     }
-  
-  
-  ## ## var.time
-  ## if(!missing( var.time))
-  ##     {
-  ##         if(!(var.time %in% colnames(newdata))) stop("'var.time' should be included in newdata")
-  ##         times <- newdata[,var.time,drop=FALSE]         
-  ##     }
-  ## else
-  ##     {
-  ##         times <- newdata[,1,drop=FALSE]
-  ##     }
-
-  
-  ## ### Traitement des donnees manquantes
-  ## newdata <- newdata[,x$Xnames2]
-  ## newdata <- as.data.frame(newdata)
-  ## colnames(newdata) <- x$Xnames2
-  
-  ## linesNA <- apply(newdata,2,function(v) which(is.na(v)))
-  ## linesNA <- unique(unlist(linesNA))
-  
-  ## if(length(linesNA) & na.action==2) stop("newdata contains missing values")
-  ## if(length(linesNA) & na.action==1)
-  ## {                                                                              
-  ##  newdata <- as.data.frame(newdata[-linesNA,])
-  ##  colnames(newdata) <- x$Xnames2
-  ##  times <- times[-linesNA,,drop=FALSE]
-  ## }
-  
- 
-  
-  ## ###matrice avec toutes les var et toutes les interactions
-  ## newdata1 <- model.matrix(as.formula(paste("~",paste(termes,collapse="+"))),data=newdata)
-  ##  #remettre les termes dans le bon ordre
-  ##  Xnames <- x$Xnames[-1]
-  ##  z <- grep("factor\\(",Xnames) 
-  ##  if (length(z))
-  ##  {
-  ##   Xnames <- gsub("factor\\(","",Xnames)
-  ##   Xnames[z] <- gsub("\\)","",Xnames[z])
-  ##  }
-  ##  newdata1 <- newdata1[,c("(Intercept)",Xnames),drop=FALSE]
-### fin a enlever
-
-### gestion comme dans master-predictY.hlme  
     call_fixed <- x$call$fixed[3]
     if(is.null(x$call$random)) {call_random <- -1} else call_random <- x$call$random[2]
     if(is.null(x$call$classmb)) {call_classmb <- -1} else call_classmb <- x$call$classmb[2]
@@ -387,10 +274,6 @@ if(x$conv==1 | x$conv==2 | x$conv==3)
       }
   }
 
-
-### fin faire comme master-predictY.hlme
-  
-  #newdata1 <- model.matrix(as.formula(paste("~",paste(x$Xnames[-1],collapse="+"))),data=newdata)
   
   #arguments pour predictMult
    maxmes <- dim(newdata1)[1]

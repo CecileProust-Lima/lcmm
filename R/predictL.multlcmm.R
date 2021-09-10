@@ -17,128 +17,242 @@ predictL.multlcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE,...)
  { 
   if(!(na.action%in%c(1,2)))stop("only 1 for 'na.omit' or 2 for 'na.fail' are required in na.action argument")
 
-    ##pour les facteurs
-    ##donnees de l estimation
-    if(!is.null(x$data))
-    {
-        olddata <- x$data
-    }
-    else
-    {
-        olddata <- eval(x$call$data)
-    }
-  termes <- x$Xnames[-1]
+    call_fixed <- x$call$fixed[3]
+    if(is.null(x$call$random)) {call_random <- -1} else call_random <- x$call$random[2]
+    if(is.null(x$call$classmb)) {call_classmb <- -1} else call_classmb <- x$call$classmb[2]
+  if(is.null(x$call$mixture)) {call_mixture <- -1} else call_mixture <- x$call$mixture[2]
+    
+  if(!(na.action%in%c(1,2)))stop("only 1 for 'na.omit' or 2 for 'na.fail' are required in na.action argument") 
   
-   #cas ou une variable dans le dataset du modele est un facteur
-   for(v in x$Xnames2[-1])
-   {                                                          
-    if (is.factor(olddata[,v]))
-    {
-     mod <- levels(olddata[,v])
-     if (!(levels(as.factor(newdata[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-     newdata[,v] <- factor(newdata[,v], levels=mod)
-  
-     for(m in mod)
-     {
-      termes <- gsub(paste(v,m,sep=""),v,termes)
-     }
-     
-    }
-   }
-  
-   #cas ou on a factor() dans l'appel de la fonction
-   dans_appel <- c(all.names(x$call$fixed),all.names(x$call$random),all.names(x$call$mixture),all.names(x$call$classmb))
-   ind_factor <- which(dans_appel=="factor")
-   if(length(ind_factor))
-   {
-    nom.factor <- dans_appel[ind_factor+1]
-    for (v in nom.factor)
-    {
-     mod <- levels(as.factor(olddata[,v]))
-     if (!all(levels(as.factor(newdata[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-     newdata[,v] <- factor(newdata[,v], levels=mod)
-     
-     factorv <- paste("factor(",v,")",sep="")
-     for(m in mod)
-     {
-      termes <- gsub(paste(factorv,m,sep=""),v,termes,fixed=TRUE)
-     }
-    }
-   }
+  if(na.action==1){
+      na.action=na.omit
+  }else{
+      na.action=na.fail
+  }
 
-
-
-  ## pour poly()
-  if(any(grep("poly",termes)))
-      {
-          split_termes <- strsplit(termes,split="")
-          for(j in 1:length(split_termes))
-              {
-                  splitj <- split_termes[[j]]
-                  
-                  if(paste(splitj[c(1:5,length(splitj)-1)],collapse="")=="poly()")
-                      {
-                          termes[j] <- paste(splitj[1:(length(splitj)-1)],collapse="")
-                      }
-
-              }
-              
-      }
-
-
-  
-  ## var.time
-  if(!missing( var.time))
-      {
-          if(!(var.time %in% colnames(newdata))) stop("'var.time' should be included in newdata")
-          times <- newdata[,var.time,drop=FALSE]         
-      }
-  else
-      {
-          times <- newdata[,1,drop=FALSE]
-      }
- 
-  ### Traitement des donnees manquantes
-  newdata <- newdata[,x$Xnames2]
-  newdata <- as.data.frame(newdata)
-  colnames(newdata) <- x$Xnames2
-  
-  linesNA <- apply(newdata,2,function(v) which(is.na(v)))
-  linesNA <- unique(unlist(linesNA))
-  
-  if(length(linesNA) & na.action==2) stop("newdata contains missing values")
-  if(length(linesNA) & na.action==1) 
+  ## transform to factor is the variable appears in levels$levelsdata
+  for(v in colnames(newdata))
   {
-   newdata <- as.data.frame(newdata[-linesNA,])
-   colnames(newdata) <- x$Xnames2
-   times <- times[-linesNA]
+      if(v %in% names(x$levels$levelsdata))
+      {
+          if(!is.null(x$levels$levelsdata[[v]]))
+          {
+              newdata[,v] <- factor(newdata[,v], levels=x$levels$levelsdata[[v]])
+          }
+      }
+  }
+  
+  call_fixed <- gsub("factor","",call_fixed)
+  call_fixed <- gsub("contrast","",call_fixed)
+  call_random <- gsub("factor","",call_random)
+  call_classmb <- gsub("factor","",call_classmb)
+  call_mixture <- gsub("factor","",call_mixture) 
+  
+  call_mixture <- formula(paste("~",call_mixture,sep=""))
+  call_random <- formula(paste("~",call_random,sep=""))
+  call_classmb <- formula(paste("~",call_classmb,sep=""))
+
+  ## Traitement des donnees manquantes
+
+  mcall <- match.call()[c(1,match(c("data","subset","na.action"),names(match.call()),0))]
+  mcall$na.action <- na.action
+  mcall$data <- newdata
+
+  ## fixed
+  m <- mcall
+  m$formula <- formula(paste("~",call_fixed,sep=""))
+  m[[1]] <- as.name("model.frame")	
+  m <- eval(m, sys.parent()) 
+  na.fixed <- attr(m,"na.action")
+  ## mixture
+  na.mixture <- NULL
+  if(call_mixture != -1)
+  {
+      m <- mcall
+      m$formula <- call_mixture
+      m[[1]] <- as.name("model.frame")	
+      m <- eval(m, sys.parent()) 
+      na.mixture <- attr(m,"na.action")
+  }
+  ## random
+  na.random <- NULL
+  if(call_random != -1)
+  {
+      m <- mcall
+      m$formula <- call_random
+      m[[1]] <- as.name("model.frame")	
+      m <- eval(m, sys.parent()) 
+      na.random <- attr(m,"na.action")
+  }
+  ## classmb
+  na.classmb <- NULL
+  if(call_classmb != -1)
+  {
+      m <- mcall
+      m$formula <- call_classmb
+      m[[1]] <- as.name("model.frame")	
+      m <- eval(m, sys.parent()) 
+      na.classmb <- attr(m,"na.action")
+  }
+  ## cor
+  na.cor <- NULL
+  if(x$N[7]>0)
+  {
+      z <- which(x$idcor0==1)
+      var.cor <- newdata[,x$Xnames[z]]
+      na.cor <- which(is.na(var.cor))
+  }
+
+  ##var.time
+  if(!missing( var.time))
+  {
+      if(!(var.time %in% colnames(newdata))) stop("'var.time' should be included in newdata")
+      times <- newdata[,var.time,drop=FALSE]
+      
+  }
+  else
+    {
+        times <- newdata[,1,drop=FALSE]
+    }
+  
+  ## Table sans donnees manquante: newdata
+  na.action <- unique(c(na.fixed,na.mixture,na.random,na.classmb,na.cor))
+  
+  if(length(na.action)){
+      newdata1 <- newdata[-na.action,]
+      times <- times[-na.action,,drop=FALSE]
+  } else {
+      newdata1 <- newdata
   }
   
 
+  ## create one data frame for each formula (useful with factors)
+  newdata1fixed <- newdata1
+  for(v in colnames(newdata1fixed))
+  {
+      if(v %in% names(x$levels$levelsfixed))
+      {
+          if(!is.null(x$levels$levelsfixed[[v]]))
+          {
+              newdata1fixed[,v] <- factor(newdata1fixed[,v], levels=x$levels$levelsfixed[[v]])
+              if(any(is.na(newdata1fixed[,v]))) stop(paste("Wrong factor level in variable",v))
+          }
+      }
+  }
+  newdata1mixture <- newdata1
+  for(v in colnames(newdata1mixture))
+  {
+      if(v %in% names(x$levels$levelsmixture))
+      {
+          if(!is.null(x$levels$levelsmixture[[v]]))
+          {
+              newdata1mixture[,v] <- factor(newdata1mixture[,v], levels=x$levels$levelsmixture[[v]])
+              if(any(is.na(newdata1mixture[,v]))) stop(paste("Wrong factor level in variable",v))
+          }
+      }
+  }
+  newdata1random <- newdata1
+  for(v in colnames(newdata1random))
+  {
+      if(v %in% names(x$levels$levelsrandom))
+      {
+          if(!is.null(x$levels$levelsrandom[[v]]))
+          {
+              newdata1random[,v] <- factor(newdata1random[,v], levels=x$levels$levelsrandom[[v]])
+              if(any(is.na(newdata1random[,v]))) stop(paste("Wrong factor level in variable",v))
+          }
+      }
+  }
+  newdata1classmb <- newdata1
+  for(v in colnames(newdata1classmb))
+  {
+      if(v %in% names(x$levels$levelsclassmb))
+      {
+          if(!is.null(x$levels$levelsclassmb[[v]]))
+          {
+              newdata1classmb[,v] <- factor(newdata1classmb[,v], levels=x$levels$levelsclassmb[[v]])
+              if(any(is.na(newdata1classmb[,v]))) stop(paste("Wrong factor level in variable",v))
+          }
+      }
+  }
   
+
+  ## Construction de nouvelles var eplicatives sur la nouvelle table
+  X_fixed <- X_mixture <- X_random <- X_classmb <- NULL
+  ## fixed
+  X_fixed <- model.matrix(formula(paste("~",call_fixed,sep="")),data=newdata1fixed)
+  if(colnames(X_fixed)[1]=="(Intercept)"){
+      colnames(X_fixed)[1] <- "intercept"
+  }
+  ## mixture
+  if(call_mixture != ~-1){
+      X_mixture <- model.matrix(call_mixture,data=newdata1mixture)	
+      if(colnames(X_mixture)[1]=="(Intercept)"){
+          colnames(X_mixture)[1] <- "intercept"
+      }
+  }            
+  ## random
+  if(call_random != ~-1){
+      X_random <- model.matrix(call_random,data=newdata1random)	
+      if(colnames(X_random)[1]=="(Intercept)"){
+          colnames(X_random)[1] <- "intercept"
+      }
+  }	
+  ## classmb
+  if(call_classmb != ~-1){ 
+      X_classmb <- model.matrix(call_classmb,data=newdata1classmb)
+      colnames(X_classmb)[1] <- "intercept"
+  }
   
-  ###matrice avec toutes les var et toutes les interactions
-  newdata1 <- model.matrix(as.formula(paste("~",paste(termes,collapse="+"))),data=newdata)
-  #remettre les termes dans le bon ordre
-   Xnames <- x$Xnames[-1]
-   z <- grep("factor\\(",Xnames) 
-   if (length(z))
-   {
-    #Xnames <- gsub("factor\\(","",Xnames)
-    #Xnames[z] <- gsub("\\)","",Xnames[z])
+  ##cor
+  if(x$N[7]>0)  #on reprend la variable de temps de cor (sans NA)
+  {
+      z <- which(x$idcor0==1)
+      var.cor <- newdata1[,x$Xnames[z]]
+  }
+  
+  ## pour mettre les var dans le bon ordre
+  newdata1 <- X_fixed
+  colX <- colnames(X_fixed)
+  
+  if(!is.null(X_mixture)){
+      for(i in 1:length(colnames(X_mixture))){
+          if((colnames(X_mixture)[i] %in% colnames(newdata1))==FALSE){
+              newdata1 <- cbind(newdata1,X_mixture[,i])
+              colnames(newdata1) <- c(colX,colnames(X_mixture)[i])
+              colX <- colnames(newdata1)
+          }
+      }
+  }
+  if(!is.null(X_random)){
+      for(i in 1:length(colnames(X_random))){
+          if((colnames(X_random)[i] %in% colnames(newdata1))==FALSE){
+              newdata1 <- cbind(newdata1,X_random[,i])
+              colnames(newdata1) <- c(colX,colnames(X_random)[i])
+              colX <- colnames(newdata1)
+          }	 
+      }
+  }
+  if(!is.null(X_classmb)){
+      for(i in 1:length(colnames(X_classmb))){
+          if((colnames(X_classmb)[i] %in% colnames(newdata1))==FALSE){
+              newdata1 <- cbind(newdata1,X_classmb[,i])
+              colnames(newdata1) <- c(colX,colnames(X_classmb)[i])
+              colX <- colnames(newdata1)
+          }	
+      }
+  }
+  if(x$N[7]>0)
+  { 
+      if( x$idg0[z]==0 & x$idea0[z]==0 & x$idprob0[z]==0)
+      {
+          newdata1 <- cbind(newdata1,var.cor)
+          colnames(newdata1) <- c(colX,x$Xnames[z])
+          colX <- colnames(newdata1)
+      }
+  }
 
-    for(k in z)
-    {
-        q <- strsplit(Xnames[k],split="factor\\(")[[1]]
-        charq <- strsplit(q[-1],split="")
-        parenth <- sapply(charq,function(x){which(x==")")[1]})
-        newcharq <- lapply(1:length(charq),function(x){ charq[[x]][-parenth[x]] })
-        newq <- sapply(newcharq,paste,collapse="")
-        Xnames[k] <- paste(q[1],newq,sep="")
-    }
-   }
 
-   newdata1 <- newdata1[,c("(Intercept)",Xnames),drop=FALSE]
   
   ###calcul des predictions
      
