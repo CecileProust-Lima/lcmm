@@ -16,17 +16,11 @@ if(any(x$linktype==3))
      if(methInteg==0) stop("predictions for ordinal outcomes are only available with MC method. Please use methInteg=1 and set nsim argument.")
      if(any(x$linktype!=3)) stop("predictions for mixed outcomes (ordinal and continuous) are not available yet.")
      if(any(x$idcor>0)) stop("predictions with BM or AR correlations are not available yet.")
-##     if(any(x$idcontr>0)) stop("predictions with constrasts are not available yet.")
 }
 
 if(x$conv==1 | x$conv==2 | x$conv==3) 
 {
-  if(x$conv==2 & draws==TRUE)
-  {
-   cat("No confidence interval will be provided since the program did not converge properly \n")
-   draws <- FALSE
-  }
-  if(x$conv==3 & draws==TRUE)
+  if(x$conv>1 & draws==TRUE)
   {
    cat("No confidence interval will be provided since the program did not converge properly \n")
    draws <- FALSE

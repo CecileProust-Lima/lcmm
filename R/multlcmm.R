@@ -887,7 +887,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     predRE <- rep(0,ns0*nea0)
 
     ## parametres MC
-    nMC <- ifelse(all(idlink0 != 3), 0, 1000)
+    if(is.null(nMC)) nMC <- ifelse(all(idlink0 != 3), 0, 1000)
     methInteg <- switch(methInteg,"MCO"=1,"MCA"=2,"QMC"=3)
     seqMC <- 0
     dimMC <- 0
@@ -1791,6 +1791,31 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 ###estimlink
     ysim <- matrix(out$marker,nsim,ny0)
     transfo <- matrix(out$transfY,nsim,ny0)
+    if(any(idlink0==3))
+    {
+        sumntr <- 0
+        for(k in 1:ny0)
+        {
+            if(idlink0[k]==3)
+            {               
+                seuils <- out$best[nef+nvc+nw+ncor0+ny0+nalea0+sumntr+1:ntrtot0[k]]
+                if(ntrtot0[k]>1) seuils <- c(seuils[1], seuils[1] + cumsum(seuils[-1]^2))
+
+                Lmin <- min(seuils[1], min(transfo[1,]))
+                Lmax <- max(seuils[length(seuils)], max(transfo[nsim,]))
+               
+                ysim_k <- rep(modalites[[k]], each=2)
+                transfo_k <- c(-2*abs(seuils[1]), rep(seuils, each=2), 2*abs(seuils[length(seuils)]))
+
+                n <- min(nsim, length(ysim_k))
+                ysim[,k] <- max(modalites[[k]])
+                ysim[1:n,k] <- rep(ysim_k, lentgh.out=n)                
+                transfo[,k] <- Lmax
+                transfo[1:n,k] <- rep(transfo_k, lentgh.out=n)
+            }
+            sumntr <- sumntr + ntrtot0[k]
+        }
+    }
     estimlink <- as.vector(rbind(ysim,transfo))
     estimlink <- matrix(estimlink,nsim,2*ny0)
     colnames(estimlink) <- paste(c("","transf"),rep(nomsY, each=2),sep="")

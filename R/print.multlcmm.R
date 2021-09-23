@@ -20,7 +20,7 @@ print.multlcmm <- function(x,...){
     posfix <- eval(cl$posfix)
 
     cat("Statistical Model:", "\n")
-    cat(paste("     Dataset:", x$call$data),"\n")
+    cat(paste("     Dataset:", as.expression(x$call$data)),"\n")
     cat(paste("     Number of subjects:", x$ns),"\n")
 
     cat(paste("     Number of observations:", x$N[9]),"\n")
@@ -37,7 +37,7 @@ print.multlcmm <- function(x,...){
         if (x$linktype[yk]==0) {
             ntrtot[yk] <- 2
             if (yk>1) cat("                     ")
-            cat("linear for",x$Ynames[yk]," \n")
+            cat("Linear for",x$Ynames[yk]," \n")
         }
         if (x$linktype[yk]==1)
         {
