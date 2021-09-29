@@ -105,11 +105,16 @@ plot.predictlink <- function(x,legend.loc="topleft",legend,add=FALSE,shades=FALS
                                 
                                 rgbcols <- sapply(dots$col,col2rgb)/255
                                 cols <- apply(rgbcols,2,function(x) rgb(x[1],x[2],x[3],alpha=0.15))
-
+                                
+                                nbnodes <- rep(2,ny)
+                                nbnodes[which(x$object$linktype==2)] <- x$object$nbnodes
+                                
                                 n <- 0
                                 for(k in 1:ny)
-                                    {
-                                        yy <- (np-1)/(nsim-1)*(c(1:nsim)-1)+1
+                                {
+                                    linknodes <- x$object$linknodes[1:nbnodes[k],k]
+                                    ygrad <- (nsim*(c(x$pred[n+1:nsim,2])-min(linknodes))-c(x$pred[n+1:nsim,2])+max(linknodes))/(max(linknodes)-min(linknodes))
+                                        yy <- (np-1)/(nsim-1)*(c(ygrad)-1)+1
                                         polygon(x=c(x$pred[n+1:nsim,4],x$pred[n+nsim:1,5]),y=c(yy,rev(yy)),col=cols[k],border=NA)
                                         n <- n+nsim
                                     }

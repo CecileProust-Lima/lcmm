@@ -4,7 +4,7 @@ predictlink.multlcmm <- function(x,ndraws=2000,Yvalues,...)
     ## verification des arguments
     if(missing(x)) stop("The model should be specified.")
     if(!(inherits(x,"multlcmm"))) stop("To use only with \"multlcmm\" objects")
-    #if(!missing(Yvalues) & x$linktype==3) warning("With thresholds links, no \"Yvalues\" should be specified. Default values will be used. \n")
+    if(!missing(Yvalues) & all(x$linktype==3)) warning("With thresholds links, no \"Yvalues\" should be specified. Default values will be used. \n")
     if(x$conv!=1 & ndraws!=0) stop("No confidence intervals can be produced since the program did not converge properly")
 
 
@@ -18,7 +18,8 @@ predictlink.multlcmm <- function(x,ndraws=2000,Yvalues,...)
                     Yvalues <- as.vector(x$estimlink[,2*1:ny-1])
                 }
             else
-                {
+            {
+                if(!is.matrix(Yvalues)) stop("Yvalues should be a matrix")
                     new.transf <- TRUE
                     na.fail(Yvalues)
                     Yvalues <- apply(Yvalues,2,sort)
@@ -26,6 +27,25 @@ predictlink.multlcmm <- function(x,ndraws=2000,Yvalues,...)
                         {
                             Yvalues <- matrix(Yvalues,ncol=ny)
                         }
+
+                    ## en ordinal, remplacer Yvalues par les modalites
+                    nsim <- nrow(Yvalues)
+                    nmax <- max(2*sapply(x$modalites, length), nsim)
+                    Yvalues2 <- matrix(NA, nrow=nmax, ncol=ny)
+                    for(yk in 1:ny)
+                    {
+                        if(x$linktype[yk] == 3)
+                        {
+                            Yvalues2[1:(2*length(x$modalites[[yk]])), yk] <- rep(x$modalites[[yk]], each=2)
+                            if(2*length(x$modalites[[yk]]) < nmax) Yvalues2[(2*length(x$modalites[[yk]])+1):nmax, yk] <- Yvalues2[2*length(x$modalites[[yk]]), yk]
+                        }
+                        else
+                        {
+                            Yvalues2[1:nsim,yk] <- Yvalues[1:nsim,yk]
+                            if(nsim < nmax) Yvalues2[(nsim+1):nmax,yk] <- Yvalues2[nsim,yk]
+                        }
+                    }
+                    Yvalues <- Yvalues2
                     
                     ##controler si minY<Yvalues<maxY
                     for(yk in 1:ny)
@@ -45,9 +65,13 @@ predictlink.multlcmm <- function(x,ndraws=2000,Yvalues,...)
                     if(x$idiag==0) best[x$N[3]+1:x$N[4]] <- x$cholesky[-1]
                     else best[x$N[3]+1:x$N[4]] <- x$cholesky[c((1:(x$N[4]+1)*2:(x$N[4]+2))/2)[-1]]
                 }
+
+            minY <- x$estimlink[1,2*1:ny-1]
+            maxY <- x$estimlink[nrow(x$estimlink),2*1:ny-1]
             
             ntrtot <- rep(NA,x$N[8])
             numSPL <- 0
+            dimide <- rep(1,ny)
             for (yk in 1:x$N[8])
                 {
                     if (x$linktype[yk]==0)
@@ -63,6 +87,13 @@ predictlink.multlcmm <- function(x,ndraws=2000,Yvalues,...)
                             numSPL <-  numSPL+1
                             ntrtot[yk] <- x$nbnodes[numSPL]+2
                         }
+                    if (x$linktype[yk]==3)
+                        {
+                            ntrtot[yk] <- x$nbmod[yk]-1
+                            minY[yk] <- 1
+                            maxY[yk] <- x$nbmod[yk]
+                            dimide[yk] <- x$nbmod[yk]-1
+                        }
                 }
             
             imoins <- sum(x$N[3:8])
@@ -71,13 +102,10 @@ predictlink.multlcmm <- function(x,ndraws=2000,Yvalues,...)
             nbzitr[which(x$linktype==2)] <- x$nbnodes
             maxnbzitr <- max(nbzitr)
             epsY <- x$epsY
-            minY <- x$estimlink[1,2*1:ny-1]
-            maxY <- x$estimlink[nrow(x$estimlink),2*1:ny-1]
             
             nsim <- length(Yvalues)/ny
             
-            ide <- matrix(0,nrow=1,ncol=ny) #pas encore de threshold link
-            dimide <- rep(1,ny)
+            ide <- matrix(1,nrow=max(dimide),ncol=ny) 
             
             ndraws <- as.integer(ndraws)
 

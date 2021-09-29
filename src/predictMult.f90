@@ -25,11 +25,12 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
 !  double precision,dimension(ng) :: pi
   double precision,dimension(nv,nv) ::Ut,Ut1
 
-  double precision,dimension(:,:),allocatable::VC,Z,P,Corr,X00,X2,X01
-  double precision,dimension(:),allocatable::Vi,ysim,usim,mu,tcor,usim2
+  double precision,dimension(:,:),allocatable::VC,Z,P,Corr,X00,X2,X01,Sigma
+  double precision,dimension(:),allocatable::Vi,ysim,usim,mu,tcor,usim2,asim,wsim
+  double precision,dimension(maxmes*ny)::wi
   double precision,dimension(nv) :: b0,b2,uu
   double precision,dimension(nv*ny) :: b01 
-  double precision :: eps,ytemp2,x22
+  double precision :: eps,ytemp2,x22,ai
   double precision ::ytemp,diff,SX,beta
   double precision::aa1,bb1,dd1,aa,bb,cc1
   double precision,dimension(:),allocatable::zitr,splaa
@@ -48,7 +49,8 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
 
   allocate(ysim(maxmes*ny),usim(maxmes*ny),mu(maxmes*ny),tcor(maxmes),Vi(maxmes*ny*(maxmes*ny+1)/2), &
        VC(maxmes*ny,maxmes*ny),Z(maxmes*ny,nv),P(maxmes*ny,nv),Corr(maxmes*ny,maxmes*ny), &
-       X00(maxmes*ny,nv),X2(maxmes*ny,nv),X01(maxmes*ny,nv*ny), usim2(nv))
+       X00(maxmes*ny,nv),X2(maxmes*ny,nv),X01(maxmes*ny,nv*ny), usim2(nv), Sigma(maxmes,maxmes), &
+       asim(ny), wsim(maxmes*ny))
 
 !       print*,"apres allocate1"
   ! en prevision de l'extension au conjoint
@@ -231,7 +233,7 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
                   exp(-b1(nef+nvc+nwg+1)*abs(tcor(j1)-tcor(j2)))
                end if
 
-               if(idlink(yk).ne.3) then
+               if(all(idlink.ne.3)) then
                   if(nalea.eq.ny) Corr(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) = Corr(maxmes*(yk-1)+j1,maxmes*(yk-1)+j2) +&
                        b1(nef+nvc+nwg+ncor+ny+yk)**2 !variance de alpha_k
                   
@@ -239,8 +241,8 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
                        b1(nef+nvc+nwg+ncor+yk) **2 ! variance de l'erreur
                end if
             end do
-         end do   
-        end do   
+         end do
+      end do
 
 
 !      print*,"Corr ok"
@@ -248,42 +250,87 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
         ! creation de P=Zi*Ut et V=P*P' que si non spec aux classes
            
 
-        if(all(idlink.ne.3)) then
-  if (nwg.eq.0.OR.NG.EQ.1) then
-     P=0.d0
-     P=MATMUL(Z,Ut)
-     VC=0.d0
-     VC=MATMUL(P,transpose(P))+Corr
-!       print*,"VC ok"
-     ! Vi en vecteur
+      if(all(idlink.ne.3)) then
+         
+         if (nwg.eq.0.OR.NG.EQ.1) then
+            P=0.d0
+            P=MATMUL(Z,Ut)
+            VC=0.d0
+            VC=MATMUL(P,transpose(P))+Corr
+            !       print*,"VC ok"
+            ! Vi en vecteur
+            
+            jj=0
+            Vi=0.d0
+            do j=1,maxmes*ny
+               do k=j,maxmes*ny
+                  jj=j+k*(k-1)/2
+                  Vi(jj)=VC(j,k)
+               end do
+            end do
+            
+            if (methInteg.eq.1) then 
+               CALL DMFSD(Vi,maxmes*ny,EPS,IER)
+               if (ier.eq.-1) then
+                  ymarg=9999.d0
+                  !           if (verbose==1) print*,"pb cholesky"
+                  goto 654
+               end if
+               
+               VC=0.d0
+               do j=1,maxmes*ny
+                  do k=1,j
+                     VC(j,k)=Vi(k+j*(j-1)/2)
+                  end do
+               end do
+            end if
+         end if
 
-     jj=0
-     Vi=0.d0
-     do j=1,maxmes*ny
-        do k=j,maxmes*ny
-           jj=j+k*(k-1)/2
-           Vi(jj)=VC(j,k)
-        end do
-     end do
+      else
 
-     if (methInteg.eq.1) then 
-        CALL DMFSD(Vi,maxmes*ny,EPS,IER)
-        if (ier.eq.-1) then
-           ymarg=9999.d0
-!           if (verbose==1) print*,"pb cholesky"
-           goto 654
-        end if
-        
-        VC=0.d0
-        do j=1,maxmes*ny
-           do k=1,j
-              VC(j,k)=Vi(k+j*(j-1)/2)
-           end do
-        end do
-     end if
-  end if
-end if
-  ! contribution individuelle a la vraisemblance
+         if(any(idlink.eq.3)) then
+
+            VC=0.d0
+            do yk=1,ny
+               
+               Sigma=0.d0
+               do j1=1,maxmes
+                  do j2=1,maxmes 
+                     if(nalea.eq.ny) Sigma(j1,j2) = b1(nef+nvc+nwg+ncor+ny+yk)**2 !variance de alpha_k
+                     
+                     if(j1.eq.j2) Sigma(j1,j2) = Sigma(j1,j2)+&
+                          b1(nef+nvc+nwg+ncor+yk) **2 ! variance de l'erreur
+                  end do
+               end do
+               
+               jj=0
+               Vi=0.d0
+               do j=1,maxmes
+                  do k=j,maxmes
+                     jj=j+k*(k-1)/2
+                     Vi(jj)=Sigma(j,k)
+                  end do
+               end do
+               
+               CALL DMFSD(Vi,maxmes,EPS,IER)
+               if (ier.eq.-1) then
+                  ymarg=9999.d0
+                  goto 654
+               end if
+               
+               VC=0.d0
+               do j=1,maxmes
+                  do k=1,j
+                     VC((yk-1)*maxmes+j,(yk-1)*maxmes+k)=Vi(k+j*(j-1)/2)
+                  end do
+               end do
+               
+            end do
+            
+         end if
+         
+      end if
+      
 
   ! cas 1 : ng=1
 
@@ -335,23 +382,38 @@ end if
 !        print*,"mu ok"
 !    if (verbose==1) print*,"mu=",mu
     
-    if(methInteg.eq.1) then !MC
-!         print*,"debut MC"
-      do l=1,nsim
-         
-         if(any(idlink.ne.0)) then
+     if(methInteg.eq.1) then !MC
+        !         print*,"debut MC"
+        do l=1,nsim
+           
+           if(any(idlink.ne.0)) then
+              
+              if(any(idlink.eq.3)) then
 
-            if(all(idlink.eq.3)) then
-               
-              usim2=0.d0
-              ysim=0.d0
-              do m=1,nea
-                 SX=1.d0
-                 call bgos(SX,0,usim2(m),x22,0.d0)
-              end do
-              uu = 0.d0
-              uu = matmul(Ut,usim2)
-              ysim=matmul(X00,b0)+matmul(X01,b01)+matmul(Z,uu)
+                 !! simuler les effets aleatoires
+                 usim2=0.d0
+                 ysim=0.d0
+                 do m=1,nea
+                    SX=1.d0
+                    call bgos(SX,0,usim2(m),x22,0.d0)
+                 end do
+                 uu = 0.d0
+                 uu = matmul(Ut,usim2)
+                 ysim=matmul(X00,b0)+matmul(X01,b01)+matmul(Z,uu)
+
+                 !! simuler le BM ou AR
+                 if(ncor.gt.0) then
+                    wsim=0.d0
+                    x22=0.d0
+                    SX=1.d0
+                    do j=1,maxmes*ny
+                       call bgos(SX,0,wsim(j),x22,0.d0)
+                    end do
+                    wi=0.d0
+                    wi=matmul(Corr,wsim)
+                    ysim = ysim + wi
+                 end if
+                 
             else
                
               usim=0.d0
@@ -368,6 +430,7 @@ end if
           sumntrtot=0
           sumnbmod = 0
           do yk=1,ny
+             
              !          print*,"boucle sur idlink, yk=",yk, "nsim=",l
              if (idlink(yk).eq.0 .and. l.eq.1) then  ! Linear link
                 
@@ -380,11 +443,19 @@ end if
                 !sumntrtot = sumntrtot +ntrtot(yk) 
                 
              else if (idlink(yk).eq.3) then
-                   
+
+                 !! simuler l'EA specifique au test
+                 ai=0.d0
+                 if(nalea.gt.0) then
+                    call bgos(SX,0,asim(yk),x22,0.d0)
+                    ai = b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+yk)*asim(yk)
+                 end if
+                 
                 aa = b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
                 do j=1,maxmes
+                   if(nalea.gt.0) ysim((yk-1)*maxmes+j) = ysim((yk-1)*maxmes+j)+ai
                    ytemp = modalite(sumnbmod + nbmod(yk)) - &
-                        alnorm((aa-ysim(j))/abs(b1(nef+nvc+nwg+ncor+yk)),.false.)
+                        alnorm((aa-ysim((yk-1)*maxmes+j))/abs(b1(nef+nvc+nwg+ncor+yk)),.false.)
                    Ymarg(maxmes*(yk-1)+j,1) = Ymarg(maxmes*(yk-1)+j,1) + ytemp / dble(nsim)
                 end do
 
@@ -393,7 +464,7 @@ end if
                       aa = aa + b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+jj)**2
                       do j=1,maxmes
                          ytemp = (modalite(sumnbmod + jj) - modalite(sumnbmod + jj+1))* &
-                              alnorm((aa-ysim(j))/abs(b1(nef+nvc+nwg+ncor+yk)),.false.)
+                              alnorm((aa-ysim((yk-1)*maxmes+j))/abs(b1(nef+nvc+nwg+ncor+yk)),.false.)
                          Ymarg(maxmes*(yk-1)+j,1) = Ymarg(maxmes*(yk-1)+j,1) + ytemp / dble(nsim)                             
                       end do
                    end do
@@ -416,7 +487,30 @@ end if
                 aa=aa1*aa1*(1-aa1)/bb1-aa1
                 bb=aa*(1-aa1)/aa1
                 beta=beta_ln(aa,bb)
-                
+
+                !! simuler une N(0,Sigma)
+                if(any(idlink.eq.3)) then
+                   usim=0.d0
+                   do m=1,maxmes
+                      SX=1.d0
+                      call bgos(SX,0,usim(m),x22,0.d0)
+                   end do
+
+                   Sigma=0.d0
+                   do j1=1,maxmes
+                      do j2=1,j1
+                         Sigma(j1,j2) = VC((yk-1)*maxmes+j1,(yk-1)*maxmes+j2)
+                      end do
+                   end do
+
+                   Vi=0.d0
+                   Vi = matmul(Sigma,usim)
+                   
+                   do j=1,maxmes
+                      ysim(maxmes*(yk-1)+j) = ysim(maxmes*(yk-1)+j) + Vi(j)
+                   end do
+                end if
+                   
                 
                 do j=1,maxmes
                    ytemp=ysim(maxmes*(yk-1)+j)*dd1+cc1
@@ -451,6 +545,29 @@ end if
                  splaa(kk-3)=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)**2
               end do
               
+              !! simuler une N(0,Sigma)
+              if(any(idlink.eq.3)) then
+                 usim=0.d0
+                 do m=1,maxmes
+                    SX=1.d0
+                    call bgos(SX,0,usim(m),x22,0.d0)
+                 end do
+                   
+                 Sigma=0.d0
+                 do j1=1,maxmes
+                    do j2=1,j1
+                       Sigma(j1,j2) = VC((yk-1)*maxmes+j1,(yk-1)*maxmes+j2)
+                    end do
+                 end do
+
+                 Vi=0.d0
+                 Vi = matmul(Sigma,usim)
+                 
+                 do j=1,maxmes
+                    ysim(maxmes*(yk-1)+j) = ysim(maxmes*(yk-1)+j) + Vi(j)
+                 end do
+              end if
+                 
               do j=1,maxmes
                  niter=0
                  diff=0.d0
@@ -691,7 +808,7 @@ end if
 
         ! variance covariance si spec aux classes :
 
-        Ut1=Ut
+               Ut1=Ut
         if (nwg.ne.0) then
            Ut1=0.d0
            if (g.eq.ng) then
@@ -700,7 +817,7 @@ end if
               Ut1=Ut*abs(b1(nef+nvc+g))
            end if
 
-
+           if(all(idlink.ne.3)) then 
            P=0.d0
            P=MATMUL(Z,Ut1)
            VC=0.d0
@@ -732,6 +849,7 @@ end if
               end do
            end if
         end if
+     end if
 
         mu=0.d0
         mu=matmul(X00,b0)+matmul(X2,b2)+matmul(X01,b01)
@@ -744,43 +862,128 @@ end if
       do l=1,nsim
          
          if(any(idlink.ne.0)) then
-              usim=0.d0
-              ysim=0.d0
-              do m=1,maxmes*ny
-                 SX=1.d0
-                 call bgos(SX,0,usim(m),x22,0.d0)
-              end do
-             ysim=mu+MATMUL(VC,usim)
-          end if
+
+            if(any(idlink.eq.3)) then
+
+               !! simuler les effets aleatoires
+               usim2=0.d0
+               ysim=0.d0
+               do m=1,nea
+                  SX=1.d0
+                  call bgos(SX,0,usim2(m),x22,0.d0)
+               end do
+               uu = 0.d0
+               uu = matmul(Ut1,usim2)
+               ysim = mu+matmul(Z,uu)
+               
+               !! simuler le BM ou AR
+               if(ncor.gt.0) then
+                  wsim=0.d0
+                  x22=0.d0
+                  SX=1.d0
+                  do j=1,maxmes*ny
+                     call bgos(SX,0,wsim(j),x22,0.d0)
+                  end do
+                  wi=0.d0
+                  wi=matmul(Corr,wsim)
+                  ysim = ysim + wi
+               end if
+
+            else
+               
+               usim=0.d0
+               ysim=0.d0
+               do m=1,maxmes*ny
+                  SX=1.d0
+                  call bgos(SX,0,usim(m),x22,0.d0)
+               end do
+               ysim=mu+MATMUL(VC,usim)
+               
+            end if
+         end if
 
 !    if (verbose==1) print*,"ysim=",ysim
       sumntrtot=0
+      sumnbmod = 0
       do yk=1,ny
 !          print*,"boucle idlink, yk et nsim=",yk,nsim 
-        if (idlink(yk).eq.0 .and. l.eq.1) then  ! Linear link
-         aa = b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
-         bb = b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2)
-         do j=1,maxmes
-           Ymarg(maxmes*(yk-1)+j,g) = mu(maxmes*(yk-1)+j)*bb+aa
-         end do
-         sumntrtot = sumntrtot +ntrtot(yk)          
+         if (idlink(yk).eq.0 .and. l.eq.1) then  ! Linear link
+            
+            aa = b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
+            bb = b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2)
+            do j=1,maxmes
+               Ymarg(maxmes*(yk-1)+j,g) = mu(maxmes*(yk-1)+j)*bb+aa
+            end do     
+            
+         else if (idlink(yk).eq.3) then ! ordinal
 
+           !! simuler l'EA specifique au test
+           ai=0.d0
+           if(nalea.gt.0) then
+              call bgos(SX,0,asim(yk),x22,0.d0)
+              ai = b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+yk)*asim(yk)
+           end if
+           
+           aa = b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
+           do j=1,maxmes
+              if(nalea.gt.0) ysim((yk-1)*maxmes+j) = ysim((yk-1)*maxmes+j)+ai
+              ytemp = modalite(sumnbmod + nbmod(yk)) - &
+                   alnorm((aa-ysim((yk-1)*maxmes+j))/abs(b1(nef+nvc+nwg+ncor+yk)),.false.)
+              Ymarg(maxmes*(yk-1)+j,g) = Ymarg(maxmes*(yk-1)+j,g) + ytemp / dble(nsim)
+           end do
+           
+           if(nbmod(yk).gt.2) then
+              do jj=2,nbmod(yk)-1
+                 aa = aa + b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+jj)**2
+                 do j=1,maxmes
+                    ytemp = (modalite(sumnbmod + jj) - modalite(sumnbmod + jj+1))* &
+                         alnorm((aa-ysim((yk-1)*maxmes+j))/abs(b1(nef+nvc+nwg+ncor+yk)),.false.)
+                    Ymarg(maxmes*(yk-1)+j,g) = Ymarg(maxmes*(yk-1)+j,g) + ytemp / dble(nsim)                             
+                 end do
+              end do
+           end if
+           
+           sumnbmod = sumnbmod + nbmod(yk)
+                
         else if (idlink(yk).eq.1) then  ! Beta link
-        aa1=exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1))/ &
-             (1+exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)))
-        bb1=exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2))/ &
-             (1+exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2)))
-        bb1=aa1*(1.d0-aa1)*bb1
-
-        cc1=abs(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+3))
-
-        dd1=abs(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+4))
-
-        aa=aa1*aa1*(1-aa1)/bb1-aa1
-        bb=aa*(1-aa1)/aa1
-        beta=beta_ln(aa,bb)
-
-
+              
+           aa1=exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1))/ &
+                   (1+exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)))
+              bb1=exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2))/ &
+                   (1+exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2)))
+              bb1=aa1*(1.d0-aa1)*bb1
+              
+              cc1=abs(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+3))
+              
+              dd1=abs(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+4))
+              
+              aa=aa1*aa1*(1-aa1)/bb1-aa1
+              bb=aa*(1-aa1)/aa1
+              beta=beta_ln(aa,bb)
+              
+              !! simuler une N(0,Sigma)
+              if(any(idlink.eq.3)) then
+                 usim=0.d0
+                 do m=1,maxmes
+                    SX=1.d0
+                    call bgos(SX,0,usim(m),x22,0.d0)
+                 end do
+                 
+                 Sigma=0.d0
+                 do j1=1,maxmes
+                    do j2=1,j1
+                       Sigma(j1,j2) = VC((yk-1)*maxmes+j1,(yk-1)*maxmes+j2)
+                    end do
+                 end do
+                 
+                 Vi=0.d0
+                 Vi = matmul(Sigma,usim)
+                 
+                 do j=1,maxmes
+                    ysim(maxmes*(yk-1)+j) = ysim(maxmes*(yk-1)+j) + Vi(j)
+                 end do
+              end if
+              
               do j=1,maxmes
                  ytemp=ysim(maxmes*(yk-1)+j)*dd1+cc1
                  if (ytemp.lt.0) then
@@ -796,9 +999,8 @@ end if
                  end if
               end do
 
-         sumntrtot = sumntrtot +ntrtot(yk) 
-
-        else if (idlink(yk).eq.2) then ! Splines link
+      else if (idlink(yk).eq.2) then ! Splines link
+         
         zitr=0.d0
         zitr(1:nbzitr(yk))=zitr0(1:nbzitr(yk),yk)
         zitr(-1)=zitr(1)
@@ -810,28 +1012,51 @@ end if
         do kk=2,ntrtot(yk)
            splaa(kk-3)=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)**2
         end do
-
-              do j=1,maxmes
-                 niter=0
-                 diff=0.d0
-                 ier=0
-                 ytemp=INV_ISPLINES(ysim(maxmes*(yk-1)+j),splaa,bb,nbzitr(yk),zitr,ier,niter,diff)
-                    if ((ier.eq.3).or.(ier.ne.1 .and. diff.gt.1.d-3).or.ymarg(maxmes*(yk-1)+j,g).eq.9999.d0) then
-                       ymarg(maxmes*(yk-1)+j,g)=9999.d0
-!                       if (verbose==1) print*,"pb splines"
-                    else
-                        ymarg(maxmes*(yk-1)+j,g)=ymarg(maxmes*(yk-1)+j,g)+ytemp/dble(nsim)
-                    end if
-
+  
+        !! simuler une N(0,Sigma)
+        if(any(idlink.eq.3)) then
+           usim=0.d0
+           do m=1,maxmes
+              SX=1.d0
+              call bgos(SX,0,usim(m),x22,0.d0)
+           end do
+           
+           Sigma=0.d0
+           do j1=1,maxmes
+              do j2=1,j1
+                 Sigma(j1,j2) = VC((yk-1)*maxmes+j1,(yk-1)*maxmes+j2)
               end do
-              
-         sumntrtot = sumntrtot+ntrtot(yk)     
-
-  end if
+           end do
+           
+           Vi=0.d0
+           Vi = matmul(Sigma,usim)
+           
+           do j=1,maxmes
+              ysim(maxmes*(yk-1)+j) = ysim(maxmes*(yk-1)+j) + Vi(j)
+           end do
+        end if
+        
+        do j=1,maxmes
+           niter=0
+           diff=0.d0
+           ier=0
+           ytemp=INV_ISPLINES(ysim(maxmes*(yk-1)+j),splaa,bb,nbzitr(yk),zitr,ier,niter,diff)
+           if ((ier.eq.3).or.(ier.ne.1 .and. diff.gt.1.d-3).or.ymarg(maxmes*(yk-1)+j,g).eq.9999.d0) then
+              ymarg(maxmes*(yk-1)+j,g)=9999.d0
+              !                       if (verbose==1) print*,"pb splines"
+           else
+              ymarg(maxmes*(yk-1)+j,g)=ymarg(maxmes*(yk-1)+j,g)+ytemp/dble(nsim)
+           end if
+           
+        end do
+        
+     end if
   ! fin if idlink
+        
+     sumntrtot = sumntrtot+ntrtot(yk)     
   
   end do
-  end do
+end do
   
   else !GH
 !       print*,"debut GH"
@@ -958,7 +1183,7 @@ end do
 654 continue
 !        print*,"avant delocate"
   deallocate(zitr,splaa)
-  deallocate(Z,P,Corr,X00,X2,X01,ysim,usim,mu,tcor,VC,Vi,usim2)
+  deallocate(Z,P,Corr,X00,X2,X01,ysim,usim,mu,tcor,VC,Vi,usim2,Sigma,wsim,asim)
 
 
   return

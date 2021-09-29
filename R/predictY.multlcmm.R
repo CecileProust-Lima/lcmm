@@ -14,8 +14,8 @@ if (!inherits(newdata, "data.frame")) stop("newdata should be a data.frame objec
 if(any(x$linktype==3))
 {
      if(methInteg==0) stop("predictions for ordinal outcomes are only available with MC method. Please use methInteg=1 and set nsim argument.")
-     if(any(x$linktype!=3)) stop("predictions for mixed outcomes (ordinal and continuous) are not available yet.")
-     if(any(x$idcor>0)) stop("predictions with BM or AR correlations are not available yet.")
+#     if(any(x$linktype!=3)) stop("predictions for mixed outcomes (ordinal and continuous) are not available yet.")
+#     if(any(x$idcor>0)) stop("predictions with BM or AR correlations are not available yet.")
 }
 
 if(x$conv==1 | x$conv==2 | x$conv==3) 

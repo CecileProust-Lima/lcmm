@@ -81,6 +81,7 @@ predictYcond <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2
             ny <- x$N[8]
             nerr <- ny
             Ynames <- x$Ynames
+            if(nalea==0) condRE_Y <- 1
         }
         else
         {

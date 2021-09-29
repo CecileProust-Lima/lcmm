@@ -1801,11 +1801,11 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                 seuils <- out$best[nef+nvc+nw+ncor0+ny0+nalea0+sumntr+1:ntrtot0[k]]
                 if(ntrtot0[k]>1) seuils <- c(seuils[1], seuils[1] + cumsum(seuils[-1]^2))
 
-                Lmin <- min(seuils[1], min(transfo[1,]))
-                Lmax <- max(seuils[length(seuils)], max(transfo[nsim,]))
+                Lmin <- min(-2*abs(seuils[1]), min(transfo[1,]))
+                Lmax <- max(2*abs(seuils[length(seuils)]), max(transfo[nsim,]))
                
                 ysim_k <- rep(modalites[[k]], each=2)
-                transfo_k <- c(-2*abs(seuils[1]), rep(seuils, each=2), 2*abs(seuils[length(seuils)]))
+                transfo_k <- c(Lmin, rep(seuils, each=2), Lmax)
 
                 n <- min(nsim, length(ysim_k))
                 ysim[,k] <- max(modalites[[k]])
