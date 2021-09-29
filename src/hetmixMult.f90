@@ -1164,7 +1164,8 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
 
               else
                  !! yk est continu
-                 
+
+                 if(nmes(i,yk).gt.0) then
                  !! variance de Y|ui,wi
                  VC=0.d0
                  do j1=1,nmes(i,yk)
@@ -1220,8 +1221,9 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                  div = (dble(2*3.14159265)**(dble(nmes(i,yk)/2)))*sqrt(exp(det))
 
                  vrais_l = vrais_l * exp(-Y4/2.d0)/div
-
               end if
+
+           end if
 
               sumMesYk = sumMesYk+nmes(i,yk)
               sumntr = sumntr + ntrtot(yk)
@@ -1667,6 +1669,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                  else
                     !! yk est continu
 
+                    if(nmes(i,yk).gt.0) then
                     !! variance de Y|ui,wi
                     VC=0.d0
                     do j1=1,nmes(i,yk)
@@ -1722,8 +1725,9 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                     vrais_l = vrais_l * exp((-det-Y4)/2.d0)
 
                     if(l.eq.1) vrais_multo_i = vrais_multo_i -dble(nmes(i,yk)/2.d0)*dlog(dble(2*3.14159265))
-
                  end if
+
+              end if
 
                  sumMesYk = sumMesYk+nmes(i,yk)
                  sumntr = sumntr + ntrtot(yk)
