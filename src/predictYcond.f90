@@ -1,6 +1,6 @@
 
 subroutine predictcondmult(X0,condRE_Y,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,idlink&
-     ,nbzitr,zitr0,nsim,Ymarg)  
+     ,nbzitr,zitr0,modalite,nbmod,nsim,Ymarg)  
 
   use optim
   IMPLICIT NONE
@@ -8,26 +8,28 @@ subroutine predictcondmult(X0,condRE_Y,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,id
   ! in input
   integer,intent(in)::maxmes,npm,nsim,nalea,ny,nerr,debut,condRE_Y
   double precision,dimension(maxmes*ny),intent(in) ::X0
-  integer,dimension(ny),intent(in)::idlink,nbzitr
+  integer,dimension(ny),intent(in)::idlink,nbzitr,nbmod
   double precision,dimension(npm),intent(in)::b1
   double precision,dimension(ny),intent(in) ::epsY
   double precision,dimension(maxval(nbzitr),ny),intent(in)::zitr0
+  integer, dimension(sum(nbmod)),intent(in)::modalite
 
   ! for output
   double precision,dimension(maxmes*ny),intent(out) ::Ymarg
 
   ! for computation
   integer ::j,k,kk,m,l,jj,j1,j2,yk,sumntrtot
-  integer ::ier,niter
+  integer ::ier,niter,sumnbmod
   double precision,dimension(:,:),allocatable::VC
   double precision,dimension(:),allocatable::Vi,ysim,usim
-  double precision :: eps,x22
+  double precision :: eps,x22,ai,asim
   double precision ::ytemp,diff,SX,beta
   double precision::aa1,bb1,dd1,aa,bb,cc1
   double precision,dimension(:),allocatable::zitr,splaa
   double precision::xinbta,INV_ISPLINES,beta_ln
   double precision,dimension(ny)::minY,maxY
   integer,dimension(ny)::ntrtot
+  double precision::alnorm
 
   allocate(ysim(maxmes*ny),usim(maxmes*ny),Vi(maxmes*ny*(maxmes*ny+1)/2), &
        VC(maxmes*ny,maxmes*ny))
@@ -43,6 +45,7 @@ subroutine predictcondmult(X0,condRE_Y,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,id
      if (idlink(yk).eq.0) ntrtot(yk)=2
      if (idlink(yk).eq.1) ntrtot(yk)=4
      if (idlink(yk).eq.2) ntrtot(yk)=nbzitr(yk)+2
+     if (idlink(yk).eq.3) ntrtot(yk)=nbmod(yk)-1
   end do
 
   !  if(verbose==1) print*,"ntrtot=",ntrtot
@@ -121,6 +124,7 @@ subroutine predictcondmult(X0,condRE_Y,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,id
      end if
 
      sumntrtot=0
+     sumnbmod = 0
      do yk=1,ny
         !          print*,"boucle sur idlink, yk=",yk, "nsim=",l
         if (idlink(yk).eq.0 .and. l.eq.1) then  ! Linear link
@@ -131,6 +135,59 @@ subroutine predictcondmult(X0,condRE_Y,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,id
               Ymarg(maxmes*(yk-1)+j) = X0(maxmes*(yk-1)+j)*bb+aa
            end do
 
+        else if (idlink(yk).eq.3) then ! ordinal
+           ! on calcule max + (mod_l - mod_l-1) * P(Lambda + eps < seuil_l)
+
+           if(condRE_Y.eq.1 .and.l.eq.1) then
+              !! sans randomY, pas besoin de MC
+              
+              aa = b1(debut+ny+nalea+sumntrtot+1)
+              do j=1,maxmes
+                 Ymarg(maxmes*(yk-1)+j) = modalite(sumnbmod + nbmod(yk)) - &
+                      alnorm((aa-X0(maxmes*(yk-1)+j))/abs(b1(debut+yk)),.false.)
+              end do
+              
+              if(nbmod(yk).gt.2) then
+                 do jj=2,nbmod(yk)-1
+                    aa = aa + b1(debut+ny+nalea+sumntrtot+jj)**2
+                    do j=1,maxmes
+                       Ymarg(maxmes*(yk-1)+j) = Ymarg(maxmes*(yk-1)+j) + &
+                            (modalite(sumnbmod + jj) - modalite(sumnbmod + jj+1))* &
+                            alnorm((aa-X0(maxmes*(yk-1)+j))/abs(b1(debut+yk)),.false.)
+                    end do
+                 end do
+              end if
+              
+           else if(condRE_Y.eq.0) then ! integrer sur randomY
+              
+              !! simuler l'EA specifique au test
+              ai=0.d0
+              call bgos(SX,0,asim,x22,0.d0)
+              ai = b1(debut+ny+yk)*asim
+              do j=1,maxmes
+                 ysim(maxmes*(yk-1)+j) = X0(maxmes*(yk-1)+j) + ai
+              end do
+           
+              aa = b1(debut+ny+nalea+sumntrtot+1)
+              do j=1,maxmes
+                 ytemp = modalite(sumnbmod + nbmod(yk)) - &
+                      alnorm((aa-ysim(maxmes*(yk-1)+j))/abs(b1(debut+yk)),.false.)
+                 Ymarg(maxmes*(yk-1)+j) = Ymarg(maxmes*(yk-1)+j) + ytemp / dble(nsim)
+              end do
+              
+              if(nbmod(yk).gt.2) then
+                 do jj=2,nbmod(yk)-1
+                    aa = aa + b1(debut+ny+nalea+sumntrtot+jj)**2
+                    do j=1,maxmes
+                       ytemp = (modalite(sumnbmod + jj) - modalite(sumnbmod + jj+1))* &
+                            alnorm((aa-ysim(maxmes*(yk-1)+j))/abs(b1(debut+yk)),.false.)
+                       Ymarg(maxmes*(yk-1)+j) = Ymarg(maxmes*(yk-1)+j) + ytemp / dble(nsim)                            
+                    end do
+                 end do
+              end if
+           end if
+           
+           sumnbmod = sumnbmod + nbmod(yk)
 
         else if (idlink(yk).eq.1) then  ! Beta link
 

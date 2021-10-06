@@ -101,7 +101,7 @@
       double precision,dimension(nobs0),intent(in)::Y0
       integer,dimension(nobs0),intent(in)::indiceY0
       double precision,dimension(nobs0*sum(nv0(:))),intent(in)::X0
-      double precision,dimension(nobs0*nv20),intent(in)::Xns0
+      double precision,dimension(ns0*nv20),intent(in)::Xns0
       double precision, dimension(ns0),intent(in)::Tentr0,Tevt0
       integer, dimension(ns0),intent(in)::prior0,Devt0,ind_survint0
       integer,dimension(4*sum(nv0(:))),intent(in)::idnv0
@@ -1446,7 +1446,7 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
                  if (yk<ny(k)) then
                     b01((m-1)*ny(k)+yk)=b1(nprob+nrisqtot+nvarxevt+tmp+nef(k)+(m-1)*(ny(k)-1)+yk)
                  else
-                    b01((m-1)*ny+ny) =-sum(b1(nprob+nrisqtot+nvarxevt+tmp+ &
+                    b01((m-1)*ny(k)+ny(k)) =-sum(b1(nprob+nrisqtot+nvarxevt+tmp+ &
                          nef(k)+(m-1)*(ny(k)-1)+1 &
                          :nprob+nrisqtot+nvarxevt+tmp+nef(k)+(m-1)*(ny(k)-1)+ny(k)-1))
                  end if
