@@ -42,7 +42,7 @@ For each model, maximum likelihood estimators are obtained using a modified Marq
 
 # Calls functions
 
-Each function is precisely introduced in the companion paper (Proust-Lima, JSS 2017 -  https://www.jstatsoft.org/article/view/v078i02).
+Each function is precisely introduced in the companion paper (Proust-Lima, JSS 2017 - https://doi.org/10.18637/jss.v078.i02).
 
 ## hlme
 
