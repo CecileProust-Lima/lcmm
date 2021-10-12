@@ -1,7 +1,7 @@
 ############## last change 2012/03/16 #####################
 
 .Contlcmm <-
-    function(fixed,mixture,random,subject,classmb,ng,idiag,nwg,cor,data,B,convB,convL,convG,prior,maxiter,epsY,idlink0,ntrtot0,nbzitr0,zitr,nsim,call,Ydiscrete,subset,na.action,posfix,partialH,verbose,returndata){
+    function(fixed,mixture,random,subject,classmb,ng,idiag,nwg,cor,data,B,convB,convL,convG,prior,maxiter,epsY,idlink0,ntrtot0,nbzitr0,zitr,nsim,call,Ydiscrete,subset,na.action,posfix,partialH,verbose,returndata,var.time){
         
         cl <- match.call()
 
@@ -161,6 +161,13 @@
             { if(!(cor.var.time %in% var.exp)) 
                   {var.exp <- c(var.exp, cor.var.time)} #si la varaible de temps dans cor n'est dan sles variables expl, on l'ajoute
           }
+        timeobs <- rep(0, nrow(newdata))
+        if(!is.null(var.time))
+        {
+            timeobs <- newdata[,var.time]
+            if(any(is.na(timeobs))) stop(paste("Cannot use",var.time,"as time variable because it contains missing data"))
+        }
+        
 
         ## ad
 
@@ -318,15 +325,16 @@
         if((int.fixed+int.random)>0) idprob0[1] <- 0
 
         ## on ordonne les donn es suivants la variable IND
-        matYX <- cbind(IND,PRIOR,Y0,X0)
+        matYX <- cbind(IND,timeobs,PRIOR,Y0,X0)
         matYXord <- matYX[sort.list(matYX[,1]),]
-        Y0 <- as.numeric(matYXord[,3])  
-        X0 <- apply(matYXord[,-c(1,2,3),drop=FALSE],2,as.numeric)
+        Y0 <- as.numeric(matYXord[,4])  
+        X0 <- apply(matYXord[,-c(1,2,3,4),drop=FALSE],2,as.numeric)
         #IDnum <- matYXord[,1]
         IND <-  matYXord[,1]
+        timeobs <- matYXord[,2]
 
 #### INCLUSION PRIOR 
-        PRIOR <- as.numeric(matYXord[,2])
+        PRIOR <- as.numeric(matYXord[,3])
         PRIOR <- as.integer(as.vector(PRIOR))
 ####
 
@@ -1030,6 +1038,12 @@
         temp <- paste("pred_m",1:ng0,sep="")
         temp1 <- paste("pred_ss",1:ng0,sep="")
         colnames(pred) <- c(nom.subject,"pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1) 
+        if(!is.null(var.time))
+        {
+            pred <- data.frame(IND,pred_m,out$resid_m,pred_ss,out$resid_ss,out$Yobs,pred_m_g,pred_ss_g,timeobs)
+            colnames(pred)<-c(nom.subject,"pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1,var.time)
+        }
+        
         names(out$best) <- names(b)
         
         estimlink <- cbind(out$marker,out$transfY)
@@ -1038,7 +1052,7 @@
 ### ad 2/04/2012
         if (!("intercept" %in% nom.X0)) X0.names2 <- X0.names2[-1]
 ### ad
-        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=call,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,Ydiscrete=Ydiscrete,discrete_loglik=out$vraisdiscret,UACV=out$UACV,IndivContrib=out$rlindiv,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random)
+        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=call,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,Ydiscrete=Ydiscrete,discrete_loglik=out$vraisdiscret,UACV=out$UACV,IndivContrib=out$rlindiv,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random, var.time=var.time)
         class(res) <- c("lcmm") 
 
         cost <- proc.time()-ptm

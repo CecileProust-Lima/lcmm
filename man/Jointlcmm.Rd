@@ -40,7 +40,8 @@ Jointlcmm(
   posfix = NULL,
   partialH = FALSE,
   verbose = TRUE,
-  returndata = FALSE
+  returndata = FALSE,
+  var.time = NULL
 )
 
 jlcmm(
@@ -77,7 +78,8 @@ jlcmm(
   posfix = NULL,
   partialH = FALSE,
   verbose = TRUE,
-  returndata = FALSE
+  returndata = FALSE,
+  var.time = NULL
 )
 }
 \arguments{
@@ -280,6 +282,8 @@ reported. Default to TRUE.}
 
 \item{returndata}{logical indicating if data used for computation should be
 returned. Default to FALSE, data are not returned.}
+
+\item{var.time}{optional character indicating the name of the time variable.}
 }
 \value{
 The list returned is: \item{loglik}{log-likelihood of the model}
@@ -299,7 +303,9 @@ individual predictions and residuals; it includes marginal predictions
 (pred_ss) and subject-specific residuals (resid_ss) averaged over classes,
 the observation (obs) and finally the class-specific marginal and
 subject-specific predictions (with the number of the latent class:
-pred_m_1,pred_m_2,...,pred_ss_1,pred_ss_2,...)} \item{pprob}{table of
+pred_m_1,pred_m_2,...,pred_ss_1,pred_ss_2,...). If \code{var.time}
+is specified, the corresponding measurement time is also included.}
+\item{pprob}{table of
 posterior classification and posterior individual class-membership
 probabilities based on the longitudinal data and the time-to-event data}
 \item{pprobY}{table of posterior classification and posterior individual

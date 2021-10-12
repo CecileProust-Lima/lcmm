@@ -200,7 +200,17 @@ plot.hlme <- function(x,which="residuals",var.time,break.times,marg,subset,shade
 
         if(which=="fit")
             {
-                if(missing(var.time)) stop("Argument var.time should be specified")
+                if(missing(var.time))
+                {
+                    if(length(x$var.time))
+                    {
+                        var.time <- x$var.time
+                    }
+                    else
+                    {
+                        stop("Argument var.time should be specified")
+                    }
+                }
                 if(missing(break.times)) break.times <- NULL
                 if(missing(marg)) marg <- TRUE
                 if(missing(subset)) subset <- NULL
@@ -235,7 +245,17 @@ plot.lcmm <- function(x,which="residuals",var.time,break.times,marg,subset,shade
 
         if(which=="fit")
             {
-                if(missing(var.time)) stop("Argument var.time should be specified")
+                if(missing(var.time))
+                {
+                    if(length(x$var.time))
+                    {
+                        var.time <- x$var.time
+                    }
+                    else
+                    {
+                        stop("Argument var.time should be specified")
+                    }
+                }
                 if(missing(break.times)) break.times <- NULL
                 if(missing(marg)) marg <- TRUE
                 if(missing(subset)) subset <- NULL
@@ -264,7 +284,17 @@ plot.multlcmm <- function(x,which="residuals",var.time,break.times,marg,outcome,
            
         if(which=="fit")
             {
-                if(missing(var.time)) stop("Argument var.time should be specified")
+                if(missing(var.time))
+                {
+                    if(length(x$var.time))
+                    {
+                        var.time <- x$var.time
+                    }
+                    else
+                    {
+                        stop("Argument var.time should be specified")
+                    }
+                }
                 if(missing(break.times)) break.times <- NULL
                 if(missing(marg)) marg <- TRUE
                 if(missing(subset)) subset <- NULL
@@ -304,7 +334,17 @@ plot.Jointlcmm <- function(x,which="residuals",var.time,break.times,marg,event,s
 
         if(which=="fit")
             {
-                if(missing(var.time)) stop("Argument var.time should be specified")
+                if(missing(var.time))
+                {
+                    if(length(x$var.time))
+                    {
+                        var.time <- x$var.time
+                    }
+                    else
+                    {
+                        stop("Argument var.time should be specified")
+                    }
+                }
                 if(missing(break.times)) break.times <- NULL
                 if(missing(marg)) marg <- TRUE
                 if(missing(subset)) subset <- NULL

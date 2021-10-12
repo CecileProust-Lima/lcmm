@@ -161,6 +161,7 @@
 #' reported. Default to TRUE.
 #' @param returndata logical indicating if data used for computation should be
 #' returned. Default to FALSE, data are not returned.
+#' @param var.time optional character indicating the name of the time variable.
 #' @return The list returned is: \item{ns}{number of grouping units in the
 #' dataset} \item{ng}{number of latent classes} \item{loglik}{log-likelihood of
 #' the model} \item{best}{vector of parameter estimates in the same order as
@@ -181,7 +182,8 @@
 #' subject-specific predictions (pred_ss) and subject-specific residuals
 #' (resid_ss) averaged over classes, the observation (obs) and finally the
 #' class-specific marginal and subject-specific predictions (with the number of
-#' the latent class: pred_m_1,pred_m_2,...,pred_ss_1,pred_ss_2,...)}
+#' the latent class: pred_m_1,pred_m_2,...,pred_ss_1,pred_ss_2,...). If \code{var.time}
+#' is specified, the corresponding measurement time is also included.}
 #' \item{pprob}{table of posterior classification and posterior individual
 #' class-membership probabilities} \item{Xnames}{list of covariates included in
 #' the model} 
@@ -281,7 +283,7 @@
 #' 
 #' 
 hlme <-
-    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=TRUE,returndata=FALSE){
+    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=TRUE,returndata=FALSE,var.time=NULL){
 
         ptm<-proc.time()
         if(verbose==TRUE) cat("Be patient, hlme is running ... \n")
@@ -525,7 +527,13 @@ hlme <-
         if(ncor0>0) 
             { if(!(cor.var.time %in% var.exp)) 
                   {var.exp <- c(var.exp, cor.var.time)} #si la varaible de temps dans cor n'est dan sles variables expl, on l'ajoute
-          }             
+            }
+        timeobs <- rep(0, nrow(newdata))
+        if(!is.null(var.time))
+        {
+            timeobs <- newdata[,var.time]
+            if(any(is.na(timeobs))) stop(paste("Cannot use",var.time,"as time variable because it contains missing data"))
+        }
         
                                         #if(!(all(nom.mixture %in% nom.fixed))) stop("The covariates in mixture should be also included in the argument fixed")
                                         # controler si les variables de mixture sont toutes dans fixed : 
@@ -703,14 +711,16 @@ hlme <-
         #IDnum <- matYXord[,1]
         #IND <- matYXord[,2]
 
-        matYX <- cbind(IND,PRIOR,Y0,X0)
+        matYX <- cbind(IND,timeobs,PRIOR,Y0,X0)
         matYXord <- matYX[sort.list(matYX[,1]),]
-        Y0 <- as.numeric(matYXord[,3])
-        X0 <- apply(matYXord[,-c(1,2,3),drop=FALSE],2,as.numeric)
+        Y0 <- as.numeric(matYXord[,4])
+        X0 <- apply(matYXord[,-c(1,2,3,4),drop=FALSE],2,as.numeric)
         IND <- matYXord[,1]
+        timeobs <- matYXord[,2]
+
         
 #### INCLUSION PRIOR 
-        PRIOR <- as.numeric(matYXord[,2])
+        PRIOR <- as.numeric(matYXord[,3])
         PRIOR <-as.integer(as.vector(PRIOR))
 ####
 
@@ -1246,7 +1256,12 @@ hlme <-
 
         temp<-paste("pred_m",1:ng0,sep="")
         temp1<-paste("pred_ss",1:ng0,sep="")
-        colnames(pred)<-c(nom.subject,"pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1) 
+        colnames(pred)<-c(nom.subject,"pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1)
+        if(!is.null(var.time))
+        {
+            pred <- data.frame(IND,pred_m,out$resid_m,pred_ss,out$resid_ss,Y0,pred_m_g,pred_ss_g,timeobs)
+            colnames(pred)<-c(nom.subject,"pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1,var.time)
+        }
 
         names(out$best)<-names(b)
         btest <- out$best[1:length(inddepvar.fixed.nom)]
@@ -1308,7 +1323,7 @@ hlme <-
         levels <- list(levelsdata=levelsdata, levelsfixed=levelsfixed, levelsrandom=levelsrandom,
                        levelsmixture=levelsmixture, levelsclassmb=levelsclassmb)
         
-        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random, levels=levels)
+        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random, levels=levels, var.time=var.time)
         class(res) <-c("hlme") 
         cost<-proc.time()-ptm
         if(verbose==TRUE) cat("The program took", round(cost[3],2), "seconds \n")

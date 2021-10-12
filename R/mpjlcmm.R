@@ -203,7 +203,8 @@
 mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     hazard="Weibull",hazardtype="Specific",hazardnodes=NULL,TimeDepVar=NULL,
                     data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,
-                    prior,logscale=FALSE,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=TRUE)
+                    prior,logscale=FALSE,subset=NULL,na.action=1,posfix=NULL,
+                    partialH=FALSE,verbose=TRUE)
     {
         
         ptm <- proc.time()
@@ -636,7 +637,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             Tentry <- 0
             ind_survint <- 0
         }
-        
+                
         ## Y0
         Y0 <- dataY$measureY
 
@@ -2053,7 +2054,6 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         temp <- paste("pred_m",1:ng,sep="")
         temp1 <- paste("pred_ss",1:ng,sep="")
         colnames(pred) <- c(nom.subject,"Yname","pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1)
-
 
         ## risques
         if(nbevt>0)

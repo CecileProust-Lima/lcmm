@@ -36,7 +36,10 @@ multlcmm(
   posfix = NULL,
   partialH = FALSE,
   verbose = TRUE,
-  returndata = FALSE
+  returndata = FALSE,
+  methInteg = "QMC",
+  nMC = NULL,
+  var.time = NULL
 )
 
 mlcmm(
@@ -67,7 +70,10 @@ mlcmm(
   posfix = NULL,
   partialH = FALSE,
   verbose = TRUE,
-  returndata = FALSE
+  returndata = FALSE,
+  methInteg = "QMC",
+  nMC = NULL,
+  var.time = NULL
 )
 }
 \arguments{
@@ -209,6 +215,14 @@ reported. Default to TRUE.}
 
 \item{returndata}{logical indicating if data used for computation should be
 returned. Default to FALSE, data are not returned.}
+
+\item{methInteg}{character indicating the type of integration if ordinal outcomes
+are considered. 'MCO' for ordinary Monte Carlo, 'MCA' for antithetic Monte Carlo,
+'QMC' for quasi MonteCarlo.}
+
+\item{nMC}{integer, number of Monte Carlo simulations}
+
+\item{var.time}{optional character indicating the name of the time variable.}
 }
 \value{
 The list returned is: \item{ns}{number of grouping units in the
@@ -232,7 +246,8 @@ residuals (resid_m), subject-specific predictions (pred_ss) and
 subject-specific residuals (resid_ss) averaged over classes, the transformed
 observations in the latent process scale (obs) and finally the
 class-specific marginal and subject-specific predictions (with the number of
-the latent class: pred_m_1,pred_m_2,...,pred_ss_1,pred_ss_2,...).}
+the latent class: pred_m_1,pred_m_2,...,pred_ss_1,pred_ss_2,...). If \code{var.time}
+is specified, the corresponding measurement time is also included.}
 \item{pprob}{table of posterior classification and posterior individual
 class-membership probabilities} \item{Xnames}{list of covariates included in
 the model} \item{predRE}{table containing individual predictions of the

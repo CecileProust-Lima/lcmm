@@ -87,7 +87,7 @@
     ntps <- length(break.times)-1
 
     numsg <- lapply(1:ng,function(g) x$pprob[which(x$pprob$class==g),1])
-    times <- data[,var.time]
+    if(length(x$var.time)) times <- x$pred[,ncol(x$pred)] else times <- data[,var.time]
     maxT <- sapply(numsg,function(y) max(times[which(data[,x$call$subject] %in% y)]))
 
 

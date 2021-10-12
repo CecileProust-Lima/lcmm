@@ -276,6 +276,7 @@
 #' reported. Default to TRUE.
 #' @param returndata logical indicating if data used for computation should be
 #' returned. Default to FALSE, data are not returned.
+#' @param var.time optional character indicating the name of the time variable.
 #' @return The list returned is: \item{loglik}{log-likelihood of the model}
 #' \item{best}{vector of parameter estimates in the same order as specified in
 #' \code{B} and detailed in section \code{details}} \item{V}{vector containing
@@ -293,7 +294,9 @@
 #' (pred_ss) and subject-specific residuals (resid_ss) averaged over classes,
 #' the observation (obs) and finally the class-specific marginal and
 #' subject-specific predictions (with the number of the latent class:
-#' pred_m_1,pred_m_2,...,pred_ss_1,pred_ss_2,...)} \item{pprob}{table of
+#' pred_m_1,pred_m_2,...,pred_ss_1,pred_ss_2,...). If \code{var.time}
+#' is specified, the corresponding measurement time is also included.}
+#' \item{pprob}{table of
 #' posterior classification and posterior individual class-membership
 #' probabilities based on the longitudinal data and the time-to-event data}
 #' \item{pprobY}{table of posterior classification and posterior individual
@@ -443,7 +446,8 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                       link=NULL,intnodes=NULL,epsY=0.5,range=NULL,
                       cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,
                       nsim=100,prior=NULL,logscale=FALSE,subset=NULL,na.action=1,
-                      posfix=NULL,partialH=FALSE,verbose=TRUE,returndata=FALSE)
+                      posfix=NULL,partialH=FALSE,verbose=TRUE,returndata=FALSE,
+                      var.time=NULL)
     {
         
         ptm<-proc.time()
@@ -872,8 +876,15 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
 
 
         X0 <- as.matrix(X0)
-###X0 fini  
-
+###X0 fini
+        
+        timeobs <- rep(0, nrow(newdata))
+        if(!is.null(var.time))
+        {
+            timeobs <- newdata[,var.time]
+            if(any(is.na(timeobs))) stop(paste("Cannot use",var.time,"as time variable because it contains missing data"))
+        }
+        
 
 ###test de link
         if(link %in% c("splines","Splines"))
@@ -985,15 +996,16 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         #IDnum <- as.numeric(IND)
         if(is.null(nom.prior)) prior <- rep(0,length(Y0))  
         if(!length(indiceY0)) indiceY0 <- rep(0,length(Y0))  
-        matYX <- cbind(IND,prior,Y0,indiceY0,Tentry,Tevent,Event,Tint,X0)
+        matYX <- cbind(IND,timeobs,prior,Y0,indiceY0,Tentry,Tevent,Event,Tint,X0)
         matYXord <- matYX[order(IND),]
-        Y0 <- as.numeric(matYXord[,3])
-        X0 <- apply(matYXord[,-c(1:8),drop=FALSE],2,as.numeric)
+        Y0 <- as.numeric(matYXord[,4])
+        X0 <- apply(matYXord[,-c(1:9),drop=FALSE],2,as.numeric)
         #IDnum <- matYXord[,1]
         IND <- matYXord[,1]
-        indiceY0 <- as.numeric(matYXord[,4])
-        prior0 <- as.numeric(unique(matYXord[,c(1,2)])[,2])
+        indiceY0 <- as.numeric(matYXord[,5])
+        prior0 <- as.numeric(unique(matYXord[,c(1,3)])[,2])
         if(length(prior0)!=length(unique(IND))) stop("Please check 'prior' argument. Subjects can not have multiple assigned classes.")
+        timeobs <- matYXord[,2]
 
         ## nombre de sujets
         ns0 <- length(unique(IND))  
@@ -1003,7 +1015,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                                         #if(nrow(data.surv) != ns0) stop("Subjects cannot have several times to event.")
         
         nmes <- as.vector(table(IND))
-        data.surv <- sweep(matYXord[cumsum(nmes),c(5,6,7,8), drop=FALSE], MARGIN=1, STATS=0, FUN=function(x,y){as.numeric(x)+y})
+        data.surv <- sweep(matYXord[cumsum(nmes),c(6,7,8,9), drop=FALSE], MARGIN=1, STATS=0, FUN=function(x,y){as.numeric(x)+y})
         
         tsurv0 <- data.surv[,1] 
         tsurv <- data.surv[,2]
@@ -2660,6 +2672,11 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         temp<-paste("pred_m",1:ng0,sep="")
         temp1<-paste("pred_ss",1:ng0,sep="")
         colnames(pred)<-c(subject,"pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1)
+        if(!is.null(var.time))
+        {
+            pred <- data.frame(IND,pred_m,out$resid_m,pred_ss,out$resid_ss,out$Yobs,pred_m_g,pred_ss_g,timeobs)
+            colnames(pred)<-c(subject,"pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1,var.time)
+        }
 
 
 ### risques
@@ -2720,7 +2737,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                    scoretest=stats,na.action=linesNA,
                    AIC=2*(length(out$best)-length(posfix)-out$loglik),
                    BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,
-                   data=datareturn)
+                   data=datareturn,var.time=var.time)
 
         class(res) <-c("Jointlcmm")
 

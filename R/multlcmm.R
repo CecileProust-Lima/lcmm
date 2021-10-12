@@ -232,6 +232,7 @@
 #' are considered. 'MCO' for ordinary Monte Carlo, 'MCA' for antithetic Monte Carlo,
 #' 'QMC' for quasi MonteCarlo.
 #' @param nMC integer, number of Monte Carlo simulations
+#' @param var.time optional character indicating the name of the time variable.
 #' @return The list returned is: \item{ns}{number of grouping units in the
 #' dataset} \item{ng}{number of latent classes} \item{loglik}{log-likelihood of
 #' the model} \item{best}{vector of parameter estimates in the same order as
@@ -253,7 +254,8 @@
 #' subject-specific residuals (resid_ss) averaged over classes, the transformed
 #' observations in the latent process scale (obs) and finally the
 #' class-specific marginal and subject-specific predictions (with the number of
-#' the latent class: pred_m_1,pred_m_2,...,pred_ss_1,pred_ss_2,...).}
+#' the latent class: pred_m_1,pred_m_2,...,pred_ss_1,pred_ss_2,...). If \code{var.time}
+#' is specified, the corresponding measurement time is also included.}
 #' \item{pprob}{table of posterior classification and posterior individual
 #' class-membership probabilities} \item{Xnames}{list of covariates included in
 #' the model} \item{predRE}{table containing individual predictions of the
@@ -345,7 +347,7 @@
 #' 
 #' @export
 #' 
-multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,randomY=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=TRUE,returndata=FALSE,methInteg="QMC",nMC=NULL,cholesky=TRUE)
+multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,randomY=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=TRUE,returndata=FALSE,methInteg="QMC",nMC=NULL,var.time=NULL)
 {
     ptm<-proc.time()
     if(verbose==TRUE) cat("Be patient, multlcmm is running ... \n")
@@ -384,6 +386,8 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     if(!(na.action%in%c(1,2)))stop("only 1 for 'na.omit' or 2 for 'na.fail' are required in na.action argument")
 
     if(length(posfix) & missing(B)) stop("A set of initial parameters must be specified if some parameters are not estimated")
+
+    cholesky <- TRUE
 
 
     ## garder data tel quel pour le renvoyer
@@ -590,6 +594,12 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     X0 <- as.matrix(X0)
 ###X0 fini
 
+    timeobs <- rep(0, nrow(data0))
+    if(!is.null(var.time))
+    {
+        timeobs <- data0[,var.time]
+        if(any(is.na(timeobs))) stop(paste("Cannot use",var.time,"as time variable because it contains missing data"))
+    }
 
 ###test de link
     if (length(link)!=1 & length(link)!=ny0) stop("One link per outcome should be specified")
@@ -814,16 +824,17 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 
 ###ordonner les mesures par individu
     #IDnum <- as.numeric(IND)
-    matYX <- cbind(IND,prior,Y0,indiceY0,outcome,X0)
+    matYX <- cbind(IND,timeobs,prior,Y0,indiceY0,outcome,X0)
     matYXord <- matYX[order(IND),]
-    Y0 <- as.numeric(matYXord[,3])
-    X0 <- apply(matYXord[,-c(1,2,3,4,5),drop=FALSE],2,as.numeric)
+    Y0 <- as.numeric(matYXord[,4])
+    X0 <- apply(matYXord[,-c(1,2,3,4,5,6),drop=FALSE],2,as.numeric)
                                         #X0 <- as.matrix(X0)  a remettre si X0 <- as.data.frame(X0) remis l.211
     IND <- matYXord[,1]
-    outcome <- matYXord[,5]
-    indiceY0 <- as.numeric(matYXord[,4])
-    prior0 <- as.numeric(unique(matYXord[,c(1,2)])[,2])
+    outcome <- matYXord[,6]
+    indiceY0 <- as.numeric(matYXord[,5])
+    prior0 <- as.numeric(unique(matYXord[,c(1,3)])[,2])
     if(length(prior0)!=length(unique(IND))) stop("Please check 'prior' argument. Subjects can not have multiple assigned classes.")
+    timeobs <- matYXord[,2]
         
 
 ###parametres pour hetmixContMult
@@ -1754,7 +1765,6 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     colnames(ppi) <- c(nom.subject,"class",temp)
     rownames(ppi) <- 1:ns0
 
-
 ###pred
     pred_m_g <- matrix(out$pred_m_g,nrow=nobs0)
     pred_ss_g <- matrix(out$pred_ss_g,nrow=nobs0)
@@ -1766,6 +1776,12 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     temp1<-paste("pred_ss",1:ng0,sep="")
     colnames(pred)<-c(nom.subject,"Yname","pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1)
     rownames(pred) <- NULL
+
+    if(!is.null(var.time))
+    {
+        pred <- data.frame(IND,outcome,pred_m,out$resid_m,pred_ss,out$resid_ss,out$Yobs,pred_m_g,pred_ss_g,timeobs)
+        colnames(pred)<-c(nom.subject,"Yname","pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1,var.time)
+    }
 
 ###estimlink
     ysim <- matrix(out$marker,nsim,ny0)
@@ -1869,7 +1885,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,nbnodes=nbnodes,nbmod=nbmod,modalites=modalites,
                na.action=nayk,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,
                wRandom=wRandom,b0Random=b0Random,CPUtime=cost[3],CorrEA=CorrEA,
-               levels=levels)
+               levels=levels, var.time=var.time)
     
     names(res$best) <- names(b)
     class(res) <-c("multlcmm")

@@ -139,7 +139,6 @@
     if(id.X_classmb == 1)var.exp <- c(var.exp,colnames(X_classmb))
     var.exp <- unique(var.exp)
     ## ad
-
                                         
     ## controler si les variables de mixture sont toutes dans fixed : 
     z.fixed <- strsplit(nom.fixed,split=":",fixed=TRUE)
