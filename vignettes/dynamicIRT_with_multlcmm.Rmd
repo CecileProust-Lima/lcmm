@@ -1,0 +1,498 @@
+---
+title: 'Dynamic IRT model of PREDALIA study'
+output: 
+  rmarkdown::html_vignette:
+    toc: true # table of content true
+    toc_depth : 3
+vignette: >
+  %\VignetteIndexEntry{Dynamic IRT with multlcmm}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette illustrates how to estimate a dynamic IRT following the methodology described in Proust-Lima et al. (2021). The model combines a graded response measurement model to link a series of ordinal items measured repeatedly over time with their underlying latent process. Simultaneously, a linear mixed model describes the trajectory of the underlying latent process over time. 
+
+```{r, results='hide',message=FALSE,warning=FALSE, echo=FALSE}
+load("models_IRT.RData")
+```
+# Importation
+
+The dynamic IRT model is estimated via multlcmm function of lcmm R package (Proust-Lima et al. 2017). 
+The following libraries are used in this vignette:
+
+```{r,message=F}
+library(lcmm)
+library(ggplot2)
+library(ggpubr)
+library(splines)
+library(gridExtra)
+library(dplyr)
+```
+
+# Dataset
+
+The illustration is on a simulated dataset that mimics the PREDIALA study described and analyzed in Proust-Lima et al. (2021). The dataset is called simdataIRT. It contains the following information:
+
+- grp: group with 0= and 1=
+- sex: sex with 0= and 1=
+- age: age at entry in the cohort (or waiting list?)
+- hads_2 ... hads_14 : 7 items of HADS measuring depression
+- ID: identification IDber of the patient
+- time: time of measurement (months since entry on the waiting list)
+- time_entry: time on the waiting list at entry in the cohort (in months)
+
+```{r}
+str(simdataHADS)
+```
+
+## Description of the sample
+
+```{r}
+demo <- simdataHADS %>% group_by(ID) %>% arrange(time) %>%
+  filter(row_number()==1)
+summary(demo)
+```
+
+
+## Timescale of interest: time on the waiting list
+
+The timescale of interest is the time in months spent on the waiting list: time. This timescale poses two problems:
+
+- As in many studies, entry in the study occurs for each individual at different timings in the progression of the disease. this is called delayed entry. It differs from the usual time in the study where entry corresponds to time 0. Here entry (variable time_entry) corresponds to the duration on the waiting list at inclusion, and time 0 is unlikely observed (i.e., entry in the cohort does not occur as the same time as entry on waiting list).
+
+- The timescale is continuous per se, with as many values as the IDber of total observations. This prevents the use of methods considering discrete timescales with measurements at the same times for all the individuals, such as classical dynamic latent variable models. 
+
+Distribution of the time at entry and time at follow_ups
+
+```{r,comment='', fig.height=4, fig.width=6}
+tempSim <- simdataHADS %>% group_by(ID) %>% arrange(time) %>% mutate(Visit=ifelse(time==time_entry,"Entry","Follow-up"))
+
+p <- ggplot(tempSim, aes(x=time,fill=Visit,color=Visit)) + geom_histogram(binwidth=1,aes(y=..density..)) +
+  labs(x="Months on the waiting list")
+p + scale_color_grey(start = 0.1,
+  end = 0.5)+scale_fill_grey(start = 0.1,
+  end = 0.5) +
+  theme_classic()
+```
+
+Quantiles of the distribution of measurement times
+
+```{r}
+quantile(simdataHADS$time,probs=(0:10)/10)
+```
+
+# Dynamic IRT model estimation
+
+We consider here a dynamic IRT model with natural cubic splines on time on the waiting list to account for a possible nonlinear trajectory over time, and we adjust the trajectory for the group. We consider 2 internal knots placed at 7 and 15, and shift the right boundary at 60 due to the long tail of the distribution. 
+In the main analysis, we estimate a model with no differential item functioning (DIF) on the group and no response shift (RS) on time.
+
+## Estimation of the model with no DIF/RS 
+
+To reduce the computation time, we first estimate a model with only 1 random-effect, a random intercept. And then, we use the estimates as initial values for the estimation of the model that also includes random-effects on the time functions. Estimation involves a numerical integration approximated by quasi Monte-Carlo (QMC) with 1000 points. This induces very intensive and long computations but was shown to give accurate results in simulations. 
+
+```{r,eval=F}
+modIRT_i <- multlcmm(hads_2 + hads_4 +hads_6 + hads_8 +hads_10+hads_12 + hads_14 ~ ns(time,knots=c(7,15),Boundary.knots = c(0,60))*grp,random=~1,data=simdataHADS,subject="ID",link="thresholds",methInteg="QMC",nMC=1000)
+# use the estimates as initial values - the vector c(0,1,0,0,1,0,0,0,1) initializes the cholesky matrix of the random-effects
+Binit <- c(modIRT_i$best[1:7],c(0,1,0,0,1,0,0,0,1),modIRT_i$best[8:length(modIRT_i$best)])
+
+modIRT <- multlcmm(hads_2 + hads_4 +hads_6 + hads_8 +hads_10+hads_12 + hads_14 ~ ns(time,knots=c(7,15),Boundary.knots = c(0,60))*grp,random=~1+ns(time,knots=c(7,15),Boundary.knots = c(0,60)),data=simdataHADS,subject="ID",link="thresholds",methInteg="QMC",nMC=1000, B=Binit)
+```
+
+The summary of the estimation: 
+```{r}
+summary(modIRT)
+```
+
+
+## Predicted underlying depressive symptomatolgy trajectory
+
+
+### plot of predicted mean trajectories
+
+The predicted trajectory of the underlying process can be obtained with predictL function and the associated plot function. 
+```{r,comment='', fig.height=4, fig.width=6}
+datnew <- data.frame(time = seq(0,75,by=1))
+datnew$grp <- 0
+pIRT0 <- predictL(modIRT,datnew,var.time="time",confint = T)
+datnew$grp <- 1
+pIRT1 <- predictL(modIRT,datnew,var.time="time",confint = T)
+plot(pIRT0,col=1,lwd=2,ylim=c(-1.5,1.5),legend=NULL,main="",ylab="latent depressive symptomatology",xlab="months since entry on the waiting list",type="l",bty="l",shades=T)
+plot(pIRT1,add=T,col=4,lwd=2,shades=T)
+legend(x="topleft",legend=c("dialysed","preemptive"),lty=c(1,1),col=c(1,4),lwd=2,bty="n")
+```
+
+
+### Posteriori distribution
+
+To better appreciate the range of the underlying depressive symptomatology, the empirical posterior distribution can be computed
+```{r,comment='', fig.height=4, fig.width=6}
+beta <- modIRT$best
+t <- 0:72
+Z <- cbind(rep(1,length(t)),ns(t,knots=c(7,15),Boundary.knots = c(0,60)))
+chol <- matrix(0,ncol=4,nrow=4)
+chol[upper.tri(chol, diag = T)] <- c(1,beta[7:15])
+library(mvtnorm)
+Lambda0 <- rmvnorm(10000,mean = Z%*%c(0,beta[1:3]),Z%*%t(chol)%*%chol%*%t(Z))
+Lambda1 <- rmvnorm(10000,mean = Z%*%beta[4:7],Z%*%t(chol)%*%chol%*%t(Z))
+Lambda <- data.frame(Lambda = as.vector(rbind(Lambda0,Lambda1)))
+phist <- ggplot(Lambda,aes(x=Lambda))+ geom_density(color="grey", fill="grey") + theme_bw() +
+  xlab("underlying depressive symptomatology") +xlim(-7,7)
+phist
+```
+
+The 95\% range of the underlying distribution is approximately:
+```{r}
+quantile(Lambda$Lambda,p=c(0.025,0.975))
+```
+
+## Location and discrimination of the items (with SE by Delta-Method)
+
+The location and discrimination parameters are transformations of the estimated parameters. They are retrieved with the following code:
+
+- isolate the corresponding parameters within the vector of estimated parameters (and the corresponding variance covariance matrix)
+
+```{r}
+## Parameters
+nlevel <- 4
+nitems <- 7
+levels <- rep(nlevel,nitems)
+npm <- length(modIRT$best)
+seuils <- modIRT$best[(npm-(nlevel-1)*(nitems)+1):(npm)]
+err <- abs(modIRT$best[(npm-(nlevel-1)*(nitems)-(nitems-1)):(npm-(nlevel-1)*(nitems))])
+seuils
+err
+# Variance
+Vseuils <- VarCov(modIRT)[(npm-(nlevel-1)*(nitems)+1):(npm),(npm-(nlevel-1)*(nitems)+1):(npm)]
+Verr <- VarCov(modIRT)[(npm-(nlevel-1)*(nitems)-(nitems-1)):(npm-(nlevel-1)*(nitems)),(npm-(nlevel-1)*(nitems)-(nitems-1)):(npm-(nlevel-1)*(nitems))]
+```
+
+- retransform these parameters to obtain the locations and the discrimination of each item with corresponding standard deviation (computed via Delta-method)
+
+
+```{r}
+# generic function
+location <- function(min,max,param,Vparam){
+  loc <- param[1]
+  se <- sqrt(Vparam[1,1])
+  param2 <- rep(0,length(param))
+  param2[1] <- 1
+  if ((max-min)>1) {
+    for (l in 1:(max-min-1)) {
+      param2[l+1] <- 2*param[l+1]
+      loc[l+1] <- loc[l] + param[1+l]^2
+      se[l+1] <- sqrt(t(param2) %*%Vparam %*%param2)
+    }
+  }
+  return(c(loc,se))
+}
+# application
+ItemLoc <- sapply(1:nitems,function(k){location(min=0,max=nlevel-1,param=seuils[((nlevel-1)*(k-1)+1):((nlevel-1)*k)],Vparam=Vseuils[((nlevel-1)*(k-1)+1):((nlevel-1)*k),((nlevel-1)*(k-1)+1):((nlevel-1)*k)])})
+colnames(ItemLoc) <- paste("Item",(1:nitems)*2)
+ItemLoc <- ItemLoc[c(1,4,2,5,3,6),]
+rownames(ItemLoc) <- rep(c("Threshold","SE"),nlevel-1)
+discrimination <- 1/abs(err)
+sediscr <- diag(err^(-2))%*%Verr%*%diag(err^(-2))
+```
+
+The 3 thresholds and discrimination estimates of each item are: 
+
+```{r}
+t(rbind(ItemLoc,discrimination,Se=sqrt(diag(sediscr))))
+```
+
+
+
+## item category probability curve 
+
+The following code computes and plots the curve of each item category probability according to the underlying level of depressive symptomatology. This is not yet automatically computed in the package. 
+
+```{r,comment='', fig.height=4, fig.width=7}
+# function for category calculation
+pred_Pr <- function(min,max,param,std,xlatent){
+  nmes <- length(xlatent)
+  prob <- rep(0,length=(max-min+1)*nmes)
+  level <- rep(1,length=(max-min+1)*nmes)
+  prob[1:nmes] <- pnorm((param[1]-xlatent)/std)
+  if ((max-min)>1) {
+    sup <- param[1]
+    l <- 2
+    for (l in 1:(max-min-1)) {
+      prob[l*nmes+(1:nmes)] <- - pnorm((sup-xlatent)/std)
+      sup <- sup + param[1+l]^2
+      prob[l*nmes+(1:nmes)] <- prob[l*nmes+(1:nmes)] + pnorm((sup-xlatent)/std)
+      level[l*nmes+(1:nmes)] <- l+1
+    }
+  }
+  prob[(max-min)*nmes+(1:nmes)] <- 1-pnorm((sup-xlatent)/std)
+  level[(max-min)*nmes+(1:nmes)] <- (max-min+1)
+  return(data.frame(level,prob,latent=rep(xlatent,(max-min+1))))
+}
+
+## application and graph
+meaning <- c("Enjoy","Laugh","Cheerful" ,"Slow" ,"Appearance" ,"Looking Forward" ,"Leisure")
+process <- seq(-6,6,by=0.1)
+p <- NULL
+for (k in 1:7){
+ICC  <- pred_Pr(min=0,max=3,param=seuils[(3*(k-1)+1):(3*k)],std=err[k],xlatent=process)
+p[[k]] <- (ggplot(ICC)
+      + geom_line(aes(x = latent, y = prob, group = level,color=level), show.legend = F,alpha = 1,size=1.2)
+      # + stat_smooth(aes(x = time, y = hads_scorea), method = "loess", size = 0.75)
+      + theme_bw()
+      + labs(title=paste("Item",2*k,"-",meaning[k]))
+      + xlab("construct")
+      + ylim(0,1)
+      + ylab("Probability of item level"))
+}
+p[[8]] <- (ggplot(ICC)
+      + geom_line(aes(x = latent, y = prob, group = level,color=level),alpha = 1,size=1.2)
+      + theme_bw()
+)
+legend <- get_legend(p[[8]])
+grid.arrange(p[[1]],p[[2]],p[[3]],p[[4]],p[[5]],p[[6]],p[[7]],as_ggplot(legend),ncol=4)
+```
+
+## Item characteristic curves
+
+The following code computes the expectation of each item according to the underlying level of depressive symptomatology. This is achieved with predictYcond function with two plot possibilities: direct plot function or ggplot
+
+```{r,comment='', fig.height=4, fig.width=7}
+expe <- predictYcond(modIRT,lprocess = seq(-6,6,by=0.1))
+# via the internal plot function 
+plot(expe,xlab="underlying depressive symptomatology",main="Item Expectation Curves",legend=paste("Item",(1:nitems)*2))
+```
+
+```{r,comment='', fig.height=4, fig.width=6}
+# via ggplot
+j <- table(expe$pred$Yname)[1]
+expe$pred$item <- as.factor(c(rep(2,j),rep(4,j),rep(6,j),rep(8,j),rep(10,j),rep(12,j),rep(14,j)))
+p <- (ggplot(expe$pred)
+      + geom_line(aes(x = Lprocess, y = Ypred, group=item,color=item),alpha = 1,size=1.2)
+      + theme_bw()
+      + xlab("underlying depressive symptomatology")
+      + ylim(0,3)
+      + ylab("Item Expectation"))
+p
+```
+
+## Item Information Function 
+
+The following codes compute and plot the level of information brought by each item category (information share) and brought in total by each item. 
+
+### by Category
+
+```{r}
+# function for computing the information share components
+NumerInf <- function(min,max,K,paramtot,stdtot,xlatent){
+  param=paramtot[(3*(K-1)+1):(3*K)]
+  std=stdtot[K]
+  nmes <- length(xlatent)
+  numer <- rep(0,length=(max-min+1)*nmes)
+  deriv2 <- rep(0,length=(max-min+1)*nmes)
+  level <- rep(1,length=(max-min+1)*nmes)
+# level 1
+  numer[1:nmes] <- ((- dnorm((xlatent-param[1])/std)/std))^2
+  deriv2[1:nmes] <- ((xlatent-param[1])/(std^3))*(dnorm((xlatent-param[1])/std))
+# intermediate levels
+  if ((max-min)>1) {
+    sup <- param[1]
+    l <- 2
+    for (l in 1:(max-min-1)) {
+      numer[l*nmes+(1:nmes)] <- dnorm((xlatent-sup)/std)/std
+      deriv2[l*nmes+(1:nmes)] <- -((xlatent-sup)/(std^3))*dnorm((xlatent-sup)/std)
+      sup <- sup + param[1+l]^2
+      numer[l*nmes+(1:nmes)] <- numer[l*nmes+(1:nmes)] - (dnorm((xlatent-sup)/std))/std
+      deriv2[l*nmes+(1:nmes)] <- deriv2[l*nmes+(1:nmes)] + ((xlatent-sup)/(std^3))*(dnorm((xlatent-sup)/std))
+      level[l*nmes+(1:nmes)] <- l+1
+      numer[l*nmes+(1:nmes)] <- numer[l*nmes+(1:nmes)]^2
+    }
+  }
+  # level max
+  numer[(max-min)*nmes+(1:nmes)] <- ((dnorm((xlatent-sup)/std))/std)^2
+  deriv2[(max-min)*nmes+(1:nmes)] <- ((xlatent-sup)/(std^3))*(-dnorm((xlatent-sup)/std))
+  level[(max-min)*nmes+(1:nmes)] <- (max-min+1)
+  res <- data.frame(level,numer,deriv2,latent=rep(xlatent,(max-min+1)))
+  return(res)
+}
+```
+
+```{r,message=F,warning=F,comment='', fig.height=4, fig.width=7}
+# Call and plot
+process <- seq(-6,6,by=0.1)
+InfoMat <- data.frame(process)
+for (k in 1:7){
+Numer <- NumerInf(min=0,max=3,K=k,paramtot=seuils,stdtot=err,xlatent=process)
+ICC <- pred_Pr(min=0,max=3,param=seuils[(3*(k-1)+1):(3*k)],std=err[k],xlatent=process)
+Numer$InfLevel <- Numer[,2]/(ICC[,2]) - Numer[,3]
+Numer$InfLevel[is.infinite(Numer$InfLevel)] <- NA
+  p[[k]] <- (ggplot(Numer)
+      + geom_line(aes(x = latent, y = InfLevel, group = level,color=level), show.legend = F,alpha = 1,size=1.2)
+      # + stat_smooth(aes(x = tempsLA, y = hads_scorea), method = "loess", size = 0.75)
+      + theme_bw()
+      + labs(title=paste("Item",2*k))
+      + xlab("construct")
+      + ylim(0,1)
+      + ylab("Information of item level"))
+Numer$infinterm <- Numer[,2]/(ICC[,2])
+Numer$infinterm [is.infinite(Numer$infinterm )] <- NA
+Info <- apply(sapply(1:4,function(x){Numer$infinterm[which(Numer$level==x)]}),MARGIN=1,FUN=sum)
+InfoMat[,k+1] <- Info
+}
+colnames(InfoMat) <- c("process",paste("Item",2*(1:7),sep=""))
+
+
+p[[8]] <- (ggplot(Numer)
+      + geom_line(aes(x = latent, y = InfLevel, group = level,color=level),alpha = 1,size=1.2)
+      + theme_bw()
+)
+legend <- get_legend(p[[8]])
+ grid.arrange(p[[1]],p[[2]],p[[3]],p[[4]],p[[5]],p[[6]],p[[7]],as_ggplot(legend),ncol=4)
+```
+
+
+### by Item
+
+```{r,message=F,warning=F,comment='', fig.height=4, fig.width=6}
+p <- NULL
+k <- 1
+InfoMatBis <- reshape(InfoMat,direction="long",
+                      idvar="process",
+                      varying=list(names(InfoMat)[-1]),
+                      timevar = "Item",v.names="Info")
+head(InfoMatBis)
+InfoMatBis$item <- as.factor(InfoMatBis$Item*2)
+InfoMatBis$Info[which(InfoMatBis$Info==Inf)] <- NA
+p <- (ggplot(InfoMatBis)
+      + geom_line(aes(x = process, y = Info, group=item,color=item),alpha = 1,size=1.2)
+      + theme_bw()
+      + xlab("underlying depressive symptomatology")
+      
+      + ylim(0,2.3)
+      + ylab("Item Information Function"))
+p
+```
+
+
+## Predicted item trajectory according to time
+
+Item predicted trajectories according to a specific profile of covariates can be computed using predictY function:
+
+```{r,eval=F}
+head(datnew)
+datnew$grp <- 0
+ns0 <- predictY(modIRT,var.time = "time",newdata=datnew,methInteg = 1,nsim=2000,draws=T)
+datnew$grp <- 1
+ns1 <- predictY(modIRT,var.time = "time",newdata=datnew,methInteg = 1,nsim=2000,draws=T)
+```
+
+
+```{r,comment='', fig.height=4, fig.width=6}
+par(mfrow=c(2,4))
+for(k in 1:7){
+plot(ns0,outcome = k,shades = T,ylim=c(0,3),bty="l",legend=NULL,main=paste("Item",2*k),ylab="Item level",xlab="months on the waiting list")
+plot(ns1,outcome=k,shades=T,add=T,col=2)
+}
+```
+
+
+# Assessment of DIF and RS
+
+## Estimation of the IRT model with a DIF on group
+
+DIF is programmed using contrasts (item-specific departure around the mean effect on the underlying latent process)
+
+```{r,eval=F}
+# initialization of the parameter vector for faster convergence
+npm <- length(modIRT$best)
+Binit <- c(modIRT$best[1:7],rep(0,(nitems-1)),modIRT$best[(npm-nlevel*nitems-9+1):npm])
+# estimation
+modIRT_DIFg <- multlcmm(hads_2 + hads_4 +hads_6 + hads_8 +hads_10+hads_12 + hads_14 ~ ns(time,knots=c(7,15),Boundary.knots = c(0,60))*(grp) +contrast(grp),random=~1+ns(time,knots=c(7,15),Boundary.knots = c(0,60)),data=simdataHADS,subject="ID",link="thresholds",methInteg="QMC",nMC=1000,B=Binit)
+```
+
+```{r}
+sumDIF <- summary(modIRT_DIFg)
+sumDIF[,2]
+```
+
+To be done again .... L'item 2 est le seul item qui semble être différent entre les groupes (p=0.0071) avec un niveau plus faible chez les preemptive par rapport aux autres items. Au global, la différence de groupe entre les 7 items ne semble pas significative (p=0.2665 au global (Chi2 à 6 degrés de liberté)). 
+
+Global test for contrasts
+```{r}
+WaldMult(modIRT_DIFg,pos=c(8:13))
+```
+
+95\% confidence interval of the difference between groups for item 2: 
+```{r}
+sum <- summary(modIRT_DIFg)[10,]
+c(sum[1],sum[1]- qnorm(0.975)*sum[2],sum[1]+ qnorm(0.975)*sum[2])
+```
+
+## C. Estimation of the IRT model with a Response Shift over time
+
+Response Shift is modelled by adding contrasts on the functions of time
+
+```{r,eval=F}
+# initialization of the parameter vector for faster convergence
+npm <- length(modIRT$best)
+Binit <- c(modIRT$best[1:7],rep(0,3*(nitems-1)),modIRT$best[(npm-nlevel*nitems-9+1):npm])
+# estimation
+modIRT_DIFt <- multlcmm(hads_2 + hads_4 +hads_6 + hads_8 +hads_10+hads_12 + hads_14 ~ ns(time,knots=c(7,15),Boundary.knots = c(0,60))*(grp) + contrast(ns(time,knots=c(7,15),Boundary.knots = c(0,60))),random=~1+ns(time,knots=c(7,15),Boundary.knots = c(0,60)),data=simdataHADS,subject="ID",link="thresholds",methInteg="QMC",nMC=1000,B=Binit)
+```
+
+```{r}
+summary(modIRT_DIFt)
+```
+
+There does not seem to be any difference in item trajectories over time (see global p-values for each function of time in the summary). We can seek whether there are some difference item by item using Wald Test. This can be done with the WaldMult function of lcmm except for the last item since this parameter is a combination of the others. 
+Next code details how to obtain this item-specific test of invariance over time. 
+
+```{r}
+## Pvalue for the last contrast
+b <- coef(modIRT_DIFt)
+v <- vcov(modIRT_DIFt)
+A <- rbind(c(rep(0,7), rep(-1,6), rep(0,49)),
+	   c(rep(0,7+6), rep(-1,6), rep(0,49-6)),
+	   c(rep(0,7+12), rep(-1,6), rep(0,49-12)))
+w <- t(A%*%b) %*% solve(A%*%v%*%t(A)) %*% A%*%b
+DIF14 <- 1-pchisq(w, df=nrow(A)) # p=0.3722833
+```
+
+```{r}
+## pvalues for all the items including the last one
+DIF <- cbind(seq(2,14,by=2),c(sapply(1:6,function(k){WaldMult(modIRT_DIFt,pos=c(7+k,(7+6+k),(7+2*6+k)))[2]}),DIF14))
+colnames(DIF) <- c("item","pvalue")
+DIF   
+```
+
+Interpretation.
+
+### Prediction in the item scale to compare the model with RS and without RS
+
+```{r,eval=F}
+head(datnew)
+datnew$grp <- 0
+ns0DIFt <- predictY(modIRT_DIFt,var.time = "time",newdata=datnew,methInteg = 1,nsim=2000,draws=T)
+datnew$grp <- 1
+ns1DIFt <- predictY(modIRT_DIFt,var.time = "time",newdata=datnew,methInteg = 1,nsim=2000,draws=T)
+```
+
+
+```{r,comment='', fig.height=6, fig.width=6}
+par(mfrow=c(3,3))
+for(k in 1:7){
+plot(ns0,outcome = k,shades = T,ylim=c(0,3),bty="l",legend=NULL,main=paste("Item",2*k,"-",meaning[k]),ylab="Item level",xlab="months on the waiting list",color=1,lwd=2,xlim=c(0,50))
+plot(ns0DIFt,outcome=k,shades=T,lty=2,add=T,col=1,lwd=2)
+plot(ns1,outcome=k,shades=T,add=T,col=4,lwd=2)
+plot(ns1DIFt,outcome=k,shades=T,add=T,col=4,lty=2,lwd=2)
+legend("top",legend=paste("(RS overall test: p = ",round(DIF[k,2],digits = 3),")",sep=""),bty="n")
+}
+plot(0,xaxt='n',yaxt='n',bty='n',pch='',ylab='',xlab='', main ='')
+legend(x="top",legend=c("dialysed","pre-emptive"),lty=c(1,1),col=c(1,4),lwd=2,bty="n")
+legend(x="bottom",legend=c("without RS","with RS"),lty=c(1,2),col=c("gray","gray"),lwd=2,bty="n")
+```
