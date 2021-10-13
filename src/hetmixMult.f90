@@ -1781,7 +1781,7 @@ double precision function vrais_multo(b,m,id,thi,jd,thj)
         !if (temp/temp.ne.1) write(*,*)"i=",i,"vrais= ",temp
         !if (temp.eq.-1.d9) then 
         vrais_multo = -1.d9
-      print*,"i=",i," vrais_multo=",vrais_multo," m=",m," b=",b
+     ! print*,"i=",i," vrais_multo=",vrais_multo," m=",m," b=",b
         ! if(verbose==1) write(*,*)"i=",i,"vrais= ",temp
         goto 541
      end iF
