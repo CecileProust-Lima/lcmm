@@ -159,7 +159,9 @@
 #' @param link optional vector of families of parameterized link functions to
 #' estimate (one by outcome). Option "linear" (by default) specifies a linear
 #' link function. Other possibilities include "beta" for estimating a link
-#' function from the family of Beta cumulative distribution functions and
+#' function from the family of Beta cumulative distribution functions,
+#' "thresholds" for using a threshold model to describe the correspondence
+#' between each level of an ordinal outcome and the underlying latent process and
 #' "Splines" for approximating the link function by I-splines. For this latter
 #' case, the number of nodes and the nodes location should be also specified.
 #' The number of nodes is first entered followed by \code{-}, then the location
