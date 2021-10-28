@@ -64,6 +64,8 @@ gridsearch <- function(m,rep,maxiter,minit,cl=NULL)
     models <- vector(mode="list",length=rep)
     assign("minit",eval(minit))
 
+    if(minit$conv != 1) stop("The model minit did not converge")
+
     ncl <- NULL
     
     ## parallel version
