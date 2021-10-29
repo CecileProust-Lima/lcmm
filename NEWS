@@ -6,9 +6,15 @@ A detailed companion paper is available in Journal of Statistical Software:
 
 Proust-Lima C, Philipps V, Liquet B. Estimation of Extended Mixed Models Using Latent Classes and Latent Processes: The R Package lcmm. Journal of Statistical Software, Articles. 2017;78(2):1-56. 
 
-https://www.jstatsoft.org/article/view/v078i02
+https://doi.org/10.18637/jss.v078.i02
 
 And specific statistical models estimated are described in various statistical papers of the authors. 
+
+Changes in Version 1.9.4 () :
+
+* multlcmm ordinal
+* simulate
+* bug...
 
 
 Changes in Version 1.9.3 (2021-06-17):

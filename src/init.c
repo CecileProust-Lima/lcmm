@@ -17,6 +17,7 @@ static R_FortranMethodDef FortRout[] = {
   {"calculustransfo", (DL_FUNC) &F77_SUB(calculustransfo), 16},
   {"mpjhet", (DL_FUNC) &F77_SUB(mpjhet), 64},
   {"hetmixmult", (DL_FUNC) &F77_SUB(hetmixmult), 59},
+  {"iteminfo", (DL_FUNC) &F77_SUB(iteminfo), 15},
   {NULL, NULL, 0}
 };
 
