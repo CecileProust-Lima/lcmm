@@ -368,11 +368,11 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
   !  write(*,*)'NVC',nvc
 
 
-  if (idiag.eq.1) then
-     DO j=1,nvc
-        btot(nprob+nef+ncontr+j)=dsqrt(abs(btot(nprob+nef+ncontr+j)))
-     END DO
-  end if
+!  if (idiag.eq.1) then
+!     DO j=1,nvc
+!        btot(nprob+nef+ncontr+j)=dsqrt(abs(btot(nprob+nef+ncontr+j)))
+!     END DO
+!  end if
 
   chol=chol0
 
@@ -1218,7 +1218,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                  Y3=matmul(VC,Y2)
                  Y4=DOT_PRODUCT(Y2,Y3)
                  
-                 div = (dble(2*3.14159265)**(dble(nmes(i,yk)/2)))*sqrt(exp(det))
+                 div = (dble(2*3.14159265)**(dble(nmes(i,yk)/2.d0)))*sqrt(exp(det))
 
                  vrais_l = vrais_l * exp(-Y4/2.d0)/div
               end if
@@ -2651,7 +2651,7 @@ end do
                           Y4=DOT_PRODUCT(Y2,Y3) 
 
                           !! densite gaussienne
-                          vrais_l = vrais_l * dble(2*3.14159265)**(dble(nmes(i,yk)/2))*exp((-det-Y4)/2.d0)
+                          vrais_l = vrais_l * dble(2*3.14159265)**(dble(nmes(i,yk)/2.d0))*exp((-det-Y4)/2.d0)
                       
                        end if
 
