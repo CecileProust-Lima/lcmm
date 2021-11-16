@@ -222,10 +222,11 @@ simulate.lcmm <- function(object, nsim, seed, times, tname=NULL, n,
         typerisq <- object$hazard[[1]] # 1=piecewise 2=weibull 3=splines
         risqcom <- object$hazard[[2]] #0=specific 1=common 2=PH
         nz <- object$hazard[[4]]
-        if(any(typerisq==3)) stop("splines risk functions are not implemented yet")
+        #if(any(typerisq==3)) stop("splines risk functions are not implemented yet")
 
         nprisq <- rep(2,nbevt)
         nprisq[which(typerisq==1)] <- nz[which(typerisq==1)]-1
+        nprisq[which(typerisq==3)] <- nz[which(typerisq==3)]+2
         nrisq <- (risqcom=="Common")*nprisq + (risqcom=="Specific")*nprisq*ng + (risqcom=="PH")*(nprisq+ng-1)
         prisq <- vector("list", length=nbevt)
         ph <- matrix(NA, nbevt, ng)
@@ -671,29 +672,55 @@ simulate.lcmm <- function(object, nsim, seed, times, tname=NULL, n,
                         tevt[ke] <- rweibull(1, shape=weib[2], scale=1/((weib[1]*exp(xbsurv+ph[ke,class]))^(1/weib[2])))
                     }
                 }
-                else # piecewise constant
+                else
                 {
-                    bl <- prisq[[ke]][,class]
-                    zl <- object$hazard[[3]][1:nz[ke],ke]
-
-                    surv <- function(t,zl,bl,expXb,p)
+                    if(typerisq[ke]==1) # piecewise constant
                     {
-                        j <- which.max(zl[which(zl<=t)])
-                        if(j==1) som <- 0 
-                        else som <- sum(bl[1:(j-1)]*(zl[2:j]-zl[1:(j-1)]))
+                        bl <- prisq[[ke]][,class]
+                        zl <- object$hazard[[3]][1:nz[ke],ke]
                         
-                        if(j<length(zl)) surv <- exp(-(som+bl[j]*(t-zl[j]))*expXb)
-                        else surv <- exp(-som*expXb)
+                        surv <- function(t,zl,bl,expXb,p)
+                        {
+                            j <- which.max(zl[which(zl<=t)])
+                            if(j==1) som <- 0 
+                            else som <- sum(bl[1:(j-1)]*(zl[2:j]-zl[1:(j-1)]))
+                            
+                            if(j<length(zl)) surv <- exp(-(som+bl[j]*(t-zl[j]))*expXb)
+                            else surv <- exp(-som*expXb)
+                            
+                            return(surv-p)
+                        }
                         
-                        return(surv-p)
+                        unif <- runif(1)
+                        zero <- try(uniroot(surv,interval=c(zl[1],zl[length(zl)]),
+                                            zl=zl,bl=bl,
+                                            expXb=exp(xbsurv+ph[ke,class]),p=unif),
+                                    silent=TRUE)
+                        if(class(zero)!="try-error") tevt[ke] <- zero$root
                     }
-                    
-                    unif <- runif(1)
-                    zero <- try(uniroot(surv,interval=c(zl[1],zl[length(zl)]),
-                                        zl=zl,bl=bl,
-                                        expXb=exp(xbsurv+ph[ke,class]),p=unif),
-                                silent=TRUE)
-                    if(class(zero)!="try-error") tevt[ke] <- zero$root
+                    else
+                    {
+                        if(typerisq[ke]==3)# splines risk
+                        {
+                            bl <- prisq[[ke]][,class]
+                            zl <- object$hazard[[3]][1:nz[ke],ke]
+
+                            surv <- function(t,zl,bl,expXb,p)
+                            {
+                                temp <- risqcum_spl(t,zl,bl)
+                                surv <- exp(-temp*expXb)
+                                
+                                return(surv-p)
+                            }
+                            
+                            unif <- runif(1)
+                            zero <- try(uniroot(surv,interval=c(zl[1],zl[length(zl)]),
+                                                zl=zl,bl=bl,
+                                                expXb=exp(xbsurv+ph[ke,class]),p=unif),
+                                        silent=TRUE)
+                            if(class(zero)!="try-error") tevt[ke] <- zero$root
+                        }
+                    }
                 }
             }
             }
