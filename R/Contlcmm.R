@@ -1023,7 +1023,14 @@
             ppi <- matrix(rep(1,ns0),ncol=ng0)
         }
 
-        classif <- apply(ppi,1,which.max)
+        chooseClass <- function(ppi)
+        {
+            res <- which.max(ppi)
+            if(!length(res)) res <- NA
+            return(res)
+        }
+        
+        classif <- apply(ppi,1,chooseClass)
         ppi <- data.frame(INDuniq,classif,ppi)
         temp <- paste("prob",1:ng0,sep="")
         colnames(ppi) <- c(nom.subject,"class",temp)

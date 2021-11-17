@@ -1979,6 +1979,12 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         }
 
         ## proba des classes a posteroiri et classification
+        chooseClass <- function(ppi)
+        {
+            res <- which.max(ppi)
+            if(!length(res)) res <- NA
+            return(res)
+        }
         if(ng>1)
             {
                 ppi <- matrix(out$ppi,ncol=ng,nrow=ns,byrow=TRUE)
@@ -1996,14 +2002,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             }
         else
             {
-                classif <- apply(ppi,1,which.max)
-
-                if(any(!is.finite(ppi)))
-                    {
-                        classif <- rep(NA,ns)
-                        iok <- which(is.finite(ppi[,1]))
-                        classif[iok] <- apply(ppi[iok,,drop=FALSE],1,which.max)
-                    }
+                classif <- apply(ppi,1,chooseClass)
             }
 
         ppi <- data.frame(unique(IND),classif,ppi)
@@ -2018,14 +2017,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             }
         else
             {
-                classif <- apply(ppitest,1,which.max)
-
-                if(any(!is.finite(ppitest)))
-                    {
-                        classif <- rep(NA,ns)
-                        iok <- which(is.finite(ppitest[,1]))
-                        classif[iok] <- apply(ppitest[iok,,drop=FALSE],1,which.max)
-                    }
+                classif <- apply(ppitest,1,chooseClass)
             }
  
         ppitest <- data.frame(unique(IND),classif,ppitest)

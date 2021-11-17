@@ -2612,16 +2612,15 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                 classif <- rep(NA,ns0)
             }
         else
+        {
+            chooseClass <- function(ppi)
             {
-                classif <- apply(ppi,1,which.max)
-
-                if(any(!is.finite(ppi)))
-                    {
-                        classif <- rep(NA,ns0)
-                        iok <- which(is.finite(ppi[,1]))
-                        classif[iok] <- apply(ppi[iok,,drop=FALSE],1,which.max)
-                    }
+                res <- which.max(ppi)
+                if(!length(res)) res <- NA
+                return(res)
             }
+            classif <- apply(ppi,1,chooseClass)
+        }
 
         ppi <- data.frame(unique(IND),classif,ppi)
         temp <- paste("probYT",1:ng0,sep="")
@@ -2636,7 +2635,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
             }
         else
             {
-                classif <- apply(ppitest,1,which.max)
+                classif <- apply(ppitest,1,chooseClass)
 
                 if(any(!is.finite(ppitest)))
                     {

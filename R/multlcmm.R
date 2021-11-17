@@ -1755,15 +1755,21 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 
 ###ppi
     if(ng0>1) {
-        ppi<- matrix(out$ppi2,ncol=ng0,byrow=TRUE)
+        ppi <- matrix(out$ppi2,ncol=ng0,byrow=TRUE)
     }
     else {
         ppi <- matrix(rep(1,ns0),ncol=ng0)
     }
-
-    classif<-apply(ppi,1,which.max)
-    ppi<-data.frame(unique(IND),classif,ppi)
-    temp<-paste("prob",1:ng0,sep="")
+    
+    chooseClass <- function(ppi)
+    {
+        res <- which.max(ppi)
+        if(!length(res)) res <- NA
+        return(res)
+    }
+    classif <- apply(ppi,1,chooseClass)
+    ppi <- data.frame(unique(IND),classif,ppi)
+    temp <- paste("prob",1:ng0,sep="")
     colnames(ppi) <- c(nom.subject,"class",temp)
     rownames(ppi) <- 1:ns0
 
