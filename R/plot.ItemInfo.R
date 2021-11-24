@@ -1,3 +1,30 @@
+#' Plot of information functions
+#' 
+#' This function plots the information functions stemmed
+#' from a \code{lcmm} or \code{multlcmm} object with threholds links.
+#' 
+#' @param x an object inheriting from classes \code{ItemInfo}
+#' @param which character specifying the values to plot. Should be one of 'ItemInfo' for
+#' the Fisher information function of the ordinal outcomes, 'LevelInfo' for the
+#' information of each item's level or 'LevelProb' for the probability of the item's
+#' levels.  Default to 'ItemInfo'.
+#' @param outcome character specifying the outcome to consider. Default to "all".
+#' @param legend.loc keyword for the position of the legend from the list
+#' \code{"bottomright"}, \code{"bottom"}, \code{"bottomleft"}, \code{"left"},
+#' \code{"topleft"},\code{"top"}, \code{"topright"}, \code{"right"} and
+#' \code{"center"}.
+#' @param legend character or expression to appear in the legend. If no legend
+#' should be added, \code{"legend"} should be NULL.
+#' @param add logical indicating if the curves should be added to an existing
+#' plot. Default to FALSE.
+#' @param shades logical indicating if confidence intervals should be
+#' represented with shades. Default to FALSE, the confidence intervals are
+#' represented with dotted lines.
+#' @param \dots other parameters to be passed through to plotting functions or
+#' to legend
+#' @author Viviane Philipps and Cecile Proust-Lima
+#' @export
+#' 
 plot.ItemInfo <- function(x, which="ItemInfo", outcome="all", legend.loc="topright", legend=NULL, add=FALSE, shades=TRUE, ...)
 {
     if(missing(x)) stop("The argument x is missing")

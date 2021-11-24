@@ -2,9 +2,8 @@
 % Please edit documentation in R/ItemInfo.R
 \name{ItemInfo}
 \alias{ItemInfo}
-\title{Conditional predictions of a \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}
-object in the natural scale of the longitudinal outcome(s) for specified
-latent process values.}
+\title{Conditional probabilities and item information of \code{lcmm} or \code{multlcmm}
+object for specified latent process values.}
 \usage{
 ItemInfo(
   x,
@@ -17,9 +16,8 @@ ItemInfo(
 )
 }
 \arguments{
-\item{x}{an object inheriting from class \code{lcmm}, 
-\code{Jointlcmm} or \code{multlcmm} representing a general latent class
-mixed model.}
+\item{x}{an object inheriting from class  \code{lcmm} or \code{multlcmm}, 
+representing a general latent class mixed model.}
 
 \item{lprocess}{numeric vector containing the latent process values at which the
 predictions should be computed.}
@@ -47,37 +45,48 @@ By default, ndraws=2000.}
 are ignored in this function.}
 }
 \value{
-An object of class \code{predictYcond} with values :
+An object of class \code{ItemInfo} with values :
 
-- \code{pred} : 
+- \code{ItemInfo} : 
 If draws=FALSE, returns a matrix with 3 columns : the first column indicates the
 name of the outcome, the second indicates the latent process value and the last
-is the computed prediction.
+is the computed Fisher information.
 If draws=TRUE, returns a matrix with 5 columns : the name of the outcome, the
 latent process value and the 50\%, 2.5\% and 97.5\% percentiles of the approximated
-posterior distribution of predicted values.
+posterior distribution of information.
 
-- \code{object} : the model from which the predictions are computed.
+- \code{LevelInfo} : 
+If draws=FALSE, returns a matrix with 5 columns : the first column indicates the
+name of the outcome, the second indicates the outcome's level, the third indicates the
+latent process value and the two last contain the probability and Fisher information.
+If draws=TRUE, returns a matrix with 5 columns : the name of the outcome,
+the outcome's level, the latent process value and the 50\%, 2.5\% and 97.5\%
+percentiles of the approximated posterior distribution of the probability and information.
+
+- \code{object} : the model from which the computatiosns are done.
+- \code{IC} : indicator specifying if confidence intervals are computed.
 }
 \description{
-The function computes the predicted values of the longitudinal markers in their
-natural scale for specified values of the latent process. For splines and Beta
-links, a Gauss-Hermite integration is used to numerically compute the predictions.
-In addition, for any type of link function, confidence bands (and median) can be
-computed by a Monte Carlo approximation of the posterior distribution of the
-predicted values.
+The function computes the conditional probability and information function of
+each level of each ordinal outcome and the information function at the item level.
+Confidence bands (and median) can be computed by a Monte Carlo approximation.
 }
 \examples{
 \dontrun{
-m12 <- lcmm(Ydep2~Time+I(Time^2),random=~Time,subject='ID',ng=1,
-data=data_lcmm,link="3-equi-splines")
-predm12 <- predictYcond(m12,lprocess=seq(-8,2,length.out=100),draws=TRUE)
-plot(predm12)
+## This is a toy example to illustrate the information functions.
+## The binary outcomes are arbitrarily created, please do not
+## consider them as relevent indicators.
+data_lcmm$Yord1 <- as.numeric(data_lcmm$Ydep1>10)
+data_lcmm$Yord2 <- as.numeric(data_lcmm$Ydep2>25)
+m <- multlcmm(Yord1+Yord2~Time+I(Time^2),random=~Time,subject='ID',ng=1,
+data=data_lcmm,link="thresholds")
+info <- ItemInfo(m,lprocess=seq(-4,4,length.out=100),draws=TRUE)
+plot(info)
+par(mfrow=c(1,2))
+plot(info, which="LevelInfo", outcome="Yord1")
+plot(info, which="LevelInfo", outcome="Yord2")
 }
 
-}
-\seealso{
-\code{\link{predictYcond}}
 }
 \author{
 Cecile Proust-Lima, Viviane Philipps

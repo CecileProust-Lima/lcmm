@@ -29,26 +29,42 @@
 #'
 #' @return An object of class \code{ItemInfo} with values :
 #'
-#' - \code{pred} : 
+#' - \code{ItemInfo} : 
 #' If draws=FALSE, returns a matrix with 3 columns : the first column indicates the
 #' name of the outcome, the second indicates the latent process value and the last
-#' is the computed prediction.
+#' is the computed Fisher information.
 #' If draws=TRUE, returns a matrix with 5 columns : the name of the outcome, the
 #' latent process value and the 50\%, 2.5\% and 97.5\% percentiles of the approximated
-#' posterior distribution of predicted values.
+#' posterior distribution of information.
+#' 
+#' - \code{LevelInfo} : 
+#' If draws=FALSE, returns a matrix with 5 columns : the first column indicates the
+#' name of the outcome, the second indicates the outcome's level, the third indicates the
+#' latent process value and the two last contain the probability and Fisher information.
+#' If draws=TRUE, returns a matrix with 5 columns : the name of the outcome,
+#' the outcome's level, the latent process value and the 50\%, 2.5\% and 97.5\%
+#' percentiles of the approximated posterior distribution of the probability and information.
 #'
-#' - \code{object} : the model from which the predictions are computed.
+#' - \code{object} : the model from which the computatiosns are done.
+#' - \code{IC} : indicator specifying if confidence intervals are computed.
 #'
 #' @examples
 #' \dontrun{
-#' m12 <- lcmm(Ydep2~Time+I(Time^2),random=~Time,subject='ID',ng=1,
-#' data=data_lcmm,link="3-equi-splines")
-#' predm12 <- predictYcond(m12,lprocess=seq(-8,2,length.out=100),draws=TRUE)
-#' plot(predm12)
+#' ## This is a toy example to illustrate the information functions.
+#' ## The binary outcomes are arbitrarily created, please do not
+#' ## consider them as relevent indicators.
+#' data_lcmm$Yord1 <- as.numeric(data_lcmm$Ydep1>10)
+#' data_lcmm$Yord2 <- as.numeric(data_lcmm$Ydep2>25)
+#' m <- multlcmm(Yord1+Yord2~Time+I(Time^2),random=~Time,subject='ID',ng=1,
+#' data=data_lcmm,link="thresholds")
+#' info <- ItemInfo(m,lprocess=seq(-4,4,length.out=100),draws=TRUE)
+#' plot(info)
+#' par(mfrow=c(1,2))
+#' plot(info, which="LevelInfo", outcome="Yord1")
+#' plot(info, which="LevelInfo", outcome="Yord2")
 #' }
 #'
 #' @author Cecile Proust-Lima, Viviane Philipps
-#' @seealso \code{\link{predictYcond}}
 #' 
 #' @export
 #' 
