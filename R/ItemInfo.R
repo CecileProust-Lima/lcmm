@@ -1,17 +1,12 @@
-#' Conditional predictions of a \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}
-#' object in the natural scale of the longitudinal outcome(s) for specified
-#' latent process values.
+#' Conditional probabilities and item information of \code{lcmm} or \code{multlcmm}
+#' object for specified latent process values.
 #'
-#' The function computes the predicted values of the longitudinal markers in their
-#' natural scale for specified values of the latent process. For splines and Beta
-#' links, a Gauss-Hermite integration is used to numerically compute the predictions.
-#' In addition, for any type of link function, confidence bands (and median) can be
-#' computed by a Monte Carlo approximation of the posterior distribution of the
-#' predicted values.
+#' The function computes the conditional probability and information function of
+#' each level of each ordinal outcome and the information function at the item level.
+#' Confidence bands (and median) can be computed by a Monte Carlo approximation.
 #' 
-#' @param x an object inheriting from class \code{lcmm}, 
-#' \code{Jointlcmm} or \code{multlcmm} representing a general latent class
-#' mixed model.
+#' @param x an object inheriting from class  \code{lcmm} or \code{multlcmm}, 
+#' representing a general latent class mixed model.
 #' @param lprocess numeric vector containing the latent process values at which the
 #' predictions should be computed.
 #' @param condRE_Y for multlcmm objects only, logical indicating if the predictions
@@ -32,7 +27,7 @@
 #' @param \dots further arguments to be passed to or from other methods.  They
 #' are ignored in this function.
 #'
-#' @return An object of class \code{predictYcond} with values :
+#' @return An object of class \code{ItemInfo} with values :
 #'
 #' - \code{pred} : 
 #' If draws=FALSE, returns a matrix with 3 columns : the first column indicates the
@@ -126,15 +121,36 @@ ItemInfo <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,
                             as.integer(nbzitr),
                             as.integer(x$linktype),
                             as.integer(unlist(x$modalites)),
-                            as.integer(x$nbmod),
+                            as.integer(nbmod),
                             as.integer(nsim),
                             as.integer(2*sum(nbmod)+ny),
                             info=as.double(info))
-            
-            out$info[out$info==9999] <- NA
-            
-            info <- data.frame(rep(Ynames,each=maxmes),rep(lambda,ny),out$info)
-            colnames(info) <- c("Yname","Lprocess","Ypred")
+
+            out$info[which(!is.finite(out$info))] <- NA
+
+            infolevel <- as.data.frame(matrix(NA, maxmes, 5))
+            infoitem <- data.frame(Yname=rep(Ynames[which(x$linktype==3)],each=maxmes),
+                                   Lprocess=rep(lambda,ny),
+                                   Info=rep(NA, ny*maxmes))
+            j <- 0
+            jj <- 0
+            for(k in 1:ny)
+            {
+                if(x$linktype[k] != 3) next
+                
+                infolevel[jj+1:(nbmod[k]*maxmes),1] <- Ynames[k]
+                infolevel[jj+1:(nbmod[k]*maxmes),2] <- rep(x$modalites[[k]], each=maxmes)
+                infolevel[jj+1:(nbmod[k]*maxmes),3] <- rep(lambda, nbmod[k])
+                infolevel[jj+1:(nbmod[k]*maxmes),4] <- out$info[j+1:(nbmod[k]*maxmes)]
+                infolevel[jj+1:(nbmod[k]*maxmes),5] <- out$info[j+nbmod[k]*maxmes+1:(nbmod[k]*maxmes)]
+
+                infoitem[(k-1)*maxmes+1:maxmes,3] <- out$info[j+2*nbmod[k]*maxmes+1:maxmes]
+
+                j <- j+(2*x$nbmod[k]+1)*maxmes
+                jj <- jj+nbmod[k]*maxmes
+            }
+
+            colnames(infolevel) <- c("Yname","Level","Lprocess","Prob","Info")
         }
         else
         {
@@ -189,12 +205,12 @@ ItemInfo <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,
                                 as.integer(nbzitr),
                                 as.integer(x$linktype),
                                 as.integer(unlist(x$modalites)),
-                                as.integer(x$nbmod),
+                                as.integer(nbmod),
                                 as.integer(nsim),
                                 as.integer(2*sum(nbmod)+ny),
                                 info=as.double(info))
                 
-                out$info[out$info==9999] <- NA
+                out$info[which(!is.finite(out$info))] <- NA
                 ydraws <- cbind(ydraws,out$info)
             }
 
@@ -206,15 +222,51 @@ ItemInfo <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,
             Ypred_2.5 <- matrix(ydistr[1,],ncol=1,byrow=FALSE)
             Ypred_97.5 <- matrix(ydistr[3,],ncol=1,byrow=FALSE)
             
-            info <- data.frame(rep(Ynames,each=maxmes),rep(lambda,ny),Ypred_50,Ypred_2.5,Ypred_97.5)
-            colnames(info) <- c("Yname","Lprocess","Ypred_50","Ypred_2.5","Ypred_97.5")
+            ## info <- data.frame(rep(Ynames,each=maxmes),
+            ##                    rep(unlist(x$modalites), each=maxmes),
+            ##                    rep(lambda,ny),
+            ##                    Ypred_50,Ypred_2.5,Ypred_97.5)
+            ## colnames(info) <- c("Yname","Lprocess","Ypred_50","Ypred_2.5","Ypred_97.5")
+
+            
+            infolevel <- as.data.frame(matrix(NA, maxmes, 9))
+            infoitem <- data.frame(Yname=rep(Ynames[which(x$linktype==3)],each=maxmes),
+                                   Lprocess=rep(lambda,ny),
+                                   Info_50=rep(NA, ny*maxmes),
+                                   Info_2.5=rep(NA, ny*maxmes),
+                                   Info_97.5=rep(NA, ny*maxmes))
+            j <- 0
+            jj <- 0
+            for(k in 1:ny)
+            {
+                if(x$linktype[k] != 3) next
+                
+                infolevel[jj+1:(nbmod[k]*maxmes),1] <- Ynames[k]
+                infolevel[jj+1:(nbmod[k]*maxmes),2] <- rep(x$modalites[[k]], each=maxmes)
+                infolevel[jj+1:(nbmod[k]*maxmes),3] <- rep(lambda, nbmod[k])
+                infolevel[jj+1:(nbmod[k]*maxmes),4] <- Ypred_50[j+1:(nbmod[k]*maxmes)]
+                infolevel[jj+1:(nbmod[k]*maxmes),5] <- Ypred_2.5[j+1:(nbmod[k]*maxmes)]
+                infolevel[jj+1:(nbmod[k]*maxmes),6] <- Ypred_97.5[j+1:(nbmod[k]*maxmes)]
+                infolevel[jj+1:(nbmod[k]*maxmes),7] <- Ypred_50[j+nbmod[k]*maxmes+1:(nbmod[k]*maxmes)]
+                infolevel[jj+1:(nbmod[k]*maxmes),8] <- Ypred_2.5[j+nbmod[k]*maxmes+1:(nbmod[k]*maxmes)]
+                infolevel[jj+1:(nbmod[k]*maxmes),9] <- Ypred_97.5[j+nbmod[k]*maxmes+1:(nbmod[k]*maxmes)]
+
+                infoitem[(k-1)*maxmes+1:maxmes,3] <- Ypred_50[j+2*nbmod[k]*maxmes+1:maxmes]
+                infoitem[(k-1)*maxmes+1:maxmes,4] <- Ypred_2.5[j+2*nbmod[k]*maxmes+1:maxmes]
+                infoitem[(k-1)*maxmes+1:maxmes,5] <- Ypred_97.5[j+2*nbmod[k]*maxmes+1:maxmes]
+
+                j <- j+(2*nbmod[k]+1)*maxmes
+                jj <- jj+nbmod[k]*maxmes
+            }
+
+            colnames(infolevel) <- c("Yname","Level","Lprocess","Prob_50","Prob_2.5","Prob_97.5","Info_50","Info_2.5","Info_97.5")
         }
 
-        res <- list(pred=info,object=x)
+        res <- list(ItemInfo=infoitem, LevelInfo=infolevel, object=x, IC=draws)
     }
     else
     {
-        res <- list(pred=NA,object=x)
+        res <- list(ItemInfo==NA, LevelInfo=NA, object=x)
     }
     
     class(res) <- "ItemInfo"

@@ -13,8 +13,10 @@ And specific statistical models estimated are described in various statistical p
 Changes in Version 1.9.4 () :
 
 * multlcmm ordinal
+* vignette IRT
 * simulate
-* bug...
+* iteminfo
+* New argument var.time in hlme, lcmm, multlcmm and Jointlcmm functions. 
 
 
 Changes in Version 1.9.3 (2021-06-17):
