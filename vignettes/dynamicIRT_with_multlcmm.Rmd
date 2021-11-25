@@ -1,5 +1,5 @@
 ---
-title: 'Dynamic IRT model of PREDALIA study'
+title: 'Dynamic IRT model of PREDIALA study'
 output: 
   rmarkdown::html_vignette:
     toc: true # table of content true
@@ -211,38 +211,32 @@ t(rbind(ItemLoc,discrimination,Se=sqrt(diag(sediscr))))
 
 ## item category probability curve 
 
-The following code computes and plots the curve of each item category probability according to the underlying level of depressive symptomatology. This is not yet automatically computed in the package. 
+The curve of each item category probability according to the underlying level of depressive symptomatology can be obtain usinf the ItemInfo function. 
 
 ```{r,comment='', fig.height=4, fig.width=7}
-# function for category calculation
-pred_Pr <- function(min,max,param,std,xlatent){
-  nmes <- length(xlatent)
-  prob <- rep(0,length=(max-min+1)*nmes)
-  level <- rep(1,length=(max-min+1)*nmes)
-  prob[1:nmes] <- pnorm((param[1]-xlatent)/std)
-  if ((max-min)>1) {
-    sup <- param[1]
-    l <- 2
-    for (l in 1:(max-min-1)) {
-      prob[l*nmes+(1:nmes)] <- - pnorm((sup-xlatent)/std)
-      sup <- sup + param[1+l]^2
-      prob[l*nmes+(1:nmes)] <- prob[l*nmes+(1:nmes)] + pnorm((sup-xlatent)/std)
-      level[l*nmes+(1:nmes)] <- l+1
-    }
-  }
-  prob[(max-min)*nmes+(1:nmes)] <- 1-pnorm((sup-xlatent)/std)
-  level[(max-min)*nmes+(1:nmes)] <- (max-min+1)
-  return(data.frame(level,prob,latent=rep(xlatent,(max-min+1))))
-}
+## computations
+info_modIRT <- ItemInfo(modIRT, lprocess=seq(-6,6,0.1))
 
-## application and graph
 meaning <- c("Enjoy","Laugh","Cheerful" ,"Slow" ,"Appearance" ,"Looking Forward" ,"Leisure")
-process <- seq(-6,6,by=0.1)
+items <- paste("hads", seq(2,14,2), sep="_")
+
+## automatic graph
+par(mfrow=c(2,4), mar=c(3,2,2,1), mgp=c(2,0.5,0))
+for(k in 1:7)
+{     
+ plot(info_modIRT, which="LevelProb", outcome=items[k],
+      main=paste("Item",2*k,"-",meaning[k]), lwd=2, legend=NULL)
+}
+plot(0,axes=FALSE, xlab="", ylab="", col="white")
+legend("center", legend=paste("Level",0:3), col=1:4, lwd=2, box.lty=0)
+```
+```{r,comment='', fig.height=4, fig.width=7}
+## graph with ggplot
 p <- NULL
 for (k in 1:7){
-ICC  <- pred_Pr(min=0,max=3,param=seuils[(3*(k-1)+1):(3*k)],std=err[k],xlatent=process)
+ICC  <- info_modIRT$LevelInfo[which(info_modIRT$LevelInfo[,1]==items[k]),]
 p[[k]] <- (ggplot(ICC)
-      + geom_line(aes(x = latent, y = prob, group = level,color=level), show.legend = F,alpha = 1,size=1.2)
+      + geom_line(aes(x = Lprocess, y = Prob, group = Level,color=Level), show.legend = F,alpha = 1,size=1.2)
       # + stat_smooth(aes(x = time, y = hads_scorea), method = "loess", size = 0.75)
       + theme_bw()
       + labs(title=paste("Item",2*k,"-",meaning[k]))
@@ -251,7 +245,7 @@ p[[k]] <- (ggplot(ICC)
       + ylab("Probability of item level"))
 }
 p[[8]] <- (ggplot(ICC)
-      + geom_line(aes(x = latent, y = prob, group = level,color=level),alpha = 1,size=1.2)
+      + geom_line(aes(x = Lprocess, y = Prob, group = Level,color=Level),alpha = 1,size=1.2)
       + theme_bw()
 )
 legend <- get_legend(p[[8]])
@@ -265,7 +259,8 @@ The following code computes the expectation of each item according to the underl
 ```{r,comment='', fig.height=4, fig.width=7}
 expe <- predictYcond(modIRT,lprocess = seq(-6,6,by=0.1))
 # via the internal plot function 
-plot(expe,xlab="underlying depressive symptomatology",main="Item Expectation Curves",legend=paste("Item",(1:nitems)*2))
+plot(expe, xlab="underlying depressive symptomatology", main="Item Expectation Curves",
+     legend=paste("Item",(1:nitems)*2), lwd=2)
 ```
 
 ```{r,comment='', fig.height=4, fig.width=6}
@@ -283,99 +278,27 @@ p
 
 ## Item Information Function 
 
-The following codes compute and plot the level of information brought by each item category (information share) and brought in total by each item. 
+The level of information brought by each item category (information share) and brought in total by each item is also computed by the ItemInfo function. The curves can be again plotted directly with options which="LevelInfo" and which="ItemInfo" respectively.
 
 ### by Category
 
-```{r}
-# function for computing the information share components
-NumerInf <- function(min,max,K,paramtot,stdtot,xlatent){
-  param=paramtot[(3*(K-1)+1):(3*K)]
-  std=stdtot[K]
-  nmes <- length(xlatent)
-  numer <- rep(0,length=(max-min+1)*nmes)
-  deriv2 <- rep(0,length=(max-min+1)*nmes)
-  level <- rep(1,length=(max-min+1)*nmes)
-# level 1
-  numer[1:nmes] <- ((- dnorm((xlatent-param[1])/std)/std))^2
-  deriv2[1:nmes] <- ((xlatent-param[1])/(std^3))*(dnorm((xlatent-param[1])/std))
-# intermediate levels
-  if ((max-min)>1) {
-    sup <- param[1]
-    l <- 2
-    for (l in 1:(max-min-1)) {
-      numer[l*nmes+(1:nmes)] <- dnorm((xlatent-sup)/std)/std
-      deriv2[l*nmes+(1:nmes)] <- -((xlatent-sup)/(std^3))*dnorm((xlatent-sup)/std)
-      sup <- sup + param[1+l]^2
-      numer[l*nmes+(1:nmes)] <- numer[l*nmes+(1:nmes)] - (dnorm((xlatent-sup)/std))/std
-      deriv2[l*nmes+(1:nmes)] <- deriv2[l*nmes+(1:nmes)] + ((xlatent-sup)/(std^3))*(dnorm((xlatent-sup)/std))
-      level[l*nmes+(1:nmes)] <- l+1
-      numer[l*nmes+(1:nmes)] <- numer[l*nmes+(1:nmes)]^2
-    }
-  }
-  # level max
-  numer[(max-min)*nmes+(1:nmes)] <- ((dnorm((xlatent-sup)/std))/std)^2
-  deriv2[(max-min)*nmes+(1:nmes)] <- ((xlatent-sup)/(std^3))*(-dnorm((xlatent-sup)/std))
-  level[(max-min)*nmes+(1:nmes)] <- (max-min+1)
-  res <- data.frame(level,numer,deriv2,latent=rep(xlatent,(max-min+1)))
-  return(res)
-}
-```
 
 ```{r,message=F,warning=F,comment='', fig.height=4, fig.width=7}
-# Call and plot
-process <- seq(-6,6,by=0.1)
-InfoMat <- data.frame(process)
-for (k in 1:7){
-Numer <- NumerInf(min=0,max=3,K=k,paramtot=seuils,stdtot=err,xlatent=process)
-ICC <- pred_Pr(min=0,max=3,param=seuils[(3*(k-1)+1):(3*k)],std=err[k],xlatent=process)
-Numer$InfLevel <- Numer[,2]/(ICC[,2]) - Numer[,3]
-Numer$InfLevel[is.infinite(Numer$InfLevel)] <- NA
-  p[[k]] <- (ggplot(Numer)
-      + geom_line(aes(x = latent, y = InfLevel, group = level,color=level), show.legend = F,alpha = 1,size=1.2)
-      # + stat_smooth(aes(x = tempsLA, y = hads_scorea), method = "loess", size = 0.75)
-      + theme_bw()
-      + labs(title=paste("Item",2*k))
-      + xlab("construct")
-      + ylim(0,1)
-      + ylab("Information of item level"))
-Numer$infinterm <- Numer[,2]/(ICC[,2])
-Numer$infinterm [is.infinite(Numer$infinterm )] <- NA
-Info <- apply(sapply(1:4,function(x){Numer$infinterm[which(Numer$level==x)]}),MARGIN=1,FUN=sum)
-InfoMat[,k+1] <- Info
+par(mfrow=c(2,4), mar=c(3,2,2,1), mgp=c(2,0.5,0))
+for(k in 1:7)
+{     
+ plot(info_modIRT, which="LevelInfo", outcome=items[k],
+ main=paste("Item",2*k,"-",meaning[k]), lwd=2, legend=NULL, ylim=c(0,1.3))
 }
-colnames(InfoMat) <- c("process",paste("Item",2*(1:7),sep=""))
-
-
-p[[8]] <- (ggplot(Numer)
-      + geom_line(aes(x = latent, y = InfLevel, group = level,color=level),alpha = 1,size=1.2)
-      + theme_bw()
-)
-legend <- get_legend(p[[8]])
- grid.arrange(p[[1]],p[[2]],p[[3]],p[[4]],p[[5]],p[[6]],p[[7]],as_ggplot(legend),ncol=4)
+plot(0,axes=FALSE, xlab="", ylab="", col="white")
+legend("center", legend=paste("Level",0:3), col=1:4, lwd=2, box.lty=0)
 ```
 
 
 ### by Item
 
 ```{r,message=F,warning=F,comment='', fig.height=4, fig.width=6}
-p <- NULL
-k <- 1
-InfoMatBis <- reshape(InfoMat,direction="long",
-                      idvar="process",
-                      varying=list(names(InfoMat)[-1]),
-                      timevar = "Item",v.names="Info")
-head(InfoMatBis)
-InfoMatBis$item <- as.factor(InfoMatBis$Item*2)
-InfoMatBis$Info[which(InfoMatBis$Info==Inf)] <- NA
-p <- (ggplot(InfoMatBis)
-      + geom_line(aes(x = process, y = Info, group=item,color=item),alpha = 1,size=1.2)
-      + theme_bw()
-      + xlab("underlying depressive symptomatology")
-      
-      + ylim(0,2.3)
-      + ylab("Item Information Function"))
-p
+plot(info_modIRT, which="ItemInfo", lwd=2, legend.loc="topleft")
 ```
 
 
@@ -393,7 +316,7 @@ ns1 <- predictY(modIRT,var.time = "time",newdata=datnew,methInteg = 1,nsim=2000,
 
 
 ```{r,comment='', fig.height=4, fig.width=6}
-par(mfrow=c(2,4))
+par(mfrow=c(2,4), mar=c(3,2,2,1), mgp=c(2,0.5,0))
 for(k in 1:7){
 plot(ns0,outcome = k,shades = T,ylim=c(0,3),bty="l",legend=NULL,main=paste("Item",2*k),ylab="Item level",xlab="months on the waiting list")
 plot(ns1,outcome=k,shades=T,add=T,col=2)
@@ -484,7 +407,7 @@ ns1DIFt <- predictY(modIRT_DIFt,var.time = "time",newdata=datnew,methInteg = 1,n
 
 
 ```{r,comment='', fig.height=6, fig.width=6}
-par(mfrow=c(3,3))
+par(mfrow=c(3,3), mar=c(3,2,2,1), mgp=c(2,0.5,0))
 for(k in 1:7){
 plot(ns0,outcome = k,shades = T,ylim=c(0,3),bty="l",legend=NULL,main=paste("Item",2*k,"-",meaning[k]),ylab="Item level",xlab="months on the waiting list",color=1,lwd=2,xlim=c(0,50))
 plot(ns0DIFt,outcome=k,shades=T,lty=2,add=T,col=1,lwd=2)

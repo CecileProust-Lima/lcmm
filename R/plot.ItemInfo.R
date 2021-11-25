@@ -23,11 +23,11 @@
 #' @param \dots other parameters to be passed through to plotting functions or
 #' to legend
 #' @author Viviane Philipps and Cecile Proust-Lima
-#' @export
-#' 
+#' @export 
 plot.ItemInfo <- function(x, which="ItemInfo", outcome="all", legend.loc="topright", legend=NULL, add=FALSE, shades=TRUE, ...)
 {
     if(missing(x)) stop("The argument x is missing")
+    if(which=="ItemProb") stop("Please use the predictYcond function to obtain the item's expectation")
     if(!(which %in% c("ItemInfo", "LevelInfo", "LevelProb"))) stop("Argument which should be one of ItemInfo, LevelInfo or LevelProb")
  
     linktype <- x$object$linktype

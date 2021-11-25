@@ -46,6 +46,7 @@
 #' percentiles of the approximated posterior distribution of the probability and information.
 #'
 #' - \code{object} : the model from which the computatiosns are done.
+#' 
 #' - \code{IC} : indicator specifying if confidence intervals are computed.
 #'
 #' @examples
@@ -62,6 +63,8 @@
 #' par(mfrow=c(1,2))
 #' plot(info, which="LevelInfo", outcome="Yord1")
 #' plot(info, which="LevelInfo", outcome="Yord2")
+#' plot(info, which="LevelProb", outcome="Yord1")
+#' plot(info, which="LevelProb", outcome="Yord2")
 #' }
 #'
 #' @author Cecile Proust-Lima, Viviane Philipps
