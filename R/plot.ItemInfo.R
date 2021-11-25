@@ -218,7 +218,18 @@ plot.ItemInfo <- function(x, which="ItemInfo", outcome="all", legend.loc="toprig
 
         if(x$IC)
         {
-
+            if(shades==FALSE)
+            {
+                dots.plot$lty <- 2
+                do.call("matlines",c(dots.plot[names(dots.plot)],list(x=lambda,y=cbind(lower,upper))))
+            }
+            else
+            {
+                rgbcols <- sapply(dots$col,col2rgb)/255
+                cols <- apply(rgbcols,2,function(x) rgb(x[1],x[2],x[3],alpha=0.15))
+                
+                sapply(1:ncol(lower),function(k,t,yl,yu,cols) polygon(x=unlist(c(t,rev(t))),y=c(yl[,k],rev(yu[,k])),col=cols[k],border=NA),t=lambda,yl=lower,yu=upper,cols=cols)
+            }
         }     
     }
 
