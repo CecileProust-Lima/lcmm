@@ -104,9 +104,9 @@ parameters that should not be estimated. Default to NULL, all parameters are
 estimated}
 
 \item{partialH}{optional logical for Piecewise and Splines baseline risk
-functions only. Indicates whether the parameters of the baseline risk
-functions can be dropped from the Hessian matrix to define convergence
-criteria.}
+functions and Splines link functions only. Indicates whether the parameters of the
+baseline risk or link functions can be dropped from the Hessian matrix to define
+convergence criteria.}
 
 \item{verbose}{logical indicating if information about computation should be
 reported. Default to TRUE.}

@@ -52,9 +52,9 @@
 #' parameters that should not be estimated. Default to NULL, all parameters are
 #' estimated
 #' @param partialH optional logical for Piecewise and Splines baseline risk
-#' functions only. Indicates whether the parameters of the baseline risk
-#' functions can be dropped from the Hessian matrix to define convergence
-#' criteria.
+#' functions and Splines link functions only. Indicates whether the parameters of the
+#' baseline risk or link functions can be dropped from the Hessian matrix to define
+#' convergence criteria.
 #' @param verbose logical indicating if information about computation should be
 #' reported. Default to TRUE.
 #' 
@@ -1343,25 +1343,54 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
 
         
         ## pour H restreint
+        Hr <- as.numeric(partialH)
         pbH <- rep(0,NPM)
-        if(any(typrisq %in% c(1,3)))
+        if(is.logical(partialH))
+        {
+            if(partialH)
             {
-                for(k in 1:nbevt)
+                if(any(typrisq %in% c(1,3)))
+                {
+                    for(k in 1:nbevt)
                     {
                         if(typrisq[k] %in% c(1,3))
+                        {
+                            pbH[nprob+sum(nrisq[1:k])-nrisq[k]+1:nrisq[k]] <- 1
+                            if(risqcom[k]==2)
                             {
-                                pbH[nprob+sum(nrisq[1:k])-nrisq[k]+1:nrisq[k]] <- 1
-                                if(risqcom[k]==2)
-                                    {
-                                        pbH[nprob+sum(nrisq[1:k])] <- 0
-                                    }
+                                pbH[nprob+sum(nrisq[1:k])] <- 0
                             }
+                        }
                     }
+                }
+                if(any(idlink==2))
+                {
+                    sumnpm <- 0
+                    for(k in 1:K)
+                    {
+                        summ <- nef[k]+ncontr[k]+nvc[k]+nw[k]+ncor[k]+nerr[k]+nalea[k]
+                        for(m in 1:ny[k])
+                        {
+                            ym <- sum(ny[1:k])-ny[k]+m
+                            if(idlink[ym]==2)
+                            {
+                                pbH[nprob+nrisqtot+nvarxevt+sumnpm+summ+1:ntr[ym]] <- 1
+                            }
+                            summ <- summ+ntr[ym]
+                        }
+                        sumnpm <- sumnpm + npmtot[k]
+                    }
+                }
             }
-        pbH[posfix] <- 0
-        Hr <- as.numeric(partialH)
-        if(sum(pbH)==0 & Hr==1) stop("No partial Hessian matrix can be defined")
-        
+            pbH[posfix] <- 0
+            if(sum(pbH)==0 & Hr==1) stop("No partial Hessian matrix can be defined")
+        }
+        else
+        {
+            if(!all(Hr %in% 1:NPM)) stop("Indexes in partialH are not correct")
+            pbH[Hr] <- 1
+            pbH[posfix] <- 0
+        }
     
         ## gestion de B=random(mod)
 

@@ -255,7 +255,7 @@
 #' @param posfix Optional vector specifying the indices in vector B of the
 #' parameters that should not be estimated. Default to NULL, all parameters are
 #' estimated.
-#' @param partialH optional logical for Beta or Splines link functions only.
+#' @param partialH optional logical for Splines link functions only.
 #' Indicates whether the parameters of the link functions can be dropped from
 #' the Hessian matrix to define convergence criteria.
 #' @param verbose logical indicating if information about computation should be
@@ -471,7 +471,7 @@ if (!is.null(cor.char))
                 B <- eval(mm$B[[2]])   
                 B$Brandom <- TRUE
                 
-                if(length(posfix)) stop("Argument posfix is not compatible with random intial values")
+                #if(length(posfix)) stop("Argument posfix is not compatible with random intial values")
             }
 
 
@@ -750,7 +750,7 @@ if (idlink0!=3) {
 
 
 ### test partialH que pour beta ou splines
-if(!(idlink0 %in% c(1,2)) & partialH) stop("No partial Hessian can be define")
+if(!(idlink0 %in% c(1,2)) & isTRUE(partialH)) stop("No partial Hessian can be define")
 
            
 
@@ -770,7 +770,7 @@ result <- switch(link
 
 ,"splines"=.Contlcmm(fixed=fixed,mixture=mixture,random=random,subject=subject,classmb=classmb,ng=ng,idiag=idiag,nwg=nwg,cor=cor.char,data=data,B=B,convB=convB,convL=convL,convG=convG,prior=prior,maxiter=maxiter,epsY=epsY,idlink0=idlink0,ntrtot0=ntrtot0,nbzitr0=nbzitr0,zitr=zitr,nsim=nsim,call=mm,Ydiscrete,subset=subset,na.action,posfix=posfix,partialH=partialH,verbose=verbose,returndata=returndata,var.time=var.time)
                  
-,"thresholds"=.Ordlcmm(fixed=fixed,mixture=mixture,random=random,subject=subject,classmb=classmb,ng=ng,idiag=idiag,nwg=nwg,data=data,B=B,convB=convB,convL=convL,convG=convG,prior=prior,maxiter=maxiter,zitr=zitr,ide=ide0,call=mm,Ydiscrete,subset=subset,na.action=na.action,posfix=posfix,verbose=verbose,returndata=returndata))
+,"thresholds"=.Ordlcmm(fixed=fixed,mixture=mixture,random=random,subject=subject,classmb=classmb,ng=ng,idiag=idiag,nwg=nwg,data=data,B=B,convB=convB,convL=convL,convG=convG,prior=prior,maxiter=maxiter,zitr=zitr,ide=ide0,call=mm,Ydiscrete,subset=subset,na.action=na.action,posfix=posfix,partialH=partialH,verbose=verbose,returndata=returndata,var.time=var.time))
   
 return(result)
 }

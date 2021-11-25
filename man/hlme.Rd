@@ -26,7 +26,8 @@ hlme(
   posfix = NULL,
   verbose = TRUE,
   returndata = FALSE,
-  var.time = NULL
+  var.time = NULL,
+  partialH = FALSE
 )
 }
 \arguments{
@@ -129,6 +130,9 @@ reported. Default to TRUE.}
 returned. Default to FALSE, data are not returned.}
 
 \item{var.time}{optional character indicating the name of the time variable.}
+
+\item{partialH}{optional logical indicating if parameters can be dropped from the
+Hessian matrix to define convergence criteria.}
 }
 \value{
 The list returned is: \item{ns}{number of grouping units in the

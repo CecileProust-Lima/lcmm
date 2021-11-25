@@ -33,7 +33,8 @@ void F77_SUB(hetmixlin)(double * Y0,
 			double * convL,
 			double * convG,
 			int * maxiter0,
-			int * fix0);
+			int * fix0,
+			int * pbH0);
 
 void F77_SUB(hetmixcont)(double * Y0,
 			 double * X0,

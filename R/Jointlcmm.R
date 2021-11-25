@@ -269,9 +269,9 @@
 #' parameters that should not be estimated. Default to NULL, all parameters are
 #' estimated.
 #' @param partialH optional logical for Piecewise and Splines baseline risk
-#' functions only. Indicates whether the parameters of the baseline risk
-#' functions can be dropped from the Hessian matrix to define convergence
-#' criteria.
+#' functions and Splines link functions only. Indicates whether the parameters of the
+#' baseline risk or link functions can be dropped from the Hessian matrix to
+#' define convergence criteria.
 #' @param verbose logical indicating if information about computation should be
 #' reported. Default to TRUE.
 #' @param returndata logical indicating if data used for computation should be
@@ -501,7 +501,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         
         if(!(na.action %in% c(1,2))) stop("only 1 for 'na.omit' or 2 for 'na.fail' are required in na.action argument")
 
-        if(length(posfix) & missing(B)) stop("A set of initial parameters must be specified if some parameters are not estimated")
+        #if(length(posfix) & missing(B)) stop("A set of initial parameters must be specified if some parameters are not estimated")
 
 
         ## garder data tel quel pour le renvoyer
@@ -1407,25 +1407,41 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
 
         
         ## pour H restreint
+        Hr0 <- as.numeric(partialH)
         pbH0 <- rep(0,NPM)
-        if(any(typrisq %in% c(1,3)))
+        if(is.logical(partialH))
+        {
+            if(partialH)
             {
-                for(k in 1:nbevt)
+                if(any(typrisq %in% c(1,3)))
+                {
+                    for(k in 1:nbevt)
                     {
                         if(typrisq[k] %in% c(1,3))
+                        {
+                            pbH0[nprob+sum(nrisq[1:k])-nrisq[k]+1:nrisq[k]] <- 1
+                            if(risqcom[k]==2)
                             {
-                                pbH0[nprob+sum(nrisq[1:k])-nrisq[k]+1:nrisq[k]] <- 1
-                                if(risqcom[k]==2)
-                                    {
-                                        pbH0[nprob+sum(nrisq[1:k])] <- 0
-                                    }
+                                pbH0[nprob+sum(nrisq[1:k])] <- 0
                             }
+                        }
                     }
+                }
+                
+                if(any(idlink==2))
+                {
+                    pbH0[nprob+nrisqtot+nvarxevt+nef+nvc+nw+ncor0+1:ntrtot0] <- 1
+                }
             }
-        pbH0[posfix] <- 0
-        Hr0 <- as.numeric(partialH)
-        if(sum(pbH0)==0 & Hr0==1) stop("No partial Hessian matrix can be defined in the absence of baseline risk function approximated by splines or piecewise linear function")
-        
+            pbH0[posfix] <- 0
+            if(sum(pbH0)==0 & Hr0==1) stop("No partial Hessian matrix can be defined in the absence of baseline risk function approximated by splines or piecewise linear function")
+        }
+        else
+        {
+            if(!all(Hr0 %in% 1:NPM)) stop("Indexes in partialH are not correct")
+            pbH0[Hr0] <- 1
+            pbH0[posfix] <- 0
+        }
     
         ## gestion de B=random(mod)
 

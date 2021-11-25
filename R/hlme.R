@@ -162,6 +162,8 @@
 #' @param returndata logical indicating if data used for computation should be
 #' returned. Default to FALSE, data are not returned.
 #' @param var.time optional character indicating the name of the time variable.
+#' @param partialH optional logical indicating if parameters can be dropped from the
+#' Hessian matrix to define convergence criteria.
 #' @return The list returned is: \item{ns}{number of grouping units in the
 #' dataset} \item{ng}{number of latent classes} \item{loglik}{log-likelihood of
 #' the model} \item{best}{vector of parameter estimates in the same order as
@@ -283,7 +285,7 @@
 #' 
 #' 
 hlme <-
-    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=TRUE,returndata=FALSE,var.time=NULL){
+    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=TRUE,returndata=FALSE,var.time=NULL,partialH=FALSE){
 
         ptm<-proc.time()
         if(verbose==TRUE) cat("Be patient, hlme is running ... \n")
@@ -775,7 +777,7 @@ hlme <-
                 Brandom <- TRUE
                 B <- eval(cl$B[[2]])
 
-                if(length(posfix)) stop("Argument posfix is not compatible with random intial values")
+                #if(length(posfix)) stop("Argument posfix is not compatible with random intial values")
             }
 
         
@@ -841,6 +843,21 @@ hlme <-
             }
         if(length(posfix)==NPM) stop("No parameter to estimate")
         
+        ## pour H restreint
+        Hr0 <- as.numeric(partialH)
+        pbH0 <- rep(0,NPM)
+        if(is.logical(partialH))
+        {
+            if(partialH) pbH0 <- rep(1,NPM)
+            pbH0[posfix] <- 0
+            if(sum(pbH0)==0 & Hr0==1) stop("No partial Hessian matrix can be defined")
+        }
+        else
+        {
+            if(!all(Hr0 %in% 1:NPM)) stop("Indexes in partialH are not correct")
+            pbH0[Hr0] <- 1
+            pbH0[posfix] <- 0
+        }
         
         if(missing(B)){
 
@@ -898,7 +915,8 @@ hlme <-
                                  as.double(convL2),
                                  as.double(convG2),
                                  as.integer(maxiter2),
-                                 as.integer(fix0))
+                                 as.integer(fix0),
+                                 as.integer(pbH0))
 
                 k <- NPROB
                 l <- 0
@@ -1176,23 +1194,54 @@ hlme <-
                         as.double(convL),
                         as.double(convG),
                         as.integer(maxiter),
-                        as.integer(fix0))
+                        as.integer(fix0),
+                        as.integer(pbH0))
         
     ### mettre 0 pr les prm fixes
     if(length(posfix))
         {
-            mr <- NPM-length(posfix)
-            Vr <- matrix(0,mr,mr)
-            Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
-            Vr <- t(Vr)
-            Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
-            V <- matrix(0,NPM,NPM)
-            V[setdiff(1:NPM,posfix),setdiff(1:NPM,posfix)] <- Vr
-            V <- V[upper.tri(V,diag=TRUE)]
+            if(out$conv==3)
+            {
+                mr <- NPM-sum(pbH0)-length(posfix)
+                Vr <- matrix(0,mr,mr)
+                Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
+                Vr <- t(Vr)
+                Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
+                V <- matrix(NA,NPM,NPM)
+                V[setdiff(1:NPM,c(which(pbH0==1),posfix)),setdiff(1:NPM,c(which(pbH0==1),posfix))] <- Vr
+                V[,posfix] <- 0
+                V[posfix,] <- 0
+                V <- V[upper.tri(V,diag=TRUE)]
+            }
+            else
+            {
+                mr <- NPM-length(posfix)
+                Vr <- matrix(0,mr,mr)
+                Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
+                Vr <- t(Vr)
+                Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
+                V <- matrix(0,NPM,NPM)
+                V[setdiff(1:NPM,posfix),setdiff(1:NPM,posfix)] <- Vr
+                V <- V[upper.tri(V,diag=TRUE)]
+            }
         }
     else
         {
-            V <- out$V
+            if(out$conv==3)
+            {
+                mr <- NPM-sum(pbH0)
+                Vr <- matrix(0,mr,mr)
+                Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
+                Vr <- t(Vr)
+                Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
+                V <- matrix(NA,NPM,NPM)
+                V[setdiff(1:NPM,which(pbH0==1)),setdiff(1:NPM,which(pbH0==1))] <- Vr
+                V <- V[upper.tri(V,diag=TRUE)]
+            }
+            else
+            {
+                V <- out$V
+            }
         }
 
 

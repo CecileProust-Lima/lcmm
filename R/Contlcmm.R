@@ -462,10 +462,18 @@
         ## pour H restreint
         Hr0 <- as.numeric(partialH)
         pbH0 <- rep(0,NPM)
-        if(idlink0==2) pbH0[NPROB+NEF+NVC+NW+1:ntrtot0] <- 1
-        pbH0[posfix] <- 0
-        if(sum(pbH0)==0 & Hr0==1) stop("No partial Hessian matrix can be defined")
-        
+        if(is.logical(partialH))
+        {
+            if(idlink0==2) pbH0[NPROB+NEF+NVC+NW+1:ntrtot0] <- 1
+            pbH0[posfix] <- 0
+            if(sum(pbH0)==0 & Hr0==1) stop("No partial Hessian matrix can be defined")
+        }
+        else
+        {
+            if(!all(Hr0 %in% 1:NPM)) stop("Indexes in partialH are not correct")
+            pbH0[Hr0] <- 1
+            pbH0[posfix] <- 0
+        }
 
 
 

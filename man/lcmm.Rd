@@ -159,7 +159,7 @@ for 'na.omit'. The alternative is 2 for 'na.fail'. Other options such as
 parameters that should not be estimated. Default to NULL, all parameters are
 estimated.}
 
-\item{partialH}{optional logical for Beta or Splines link functions only.
+\item{partialH}{optional logical for Splines link functions only.
 Indicates whether the parameters of the link functions can be dropped from
 the Hessian matrix to define convergence criteria.}
 

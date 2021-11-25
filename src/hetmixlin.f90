@@ -93,7 +93,7 @@
       subroutine hetmixlin(Y0,X0,Prior0, idprob0,idea0,idg0,idcor0  &
           ,ns0,ng0,nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0   &
           ,npmtot0,btot,vopt,vrais,ni,istop,gconv,ppi0,resid_m0,resid_ss0 &
-          ,pred_m_g0,pred_ss_g0,pred_RE,convB,convL,convG,maxiter0,fix0)
+          ,pred_m_g0,pred_ss_g0,pred_RE,convB,convL,convG,maxiter0,fix0,pbH0)
 
       use commun
       use parameters
@@ -110,7 +110,7 @@
       double precision, dimension(nobs0), intent(in) :: Y0
       double precision, dimension(nobs0*nv0), intent(in) :: X0
       double precision, intent(in) :: convB, convL, convG
-      integer,dimension(npmtot0),intent(in)::fix0
+      integer,dimension(npmtot0),intent(in)::fix0,pbH0
 
         !D claration des variable en entr e et sortie
       double precision, dimension(npmtot0), intent(inout) :: btot
@@ -312,6 +312,13 @@
 
       allocate(pbH(npm))
       pbH(1:npm)=0 
+      k=0
+      do j=1,npmtot
+         if(fix0(j).eq.0) then
+            k=k+1
+            pbH(k)=pbH0(j)
+         end if
+      end do
 
 !lancement de l'optimisation
 

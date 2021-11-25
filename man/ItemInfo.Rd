@@ -64,6 +64,7 @@ the outcome's level, the latent process value and the 50\%, 2.5\% and 97.5\%
 percentiles of the approximated posterior distribution of the probability and information.
 
 - \code{object} : the model from which the computatiosns are done.
+
 - \code{IC} : indicator specifying if confidence intervals are computed.
 }
 \description{
@@ -85,6 +86,8 @@ plot(info)
 par(mfrow=c(1,2))
 plot(info, which="LevelInfo", outcome="Yord1")
 plot(info, which="LevelInfo", outcome="Yord2")
+plot(info, which="LevelProb", outcome="Yord1")
+plot(info, which="LevelProb", outcome="Yord2")
 }
 
 }

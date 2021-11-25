@@ -1,6 +1,6 @@
 ###################### derniere mise a jour : 2012/03/16 ############"
 .Ordlcmm <-
-    function(fixed,mixture,random,subject,classmb,ng,idiag,nwg,data,B,convB,convL,convG,prior,maxiter,zitr,ide,call,Ydiscrete,subset=subset,na.action,posfix,verbose,returndata)
+    function(fixed,mixture,random,subject,classmb,ng,idiag,nwg,data,B,convB,convL,convG,prior,maxiter,zitr,ide,call,Ydiscrete,subset=subset,na.action,posfix,partialH,verbose,returndata,var.time)
 {
     
     ptm<-proc.time()
@@ -139,7 +139,13 @@
     if(id.X_classmb == 1)var.exp <- c(var.exp,colnames(X_classmb))
     var.exp <- unique(var.exp)
     ## ad
-                                        
+    timeobs <- rep(0, nrow(newdata))
+    if(!is.null(var.time))
+    {
+        timeobs <- newdata[,var.time]
+        #if(any(is.na(timeobs))) stop(paste("Cannot use",var.time,"as time variable because it contains missing data"))
+    }
+    
     ## controler si les variables de mixture sont toutes dans fixed : 
     z.fixed <- strsplit(nom.fixed,split=":",fixed=TRUE)
     z.fixed <- lapply(z.fixed,sort)
@@ -397,7 +403,22 @@
             fix0[posfix] <- 1
         }
     if(length(posfix)==NPM) stop("No parameter to estimate")
-
+    
+    ## pour H restreint
+    Hr0 <- as.numeric(partialH)
+    pbH0 <- rep(0,NPM)
+    if(is.logical(partialH))
+    {
+        if(partialH) pbH0 <- rep(1,NPM)
+        pbH0[posfix] <- 0
+        if(sum(pbH0)==0 & Hr0==1) stop("No partial Hessian matrix can be defined")
+    }
+    else
+    {
+        if(!all(Hr0 %in% 1:NPM)) stop("Indexes in partialH are not correct")
+        pbH0[Hr0] <- 1
+        pbH0[posfix] <- 0
+    }
 
     if(missing(B)){
 
@@ -855,7 +876,7 @@
     if (!("intercept" %in% nom.X0)) X0.names2 <- X0.names2[-1]
 ### ad
 
-    res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=rep(0,nvar.exp),loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=call,niter=out$niter,N=N,idiag=idiag0,pprob=ppi,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,estimlink=estimlink,linktype=3,linknodes=zitr,ide=ide,Ydiscrete=Ydiscrete,discrete_loglik=out$loglik,UACV=out$UACV,IndivContrib=out$rlindiv,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn)
+    res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=rep(0,nvar.exp),loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=call,niter=out$niter,N=N,idiag=idiag0,pprob=ppi,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,estimlink=estimlink,linktype=3,linknodes=zitr,ide=ide,Ydiscrete=Ydiscrete,discrete_loglik=out$loglik,UACV=out$UACV,IndivContrib=out$rlindiv,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn, var.time=var.time)
     class(res) <-c("lcmm")  
 
     cost<-proc.time()-ptm
