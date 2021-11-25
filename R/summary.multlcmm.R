@@ -136,6 +136,9 @@ summary.multlcmm <- function(object,...)
                     sech <- format(as.numeric(sprintf("%.5f",se)),nsmall=5,scientific=FALSE)
                     waldch <- format(as.numeric(sprintf("%.3f",wald)),nsmall=3,scientific=FALSE)
                     pwaldch <- format(as.numeric(sprintf("%.5f",pwald)),nsmall=5,scientific=FALSE)
+                    sech[which(is.na(sqrt(x$V[indice])))] <- NA
+                    waldch[which(is.na(sqrt(x$V[indice])))] <- NA
+                    pwaldch[which(is.na(sqrt(x$V[indice])))] <- NA
                 }
             else
                 {

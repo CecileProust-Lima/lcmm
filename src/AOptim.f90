@@ -253,7 +253,7 @@
            dd=GHG/dble(m)
         end if
         
- !           if(verbose==1) print *,"ca=",ca,"cb=",cb,"dd=",dd   !**
+        !           if(verbose==1)print *,"ca=",ca,"cb=",cb,"dd=",dd   !**
 
         if(ca.lt.epsa.and.cb.lt.epsb.and.dd.lt.epsd) exit main
 
@@ -272,6 +272,12 @@
                  end do
               end if
            end do
+
+           if(ir.eq.0) then
+              istop=3
+              v=0.d0
+              goto 110
+           end if
 
            call dsinv(fur,mr,ep,ier,det)  
 

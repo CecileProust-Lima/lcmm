@@ -5,7 +5,7 @@
 \alias{mlcmm}
 \title{Estimation of multivariate mixed-effect models and multivariate latent class
 mixed-effect models for multivariate longitudinal outcomes of possibly
-multiple types (continuous Gaussian, continuous non-Gaussian - curvilinear)
+multiple types (continuous Gaussian, continuous non-Gaussian - curvilinear, ordinal)
 that measure the same underlying latent process.}
 \usage{
 multlcmm(
@@ -220,9 +220,10 @@ returned. Default to FALSE, data are not returned.}
 
 \item{methInteg}{character indicating the type of integration if ordinal outcomes
 are considered. 'MCO' for ordinary Monte Carlo, 'MCA' for antithetic Monte Carlo,
-'QMC' for quasi MonteCarlo.}
+'QMC' for quasi Monte Carlo. Default to "QMC".}
 
-\item{nMC}{integer, number of Monte Carlo simulations}
+\item{nMC}{integer, number of Monte Carlo simulations. By default, 1000 points are used
+if at least one threshold link is specified.}
 
 \item{var.time}{optional character indicating the name of the time variable.}
 }
@@ -270,8 +271,7 @@ This function constitutes a multivariate extension of function \code{lcmm}.
 It fits multivariate mixed models and multivariate latent class mixed models
 for multivariate longitudinal outcomes of different types. It handles
 continuous longitudinal outcomes (Gaussian or non-Gaussian, curvilinear) as
-well as bounded quantitative and discrete longitudinal outcomes. Next
-version will also handle ordinal outcomes.  The model assumes that all the
+well as ordinal longitudinal outcomes. The model assumes that all the
 outcomes measure the same underlying latent process defined as their common
 factor, and each outcome is related to this latent common factor by a
 specific parameterized link function.  At the latent process level, the
@@ -308,6 +308,13 @@ where I_1,...,I_{n+1} is the basis of quadratic I-splines. To constraint the
 parameters to be positive, except for b_1, the program estimates b_k^* (for
 k=2,...,n+2) so that b_k=(b_k^*)^2. This parameterization may lead in some
 cases to problems of convergence that we are currently addressing.
+
+4. With the "thresholds" link function for an ordinal outcome with levels
+0,...,C, C-1 parameters are required for the following transformation:
+Y(t)=c <=> b_c < L(t) <= b_{c+1} with b_0 = - infinity and b_{C+1}=+infinity.
+To constraint the parameters to be increasing, except for the first
+parameter b_1, the program estimates b_k^* (for k=2,...C-1) so that
+b_{k}=b_{k-1}+(b_k^*)^2.
 
 Details of these parameterized link functions can be found in the papers:
 Proust-Lima et al. (Biometrics 2006) and Proust-Lima et al. (BJMSP 2013).
@@ -379,6 +386,17 @@ why several alternatives exist. The vector of initial values can be directly
 specified in \code{B} the initial values can be generated (automatically or
 randomly) from a model with \code{ng=}. Finally, function \code{gridsearch}
 performs an automatic grid search.
+
+D. NUMERICAL INTEGRATION WITH THE THRESHOLD LINK FUNCTION
+
+When dealing only with continuous outcomes, the computation of the likelihood does not
+require any numerical integration over the random-effects, so that the estimation
+procedure is relatively fast.
+When at least one ordinal outcome is modeled, a numerical integration over the
+random-effects is required in each computation of the individual contribution to the
+likelihood. This achieved using a Monte-Carlo procedure. We allow three options :
+the standard Monte-Carlo simulations, as well as antithetic Monte-Carlo and quasi
+Monte-Carlo methods as proposed in Philipson et al (2020).
 }
 \examples{
 
@@ -448,6 +466,13 @@ Psychol 66(3): 470-87.
 
 Commenges, Proust-Lima, Samieri, Liquet (2012). A universal approximate
 cross-validation criterion and its asymptotic distribution, Arxiv.
+
+Philipson, Hickey, Crowther, Kolamunnage-Dona (2020). Faster Monte Carlo estimation
+of semiparametric joint models of time-to-event and multivariate longitudinal data.
+Computational Statistics & Data Analysis 151.
+
+Proust-Lima, Philipps, Perrot, Blanchin, Sebille (2021). Continuous-time modeling of
+self-reported outcome data : a dynamic Item Response Theory model. Arxiv.
 }
 \seealso{
 \code{\link{postprob}}, \code{\link{plot.multlcmm}}, \code{\link{predictL}},

@@ -1,14 +1,13 @@
 #' Estimation of multivariate mixed-effect models and multivariate latent class
 #' mixed-effect models for multivariate longitudinal outcomes of possibly
-#' multiple types (continuous Gaussian, continuous non-Gaussian - curvilinear)
+#' multiple types (continuous Gaussian, continuous non-Gaussian - curvilinear, ordinal)
 #' that measure the same underlying latent process.
 #' 
 #' This function constitutes a multivariate extension of function \code{lcmm}.
 #' It fits multivariate mixed models and multivariate latent class mixed models
 #' for multivariate longitudinal outcomes of different types. It handles
 #' continuous longitudinal outcomes (Gaussian or non-Gaussian, curvilinear) as
-#' well as bounded quantitative and discrete longitudinal outcomes. Next
-#' version will also handle ordinal outcomes.  The model assumes that all the
+#' well as ordinal longitudinal outcomes. The model assumes that all the
 #' outcomes measure the same underlying latent process defined as their common
 #' factor, and each outcome is related to this latent common factor by a
 #' specific parameterized link function.  At the latent process level, the
@@ -45,6 +44,13 @@
 #' parameters to be positive, except for b_1, the program estimates b_k^* (for
 #' k=2,...,n+2) so that b_k=(b_k^*)^2. This parameterization may lead in some
 #' cases to problems of convergence that we are currently addressing.
+#' 
+#' 4. With the "thresholds" link function for an ordinal outcome with levels
+#' 0,...,C, C-1 parameters are required for the following transformation:
+#' Y(t)=c <=> b_c < L(t) <= b_{c+1} with b_0 = - infinity and b_{C+1}=+infinity.
+#' To constraint the parameters to be increasing, except for the first
+#' parameter b_1, the program estimates b_k^* (for k=2,...C-1) so that
+#' b_{k}=b_{k-1}+(b_k^*)^2.
 #' 
 #' Details of these parameterized link functions can be found in the papers:
 #' Proust-Lima et al. (Biometrics 2006) and Proust-Lima et al. (BJMSP 2013).
@@ -116,6 +122,17 @@
 #' specified in \code{B} the initial values can be generated (automatically or
 #' randomly) from a model with \code{ng=}. Finally, function \code{gridsearch}
 #' performs an automatic grid search.
+#' 
+#' D. NUMERICAL INTEGRATION WITH THE THRESHOLD LINK FUNCTION
+#'
+#' When dealing only with continuous outcomes, the computation of the likelihood does not
+#' require any numerical integration over the random-effects, so that the estimation
+#' procedure is relatively fast.
+#' When at least one ordinal outcome is modeled, a numerical integration over the
+#' random-effects is required in each computation of the individual contribution to the
+#' likelihood. This achieved using a Monte-Carlo procedure. We allow three options :
+#' the standard Monte-Carlo simulations, as well as antithetic Monte-Carlo and quasi
+#' Monte-Carlo methods as proposed in Philipson et al (2020).
 #' 
 #' @param fixed a two-sided linear formula object for specifying the
 #' fixed-effects in the linear mixed model at the latent process level. The
@@ -232,8 +249,9 @@
 #' returned. Default to FALSE, data are not returned.
 #' @param methInteg character indicating the type of integration if ordinal outcomes
 #' are considered. 'MCO' for ordinary Monte Carlo, 'MCA' for antithetic Monte Carlo,
-#' 'QMC' for quasi MonteCarlo.
-#' @param nMC integer, number of Monte Carlo simulations
+#' 'QMC' for quasi Monte Carlo. Default to "QMC".
+#' @param nMC integer, number of Monte Carlo simulations. By default, 1000 points are used
+#' if at least one threshold link is specified.
 #' @param var.time optional character indicating the name of the time variable.
 #' @return The list returned is: \item{ns}{number of grouping units in the
 #' dataset} \item{ng}{number of latent classes} \item{loglik}{log-likelihood of
@@ -303,6 +321,14 @@
 #' 
 #' Commenges, Proust-Lima, Samieri, Liquet (2012). A universal approximate
 #' cross-validation criterion and its asymptotic distribution, Arxiv.
+#'
+#' Philipson, Hickey, Crowther, Kolamunnage-Dona (2020). Faster Monte Carlo estimation
+#' of semiparametric joint models of time-to-event and multivariate longitudinal data.
+#' Computational Statistics & Data Analysis 151.
+#'
+#' Proust-Lima, Philipps, Perrot, Blanchin, Sebille (2021). Continuous-time modeling of
+#' self-reported outcome data : a dynamic Item Response Theory model. Arxiv.
+#' 
 #' @examples
 #' 
 #' \dontrun{
@@ -387,7 +413,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 
     if(!(na.action%in%c(1,2)))stop("only 1 for 'na.omit' or 2 for 'na.fail' are required in na.action argument")
 
-    if(length(posfix) & missing(B)) stop("A set of initial parameters must be specified if some parameters are not estimated")
+    #if(length(posfix) & missing(B)) stop("A set of initial parameters must be specified if some parameters are not estimated")
 
     cholesky <- TRUE
 
@@ -1373,10 +1399,18 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     ## pour H restreint
     Hr0 <- as.numeric(partialH)
     pbH0 <- rep(0,NPM)
-    pbH0[grep("I-splines",names(b))] <- 1
-    pbH0[posfix] <- 0
-    if(sum(pbH0)==0 & Hr0==1) stop("No partial Hessian matrix can be defined")
-
+    if(is.logical(partialH))
+    {
+        if(partialH) pbH0[grep("I-splines",names(b))] <- 1
+        pbH0[posfix] <- 0
+        if(sum(pbH0)==0 & Hr0==1) stop("No partial Hessian matrix can be defined")
+    }
+    else
+    {
+        if(!all(Hr0 %in% 1:NPM)) stop("Indexes in partialH are not correct")
+        pbH0[Hr0] <- 1
+        pbH0[posfix] <- 0
+    }
     
     ##initialisation pour ng>1
     if(missing(B) & ng0>1)
