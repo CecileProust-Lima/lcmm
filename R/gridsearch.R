@@ -118,7 +118,7 @@ gridsearch <- function(m,rep,maxiter,minit,cl=NULL)
         for(k in 1:rep)
         {
             mc$B <- substitute(random(minit),environment())
-            models[[k]] <- do.call(as.character(mc[[1]]),as.list(mc[-1]))
+            models[[k]] <- do.call(as.character(mc[[1]]),as.list(mc[-1]), envir=parent.frame())
         }
     }
     
@@ -129,7 +129,7 @@ gridsearch <- function(m,rep,maxiter,minit,cl=NULL)
     mc$B <- models[[kmax]]$best
     mc$maxiter <- match.call()$m$maxiter
     
-    return(do.call(as.character(mc[[1]]),as.list(mc[-1])))
+    return(do.call(as.character(mc[[1]]),as.list(mc[-1]), envir=parent.frame()))
 }
 
 
