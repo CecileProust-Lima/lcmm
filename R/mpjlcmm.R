@@ -1112,7 +1112,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 if(hazardtype[ke]=="PH")
                 {
                     wBrandom <- c(wBrandom,nn+1:nprisq[ke],rep(0,ng-1))
-                    b0Brandom <- c(b0Brandom,rep(1,ng-1))
+                    b0Brandom <- c(b0Brandom,rep(0,ng-1))
                     nn <- nn + nprisq[ke]
                 }
                 if(hazardtype[ke]=="Specific")
@@ -1472,6 +1472,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                             if(nbevt>0) #survie
                             {
                                 w <- c(w,wBrandom)
+                                b0 <- c(b0, b0Brandom)
                             }
 
                             sumnpm <- 0
@@ -1519,7 +1520,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                             ww[which(w %in% fix1)] <- 0
                             theta1 <- theta0[setdiff(1:length(theta0),fix1)]
                             var1 <- var0[setdiff(1:length(B$best),fix1),setdiff(1:length(B$best),fix1)]
-
+browser()
                             b <- Brandom(theta0=theta1,v0=var1,w=ww,b0=b0,chol=cholRandom,mult=multRandom)
 
                         } # fin random
