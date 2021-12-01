@@ -156,16 +156,22 @@ permut <- function(m,order,estim=TRUE)
             {
                 avtnef <- m$N[1]
                 nef <- m$N[2]
+                ny <- 1
+                avttr <- sum(m$N[1:4]) # ne servira que pour lcmm
             }
         if(class(m)=="multlcmm")
             {
                 avtnef <- m$N[1]
                 nef <- m$N[3]-m$N[1]-m$N[2]
+                ny <- m$N[8]
+                avttr <- sum(m$N[3:8])
             }
         if(class(m)=="Jointlcmm")
             {
                 avtnef <- m$N[1]+m$N[2]+m$N[3]
                 nef <- m$N[4]
+                ny <- 1
+                avttr <- sum(m$N[1:7])
             }
         tmpnef <- 0
         if(m$idg[1]==2) # intercept en mixture
@@ -179,6 +185,7 @@ permut <- function(m,order,estim=TRUE)
                     {
                         coefold <- c(0,m$best[avtnef+1:(ng-1)]) # car intercept fixe a 0 dans la premiere classe
                         coeford <- coefold[order] # ordonner
+                        newIref <- coeford[1] # servira pour transfo
                         coefref <- coeford-coeford[1] # soustraire le nouveau coef de ref
                         coefnew <- coefref[2:ng] # enlever le premier coef
                         bnew[avtnef+1:(ng-1)] <- coefnew
@@ -234,6 +241,32 @@ permut <- function(m,order,estim=TRUE)
             coefref <- coeford/coeford[ng]
             coefnew <- coefref[1:(ng-1)]
             bnew[avtnw+1:(ng-1)] <- coefnew
+        }
+
+        ## coef transfo
+        if(any(m$linktype>-1))
+        {
+            if(class(m) %in% c("lcmm","Jointlcmm")) m$nbnodes <- length(m$linknodes)
+            
+            sumntr <- 0
+            for(k in 1:ny)
+            {
+                if(m$linktype[k]==0) #linear (Y-a)/b, a devient a + b*newIref
+                {
+                    bnew[avttr+sumntr+1] <- bnew[avttr+sumntr+1] + bnew[avttr+sumntr+2]*newIref
+                    sumntr <- sumntr + 2
+                }
+                if(m$linktype[k]==1) #beta (b(Y)-a)/b, a devient a + b*newIref
+                {
+                    bnew[avttr+sumntr+3] <- bnew[avttr+sumntr+3] + bnew[avttr+sumntr+4]*newIref
+                    sumntr <- sumntr + 4
+                }
+                if(m$linktype[k]==2) #splines a+sum(bk*Ik(Y)), a devient a - newIref
+                {
+                    bnew[avttr+sumntr+1] <- bnew[avttr+sumntr+1] - newIref
+                    sumntr <- sumntr + m$nbnodes[k]+2
+                }
+            }
         }
         
         ## modele avec les nouveaux coef
