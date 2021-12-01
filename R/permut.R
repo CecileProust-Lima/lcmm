@@ -241,7 +241,7 @@ permut <- function(m,order,estim=TRUE)
             {
                 z <- m$call
                 z$B <- bnew
-                mnew <- eval(z)
+                mnew <- eval(z, envir=parent.frame())
             }
         else
             {
