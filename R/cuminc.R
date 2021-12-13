@@ -93,7 +93,7 @@ cuminc <- function(x,time,draws=FALSE,ndraws=2000,integrateOptions=NULL,...)
             }
         
         ## matrice avec 1 profil par ligne
-        Xprofil <- do.call("expand.grid",Xdots)
+        Xprofil <- as.matrix(do.call("expand.grid",Xdots))
         if(nrow(Xprofil)==0) Xprofil <- matrix(0,1,1)
         
         ## fonction d'integration
