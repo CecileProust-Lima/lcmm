@@ -40,11 +40,11 @@ library(dplyr)
 
 The illustration is on a simulated dataset that mimics the PREDIALA study described and analyzed in Proust-Lima et al. (2021). The dataset is called simdataIRT. It contains the following information:
 
-- grp: group with 0= and 1=
-- sex: sex with 0= and 1=
-- age: age at entry in the cohort (or waiting list?)
+- grp: group with 0=dialyzed and 1=preemptive
+- sex: sex with 0=woman and 1=man
+- age: age at entry in the cohort
 - hads_2 ... hads_14 : 7 items of HADS measuring depression
-- ID: identification IDber of the patient
+- ID: identification number of the patient
 - time: time of measurement (months since entry on the waiting list)
 - time_entry: time on the waiting list at entry in the cohort (in months)
 
@@ -67,7 +67,7 @@ The timescale of interest is the time in months spent on the waiting list: time.
 
 - As in many studies, entry in the study occurs for each individual at different timings in the progression of the disease. this is called delayed entry. It differs from the usual time in the study where entry corresponds to time 0. Here entry (variable time_entry) corresponds to the duration on the waiting list at inclusion, and time 0 is unlikely observed (i.e., entry in the cohort does not occur as the same time as entry on waiting list).
 
-- The timescale is continuous per se, with as many values as the IDber of total observations. This prevents the use of methods considering discrete timescales with measurements at the same times for all the individuals, such as classical dynamic latent variable models. 
+- The timescale is continuous per se, with as many values as the number of total observations. This prevents the use of methods considering discrete timescales with measurements at the same times for all the individuals, such as classical dynamic latent variable models. 
 
 Distribution of the time at entry and time at follow_ups
 
@@ -318,7 +318,7 @@ ns1 <- predictY(modIRT,var.time = "time",newdata=datnew,methInteg = 1,nsim=2000,
 ```{r,comment='', fig.height=4, fig.width=6}
 par(mfrow=c(2,4), mar=c(3,2,2,1), mgp=c(2,0.5,0))
 for(k in 1:7){
-plot(ns0,outcome = k,shades = T,ylim=c(0,3),bty="l",legend=NULL,main=paste("Item",2*k),ylab="Item level",xlab="months on the waiting list")
+plot(ns0,outcome = k,shades = T,ylim=c(0,3),bty="l",legend=NULL,main=paste("Item",2*k,"-",meaning[k]),ylab="Item level",xlab="months on the waiting list")
 plot(ns1,outcome=k,shades=T,add=T,col=2)
 }
 ```
