@@ -10,13 +10,20 @@ https://doi.org/10.18637/jss.v078.i02
 
 And specific statistical models estimated are described in various statistical papers of the authors. 
 
-Changes in Version 1.9.4 () :
+Changes in Version 1.9.4 (2021-12-17) :
 
-* multlcmm ordinal
-* vignette IRT
-* simulate
-* iteminfo
-* New argument var.time in hlme, lcmm, multlcmm and Jointlcmm functions. 
+* the multlcmm function is now available for ordinal outcomes (link="thresholds")
+* new vignette 'Dynamic IRT with multlcmm'
+* new dataset simdataHADS
+* new function 'simulate' to simulate a dataset from a hlme, lcmm, multlcmm or Jointlcmm model
+* new functions 'ItemInfo' and 'plot.ItemInfo' to compute and plot Fisher information for ordinal outcomes
+* new argument 'var.time' in the hlme, lcmm, multlcmm and Jointlcmm functions (used in plot(, which="fit"); issue #91)
+* fix CRAN error with as.vector.data.frame
+* correction in the permut function (transformation parameters were not updated)
+* add envir=parent.frame() in permut and gridsearch to enable the use of these functions in a parallel setting
+* fix bug in the estimation functions with infinite posterior probabilities
+* the gridsearch function now checks that the initial model converged (ie minit$conv=1)
+* the fixef and ranef function are now imported from the nlme package
 
 
 Changes in Version 1.9.3 (2021-06-17):
