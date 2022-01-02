@@ -1,11 +1,11 @@
 ---
-title: 'Dynamic IRT model of PREDIALA study'
+title: 'Continuous-time longitudinal IRT model of PREDIALA study'
 output: 
   rmarkdown::html_vignette:
     toc: true # table of content true
     toc_depth : 3
 vignette: >
-  %\VignetteIndexEntry{Dynamic IRT with multlcmm}
+  %\VignetteIndexEntry{Longitudinal IRT with multlcmm}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,14 +17,14 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette illustrates how to estimate a dynamic IRT following the methodology described in Proust-Lima et al. (2021). The model combines a graded response measurement model to link a series of ordinal items measured repeatedly over time with their underlying latent process. Simultaneously, a linear mixed model describes the trajectory of the underlying latent process over time. 
+This vignette illustrates how to estimate a longitudinal IRT following the methodology described in Proust-Lima et al. (2021 - https://arxiv.org/abs/2109.13064). The model combines a graded response measurement model to link a series of ordinal items measured repeatedly over time with their underlying latent process. Simultaneously, a linear mixed model describes the trajectory of the underlying latent process over time. 
 
 ```{r, results='hide',message=FALSE,warning=FALSE, echo=FALSE}
 load("models_IRT.RData")
 ```
 # Importation
 
-The dynamic IRT model is estimated via multlcmm function of lcmm R package (Proust-Lima et al. 2017). 
+The longitudinal IRT model is estimated via multlcmm function of lcmm R package (Proust-Lima et al. 2017). 
 The following libraries are used in this vignette:
 
 ```{r,message=F}
@@ -67,7 +67,7 @@ The timescale of interest is the time in months spent on the waiting list: time.
 
 - As in many studies, entry in the study occurs for each individual at different timings in the progression of the disease. this is called delayed entry. It differs from the usual time in the study where entry corresponds to time 0. Here entry (variable time_entry) corresponds to the duration on the waiting list at inclusion, and time 0 is unlikely observed (i.e., entry in the cohort does not occur as the same time as entry on waiting list).
 
-- The timescale is continuous per se, with as many values as the number of total observations. This prevents the use of methods considering discrete timescales with measurements at the same times for all the individuals, such as classical dynamic latent variable models. 
+- The timescale is continuous per se, with as many values as the number of total observations. This prevents the use of methods considering discrete timescales with measurements at the same times for all the individuals, such as classical longitudinal latent variable models. 
 
 Distribution of the time at entry and time at follow_ups
 
@@ -88,9 +88,9 @@ Quantiles of the distribution of measurement times
 quantile(simdataHADS$time,probs=(0:10)/10)
 ```
 
-# Dynamic IRT model estimation
+# Continuous-time longitudinal IRT model estimation
 
-We consider here a dynamic IRT model with natural cubic splines on time on the waiting list to account for a possible nonlinear trajectory over time, and we adjust the trajectory for the group. We consider 2 internal knots placed at 7 and 15, and shift the right boundary at 60 due to the long tail of the distribution. 
+We consider here a longitudinal IRT model with natural cubic splines on time on the waiting list to account for a possible nonlinear trajectory over time, and we adjust the trajectory for the group. We consider 2 internal knots placed at 7 and 15, and shift the right boundary at 60 due to the long tail of the distribution. 
 In the main analysis, we estimate a model with no differential item functioning (DIF) on the group and no response shift (RS) on time.
 
 ## Estimation of the model with no DIF/RS 

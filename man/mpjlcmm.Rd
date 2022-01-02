@@ -31,7 +31,7 @@ mpjlcmm(
 )
 }
 \arguments{
-\item{longitudinal}{list of longitudinal models of the type hlme, lcmm or multlcmm}
+\item{longitudinal}{list of longitudinal models of type hlme, lcmm or multlcmm}
 
 \item{subject}{name of the covariate representing the grouping structure
 (called subject identifier)}
@@ -58,7 +58,7 @@ covariate in the survival model}
 
 \item{data}{data frame containing all the variables used in the model}
 
-\item{B}{optional specification for the initial values for the parameters.
+\item{B}{optional specification for the initial values of the parameters.
 Three options are allowed: (1) a vector of initial values is entered (the
 order in which the parameters are included is detailed in \code{details}
 section).  (2) nothing is specified. Initial values are extracted from the models
@@ -70,7 +70,7 @@ local maxima, the \code{B} vector should be specified and several different
 starting points should be tried.}
 
 \item{convB}{optional threshold for the convergence criterion based on the
-parameter stabilit}
+parameter stability}
 
 \item{convL}{optional threshold for the convergence criterion based on the
 log-likelihood stability}
@@ -106,9 +106,10 @@ estimated}
 \item{partialH}{optional logical for Piecewise and Splines baseline risk
 functions and Splines link functions only. Indicates whether the parameters of the
 baseline risk or link functions can be dropped from the Hessian matrix to define
-convergence criteria.}
+convergence criteria (can solve non convergence due to estimates at the boundary 
+of the parameter space - usually 0).}
 
-\item{verbose}{logical indicating if information about computation should be
+\item{verbose}{logical indicating whether information about computation should be
 reported. Default to TRUE.}
 }
 \description{

@@ -23,9 +23,13 @@ A data frame with 1140 observations on the following 13 variables.
 }
 }
 \description{
-The data mimic the PREDIALA study described and analysed in Proust-Lima et al (2021).
-Repeated measures of anxiety and depression (HADS) were simulated for 561 subjects.
-Two groups are simulated and individual information of sex, age at entry in cohort
-and measurement time are provided.
+The data mimic the PREDIALA study described and analyzed in Proust-Lima et al (2021 - 
+https://arxiv.org/abs/2109.13064). 
+The study aims to describe the trajectories of depressive symptomatology of patients 
+suffering end-stage renal disease and registered on the renal transplant waiting list.
+Repeated measures of anxiety and depression (HADS) were simulated at different times
+of measurement for 561 subjects. Four time-independent covariates were also generated: 
+group (dialyzed or pre-emptive), sex and age at entry in the cohort and time on the 
+waiting list at entry in the cohort.
 }
 \keyword{datasets}

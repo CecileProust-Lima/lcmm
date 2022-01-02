@@ -5,7 +5,7 @@
 \alias{mlcmm}
 \title{Estimation of multivariate mixed-effect models and multivariate latent class
 mixed-effect models for multivariate longitudinal outcomes of possibly
-multiple types (continuous Gaussian, continuous non-Gaussian - curvilinear, ordinal)
+multiple types (continuous Gaussian, continuous non-Gaussian/curvilinear, ordinal)
 that measure the same underlying latent process.}
 \usage{
 multlcmm(
@@ -271,15 +271,15 @@ This function constitutes a multivariate extension of function \code{lcmm}.
 It fits multivariate mixed models and multivariate latent class mixed models
 for multivariate longitudinal outcomes of different types. It handles
 continuous longitudinal outcomes (Gaussian or non-Gaussian, curvilinear) as
-well as ordinal longitudinal outcomes. The model assumes that all the
-outcomes measure the same underlying latent process defined as their common
-factor, and each outcome is related to this latent common factor by a
-specific parameterized link function.  At the latent process level, the
+well as ordinal longitudinal outcomes (with cumulative probit measurement model). 
+The model assumes that all the outcomes measure the same underlying latent process
+ defined as their common factor, and each outcome is related to this latent common
+ factor by a specific parameterized link function. At the latent process level, the
 model estimates a standard linear mixed model or a latent class linear mixed
 model when heterogeneity in the population is investigated (in the same way
-as in function \code{hlme}). Parameters of the nonlinear link functions and
-of the latent process mixed model are estimated simultaneously using a
-maximum likelihood method.
+as in functions \code{hlme} and \code{lcmm}). Parameters of the nonlinear link 
+functions and of the latent process mixed model are estimated simultaneously 
+using a maximum likelihood method.
 }
 \details{
 A. THE PARAMETERIZED LINK FUNCTIONS
@@ -317,7 +317,8 @@ parameter b_1, the program estimates b_k^* (for k=2,...C-1) so that
 b_{k}=b_{k-1}+(b_k^*)^2.
 
 Details of these parameterized link functions can be found in the papers:
-Proust-Lima et al. (Biometrics 2006) and Proust-Lima et al. (BJMSP 2013).
+Proust-Lima et al. (Biometrics 2006), Proust-Lima et al. (BJMSP 2013),
+Proust-Lima et al. (arxiv 2021 - https://arxiv.org/abs/2109.13064)
 
 B. THE VECTOR OF PARAMETERS B
 
@@ -365,7 +366,7 @@ parameters that are too high or low (perfect classification). When
 identifiability of some parameters is suspected, the program can be run
 again from the former estimates by fixing the suspected parameters to their
 value with option posfix. This usually solves the problem. An alternative is
-to remove the parameters of the Beta of Splines link function from the
+to remove the parameters of the Beta or Splines link function from the
 inverse of the Hessian with option partialH.
 
 If not, the program should be run again with other initial values, with a
@@ -394,7 +395,7 @@ require any numerical integration over the random-effects, so that the estimatio
 procedure is relatively fast.
 When at least one ordinal outcome is modeled, a numerical integration over the
 random-effects is required in each computation of the individual contribution to the
-likelihood. This achieved using a Monte-Carlo procedure. We allow three options :
+likelihood. This achieved using a Monte-Carlo procedure. We allow three options:
 the standard Monte-Carlo simulations, as well as antithetic Monte-Carlo and quasi
 Monte-Carlo methods as proposed in Philipson et al (2020).
 }
@@ -471,8 +472,9 @@ Philipson, Hickey, Crowther, Kolamunnage-Dona (2020). Faster Monte Carlo estimat
 of semiparametric joint models of time-to-event and multivariate longitudinal data.
 Computational Statistics & Data Analysis 151.
 
-Proust-Lima, Philipps, Perrot, Blanchin, Sebille (2021). Continuous-time modeling of
-self-reported outcome data : a dynamic Item Response Theory model. Arxiv.
+Proust-Lima, Philipps, Perrot, Blanchin, Sebille (2021). Modeling repeated 
+self-reported outcome data: a continuous-time longitudinal Item Response 
+Theory model. https://arxiv.org/abs/2109.13064
 }
 \seealso{
 \code{\link{postprob}}, \code{\link{plot.multlcmm}}, \code{\link{predictL}},

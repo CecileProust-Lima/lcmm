@@ -10,9 +10,9 @@ https://doi.org/10.18637/jss.v078.i02
 
 And specific statistical models estimated are described in various statistical papers of the authors. 
 
-Changes in Version 1.9.4 (2021-12-17) :
+Changes in Version 1.9.4 (2022-01-03) :
 
-* the multlcmm function is now available for ordinal outcomes (link="thresholds")
+* the multlcmm function is now available for ordinal outcomes (link="thresholds") providing a longitudinal IRT model!
 * new vignette 'Dynamic IRT with multlcmm'
 * new dataset simdataHADS
 * new function 'simulate' to simulate a dataset from a hlme, lcmm, multlcmm or Jointlcmm model

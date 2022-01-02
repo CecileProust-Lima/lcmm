@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate.R
 \name{simulate.lcmm}
 \alias{simulate.lcmm}
-\title{Data simulation according to a latent class mixed model}
+\title{Data simulation according to models from lcmm package}
 \usage{
 \method{simulate}{lcmm}(
   object,

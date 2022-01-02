@@ -1,7 +1,7 @@
 #' Plot of information functions
 #' 
 #' This function plots the information functions stemmed
-#' from a \code{lcmm} or \code{multlcmm} object with threholds links.
+#' from a \code{lcmm} or \code{multlcmm} object with ordinal outcomes modeled via threshold links.
 #' 
 #' @param x an object inheriting from classes \code{ItemInfo}
 #' @param which character specifying the values to plot. Should be one of 'ItemInfo' for

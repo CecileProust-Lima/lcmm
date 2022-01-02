@@ -1,4 +1,4 @@
-#' Data simulation according to a latent class mixed model
+#' Data simulation according to models from lcmm package
 #'
 #' This function simulates a sample according to a model estimated with \code{hlme},
 #' \code{lcmm}, \code{multlcmm} or \code{Jointlcmm} functions.

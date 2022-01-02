@@ -1,26 +1,26 @@
-#' Conditional probabilities and item information of \code{lcmm} or \code{multlcmm}
-#' object for specified latent process values.
+#' Conditional probabilities and item information given specified latent process values
+#' for \code{lcmm} or \code{multlcmm}
+#' object with ordinal outcomes.
 #'
 #' The function computes the conditional probability and information function of
 #' each level of each ordinal outcome and the information function at the item level.
 #' Confidence bands (and median) can be computed by a Monte Carlo approximation.
 #' 
 #' @param x an object inheriting from class  \code{lcmm} or \code{multlcmm}, 
-#' representing a general latent class mixed model.
+#' representing a general (latent class) mixed model.
 #' @param lprocess numeric vector containing the latent process values at which the
 #' predictions should be computed.
 #' @param condRE_Y for multlcmm objects only, logical indicating if the predictions
-#' are conditional to the outcome specific random effects or not. Default to FALSE,
+#' are conditional to the outcome-specific random-effects or not. Default to FALSE=
 #' the predictions are marginal to these random effects.
 #' @param nsim  number of points used in the numerical integration (Monte-Carlo) with
 #' splines or Beta link functions. nsim should be relatively important
 #' (nsim=200 by default).
 #' @param draws optional boolean specifying whether median and confidence bands
-#' of the predicted values should be computed (TRUE) - whatever the type of
-#' link function. A Monte Carlo approximation of the posterior distribution of the
-#' predicted values is computed and the median, 2.5\% and 97.5\% percentiles
-#' are given. Otherwise, the predicted values are computed at the point
-#' estimate. By default, draws=FALSE.
+#' of the predicted values should be computed (TRUE). A Monte Carlo approximation 
+#' of the posterior distribution of the predicted values is computed and the median, 
+#' 2.5\% and 97.5\% percentiles are given. Otherwise, the predicted values are 
+#' computed at the point estimate. By default, draws=FALSE.
 #' @param ndraws if draws=TRUE, ndraws specifies the number of draws that should be
 #' generated to approximate the posterior distribution of the predicted values.
 #' By default, ndraws=2000.
@@ -29,25 +29,25 @@
 #'
 #' @return An object of class \code{ItemInfo} with values :
 #'
-#' - \code{ItemInfo} : 
-#' If draws=FALSE, returns a matrix with 3 columns : the first column indicates the
+#' - \code{ItemInfo}: 
+#' If draws=FALSE, returns a matrix with 3 columns: the first column indicates the
 #' name of the outcome, the second indicates the latent process value and the last
 #' is the computed Fisher information.
-#' If draws=TRUE, returns a matrix with 5 columns : the name of the outcome, the
+#' If draws=TRUE, returns a matrix with 5 columns: the name of the outcome, the
 #' latent process value and the 50\%, 2.5\% and 97.5\% percentiles of the approximated
 #' posterior distribution of information.
 #' 
-#' - \code{LevelInfo} : 
-#' If draws=FALSE, returns a matrix with 5 columns : the first column indicates the
+#' - \code{LevelInfo}: 
+#' If draws=FALSE, returns a matrix with 5 columns: the first column indicates the
 #' name of the outcome, the second indicates the outcome's level, the third indicates the
 #' latent process value and the two last contain the probability and Fisher information.
-#' If draws=TRUE, returns a matrix with 5 columns : the name of the outcome,
+#' If draws=TRUE, returns a matrix with 5 columns: the name of the outcome,
 #' the outcome's level, the latent process value and the 50\%, 2.5\% and 97.5\%
 #' percentiles of the approximated posterior distribution of the probability and information.
 #'
-#' - \code{object} : the model from which the computatiosns are done.
+#' - \code{object}: the model from which the computations are done.
 #' 
-#' - \code{IC} : indicator specifying if confidence intervals are computed.
+#' - \code{IC}: indicator specifying if confidence intervals are computed.
 #'
 #' @examples
 #' \dontrun{
@@ -285,7 +285,7 @@ ItemInfo <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,
     }
     else
     {
-        res <- list(ItemInfo==NA, LevelInfo=NA, object=x)
+        res <- list(ItemInfo=NA, LevelInfo=NA, object=x)
     }
     
     class(res) <- "ItemInfo"

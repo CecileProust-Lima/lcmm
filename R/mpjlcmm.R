@@ -1,6 +1,6 @@
 #' Estimation of multi-process joint latent class mixed models
 #'
-#' @param longitudinal list of longitudinal models of the type hlme, lcmm or multlcmm
+#' @param longitudinal list of longitudinal models of type hlme, lcmm or multlcmm
 #' @param subject name of the covariate representing the grouping structure
 #' (called subject identifier)
 #' @param classmb optional one-sided formula describing the covariates in the
@@ -17,7 +17,7 @@
 #' @param TimeDepVar optional vector specifying the name of the time-depending
 #' covariate in the survival model
 #' @param data data frame containing all the variables used in the model
-#' @param B optional specification for the initial values for the parameters.
+#' @param B optional specification for the initial values of the parameters.
 #' Three options are allowed: (1) a vector of initial values is entered (the
 #' order in which the parameters are included is detailed in \code{details}
 #' section).  (2) nothing is specified. Initial values are extracted from the models
@@ -28,7 +28,7 @@
 #' local maxima, the \code{B} vector should be specified and several different
 #' starting points should be tried.
 #' @param convB optional threshold for the convergence criterion based on the
-#' parameter stabilit
+#' parameter stability
 #' @param convL optional threshold for the convergence criterion based on the
 #' log-likelihood stability
 #' @param convG optional threshold for the convergence criterion based on the
@@ -54,8 +54,9 @@
 #' @param partialH optional logical for Piecewise and Splines baseline risk
 #' functions and Splines link functions only. Indicates whether the parameters of the
 #' baseline risk or link functions can be dropped from the Hessian matrix to define
-#' convergence criteria.
-#' @param verbose logical indicating if information about computation should be
+#' convergence criteria (can solve non convergence due to estimates at the boundary 
+#' of the parameter space - usually 0).
+#' @param verbose logical indicating whether information about computation should be
 #' reported. Default to TRUE.
 #' 
 #' @author Cecile Proust Lima and Viviane Philipps

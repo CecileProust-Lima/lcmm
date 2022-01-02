@@ -2,8 +2,9 @@
 % Please edit documentation in R/ItemInfo.R
 \name{ItemInfo}
 \alias{ItemInfo}
-\title{Conditional probabilities and item information of \code{lcmm} or \code{multlcmm}
-object for specified latent process values.}
+\title{Conditional probabilities and item information given specified latent process values
+for \code{lcmm} or \code{multlcmm}
+object with ordinal outcomes.}
 \usage{
 ItemInfo(
   x,
@@ -17,13 +18,13 @@ ItemInfo(
 }
 \arguments{
 \item{x}{an object inheriting from class  \code{lcmm} or \code{multlcmm}, 
-representing a general latent class mixed model.}
+representing a general (latent class) mixed model.}
 
 \item{lprocess}{numeric vector containing the latent process values at which the
 predictions should be computed.}
 
 \item{condRE_Y}{for multlcmm objects only, logical indicating if the predictions
-are conditional to the outcome specific random effects or not. Default to FALSE,
+are conditional to the outcome-specific random-effects or not. Default to FALSE=
 the predictions are marginal to these random effects.}
 
 \item{nsim}{number of points used in the numerical integration (Monte-Carlo) with
@@ -31,11 +32,10 @@ splines or Beta link functions. nsim should be relatively important
 (nsim=200 by default).}
 
 \item{draws}{optional boolean specifying whether median and confidence bands
-of the predicted values should be computed (TRUE) - whatever the type of
-link function. A Monte Carlo approximation of the posterior distribution of the
-predicted values is computed and the median, 2.5\% and 97.5\% percentiles
-are given. Otherwise, the predicted values are computed at the point
-estimate. By default, draws=FALSE.}
+of the predicted values should be computed (TRUE). A Monte Carlo approximation 
+of the posterior distribution of the predicted values is computed and the median, 
+2.5\% and 97.5\% percentiles are given. Otherwise, the predicted values are 
+computed at the point estimate. By default, draws=FALSE.}
 
 \item{ndraws}{if draws=TRUE, ndraws specifies the number of draws that should be
 generated to approximate the posterior distribution of the predicted values.
@@ -47,25 +47,25 @@ are ignored in this function.}
 \value{
 An object of class \code{ItemInfo} with values :
 
-- \code{ItemInfo} : 
-If draws=FALSE, returns a matrix with 3 columns : the first column indicates the
+- \code{ItemInfo}: 
+If draws=FALSE, returns a matrix with 3 columns: the first column indicates the
 name of the outcome, the second indicates the latent process value and the last
 is the computed Fisher information.
-If draws=TRUE, returns a matrix with 5 columns : the name of the outcome, the
+If draws=TRUE, returns a matrix with 5 columns: the name of the outcome, the
 latent process value and the 50\%, 2.5\% and 97.5\% percentiles of the approximated
 posterior distribution of information.
 
-- \code{LevelInfo} : 
-If draws=FALSE, returns a matrix with 5 columns : the first column indicates the
+- \code{LevelInfo}: 
+If draws=FALSE, returns a matrix with 5 columns: the first column indicates the
 name of the outcome, the second indicates the outcome's level, the third indicates the
 latent process value and the two last contain the probability and Fisher information.
-If draws=TRUE, returns a matrix with 5 columns : the name of the outcome,
+If draws=TRUE, returns a matrix with 5 columns: the name of the outcome,
 the outcome's level, the latent process value and the 50\%, 2.5\% and 97.5\%
 percentiles of the approximated posterior distribution of the probability and information.
 
-- \code{object} : the model from which the computatiosns are done.
+- \code{object}: the model from which the computations are done.
 
-- \code{IC} : indicator specifying if confidence intervals are computed.
+- \code{IC}: indicator specifying if confidence intervals are computed.
 }
 \description{
 The function computes the conditional probability and information function of

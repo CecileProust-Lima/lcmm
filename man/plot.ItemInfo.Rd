@@ -45,7 +45,7 @@ to legend}
 }
 \description{
 This function plots the information functions stemmed
-from a \code{lcmm} or \code{multlcmm} object with threholds links.
+from a \code{lcmm} or \code{multlcmm} object with ordinal outcomes modeled via threshold links.
 }
 \author{
 Viviane Philipps and Cecile Proust-Lima

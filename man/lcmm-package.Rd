@@ -7,11 +7,12 @@
 processes.}
 \description{
 Functions for the estimation of latent class mixed models (LCMM), joint
-latent class mixed models (JLCM) and mixed models for curvilinear and
-ordinal univariate and multivariate longitudinal outcomes (with or without
-latent classes of trajectory). All the models are estimated in a maximum
-likelihood framework using an iterative algorithm. The package also provides
-various post fit functions.
+latent class mixed models fof longitudinal and survival data (JLCM)
+and latent process mixed models (with or without latent classes of trajectory) 
+for univariate and multivariate longitudinal outcomes of different types 
+including curvilinear and ordinal outcomes. 
+All the models are estimated in a maximum likelihood framework using an 
+iterative algorithm. The package also provides various post fit functions.
 }
 \details{
 \Sexpr[stage=build,results=hide]{descr <- packageDescription("lcmm")}
@@ -22,16 +23,19 @@ License: \tab GPL (>=2.0) \cr LazyLoad: \tab yes \cr }
 The package includes for the moment the estimation of :
 \itemize{ \item latent class mixed models for Gaussian longitudinal outcomes
 using \code{hlme} function, \item latent class mixed models for other
-quantitative, bounded quantitative (curvilinear) and discrete longitudinal
-outcomes using \code{lcmm} function, \item latent class mixed models for
-multivariate (possibly curvilinear) longitudinal outcomes using
-\code{multlcmm} function, \item joint latent class mixed models for a
+quantitative, bounded quantitative (curvilinear) and discrete (ordinal/binary) longitudinal
+outcomes using \code{lcmm} function, \item mixed models (with and without latent classes) for
+multivariate longitudinal outcomes of different nature using
+\code{multlcmm} function (this includes a longitudinal IRT model for homogeneous and heterogeneous data),
+ \item joint latent class mixed models for a
 Gaussian (or curvilinear) longitudinal outcome and a right-censored
 (potentially left-truncated and of multiple causes) time-to-event using
-\code{Jointlcmm} function.  }
+\code{Jointlcmm} function, \item joint latent class mixed models for multivariate longitudinal outcomes
+ and a right-censored (potentially left-truncated and of multiple causes) time-to-event using
+\code{mpjlcmm} function. }
 
-Please report to the maintainer via github any bug or comment regarding the package for
-future updates.
+Please report any bug or comment regarding the package for
+future updates VIA GITHUB ONLY.
 }
 \references{
 Proust-Lima C, Philipps V, Liquet B (2017). Estimation of Extended Mixed 
@@ -69,7 +73,20 @@ Medical Research 23, 74-90.
 Proust-Lima, Amieva, Jacqmin-Gadda (2013). Analysis of multivariate mixed
 longitudinal data: A flexible latent process approach. Br J Math Stat
 Psychol 66(3), 470-87.
-
+ 
+Proust-Lima, Philipps, Perrot, Blanchin, Sebille (2021). Modeling repeated self-reported
+outcome data: a continuous-time longitudinal Item Response Theory model. 
+arXiv:210913064. http://arxiv.org/abs/2109.13064
+ 
+Proust-Lima, Dartigues, Jacqmin-Gadda (2016). Joint modeling of repeated multivariate 
+cognitive measures and competing risks of dementia and death: a latent process and
+ latent class approach. Stat Med;35(3):382-98
+ 
+ Proust-Lima, Philipps, Dartigues, Bennett, Glymour, Jacqmin-Gadda, et al (2019). 
+ Are latent variable models preferable to composite score approaches when assessing
+ risk factors of change? Evaluation of type-I error and statistical power in longitudinal
+ cognitive studies. Stat Methods Med Res;28(7):1942-57  
+      
 Verbeke and Lesaffre (1996). A linear mixed-effects model with heterogeneity
 in the random-effects population. Journal of the American Statistical
 Association 91, 217-21
