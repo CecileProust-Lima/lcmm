@@ -7,7 +7,7 @@
 processes.}
 \description{
 Functions for the estimation of latent class mixed models (LCMM), joint
-latent class mixed models fof longitudinal and survival data (JLCM)
+latent class mixed models for longitudinal and survival data (JLCM)
 and latent process mixed models (with or without latent classes of trajectory) 
 for univariate and multivariate longitudinal outcomes of different types 
 including curvilinear and ordinal outcomes. 
