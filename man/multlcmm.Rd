@@ -39,7 +39,9 @@ multlcmm(
   returndata = FALSE,
   methInteg = "QMC",
   nMC = NULL,
-  var.time = NULL
+  var.time = NULL,
+  mla = 0,
+  nproc = 1
 )
 
 mlcmm(
@@ -73,7 +75,9 @@ mlcmm(
   returndata = FALSE,
   methInteg = "QMC",
   nMC = NULL,
-  var.time = NULL
+  var.time = NULL,
+  mla = 0,
+  nproc = 1
 )
 }
 \arguments{

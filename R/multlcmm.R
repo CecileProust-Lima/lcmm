@@ -378,7 +378,7 @@
 #' 
 #' @export
 #' 
-multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,randomY=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=TRUE,returndata=FALSE,methInteg="QMC",nMC=NULL,var.time=NULL)
+multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,randomY=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=TRUE,returndata=FALSE,methInteg="QMC",nMC=NULL,var.time=NULL,mla=0,nproc=1,clustertype=NULL)
 {
     ptm<-proc.time()
     if(verbose==TRUE) cat("Be patient, multlcmm is running ... \n")
@@ -1607,7 +1607,8 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     ##                 as.integer(pbH0),
     ##                 as.integer(fix0))
     ## }else{
-        
+
+    if(mla==0){
     out <- .Fortran(C_hetmixmult,
                     as.double(Y0),
                     as.double(X0),
@@ -1669,7 +1670,147 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                     as.double(seqMC),
                     as.integer(chol))
 #}
+    } else {
 
+        if(partialH) stop("partialH is not supported with mla optimization")
+
+        nfix <- sum(fix0)
+        bfix <- 0
+        if(nfix>0)
+        {
+            bfix <- b[which(fix0==1)]
+            b <- b[which(fix0==0)]
+            NPM <- NPM-nfix
+        }
+
+        if(maxiter==0)
+        {
+            vrais <- loglikmultlcmm(b,Y0,X0,prior0,idprob0,idea0,idg0,idcor0,idcontr0,
+                                    ny0,ns0,ng0,nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0,
+                                    nalea0,NPM,epsY,idlink0,nbzitr0,zitr,uniqueY0,
+                                    indiceY0,nvalSPLORD0,fix0,nfix,bfix,methInteg,nMC,
+                                    dimMC,seqMC,chol)
+            
+            out <- list(conv=2, V=rep(NA, length(b)), best=b,
+                        ppi=NA, predRE=NA, predRE_Y=NA, Yobs=NA, resid_m=NA, resid_ss=NA,
+                        marker=NA, transfY=NA, pred_m_g=NA, pred_ss_g=NA,
+                        gconv=rep(NA,3), niter=0, loglik=vrais)
+        }
+        else
+        {   
+            res <- mla(b=b, m=length(b), fn=loglikmultlcmm,
+                       clustertype=clustertype,.packages=NULL,
+                       epsa=convB,epsb=convL,epsd=convG,
+                       digits=8,print.info=verbose,blinding=FALSE,
+                       multipleTry=25,file="",
+                       nproc=nproc,maxiter=maxiter,minimize=FALSE,
+                       Y0=Y0,X0=X0,prior0=prior0,idprob0=idprob0,idea0=idea0,idg0=idg0,
+                       idcor0=idcor0,idcontr0=idcontr0,ny0=ny0,ns0=ns0,ng0=ng0,nv0=nv0,
+                       nobs0=nobs0,nea0=nea0,nmes0=nmes0,idiag0=idiag0,nwg0=nwg0,
+                       ncor0=ncor0,nalea0=nalea0,npm0=NPM,epsY0=epsY,idlink0=idlink0,
+                       nbzitr0=nbzitr0,zitr0=zitr,uniqueY0=uniqueY0,indiceY0=indiceY0,
+                       nvalSPLORD0=nvalSPLORD0,fix0=fix0,nfix0=nfix,bfix0=bfix,
+                       methInteg0=methInteg,nMC0=nMC,dimMC0=dimMC,seqMC0=seqMC,chol0=chol)
+            
+            out <- list(conv=res$istop, V=res$v, best=res$b,
+                        ppi=NA, predRE=NA, predRE_Y=NA, Yobs=NA, resid_m=NA, resid_ss=NA,
+                        marker=NA, transfY=NA, pred_m_g=NA, pred_ss_g=NA,
+                        gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,
+                        loglik=res$fn.value)
+
+            if(out$conv %in% c(1,2,3))
+            {
+                estim0 <- 0
+                ll <- 0
+                ppi0 <- rep(0,ns0*ng0)
+                resid_m <- rep(0,nobs0)
+                resid_ss <- rep(0,nobs0)
+                pred_m_g <- rep(0,nobs0*ng0)
+                pred_ss_g <- rep(0,nobs0*ng0)
+                predRE <- rep(0,ns0*nea0)
+                predRE_Y <- rep(0,ns0*nalea0)
+                marker <- rep(0,nsim*ny0)
+                transfY <- rep(0,nsim*ny0)
+                Yobs <- rep(0,nobs0)
+                Ydiscret <- 0
+                vraisdiscret <- 0
+                UACV <- 0
+                rlindiv <- rep(0,ns0)
+                post <- .Fortran(C_loglikmultlcmm,
+                                 as.double(Y0),
+                                 as.double(X0),
+                                 as.integer(prior0),
+                                 as.integer(idprob0),
+                                 as.integer(idea0),
+                                 as.integer(idg0),
+                                 as.integer(idcor0),
+                                 as.integer(idcontr0),
+                                 as.integer(ny0),
+                                 as.integer(ns0),
+                                 as.integer(ng0),
+                                 as.integer(nv0),
+                                 as.integer(nobs0),
+                                 as.integer(nea0),
+                                 as.integer(nmes0),
+                                 as.integer(idiag0),
+                                 as.integer(nwg0),
+                                 as.integer(ncor0),
+                                 as.integer(nalea0),
+                                 as.integer(NPM),
+                                 best=as.double(out$best),
+                                 ppi2=as.double(ppi0),
+                                 resid_m=as.double(resid_m),
+                                 resid_ss=as.double(resid_ss),
+                                 pred_m_g=as.double(pred_m_g),
+                                 pred_ss_g=as.double(pred_ss_g),
+                                 predRE=as.double(predRE),
+                                 predRE_Y=as.double(predRE_Y),
+                                 as.double(epsY),
+                                 as.integer(idlink0),
+                                 as.integer(nbzitr0),
+                                 as.double(zitr),
+                                 as.double(uniqueY0),
+                                 as.integer(indiceY0),
+                                 as.integer(nvalSPLORD0),
+                                 marker=as.double(marker),
+                                 transfY=as.double(transfY),
+                                 as.integer(nsim),
+                                 Yobs=as.double(Yobs),
+                                 as.integer(Ydiscret),
+                                 vraisdiscret=as.double(vraisdiscret),
+                                 UACV=as.double(UACV),
+                                 rlindiv=as.double(rlindiv),
+                                 as.integer(fix0),
+                                 as.integer(nfix),
+                                 as.double(bfix),
+                                 as.integer(methInteg),
+                                 as.integer(nMC),
+                                 as.integer(dimMC),
+                                 as.double(seqMC),
+                                 as.integer(chol),
+                                 as.integer(estim0),
+                                 as.double(ll))
+
+                out$ppi <- post$ppi2
+                out$predRE <- post$predRE
+                out$predRE_Y <- post$predRE_Y
+                out$Yobs <- post$Yobs
+                out$resid_m <- post$resid_m
+                out$resid_ss <- post$resid_ss
+                out$marker <- post$marker
+                out$transfY <- post$transfY
+                out$pred_m_g <- post$pred_m_g
+                out$pred_ss_g <- post$pred_ss_g
+            }
+        }
+        
+        ## creer best a partir de b et bfix
+        best <- rep(NA,length(fix0))
+        best[which(fix0==0)] <- out$best
+        best[which(fix0==1)] <- bfix
+        out$best <- best
+    }
+    
     
 
     ## mettre NA pour les variances et covariances non calculees et  0 pr les prm fixes
@@ -1944,3 +2085,33 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 #' @rdname multlcmm
 #' @export
 mlcmm <- multlcmm
+
+
+
+#'@export
+loglikmultlcmm <- function(b,Y0,X0,prior0,idprob0,idea0,idg0,idcor0,idcontr0,ny0,ns0,ng0,
+                           nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0,nalea0,npm0,
+                           #ppi0,resid_m,resid_ss,pred_m_g,pred_ss_g,pred_RE,pred_RE_Y,
+                           epsY0,idlink0,nbzitr0,zitr0,uniqueY0,indiceY0,nvalSPLORD0,
+                           #marker,transfY,nsim0,Yobs,Ydiscret,vraisdiscret,UACV,rlindiv,
+                           fix0,nfix0,bfix0,methInteg0,nMC0,dimMC0,seqMC0,chol0)#,estim0)
+{
+    res <- 0
+    ppi0 <- rep(0,ns0*ng0)
+    resid_m <- rep(0,nobs0)
+    resid_ss <- rep(0,nobs0)
+    pred_m_g <- rep(0,nobs0*ng0)
+    pred_ss_g <- rep(0,nobs0*ng0)
+    predRE <- rep(0,ns0*nea0)
+    predRE_Y <- rep(0,ns0*nalea0)
+    nsim0 <- 0
+    marker <- rep(0,nsim0*ny0)
+    transfY <- rep(0,nsim0*ny0)
+    Yobs <- rep(0,nobs0)
+    Ydiscret <- 0
+    vraisdiscret <- 0
+    UACV <- 0
+    rlindiv <- rep(0,ns0)
+    estim0 <- 1
+    .Fortran(C_loglikmultlcmm,as.double(Y0),as.double(X0),as.integer(prior0),as.integer(idprob0),as.integer(idea0),as.integer(idg0),as.integer(idcor0),as.integer(idcontr0),as.integer(ny0),as.integer(ns0),as.integer(ng0),as.integer(nv0),as.integer(nobs0),as.integer(nea0),as.integer(nmes0),as.integer(idiag0),as.integer(nwg0),as.integer(ncor0),as.integer(nalea0),as.integer(npm0),as.double(b),as.double(ppi0),as.double(resid_m),as.double(resid_ss),as.double(pred_m_g),as.double(pred_ss_g),as.double(predRE),as.double(predRE_Y),as.double(epsY0),as.integer(idlink0),as.integer(nbzitr0),as.double(zitr0),as.double(uniqueY0),as.integer(indiceY0),as.integer(nvalSPLORD0),as.double(marker),as.double(transfY),as.integer(nsim0),as.double(Yobs),as.integer(Ydiscret),as.double(vraisdiscret),as.double(UACV),as.double(rlindiv),as.integer(fix0),as.integer(nfix0),as.double(bfix0),as.integer(methInteg0),as.integer(nMC0),as.integer(dimMC0),as.double(seqMC0),as.integer(chol0),as.integer(estim0),loglik=as.double(res))$loglik
+}

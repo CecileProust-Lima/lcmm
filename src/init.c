@@ -18,6 +18,7 @@ static R_FortranMethodDef FortRout[] = {
   {"mpjhet", (DL_FUNC) &F77_SUB(mpjhet), 64},
   {"hetmixmult", (DL_FUNC) &F77_SUB(hetmixmult), 59},
   {"iteminfo", (DL_FUNC) &F77_SUB(iteminfo), 15},
+  {"loglikmultlcmm", (DL_FUNC) &F77_SUB(loglikmultlcmm), 53},
   {NULL, NULL, 0}
 };
 
