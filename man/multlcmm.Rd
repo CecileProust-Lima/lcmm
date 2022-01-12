@@ -41,7 +41,8 @@ multlcmm(
   nMC = NULL,
   var.time = NULL,
   mla = 0,
-  nproc = 1
+  nproc = 1,
+  clustertype = NULL
 )
 
 mlcmm(
@@ -77,7 +78,8 @@ mlcmm(
   nMC = NULL,
   var.time = NULL,
   mla = 0,
-  nproc = 1
+  nproc = 1,
+  clustertype = NULL
 )
 }
 \arguments{

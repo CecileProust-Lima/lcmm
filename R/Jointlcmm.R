@@ -447,7 +447,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                       cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,
                       nsim=100,prior=NULL,logscale=FALSE,subset=NULL,na.action=1,
                       posfix=NULL,partialH=FALSE,verbose=TRUE,returndata=FALSE,
-                      var.time=NULL)
+                      var.time=NULL,mla=0,nproc=1,clustertype=NULL)
     {
         
         ptm<-proc.time()
@@ -2461,7 +2461,9 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
 #print(b)
 #### estimation
         idspecif <- as.vector(t(idspecif))
-#return(b)
+                                        #return(b)
+
+        if(mla==0){
         ## pour reduire le nb d'arguments:
         int6 <- c(nw,ncor0,idiag0,idtrunc,logspecif,maxiter)
         convBLG <- c(convB,convL,convG)
@@ -2526,7 +2528,166 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                         statevt=as.double(statevt),
                         as.integer(pbH0),
                         as.integer(fix0))
+        } else {
 
+            if(partialH) stop("partialH is not supported with mla optimization")
+            
+            nfix <- sum(fix0)
+            bfix <- 0
+            if(nfix>0)
+            {
+                bfix <- b[which(fix0==1)]
+                b <- b[which(fix0==0)]
+                NPM <- NPM-nfix
+            }
+
+            if(maxiter==0)
+            {
+                vrais <- loglikJointlcmm(b,Y0,X0,prior0,tsurv0,tsurv,devt,ind_survint,
+                                         idprob0,idea0,idg0,idcor0,idcom,idspecif,idtdv,
+                                         idlink,epsY,nbzitr,zitr0,uniqueY0,nvalSPL0,
+                                         indiceY0,typrisq,risqcom,nz,zi,ns0,ng0,nv0,
+                                         nobs0,nmes0,nbevt,nea0,nw,ncor0,idiag0,idtrunc,
+                                         logspecif,NPM,fix0,nfix,bfix)
+                
+                out <- list(conv=2, V=rep(NA, length(b)), best=b,
+                            ppi=NA, ppitest=NA, predRE=NA, Yobs=NA, resid_m=NA,
+                            resid_ss=NA, marker=NA, transfY=NA, pred_m_g=NA, pred_ss_g=NA,
+                            time=NA, risq_est=NA, risqcum_est=NA,
+                            statglob=NA, statevt=rep(NA,nbevt),
+                            gconv=rep(NA,3), niter=0, loglik=vrais)
+            }
+            else
+            {
+                res <- mla(b=b, m=length(b), fn=loglikJointlcmm,
+                           clustertype=clustertype,.packages=NULL,
+                           epsa=convB,epsb=convL,epsd=convG,
+                           digits=8,print.info=verbose,blinding=FALSE,
+                           multipleTry=25,file="",
+                           nproc=nproc,maxiter=maxiter,minimize=FALSE,
+                           Y0=Y0,X0=X0,prior0=prior0,tentr0=tsurv0,tevt0=tsurv,devt0=devt,
+                           ind_survint0=ind_survint,idprob0=idprob0,idea0=idea0,idg0=idg0,
+                           idcor0=idcor0,idcom0=idcom,idspecif0=idspecif,idtdv0=idtdv,
+                           idlink0=idlink,epsY0=epsY,nbzitr0=nbzitr,zitr0=zitr0,
+                           uniqueY0=uniqueY0,nvalSPL0=nvalSPL0,indiceY0=indiceY0,
+                           typrisq0=typrisq,risqcom0=risqcom,nz0=nz,zi0=zi,ns0=ns0,
+                           ng0=ng0,nv0=nv0,nobs0=nobs0,nmes0=nmes0,nbevt0=nbevt,nea0=nea0,
+                           nwg0=nw,ncor0=ncor0,idiag0=idiag0,idtrunc0=idtrunc,
+                           logspecif0=logspecif,npm0=NPM,fix0=fix0,nfix0=nfix,bfix0=bfix)
+                
+                out <- list(conv=res$istop, V=res$v, best=res$b,
+                            ppi=NA, ppitest=NA, predRE=NA, Yobs=NA, resid_m=NA,
+                            resid_ss=NA, marker=NA, transfY=NA, pred_m_g=NA, pred_ss_g=NA,
+                            time=NA, risq_est=NA, risqcum_est=NA,
+                            statglob=NA, statevt=rep(NA,nbevt),
+                            gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,
+                            loglik=res$fn.value)
+                
+                if(out$conv %in% c(1,2,3))
+                {
+                    estim0 <- 0
+                    ll <- 0
+                    ppi0 <- rep(0,ns0*ng0)
+                    ppitest0 <- rep(0,ns0*ng0)
+                    resid_m <- rep(0,nobs0)
+                    resid_ss <- rep(0,nobs0)
+                    pred_m_g <- rep(0,nobs0*ng0)
+                    pred_ss_g <- rep(0,nobs0*ng0)
+                    predRE <- rep(0,ns0*nea0)
+                    marker <- rep(0,nsim)
+                    transfY <- rep(0,nsim)
+                    Yobs <- rep(0,nobs0)
+                    risq_est <- rep(0,nsim*ng0*nbevt)
+                    risqcum_est <- rep(0,nsim*ng0*nbevt)
+                    statglob <- 0
+                    statevt <- rep(0,nbevt)
+                    estim0 <- 0
+                    post <- .Fortran(C_loglikjointlcmm,
+                             as.double(Y0),
+                             as.double(X0),
+                             as.integer(prior0),
+                             as.double(tsurv0),
+                             as.double(tsurv),
+                             as.integer(devt),
+                             as.integer(ind_survint),
+                             as.integer(idprob0),
+                             as.integer(idea0),
+                             as.integer(idg0),
+                             as.integer(idcor0),
+                             as.integer(idcom),
+                             as.integer(idspecif),
+                             as.integer(idtdv),
+                             as.integer(idlink),
+                             as.double(epsY),
+                             as.integer(nbzitr),
+                             as.double(zitr0),
+                             as.double(uniqueY0),
+                             as.integer(nvalSPL0),
+                             as.integer(indiceY0),
+                             as.integer(typrisq),
+                             as.integer(risqcom),
+                             as.integer(nz),
+                             as.double(zi),
+                             as.integer(ns0),
+                             as.integer(ng0),
+                             as.integer(nv0),
+                             as.integer(nobs0),
+                             as.integer(nmes0),
+                             as.integer(nbevt),
+                             as.integer(nea0),
+                             as.integer(nw),
+                             as.integer(ncor0),
+                             as.integer(idiag0),
+                             as.integer(idtrunc),
+                             as.integer(logspecif),
+                             as.integer(NPM),
+                             best=as.double(b),
+                             ppi=as.double(ppi0),
+                             ppitest=as.double(ppitest0),
+                             resid_m=as.double(resid_m),
+                             resid_ss=as.double(resid_ss),
+                             pred_m_g=as.double(pred_m_g),
+                             pred_ss_g=as.double(pred_ss_g),
+                             predRE=as.double(predRE),
+                             time=as.double(time),
+                             risq_est=as.double(risq_est),
+                             risqcum_est=as.double(risqcum_est),
+                             marker=as.double(marker),
+                             transfY=as.double(transfY),
+                             as.integer(nsim),
+                             Yobs=as.double(Yobs),
+                             statglob=as.double(statglob),
+                             statevt=as.double(statevt),
+                             as.integer(fix0),
+                             as.integer(nfix),
+                             as.double(bfix),
+                             as.integer(estim0),
+                             loglik=as.double(ll))
+
+                    out$ppi <- post$ppi
+                    out$ppitest <- post$ppitest
+                    out$predRE <- post$predRE
+                    out$Yobs <- post$Yobs
+                    out$resid_m <- post$resid_m
+                    out$resid_ss <- post$resid_ss
+                    out$marker <- post$marker
+                    out$transfY <- post$transfY
+                    out$pred_m_g <- post$pred_m_g
+                    out$pred_ss_g <- post$pred_ss_g
+                    out$risq_est <- post$risq_est
+                    out$risqcum_est <- post$risqcum_est
+                    out$statglob <- post$statglob
+                    out$statevt <- post$statevt
+                }
+            }
+            
+            ## creer best a partir de b et bfix
+            best <- rep(NA,length(fix0))
+            best[which(fix0==0)] <- out$best
+            best[which(fix0==1)] <- bfix
+            out$best <- best
+        }
+        
 
 
  ### mettre NA pour les variances et covariances non calculees et  0 pr les prm fixes
@@ -2767,3 +2928,88 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
 #' @rdname Jointlcmm
 #' @export
 jlcmm <- Jointlcmm
+
+
+#' @export
+loglikJointlcmm <- function(b,Y0,X0,prior0,tentr0,tevt0,devt0,ind_survint0,idprob0,idea0,idg0,idcor0,idcom0,idspecif0,idtdv0,idlink0,epsY0,nbzitr0,zitr0,uniqueY0,nvalSPL0,indiceY0,typrisq0,risqcom0,nz0,zi0,ns0,ng0,nv0,nobs0,nmes0,nbevt0,nea0,nwg0,ncor0,idiag0,idtrunc0,logspecif0,npm0,fix0,nfix0,bfix0)
+{
+    res <- 0
+    ppi0 <- rep(0,ns0*ng0)
+    ppitest0 <- rep(0,ns0*ng0)
+    resid_m <- rep(0,nobs0)
+    resid_ss <- rep(0,nobs0)
+    pred_m_g <- rep(0,nobs0*ng0)
+    pred_ss_g <- rep(0,nobs0*ng0)
+    predRE <- rep(0,ns0*nea0)
+    nsim0 <- 0
+    marker <- rep(0,nsim0)
+    transfY <- rep(0,nsim0)
+    Yobs <- rep(0,nobs0)
+    time <- rep(0,nsim0)
+    risq_est <- rep(0,nsim0*ng0*nbevt0)
+    risqcum_est <- rep(0,nsim0*ng0*nbevt0)
+    statglob <- 0
+    statevt <- rep(0,nbevt0)
+    estim0 <- 1
+    .Fortran(C_loglikjointlcmm,
+             as.double(Y0),
+             as.double(X0),
+             as.integer(prior0),
+             as.double(tentr0),
+             as.double(tevt0),
+             as.integer(devt0),
+             as.integer(ind_survint0),
+             as.integer(idprob0),
+             as.integer(idea0),
+             as.integer(idg0),
+             as.integer(idcor0),
+             as.integer(idcom0),
+             as.integer(idspecif0),
+             as.integer(idtdv0),
+             as.integer(idlink0),
+             as.double(epsY0),
+             as.integer(nbzitr0),
+             as.double(zitr0),
+             as.double(uniqueY0),
+             as.integer(nvalSPL0),
+             as.integer(indiceY0),
+             as.integer(typrisq0),
+             as.integer(risqcom0),
+             as.integer(nz0),
+             as.double(zi0),
+             as.integer(ns0),
+             as.integer(ng0),
+             as.integer(nv0),
+             as.integer(nobs0),
+             as.integer(nmes0),
+             as.integer(nbevt0),
+             as.integer(nea0),
+             as.integer(nwg0),
+             as.integer(ncor0),
+             as.integer(idiag0),
+             as.integer(idtrunc0),
+             as.integer(logspecif0),
+             as.integer(npm0),
+             best=as.double(b),
+             ppi=as.double(ppi0),
+             ppitest=as.double(ppitest0),
+             resid_m=as.double(resid_m),
+             resid_ss=as.double(resid_ss),
+             pred_m_g=as.double(pred_m_g),
+             pred_ss_g=as.double(pred_ss_g),
+             predRE=as.double(predRE),
+             time=as.double(time),
+             risq_est=as.double(risq_est),
+             risqcum_est=as.double(risqcum_est),
+             marker=as.double(marker),
+             transfY=as.double(transfY),
+             as.integer(nsim0),
+             Yobs=as.double(Yobs),
+             statglob=as.double(statglob),
+             statevt=as.double(statevt),
+             as.integer(fix0),
+             as.integer(nfix0),
+             as.double(bfix0),
+             as.integer(estim0),
+             loglik=as.double(res))$loglik
+}
