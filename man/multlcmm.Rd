@@ -38,7 +38,7 @@ multlcmm(
   verbose = TRUE,
   returndata = FALSE,
   methInteg = "QMC",
-  nMC = 1000,
+  nMC = NULL,
   cholesky = TRUE
 )
 
@@ -72,7 +72,7 @@ mlcmm(
   verbose = TRUE,
   returndata = FALSE,
   methInteg = "QMC",
-  nMC = 1000,
+  nMC = NULL,
   cholesky = TRUE
 )
 }
