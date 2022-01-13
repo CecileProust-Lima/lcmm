@@ -845,7 +845,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
            if(j1.eq.j2) then
               varB(j1,j2) = Ut(j1,j2)*Ut(j1,j2)
            else
-              varB(j1,j2) = (exp(Ut(j1,j2))-1)/(exp(Ut(j1,j2)+1))
+              varB(j1,j2) = (exp(Ut(j1,j2))-1)/(exp(Ut(j1,j2))+1)
               varB(j2,j1) = varB(j1,j2)
            end if
         end do
@@ -2129,7 +2129,7 @@ end do
                     if(j1.eq.j2) then
                        varB(j1,j2) = Ut(j1,j2)*Ut(j1,j2)
                     else
-                       varB(j1,j2) = (exp(Ut(j1,j2))-1)/(exp(Ut(j1,j2)+1))
+                       varB(j1,j2) = (exp(Ut(j1,j2))-1)/(exp(Ut(j1,j2))+1)
                        varB(j2,j1) = varB(j1,j2)
                     end if
                  end do
