@@ -232,6 +232,14 @@ are considered. 'MCO' for ordinary Monte Carlo, 'MCA' for antithetic Monte Carlo
 if at least one threshold link is specified.}
 
 \item{var.time}{optional character indicating the name of the time variable.}
+
+\item{mla}{integer indicating if the optimization should use the mla function
+from marqLevAlg package. Default to 0, the internal optimization algorithm is used.}
+
+\item{nproc}{if mla=1, the number cores for parallel computation.
+Default to 1 (sequential mode).}
+
+\item{clustertype}{optional character indicating the type of cluster for parallel computation.}
 }
 \value{
 The list returned is: \item{ns}{number of grouping units in the

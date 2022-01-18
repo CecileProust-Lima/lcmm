@@ -277,6 +277,11 @@
 #' @param returndata logical indicating if data used for computation should be
 #' returned. Default to FALSE, data are not returned.
 #' @param var.time optional character indicating the name of the time variable.
+#' @param mla integer indicating if the optimization should use the mla function
+#' from marqLevAlg package. Default to 0, the internal optimization algorithm is used.
+#' @param nproc if mla=1, the number cores for parallel computation.
+#' Default to 1 (sequential mode).
+#' @param clustertype optional character indicating the type of cluster for parallel computation.
 #' @return The list returned is: \item{loglik}{log-likelihood of the model}
 #' \item{best}{vector of parameter estimates in the same order as specified in
 #' \code{B} and detailed in section \code{details}} \item{V}{vector containing
@@ -2641,7 +2646,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                              as.integer(idtrunc),
                              as.integer(logspecif),
                              as.integer(NPM),
-                             best=as.double(b),
+                             best=as.double(out$best),
                              ppi=as.double(ppi0),
                              ppitest=as.double(ppitest0),
                              resid_m=as.double(resid_m),
@@ -2686,6 +2691,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
             best[which(fix0==0)] <- out$best
             best[which(fix0==1)] <- bfix
             out$best <- best
+            NPM <- NPM+nfix
         }
         
 

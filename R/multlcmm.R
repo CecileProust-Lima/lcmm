@@ -254,6 +254,11 @@
 #' @param nMC integer, number of Monte Carlo simulations. By default, 1000 points are used
 #' if at least one threshold link is specified.
 #' @param var.time optional character indicating the name of the time variable.
+#' @param mla integer indicating if the optimization should use the mla function
+#' from marqLevAlg package. Default to 0, the internal optimization algorithm is used.
+#' @param nproc if mla=1, the number cores for parallel computation.
+#' Default to 1 (sequential mode).
+#' @param clustertype optional character indicating the type of cluster for parallel computation.
 #' @return The list returned is: \item{ns}{number of grouping units in the
 #' dataset} \item{ng}{number of latent classes} \item{loglik}{log-likelihood of
 #' the model} \item{best}{vector of parameter estimates in the same order as
@@ -1809,6 +1814,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
         best[which(fix0==0)] <- out$best
         best[which(fix0==1)] <- bfix
         out$best <- best
+        NPM <- NPM+nfix
     }
     
     

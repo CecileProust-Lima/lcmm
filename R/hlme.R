@@ -164,6 +164,11 @@
 #' @param var.time optional character indicating the name of the time variable.
 #' @param partialH optional logical indicating if parameters can be dropped from the
 #' Hessian matrix to define convergence criteria.
+#' @param mla integer indicating if the optimization should use the mla function
+#' from marqLevAlg package. Default to 0, the internal optimization algorithm is used.
+#' @param nproc if mla=1, the number cores for parallel computation.
+#' Default to 1 (sequential mode).
+#' @param clustertype optional character indicating the type of cluster for parallel computation.
 #' @return The list returned is: \item{ns}{number of grouping units in the
 #' dataset} \item{ng}{number of latent classes} \item{loglik}{log-likelihood of
 #' the model} \item{best}{vector of parameter estimates in the same order as
@@ -285,7 +290,7 @@
 #' 
 #' 
 hlme <-
-    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=TRUE,returndata=FALSE,var.time=NULL,partialH=FALSE){
+    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=TRUE,returndata=FALSE,var.time=NULL,partialH=FALSE,mla=0,nproc=1,clustertype=NULL){
 
         ptm<-proc.time()
         if(verbose==TRUE) cat("Be patient, hlme is running ... \n")

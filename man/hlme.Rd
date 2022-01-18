@@ -27,7 +27,10 @@ hlme(
   verbose = TRUE,
   returndata = FALSE,
   var.time = NULL,
-  partialH = FALSE
+  partialH = FALSE,
+  mla = 0,
+  nproc = 1,
+  clustertype = NULL
 )
 }
 \arguments{
@@ -133,6 +136,14 @@ returned. Default to FALSE, data are not returned.}
 
 \item{partialH}{optional logical indicating if parameters can be dropped from the
 Hessian matrix to define convergence criteria.}
+
+\item{mla}{integer indicating if the optimization should use the mla function
+from marqLevAlg package. Default to 0, the internal optimization algorithm is used.}
+
+\item{nproc}{if mla=1, the number cores for parallel computation.
+Default to 1 (sequential mode).}
+
+\item{clustertype}{optional character indicating the type of cluster for parallel computation.}
 }
 \value{
 The list returned is: \item{ns}{number of grouping units in the

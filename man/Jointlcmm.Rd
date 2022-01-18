@@ -290,6 +290,14 @@ reported. Default to TRUE.}
 returned. Default to FALSE, data are not returned.}
 
 \item{var.time}{optional character indicating the name of the time variable.}
+
+\item{mla}{integer indicating if the optimization should use the mla function
+from marqLevAlg package. Default to 0, the internal optimization algorithm is used.}
+
+\item{nproc}{if mla=1, the number cores for parallel computation.
+Default to 1 (sequential mode).}
+
+\item{clustertype}{optional character indicating the type of cluster for parallel computation.}
 }
 \value{
 The list returned is: \item{loglik}{log-likelihood of the model}

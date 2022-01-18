@@ -58,6 +58,11 @@
 #' of the parameter space - usually 0).
 #' @param verbose logical indicating whether information about computation should be
 #' reported. Default to TRUE.
+#' @param mla integer indicating if the optimization should use the mla function
+#' from marqLevAlg package. Default to 0, the internal optimization algorithm is used.
+#' @param nproc if mla=1, the number cores for parallel computation.
+#' Default to 1 (sequential mode).
+#' @param clustertype optional character indicating the type of cluster for parallel computation.
 #' 
 #' @author Cecile Proust Lima and Viviane Philipps
 #'
@@ -2031,7 +2036,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                                  as.integer(idtrunc),
                                  as.integer(logspecif),
                                  as.integer(NPM),
-                                 best=as.double(b),
+                                 best=as.double(out$best),
                                  ppi=as.double(ppi0),
                                  ppitest=as.double(ppitest0),
                                  resid_m=as.double(resid_m),
@@ -2075,7 +2080,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             best[which(fix==0)] <- out$best
             best[which(fix==1)] <- bfix
             out$best <- best
-            
+            NPM <- NPM+nfix
         }
         ## out$conv= 1 si toutok
         ##           2 si maxiter atteint
