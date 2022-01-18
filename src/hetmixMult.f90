@@ -696,7 +696,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
      end do
 
      ! passer en cholesky si on a de l ordinal
-     if(any(idlink.eq.3)) then
+     if(any(idlink.eq.3) .or. nMC.ne.0) then
         jj=0
         Vi=0.d0
         do j=1,sum(nmes(i,:))
@@ -727,7 +727,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
   do yk=1,ny
 
      ! si que du continu, ajouter alpha et sigma dans corr
-     if(all(idlink.ne.3)) then
+     if(all(idlink.ne.3) .and. nMC.eq.0) then
         do j1=1,nmes(i,yk)
            Corr(sumMesYk+j1,sumMesYk+j1) =  Corr(sumMesYk+j1,sumMesYk+j1)+b1(nprob+nef+ncontr+nvc+nwg+ncor+yk)**2 !variance de l'erreur k
            if (nalea.eq.ny) then
