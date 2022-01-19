@@ -1269,8 +1269,9 @@ hlme <-
                            npm0=NPM,fix0=fix0,nfix0=nfix,bfix0=bfix)
                 
                 out <- list(conv=res$istop, V=res$v, best=res$b,
-                            ppi2=NA, predRE=NA, resid_m=NA, resid_ss=NA,
-                            pred_m_g=NA, pred_ss_g=NA,
+                            ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
+                            resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
+                            pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
                             gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,
                             loglik=res$fn.value)
 

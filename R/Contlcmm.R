@@ -972,9 +972,12 @@
                                     fix0,nfix,bfix)
                 
                 out <- list(conv=2, V=rep(NA, length(b)), best=b,
-                            ppi2=NA, predRE=NA,Yobs=NA, resid_m=NA, resid_ss=NA,
-                            marker=NA, transfY=NA, pred_m_g=NA, pred_ss_g=NA,
-                            vraisdiscret=NA, UACV=NA, rlindiv=NA,
+                            ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
+                            resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
+                            marker=rep(NA,nobs0), transfY=rep(NA,nobs0),
+                            Yobs=rep(NA,nobs0), 
+                            pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
+                            vraisdiscret=NA, UACV=NA, rlindiv=rep(NA,ns0),
                             gconv=rep(NA,3), niter=0, loglik=vrais)
             }
             else
@@ -993,9 +996,12 @@
                            fix0=fix0,nfix0=nfix,bfix0=bfix)
                 
                 out <- list(conv=res$istop, V=res$v, best=res$b,
-                            ppi2=NA, predRE=NA, Yobs=NA, resid_m=NA, resid_ss=NA,
-                            marker=NA, transfY=NA, pred_m_g=NA, pred_ss_g=NA,
-                            vraisdiscret=NA, UACV=NA, rlindiv=NA,
+                            ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
+                            resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
+                            marker=rep(NA,nobs0), transfY=rep(NA,nobs0),
+                            Yobs=rep(NA,nobs0), 
+                            pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
+                            vraisdiscret=NA, UACV=NA, rlindiv=rep(NA,ns0),
                             gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,
                             loglik=res$fn.value)
                 

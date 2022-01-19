@@ -2556,9 +2556,13 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                                          logspecif,NPM,fix0,nfix,bfix)
                 
                 out <- list(conv=2, V=rep(NA, length(b)), best=b,
-                            ppi=NA, ppitest=NA, predRE=NA, Yobs=NA, resid_m=NA,
-                            resid_ss=NA, marker=NA, transfY=NA, pred_m_g=NA, pred_ss_g=NA,
-                            time=NA, risq_est=NA, risqcum_est=NA,
+                            ppi=rep(NA,ns0*ng0), ppitest=rep(NA,ns0*ng0),
+                            predRE=rep(NA,ns0*nea0), Yobs=rep(NA,nobs0),
+                            resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
+                            marker=rep(NA,nobs0), transfY=rep(NA,nobs0),
+                            pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
+                            time=rep(NA,nsim), risq_est=rep(NA,nsim*ng0*nbevt),
+                            risqcum_est=rep(NA,nsim*ng0*nbevt),
                             statglob=NA, statevt=rep(NA,nbevt),
                             gconv=rep(NA,3), niter=0, loglik=vrais)
             }
@@ -2581,9 +2585,13 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                            logspecif0=logspecif,npm0=NPM,fix0=fix0,nfix0=nfix,bfix0=bfix)
                 
                 out <- list(conv=res$istop, V=res$v, best=res$b,
-                            ppi=NA, ppitest=NA, predRE=NA, Yobs=NA, resid_m=NA,
-                            resid_ss=NA, marker=NA, transfY=NA, pred_m_g=NA, pred_ss_g=NA,
-                            time=NA, risq_est=NA, risqcum_est=NA,
+                            ppi=rep(NA,ns0*ng0), ppitest=rep(NA,ns0*ng0),
+                            predRE=rep(NA,ns0*nea0), Yobs=rep(NA,nobs0),
+                            resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
+                            marker=rep(NA,nobs0), transfY=rep(NA,nobs0),
+                            pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
+                            time=rep(NA,nsim), risq_est=rep(NA,nsim*ng0*nbevt),
+                            risqcum_est=rep(NA,nsim*ng0*nbevt),
                             statglob=NA, statevt=rep(NA,nbevt),
                             gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,
                             loglik=res$fn.value)

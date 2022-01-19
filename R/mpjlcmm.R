@@ -1951,9 +1951,14 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                           logspecif,NPM,fix,contrainte,nfix,bfix)
             
             out <- list(conv=2, V=rep(NA, length(b)), best=b,
-                        ppi=NA, ppitest=NA, predRE=NA, predRE_Y=NA, Yobs=NA,
-                        resid_m=NA, resid_ss=NA, marker=NA, transfY=NA, pred_m_g=NA, pred_ss_g=NA,
-                        time=NA, risq_est=NA, risqcum_est=NA, statscoretest=NA,
+                        ppi=rep(NA,ns*ng), ppitest=rep(NA,ns*ng),
+                        predRE=rep(NA,ns*sum(nea)), predRE_Y=rep(NA,ns*sum(nalea)),
+                        Yobs=rep(NA,nobs0),
+                        resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
+                        marker=rep(NA,nsim*sum(ny)), transfY=rep(NA,nsim*sum(ny)),
+                        pred_m_g=rep(NA,nobs0*ng), pred_ss_g=rep(NA,nobs0*ng),
+                        time=rep(NA,nsim), risq_est=rep(NA,nsim*ng*nbevt),
+                        risqcum_est=rep(NA,nsim*ng*nbevt), statscoretest=rep(NA,1+nbevt),
                         gconv=rep(NA,3), niter=0, loglik=vrais)
         }
         else
@@ -1974,9 +1979,14 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                        contrainte0=contrainte,nfix0=nfix,bfix0=bfix)
             
             out <- list(conv=res$istop, V=res$v, best=res$b,
-                        ppi=NA, ppitest=NA, predRE=NA, predRE_Y=NA, Yobs=NA,
-                        resid_m=NA, resid_ss=NA, marker=NA, transfY=NA, pred_m_g=NA, pred_ss_g=NA,
-                        time=NA, risq_est=NA, risqcum_est=NA, statscoretest=NA,
+                        ppi=rep(NA,ns*ng), ppitest=rep(NA,ns*ng),
+                        predRE=rep(NA,ns*sum(nea)), predRE_Y=rep(NA,ns*sum(nalea)),
+                        Yobs=rep(NA,nobs0),
+                        resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
+                        marker=rep(NA,nsim*sum(ny)), transfY=rep(NA,nsim*sum(ny)),
+                        pred_m_g=rep(NA,nobs0*ng), pred_ss_g=rep(NA,nobs0*ng),
+                        time=rep(NA,nsim), risq_est=rep(NA,nsim*ng*nbevt),
+                        risqcum_est=rep(NA,nsim*ng*nbevt), statscoretest=rep(NA,1+nbevt),
                         gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,
                         loglik=res$fn.value)
 
