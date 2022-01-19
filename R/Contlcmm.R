@@ -1081,6 +1081,7 @@
             best[which(fix0==0)] <- out$best
             best[which(fix0==1)] <- bfix
             out$best <- best
+            NPM <- NPM+nfix
         }
 
 ### mettre NA pour les variances et covariances non calculees et  0 pr les prm fixes

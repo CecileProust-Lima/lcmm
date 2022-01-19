@@ -941,6 +941,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     {
         dimMC <- nea0+nalea0
         if(ncor0>0) dimMC <- dimMC+maxmes
+        # dimMC <- max(nea0, nalea0, maxmes) #?? !**
         if(dimMC>0) seqMC <- randtoolbox::sobol(n=nMC,dim=dimMC,normal=TRUE,scrambling=1) 
     }
     

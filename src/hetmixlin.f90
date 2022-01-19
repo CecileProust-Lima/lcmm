@@ -267,32 +267,32 @@
       nef=nprob+ncssg+ncg*ng
       npmtot=nef+nvc+nwg+ncor+1
 
-      if (idiag.eq.1) then
-         DO j=1,nvc
-            btot(nef+j)=dsqrt(abs(btot(nef+j)))
-         END DO
-      end if
+!       if (idiag.eq.1) then
+!          DO j=1,nvc
+!             btot(nef+j)=dsqrt(abs(btot(nef+j)))
+!          END DO
+!       end if
 
-!si idiag=0, on met dans le vecteur des parms, les parms
-!de la transformee de Cholesky
+! !si idiag=0, on met dans le vecteur des parms, les parms
+! !de la transformee de Cholesky
 
-      if (idiag.eq.0) then
+!       if (idiag.eq.0) then
 
 
-         DO j=1,nvc
-            mvc(j)=btot(nef+j)
-         END DO
+!          DO j=1,nvc
+!             mvc(j)=btot(nef+j)
+!          END DO
 
-         CALL DMFSD(mvc,nea,EPS,IER)
-         DO j=1,nvc
-            btot(nef+j)=mvc(j)
-         END DO
-      end if
-      if (nwg.gt.0) then
-         do i=1,nwg
-            btot(nef+nvc+i)=abs(btot(nef+nvc+i))
-         end do
-      end if
+!          CALL DMFSD(mvc,nea,EPS,IER)
+!          DO j=1,nvc
+!             btot(nef+j)=mvc(j)
+!          END DO
+!       end if
+!       if (nwg.gt.0) then
+!          do i=1,nwg
+!             btot(nef+nvc+i)=abs(btot(nef+nvc+i))
+!          end do
+!       end if
 
 ! creation du vecteur b avec slt les prm a estimer
       b=0.d0
@@ -1534,5 +1534,239 @@
 
 
 
+
+
+
+      subroutine loglikhlme(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0  &
+          ,ns0,ng0,nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0   &
+          ,npm0,b0,ppi0,resid_m0,resid_ss0 &
+          ,pred_m_g0,pred_ss_g0,pred_RE,fix0,nfix0,bfix0,estim0,loglik)
+
+      use commun
+
+      IMPLICIT NONE
+
+
+        !D claration des variables en entree
+      integer,intent(in):: nv0,nea0,nfix0,estim0
+      integer, intent(in) :: ns0, ng0, nobs0, idiag0, nwg0, npm0,ncor0
+      integer, dimension(nv0), intent(in) :: idea0,idg0,idprob0,idcor0
+      integer, dimension(ns0), intent(in) :: nmes0,Prior0
+      double precision, dimension(nobs0), intent(in) :: Y0
+      double precision, dimension(nobs0*nv0), intent(in) :: X0
+      integer,dimension(npm0+nfix0),intent(in)::fix0
+      double precision, dimension(nfix0), intent(in) :: bfix0
+      double precision, dimension(npm0), intent(in) :: b0
+
+        !D claration des variables en sortie
+      double precision, intent(out) :: loglik
+      double precision, dimension(ns0*ng0), intent(out) :: ppi0
+      double precision, dimension(nobs0), intent(out) :: resid_m0
+      double precision, dimension(nobs0), intent(out) :: resid_ss0
+      double precision, dimension(nobs0*ng0), intent(out) :: pred_m_g0
+      double precision, dimension(nobs0*ng0), intent(out) :: pred_ss_g0
+
+        !Variables locales
+      integer :: jtemp,nef,i,g,j,ij,npm,ier,k,ktemp,ig,nmestot,it,nbfix,k2
+      integer::npmtot0,id,jd
+      double precision::thi,thj
+      double precision, dimension(ns0,ng0) :: PPI
+      double precision, dimension(npm0) :: mvc
+      double precision, dimension(npm0+nfix0)::btot
+      double precision, dimension(ns0*nea0), intent(out)::pred_RE
+      double precision, dimension(nobs0) :: resid_m, resid_ss
+      double precision, dimension(nobs0,ng0):: pred_m_g, pred_ss_g
+      double precision,external::funcpa
+
+
+      !write(*,*)'B',npm0,b
+      !write(*,*)'ncor0',ncor0
+
+
+      maxmes=0
+      do i=1,ns0
+         if (nmes0(i).gt.maxmes) then
+            maxmes=nmes0(i)
+         end if
+      end do
+
+      ! pas de H restreint pr hlme
+         
+      allocate(Y(ns0*maxmes),idprob(nv0),X(ns0*maxmes,nv0)    &
+     ,idea(nv0),idg(nv0),nmes(ns0),prior(ns0),idcor(nv0))
+
+
+
+      ppi0=1.d0
+      resid_m0=0.d0
+      resid_ss0=0.d0
+      pred_m_g0=0.d0
+      pred_ss_g0=0.d0
+      pred_re=0.d0
+
+!enrigstrement pour les modules
+      ns=ns0
+      ng=ng0
+      nv=nv0
+      nobs=nobs0
+      if (nwg0.eq.0) then
+         nwg=0
+      else
+         nwg=ng-1
+      end if
+      ncor=ncor0
+
+      idiag=idiag0
+      prior=0
+      nmes=0
+      Y=0.d0
+      X=0.d0
+      idprob=0
+      idea=0
+      idg=0
+      idcor=0
+      nmestot=0
+      ktemp=0
+      do k=1,nv
+         idprob(k)=idprob0(k)
+         idea(k)=idea0(k)
+         idg(k)=idg0(k)
+         idcor(k) = idcor0(k)
+         jtemp=0
+         it=0
+         DO i=1,ns
+            if (k.eq.1) then
+               nmes(i)=nmes0(i)
+               prior(i)=prior0(i)
+               do j=1,nmes(i)
+                  nmestot=nmestot+1
+                  jtemp=jtemp+1
+                  Y(jtemp)=Y0(jtemp)
+               end do
+            end if
+            
+            do j=1,nmes(i)
+               ktemp=ktemp+1
+               it=it+1
+               X(it,k)=X0(ktemp)
+            end do
+         end do
+      end do
+
+      ! prm fixes
+      npmtot0=npm0+nfix0
+      allocate(fix(npmtot0))
+      fix=0
+      fix(1:npmtot0)=fix0(1:npmtot0)
+      nbfix=sum(fix)
+      if(nbfix.eq.0) then
+         allocate(bfix(1))
+      else
+         allocate(bfix(nbfix))
+      end if
+      bfix(1:nbfix)=bfix0(1:nbfix)
+      
+
+!creation des parametres
+
+      nea=nea0
+      ncg=0
+      ncssg=0
+      nprob=ng-1
+      nvarprob=min(ng-1,1)
+      do k=1,nv
+         if (idg(k).eq.1) then
+            ncssg=ncssg+1      ! nb var. sans melange
+         else if (idg(k).eq.2) then
+            ncg=ncg+1      ! nb var. dans melange
+         end if
+         nprob=nprob+(idprob(k))*(ng-1)
+         nvarprob=nvarprob+idprob(k)
+      end do
+
+      if((ng.eq.1.and.ncg.gt.0).or.(ng.eq.1.and.nprob.gt.0)) then
+         go to 1589
+      end if
+
+
+! nb effets fixes = nb effets fixes sans melange
+!                 + ng fois le nb de var dans melange
+
+
+      if (idiag.eq.1) then
+         nvc=nea
+      else if(idiag.eq.0) then
+         nvc=nea*(nea+1)/2
+      end if
+
+      nef=nprob+ncssg+ncg*ng
+      npmtot=nef+nvc+nwg+ncor+1
+
+
+
+        IF (estim0.eq.1) then
+
+           id=0
+           jd=0
+           thi=0.d0
+           thj=0.d0
+
+           loglik=funcpa(b0,npm0,id,thi,jd,thj)
+
+        else
+           !  injecter le b estime dans btot
+           btot=0.d0
+           k=0
+           k2=0
+           do j=1,npmtot
+              if(fix0(j).eq.0) then
+                 k=k+1
+                 btot(j)=b0(k)
+              else
+                 k2=k2+1
+                 btot(j)=bfix0(k2)
+              end if
+           end do
+                 
+
+!probas posteriori
+            if (ng.gt.1) then
+               call postprob(btot,npmtot,PPI)
+            end if
+                        
+            call residuals(btot,npmtot,ppi,resid_m,pred_m_g,resid_ss  &
+                ,pred_ss_g,pred_RE)
+
+            ig=0
+            ij=0
+            do i=1,ns
+                if (ng.gt.1) then
+                    do g=1,ng0
+                        ig=ig+1
+                        ppi0(ig)=PPI(i,g)
+                    end do
+                end if
+               do j=1,nmes(i)
+                  ij=ij+1
+                  resid_ss0(ij)=resid_ss(ij)
+                  resid_m0(ij)=resid_m(ij)
+                  do g=1,ng0
+                     pred_ss_g0(ij+nmestot*(g-1))=pred_ss_g(ij,g)
+                     pred_m_g0(ij+nmestot*(g-1))=pred_m_g(ij,g)
+                  end do
+               end do
+            end do
+
+         
+         end if
+
+
+ 1589 continue
+
+      deallocate(Y,X,idprob,idea,idg,nmes,prior,idcor)
+      deallocate(fix,bfix)
+
+      return
+      end subroutine loglikhlme
 
 

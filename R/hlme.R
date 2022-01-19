@@ -953,8 +953,36 @@ hlme <-
             {
                 if(is.vector(B))
                     {
-                        if(length(B)!=NPM) stop(paste("Vector B should be of length",NPM))
-                        else {b <-B}
+                        if(length(B)!=NPM)
+                        {
+                            stop(paste("Vector B should be of length",NPM))
+                        }
+                        else
+                        {
+                            b <-B
+                            
+                            if(NVC>0)
+                            {
+                                ## remplacer varcov des EA par les prm a estimer
+                                
+                                if(idiag0==1)
+                                {
+                                    b[NPROB+NEF+1:NVC] <- sqrt(b[NPROB+NEF+1:NVC])
+                                }
+                                else
+                                {
+                                    varcov <- matrix(0,nrow=nea0,ncol=nea0)
+                                    varcov[upper.tri(varcov,diag=TRUE)] <- b[NPROB+NEF+1:NVC]
+                                    varcov <- t(varcov)
+                                    varcov[upper.tri(varcov,diag=TRUE)] <- b[NPROB+NEF+1:NVC]
+                                    
+                                    ch <- chol(varcov)
+                                    
+                                    b[NPROB+NEF+1:NVC] <- ch[upper.tri(ch,diag=TRUE)]
+                                    
+                                }
+                            }    
+                        }
                     }
                 else
                     { 
@@ -1165,6 +1193,7 @@ hlme <-
 
 ################ Sortie ###########################
 
+        if(mla==0) {
         out <- .Fortran(C_hetmixlin,
                         as.double(Y0),
                         as.double(X0),
@@ -1201,6 +1230,109 @@ hlme <-
                         as.integer(maxiter),
                         as.integer(fix0),
                         as.integer(pbH0))
+        } else {
+
+            if(partialH) stop("partialH is not supported with mla optimization")
+            
+            nfix <- sum(fix0)
+            bfix <- 0
+            if(nfix>0)
+            {
+                bfix <- b[which(fix0==1)]
+                b <- b[which(fix0==0)]
+                NPM <- NPM-nfix
+            }
+            
+            if(maxiter==0)
+            {
+                vrais <- loglikhlme(b,Y0,X0,prior0,idprob0,idea0,idg0,idcor0,
+                                    ns0,ng0,nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0,
+                                    NPM,fix0,nfix,bfix)
+                
+                out <- list(conv=2, V=rep(NA, NPM*(NPM+1)/2), best=b,
+                            ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
+                            resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
+                            pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
+                            gconv=rep(NA,3), niter=0, loglik=vrais)
+            }
+            else
+            {  
+                res <- mla(b=b, m=length(b), fn=loglikhlme,
+                           clustertype=clustertype,.packages=NULL,
+                           epsa=convB,epsb=convL,epsd=convG,
+                           digits=8,print.info=verbose,blinding=FALSE,
+                           multipleTry=25,file="",
+                           nproc=nproc,maxiter=maxiter,minimize=FALSE,
+                           Y0=Y0,X0=X0,prior0=prior0,idprob0=idprob0,idea0=idea0,
+                           idg0=idg0,idcor0=idcor0,ns0=ns0,ng0=ng0,nv0=nv0,nobs=nobs0,
+                           nea0=nea0,nmes0=nmes0,idiag=idiag0,nwg0=nwg0,ncor0=ncor0,
+                           npm0=NPM,fix0=fix0,nfix0=nfix,bfix0=bfix)
+                
+                out <- list(conv=res$istop, V=res$v, best=res$b,
+                            ppi2=NA, predRE=NA, resid_m=NA, resid_ss=NA,
+                            pred_m_g=NA, pred_ss_g=NA,
+                            gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,
+                            loglik=res$fn.value)
+
+                if(out$conv %in% c(1,2,3))
+                {
+                    estim0 <- 0
+                    ll <- 0
+                    ppi0 <- rep(0,ns0*ng0)
+                    resid_m <- rep(0,nobs0)
+                    resid_ss <- rep(0,nobs0)
+                    pred_m_g <- rep(0,nobs0*ng0)
+                    pred_ss_g <- rep(0,nobs0*ng0)
+                    predRE <- rep(0,ns0*nea0)
+                    
+                    post <- .Fortran(C_loglikhlme,
+                                     as.double(Y0),
+                                     as.double(X0),
+                                     as.integer(prior0),
+                                     as.integer(idprob0),
+                                     as.integer(idea0),
+                                     as.integer(idg0),
+                                     as.integer(idcor0),
+                                     as.integer(ns0),
+                                     as.integer(ng0),
+                                     as.integer(nv0),
+                                     as.integer(nobs0),
+                                     as.integer(nea0),
+                                     as.integer(nmes0),
+                                     as.integer(idiag0),
+                                     as.integer(nwg0),
+                                     as.integer(ncor0),
+                                     as.integer(NPM),
+                                     as.double(out$best),
+                                     ppi=as.double(ppi0),
+                                     resid_m=as.double(resid_m),
+                                     resid_ss=as.double(resid_ss),
+                                     pred_m_g=as.double(pred_m_g),
+                                     pred_ss_g=as.double(pred_ss_g),
+                                     predRE=as.double(predRE),
+                                     as.integer(fix0),
+                                     as.integer(nfix),
+                                     as.double(bfix),
+                                     as.integer(estim0),
+                                     loglik=as.double(ll))
+                    
+                    out$ppi2 <- post$ppi
+                    out$predRE <- post$predRE
+                    out$resid_m <- post$resid_m
+                    out$resid_ss <- post$resid_ss
+                    out$pred_m_g <- post$pred_m_g
+                    out$pred_ss_g <- post$pred_ss_g
+                }
+                
+            }
+            
+            ## creer best a partir de b et bfix
+            best <- rep(NA,length(fix0))
+            best[which(fix0==0)] <- out$best
+            best[which(fix0==1)] <- bfix
+            out$best <- best
+            NPM <- NPM+nfix
+        }
         
     ### mettre 0 pr les prm fixes
     if(length(posfix))
@@ -1270,7 +1402,7 @@ hlme <-
 
 ####################################################
         if (nea0>0) {
-            predRE <- matrix(out$predRE,ncol=nea0,byrow=T)
+            predRE <- matrix(out$predRE,ncol=nea0,byrow=TRUE)
             predRE <- data.frame(INDuniq,predRE)
             colnames(predRE) <- c(nom.subject,nom.X0[idea0!=0])
         }
@@ -1385,3 +1517,20 @@ hlme <-
         
         res
     }
+
+
+#'@export
+loglikhlme <- function(b,Y0,X0,prior0,idprob0,idea0,idg0,idcor0,
+                       ns0,ng0,nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0,
+                       npm0,fix0,nfix0,bfix0)
+{
+    res <- 0
+    ppi0 <- rep(0,ns0*ng0)
+    resid_m <- rep(0,nobs0)
+    resid_ss <- rep(0,nobs0)
+    pred_m_g <- rep(0,nobs0*ng0)
+    pred_ss_g <- rep(0,nobs0*ng0)
+    predRE <- rep(0,ns0*nea0)
+    estim0 <- 1
+    .Fortran(C_loglikhlme,as.double(Y0),as.double(X0),as.integer(prior0),as.integer(idprob0),as.integer(idea0),as.integer(idg0),as.integer(idcor0),as.integer(ns0),as.integer(ng0),as.integer(nv0),as.integer(nobs0),as.integer(nea0),as.integer(nmes0),as.integer(idiag0),as.integer(nwg0),as.integer(ncor0),as.integer(npm0),as.double(b),as.double(ppi0),as.double(resid_m),as.double(resid_ss),as.double(pred_m_g),as.double(pred_ss_g),as.double(predRE),as.integer(fix0),as.integer(nfix0),as.double(bfix0),as.integer(estim0),loglik=as.double(res))$loglik
+}
