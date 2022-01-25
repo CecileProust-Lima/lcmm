@@ -138,10 +138,10 @@
       !Variables locales
       integer::jtemp,i,g,j,npm,ier,k,ktemp,ig,ke,sumnrisq,dejaspl,nbfix,nytot
       integer::mi,k1,l,neftot,nvctot,ncontrtot,nwtot,ncortot,nerrtot,naleatot
-      integer::tmp,sumny,m,jj,ll,sumntr
-      double precision::eps,ca,cb,dd
+      integer::sumny,m,jj,ll
+      double precision::ca,cb,dd
       double precision,dimension(ns0,ng0)::PPI,ppiy
-      double precision,dimension(npmtot0)::mvc,b
+      double precision,dimension(npmtot0)::b
       double precision,dimension(npmtot0*(npmtot0+3)/2)::V
       double precision,external::vrais_mpj
 
@@ -587,57 +587,57 @@
 
 
       ! changer prm de B par prm a estimer
-      tmp=0
-      sumny=0
-      sumntr=0
-      do k=1,nbK
+      ! tmp=0
+      ! sumny=0
+      ! sumntr=0
+      ! do k=1,nbK
          
-         if (idiag(k).eq.1) then
-            do j=1,nvc(k)
-               btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+j)=dsqrt(abs(btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+j)))
-            end do
-         else
+      !    if (idiag(k).eq.1) then
+      !       do j=1,nvc(k)
+      !          btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+j)=dsqrt(abs(btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+j)))
+      !       end do
+      !    else
 
-            if(contraint.eq.2) then
-               mvc(1)=1.d0
-               do j=1,nvc(k)
-                  mvc(1+j)=btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+j)
-               end do
-            else
-               do j=1,nvc(k)
-                  mvc(j)=btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+j)
-               end do
-            end if
+      !       if(contraint.eq.2) then
+      !          mvc(1)=1.d0
+      !          do j=1,nvc(k)
+      !             mvc(1+j)=btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+j)
+      !          end do
+      !       else
+      !          do j=1,nvc(k)
+      !             mvc(j)=btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+j)
+      !          end do
+      !       end if
             
-            eps=1.d-20
-            call DMFSD(mvc,nea(k),eps,ier)
+      !       eps=1.d-20
+      !       call DMFSD(mvc,nea(k),eps,ier)
             
-            if(contraint.eq.2) then
-               do j=1,nvc(k)
-                  btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+j)=mvc(1+j)
-               end do
-            else
-               do j=1,nvc(k)
-                  btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+j)=mvc(j)
-               end do
-            end if
-         end if
+      !       if(contraint.eq.2) then
+      !          do j=1,nvc(k)
+      !             btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+j)=mvc(1+j)
+      !          end do
+      !       else
+      !          do j=1,nvc(k)
+      !             btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+j)=mvc(j)
+      !          end do
+      !       end if
+      !    end if
          
-         if (nw(k).gt.0) then
-            do j=1,nw(k)
-               btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+nvc(k)+j)= &
-                    abs(btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+nvc(k)+j))
-            end do
-         end if
+      !    if (nw(k).gt.0) then
+      !       do j=1,nw(k)
+      !          btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+nvc(k)+j)= &
+      !               abs(btot(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+nvc(k)+j))
+      !       end do
+      !    end if
 
-         sumntr=0
-         do l=1,ny(k)
-           sumntr = sumntr+ntr(sumny+l)
-         end do
+      !    sumntr=0
+      !    do l=1,ny(k)
+      !      sumntr = sumntr+ntr(sumny+l)
+      !    end do
             
-         tmp = tmp+nef(k)+ncontr(k)+nvc(k)+nw(k)+ncor(k)+nerr(k)+nalea(k)+sumntr
-         sumny = sumny+ny(k)
-      end do
+      !    tmp = tmp+nef(k)+ncontr(k)+nvc(k)+nw(k)+ncor(k)+nerr(k)+nalea(k)+sumntr
+      !    sumny = sumny+ny(k)
+      ! end do
 
 
       ! creation du vecteur b avec slt les prm a estimer
@@ -4453,12 +4453,11 @@ subroutine loglikmpjlcmm(K0,ny0,nbevt0,ng0,ns0,Y0,nobs0,X0,nv0,Xns0,nv20, &
   double precision,dimension(1+nbevt0),intent(out)::statscoretest
 
   !Variables locales
-  integer::jtemp,i,g,j,npm,ier,k,ktemp,ig,ke,sumnrisq,dejaspl,nbfix,nytot
+  integer::jtemp,i,g,j,ier,k,ktemp,ig,ke,sumnrisq,dejaspl,nbfix,nytot
   integer::mi,k1,l,neftot,nvctot,ncontrtot,nwtot,ncortot,nerrtot,naleatot
-  integer::tmp,sumny,m,jj,ll,sumntr,npmtot0,k2,id,jd
+  integer::sumny,m,jj,ll,npmtot0,k2,id,jd
   double precision::thi,thj
   double precision,dimension(ns0,ng0)::PPI,ppiy
-  double precision,dimension(npm0)::mvc
   double precision,dimension(npm0+nfix0)::btot
   double precision,external::vrais_mpj
 

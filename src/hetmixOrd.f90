@@ -1603,7 +1603,7 @@ subroutine hetmixord(Y0,X0,Prior0,idprob0,idea0,idg0,ns0,ng0,nv0,nobs0 &
   integer::jtemp,i,g,j,ij,npm,ier,k,ktemp,ig,nmestot,it,npmtot,nbfix
   double precision::eps,ca,cb,dd,UACV
   double precision,dimension(ns0,ng0)::PPI
-  double precision,dimension(npmtot0)::mvc,b
+  double precision,dimension(npmtot0)::b
   double precision,dimension(npmtot0*(npmtot0+3)/2)::V
   double precision,external::funcpao
 
@@ -3757,12 +3757,11 @@ subroutine logliklcmmord(Y0,X0,Prior0,idprob0,idea0,idg0,ns0,ng0,nv0,nobs0, &
   double precision,dimension(2*(maxY0-minY0+1)),intent(out)::marker,transfY
   double precision,dimension(ns0),intent(out)::rlindiv
   !Variables locales
-  integer::jtemp,i,g,j,ij,npm,ier,k,ktemp,ig,nmestot,it,npmtot,nbfix
+  integer::jtemp,i,g,j,ij,k,ktemp,ig,nmestot,it,npmtot,nbfix
   integer::k2,id,jd,npmtot0
   double precision::thi,thj
   double precision::UACV
   double precision,dimension(ns0,ng0)::PPI
-  double precision,dimension(npm0)::mvc
   double precision,dimension(npm0+nfix0)::btot
   double precision,external::funcpao
 

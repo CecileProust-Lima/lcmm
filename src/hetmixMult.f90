@@ -87,7 +87,7 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
   integer::jtemp,i,g,j,ij,npm,ier,k,ktemp,ig,id,yk,k1,k2,mi,nbfix  
   double precision::eps,ca,cb,dd,thi
   double precision,dimension(ns0,ng0)::PPI
-  double precision,dimension(npmtot0)::mvc,b
+  double precision,dimension(npmtot0)::b
   double precision,dimension(npmtot0*(npmtot0+3)/2)::V
   double precision,external::vrais_multo
 
@@ -582,7 +582,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
   double precision,dimension(nvc+1)::mvc
 
   double precision :: vrais,eps,det,som,thi,thj,temp,eta0,vrais_Y
-  double precision ::Y4,expo,jacobien,beta_densite,ytemp
+  double precision ::Y4,jacobien,beta_densite,ytemp
   double precision,dimension(maxmes) :: mu,Y1,Y2,Y3,tcor
   double precision,dimension(ng) :: pi
   double precision,dimension(-1:maxval(ntrtot)-3)::splaa
@@ -1909,7 +1909,7 @@ end do
         double precision,dimension(maxmes)::wi,wsim
         double precision,dimension(ny)::asim
         double precision::ai,binf,bsup
-        double precision::SX,x22,div,vrais_l
+        double precision::SX,x22,vrais_l
         double precision,external::alnorm
         
 
@@ -3556,11 +3556,10 @@ end do
         double precision,dimension(nsim0*ny0),intent(out)::marker,transfY 
 
         !Variables locales
-        integer::jtemp,i,g,j,ij,npm,ier,k,ktemp,ig,id,yk,k1,k2,mi,nbfix,jd,npmtot0
+        integer::jtemp,i,g,j,ij,ier,k,ktemp,ig,id,yk,k1,k2,mi,nbfix,jd,npmtot0
         double precision::thi,thj
         double precision,dimension(npm0+nfix0)::btot
         double precision,dimension(ns0,ng0)::PPI
-        double precision,dimension(npm0)::mvc,b
         double precision,external::vrais_multo
 
 

@@ -131,7 +131,7 @@
       integer :: jtemp,nef,i,g,j,ij,npm,ier,k,ktemp,ig,nmestot,it,nbfix
       double precision :: eps, ca, cb, dd
       double precision, dimension(ns0,ng0) :: PPI
-      double precision, dimension(npmtot0) :: mvc,b
+      double precision, dimension(npmtot0) :: b
       double precision, dimension(ns0*nea0), intent(out)::pred_RE
       double precision, dimension(nobs0) :: resid_m, resid_ss
       double precision, dimension(nobs0,ng0):: pred_m_g, pred_ss_g
@@ -1567,11 +1567,10 @@
       double precision, dimension(nobs0*ng0), intent(out) :: pred_ss_g0
 
         !Variables locales
-      integer :: jtemp,nef,i,g,j,ij,npm,ier,k,ktemp,ig,nmestot,it,nbfix,k2
+      integer :: jtemp,nef,i,g,j,ij,k,ktemp,ig,nmestot,it,nbfix,k2
       integer::npmtot0,id,jd
       double precision::thi,thj
       double precision, dimension(ns0,ng0) :: PPI
-      double precision, dimension(npm0) :: mvc
       double precision, dimension(npm0+nfix0)::btot
       double precision, dimension(ns0*nea0), intent(out)::pred_RE
       double precision, dimension(nobs0) :: resid_m, resid_ss
