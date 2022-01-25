@@ -1698,7 +1698,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                                     dimMC,seqMC,chol)
             
             out <- list(conv=2, V=rep(NA, length(b)), best=b,
-                        ppi=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
+                        ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
                         predRE_Y=rep(NA,ns0*nalea0), Yobs=rep(NA,nobs0),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         marker=rep(NA,nobs0), transfY=rep(NA,nobs0),
@@ -1722,7 +1722,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                        methInteg0=methInteg,nMC0=nMC,dimMC0=dimMC,seqMC0=seqMC,chol0=chol)
             
             out <- list(conv=res$istop, V=res$v, best=res$b,
-                        ppi=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
+                        ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
                         predRE_Y=rep(NA,ns0*nalea0), Yobs=rep(NA,nobs0),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         marker=rep(NA,nobs0), transfY=rep(NA,nobs0),
@@ -1803,7 +1803,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                                  as.integer(estim0),
                                  as.double(ll))
 
-                out$ppi <- post$ppi2
+                out$ppi2 <- post$ppi2
                 out$predRE <- post$predRE
                 out$predRE_Y <- post$predRE_Y
                 out$Yobs <- post$Yobs
