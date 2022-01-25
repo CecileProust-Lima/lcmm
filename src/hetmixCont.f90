@@ -1602,7 +1602,7 @@
       integer::jtemp,i,g,j,ij,npm,ier,k,ktemp,ig,nmestot,it,id,nbfix
       double precision::eps,ca,cb,dd,thi
       double precision,dimension(ns0,ng0)::PPI
-      double precision,dimension(npmtot0)::mvc,b
+      double precision,dimension(npmtot0)::b
       double precision,dimension(npmtot0*(npmtot0+3)/2)::V
       double precision,external::funcpac
 

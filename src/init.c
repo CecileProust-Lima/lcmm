@@ -7,7 +7,6 @@ static R_FortranMethodDef FortRout[] = {
   {"hetmixlin", (DL_FUNC) &F77_SUB(hetmixlin), 35},
   {"hetmixcont", (DL_FUNC) &F77_SUB(hetmixcont), 47},
   {"hetmixord", (DL_FUNC) &F77_SUB(hetmixord), 39},
-  {"hetmixcontmult", (DL_FUNC) &F77_SUB(hetmixcontmult), 54},
   {"jointhet", (DL_FUNC) &F77_SUB(jointhet), 59},
   {"predictcont", (DL_FUNC) &F77_SUB(predictcont), 21},
   {"predictmult", (DL_FUNC) &F77_SUB(predictmult), 25},

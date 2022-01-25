@@ -868,7 +868,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     timeobs <- matYXord[,2]
         
 
-###parametres pour hetmixContMult
+###parametres pour hetmixMult
     ns0 <- length(unique(IND))
     ng0 <- ng
     nv0 <- dim(X0)[2]
@@ -1549,65 +1549,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 
         }
 #browser()
-###estimation
-    ## if(all(idlink0!=3)) {
-    ## out <- .Fortran(C_hetmixcontmult,
-    ##                 as.double(Y0),
-    ##                 as.double(X0),
-    ##                 as.integer(prior0),
-    ##                 as.integer(idprob0),
-    ##                 as.integer(idea0),
-    ##                 as.integer(idg0),
-    ##                 as.integer(idcor0),
-    ##                 as.integer(idcontr0),
-    ##                 as.integer(ny0),
-    ##                 as.integer(ns0),
-    ##                 as.integer(ng0),
-    ##                 as.integer(nv0),
-    ##                 as.integer(nobs0),
-    ##                 as.integer(nea0),
-    ##                 as.integer(nmes0),
-    ##                 as.integer(idiag0),
-    ##                 as.integer(nwg0),
-    ##                 as.integer(ncor0),
-    ##                 as.integer(nalea0),
-    ##                 as.integer(NPM),
-    ##                 best=as.double(b),
-    ##                 V=as.double(V),
-    ##                 loglik=as.double(loglik),
-    ##                 niter=as.integer(ni),
-    ##                 conv=as.integer(istop),
-    ##                 gconv=as.double(gconv),
-    ##                 ppi2=as.double(ppi0),
-    ##                 resid_m=as.double(resid_m),
-    ##                 resid_ss=as.double(resid_ss),
-    ##                 pred_m_g=as.double(pred_m_g),
-    ##                 pred_ss_g=as.double(pred_ss_g),
-    ##                 predRE=as.double(predRE),
-    ##                 predRE_Y=as.double(predRE_Y),
-    ##                 as.double(convB),
-    ##                 as.double(convL),
-    ##                 as.double(convG),
-    ##                 as.integer(maxiter),
-    ##                 as.double(epsY),
-    ##                 as.integer(idlink0),
-    ##                 as.integer(nbzitr0),
-    ##                 as.double(zitr),
-    ##                 as.double(uniqueY0),
-    ##                 as.integer(indiceY0),
-    ##                 as.integer(nvalSPLORD0),
-    ##                 marker=as.double(marker),
-    ##                 transfY=as.double(transfY),
-    ##                 as.integer(nsim),
-    ##                 Yobs=as.double(Yobs),
-    ##                 as.integer(Ydiscrete),
-    ##                 vraisdiscret=as.double(vraisdiscret),
-    ##                 UACV=as.double(UACV),
-    ##                 rlindiv=as.double(rlindiv),
-    ##                 as.integer(pbH0),
-    ##                 as.integer(fix0))
-    ## }else{
-        
+###estimation        
     out <- .Fortran(C_hetmixmult,
                     as.double(Y0),
                     as.double(X0),

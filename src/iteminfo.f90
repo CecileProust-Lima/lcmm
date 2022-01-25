@@ -16,12 +16,12 @@ subroutine iteminfo(X0,condRE_Y,nalea,ny,maxmes,npm,b1,debut,nbzitr,idlink,&
   double precision,dimension(maxmes*ninfo),intent(out) ::info
 
   ! for computation
-  integer ::j,k,kk,m,l,jj,j1,j2,yk,sumntrtot
-  integer ::ier,niter,sumnbmod
+  integer::j,m,l,jj,yk,sumntrtot
+  integer::sumnbmod
   double precision,dimension(:),allocatable::ysim
-  double precision :: eps,x22,ai,asim
-  double precision ::ytemp,diff,SX,beta
-  double precision::aa1,bb1,dd1,aa,bb,cc1
+  double precision::x22,ai,asim
+  double precision::ytemp,SX
+  double precision::aa1,aa
   double precision,dimension(:),allocatable::grandPhi,petitphi
   integer,dimension(ny)::ntrtot
   double precision::alnorm

@@ -129,7 +129,7 @@
       integer::jtemp,i,g,j,npm,ier,k,ktemp,ig,it,ke,sumnrisq,dejaspl,nbfix
       double precision::eps,ca,cb,dd
       double precision,dimension(ns0,ng0)::PPI,ppiy
-      double precision,dimension(npmtot0)::mvc,b
+      double precision,dimension(npmtot0)::b
       double precision,dimension(npmtot0*(npmtot0+3)/2)::V
       double precision,external::vrais_comp
 
@@ -719,9 +719,6 @@
 
 
      end if
-
-
- 1589 continue
 
 
 
