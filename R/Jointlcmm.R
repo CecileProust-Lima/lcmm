@@ -1888,11 +1888,11 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                             {
                                 if(logspecif==1)
                                     {  
-                                        b[nprob+sum(nrisq[1:i])-nrisq[i]+1:nrisq[i]] <- c(rep(c(log(sum(devt==i)/sum(tsurv[devt==i])),0),ifelse(risqcom==0,ng,1)),rep(1,(ng-1)*(risqcom[i]==2)))  
+                                        b[nprob+sum(nrisq[1:i])-nrisq[i]+1:nrisq[i]] <- c(rep(c(log(sum(devt==i)/sum(tsurv[devt==i])),0),ifelse(risqcom[i]==0,ng,1)),rep(1,(ng-1)*(risqcom[i]==2)))  
                                     }
                                 else
                                     {
-                                        b[nprob+sum(nrisq[1:i])-nrisq[i]+1:nrisq[i]] <- c(rep(c(sqrt(sum(devt==i)/sum(tsurv[devt==i])),1),ifelse(risqcom==0,ng,1)),rep(1,(ng-1)*(risqcom[i]==2)))
+                                        b[nprob+sum(nrisq[1:i])-nrisq[i]+1:nrisq[i]] <- c(rep(c(sqrt(sum(devt==i)/sum(tsurv[devt==i])),1),ifelse(risqcom[i]==0,ng,1)),rep(1,(ng-1)*(risqcom[i]==2)))
                                     }   
                             }
                         else
