@@ -683,8 +683,18 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                         formk <- paste(formk,as.character(mod$call$cor)[2],sep="+")
                     }
 
+                ## garder l'intercept si intercept dans fixed ou dans random
+                ## car pb si random=~-1, on n'a pas intercept dans formk
+                terms_formk <- terms(formula(paste("~",formk)))
+                terms_formf <- terms(formula(paste("~",paste(formf,collapse="+"))))
+                terms_random <- terms(formula(paste("~",paste(mod$call$random[2],collapse="+"))))
+                if(attr(terms_formf,"intercept") | attr(terms_random,"intercept"))
+                {
+                    attr(terms_formk,"intercept") <- 1
+                }
+
                 ## X0 pour k
-                xk <- model.matrix(formula(paste("~",formk)),data=dataY[which(dataY$processK==k),,drop=FALSE])
+                xk <- model.matrix(terms_formk,data=dataY[which(dataY$processK==k),,drop=FALSE])
                 nomxk[[k]] <- colnames(xk)
 
                 ## X0 merge (range par K)
@@ -944,6 +954,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 ##nmesM[,sum(ny[1:k])-ny[k]+m] <- table(matYXord[which(matYXord$processK==k & matYXord$outcomeM==m),1]) # va pas si nb sujets differents par outcome
                 temp <- rle(matYXord[which(matYXord$processK==k & matYXord$outcomeM==m),1])
                 tempnmesm <- data.frame(id=temp[[2]], nm=temp[[1]])
+                if(nrow(tempnmesm)!=nrow(nmesM)) warning(paste("Some subjects have no measure for outcome",m,"in process",k))
                 old <- colnames(nmesM)
                 nmesM <- merge(nmesM, tempnmesm, by="id", all=TRUE)
                 colnames(nmesM) <- c(old, paste("k", k, "m", m, sep=""))
@@ -1329,7 +1340,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         NPM <- nprob + nrisqtot + nvarxevt +
             neftot + ncontrtot + nvctot + nwtot + ncortot +
             naleatot + ntrtot + nerrtot
-                     
+                  
         V <- rep(0, NPM*(NPM+1)/2)  #pr variance des parametres
 
         ## prm fixes

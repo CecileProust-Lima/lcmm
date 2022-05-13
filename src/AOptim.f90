@@ -345,7 +345,7 @@
          if (idpos.ne.0) then
            ncount=ncount+1
            if (ncount.gt.3000) then 
-              !print*,"ncount=",ncount
+              print*,"ncount=",ncount
               istop=4 
               rl=-1.d9
               goto 110
@@ -387,7 +387,7 @@
          rl=-fi
          if(rl.eq.-1.D9) then
                istop=4
- !             write(*,*)'searpas problem' ,ni  !**
+               write(*,*)'searpas problem' ,ni  !**
                goto 110
           end if
 
@@ -521,12 +521,15 @@
 !      double precision::vlw3
       integer::i
       double precision,external::namefunc
-  !        print*,"dans searpas" !**
+     !     print*,"dans searpas" !**
        vlw1=dlog(vw)
        vlw2=vlw1+step
        call valfpa(vlw1,fi1,b,bh,m,delta,namefunc)
        call valfpa(vlw2,fi2,b,bh,m,delta,namefunc)
- !             print*,"fi1=",fi1,"fi2=",fi2  !**
+      ! print*,"fi1=",fi1,"fi2=",fi2  !**
+      ! print*,"b=",b
+      ! print*,"delta=",delta
+      ! print*,"vlw=",vlw1,vlw2
        if(fi2.ge.fi1) then
 !         vlw3=vlw2
           vlw2=vlw1
@@ -547,7 +550,7 @@
        end if
 
        do i=1,40
-  !     print*,"i=",i !**
+       !print*,"i=",i !**
 !          vlw3=vlw2
           vlw2=vlw1
           fi3=fi2
@@ -556,7 +559,8 @@
           vlw1=vlw2+step
           call valfpa(vlw1,fi1,b,bh,m,delta,namefunc)
           
-!            print*,"fi1=",fi1,"fi2=",fi2  !**
+          !print*,"fi1=",fi1,"fi2=",fi2  !**
+          !print*,"vlw=",vlw1
             
           if(fi1.gt.fi2) goto 50
           if(fi1.eq.fi2) then
@@ -574,7 +578,7 @@
 !
       vm=vlw2-step*(fi1-fi3)/(2.d0*(fi1-2.d0*fi2+fi3))
       call valfpa(vm,fim,b,bh,m,delta,namefunc)
-  !    print*,"fim=",fim !**
+      !print*,"fim=",fim !**
       if(fim.le.fi2) goto 100
       vm=vlw2
       fim=fi2

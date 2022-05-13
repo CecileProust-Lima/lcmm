@@ -1123,7 +1123,7 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
            
               if (ll.lt.1.or.ll.gt.ntr(sumny+yk)-3) then          
                  vrais_mpj_i=-1.d9
-                 !print*,"-1.d9 ll<1 ou ll>ntrtot-3"
+                 !print*,"-1.d9 ll<1 ou ll>ntrtot-3",Y(nmescur+sumMesYk+sumparK+j)
                  goto 654
               end if
               if (ll.gt.1) then
@@ -1792,6 +1792,8 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
               sumntr = sumntr + ntr(sumny+yk) ! sert a incrementer tmp
            end do
 
+           if(nmesparK(i,k).eq.0) goto 200
+
            ! matrice de variance de Yik
            P=0.d0
            P=MATMUL(Z,Ut)
@@ -1811,14 +1813,14 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
            CALL dsinv(Vi,nmesparK(i,k),eps,ier,det)
            if (ier.eq.-1) then
               vrais_mpj_i=-1.d9
-             ! print*,"-1.d9 dsinv"
-             ! print*,"i=",i, "nmespark=",nmesparK(i,k)
-             ! print*,"Vi=",Vi
-             ! print*,"b=",b
-             ! print*,"bfix=",bfix
-             ! print*,"id=",id,"thi=",thi
-             ! print*,"jd=",jd,"thj=",thj
-             ! print*,"fix=",fix
+              !print*,"-1.d9 dsinv"
+              !print*,"i=",i, "nmespark=",nmesparK(i,k)
+              !print*,"Vi=",Vi
+              !print*,"b=",b
+              !print*,"bfix=",bfix
+              !print*,"id=",id,"thi=",thi
+              !print*,"jd=",jd,"thj=",thj
+              !print*,"fix=",fix
               goto 654
            end if
 
@@ -1948,7 +1950,10 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
 !            print*,"Y4",Y4
 !            print*,"Y1",Y1
 !            print*,"Y2",Y2
-! print*,"vrais_Y ok", exp((-det-Y4)/2)
+           ! print*,"vrais_Y ok", exp((-det-Y4)/2)
+
+200        continue
+           
            sumny = sumny + ny(k)
            tmp = tmp + nef(k)+ncontr(k)+nvc(k)+nw(k)+ncor(k)+nerr(k)+nalea(k)+sumntr
            sumparK=sumparK+nmesparK(i,k)
