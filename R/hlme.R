@@ -866,87 +866,10 @@ hlme <-
         
         if(missing(B)){
 
-            if(ng0>1){
-                idea2 <- idea0
-                idprob2 <- rep(0,nv0)  
-                idg2 <- rep(0,nv0) 
-                idg2[idg0!=0] <- 1
-                NEF2<-sum(idg2==1)
-                NPM2<-NEF2+NVC+ncor0+1
-                nwg2<-0
-                ng2<-1
-                ppi2<- rep(0,ns0)
-                pred_m_g2 <- rep(0,nobs0)
-                pred_ss_g2 <- rep(0,nobs0)
-                maxiter2 <- min(75,maxiter)
-                convB2 <- max(0.01,convB)
-                convL2 <- max(0.01,convL)
-                convG2 <- max(0.01,convG)
-
-                V2 <- rep(0,NPM2*(NPM2+1)/2)
-                best <- rep(0,NPM2)
-                
-                init <- .Fortran(C_hetmixlin,
-                                 as.double(Y0),
-                                 as.double(X0),
-                                 as.integer(prior2),
-                                 as.integer(idprob2),
-                                 as.integer(idea2),
-                                 as.integer(idg2),
-                                 as.integer(idcor0),
-                                 as.integer(ns0),
-                                 as.integer(ng2),
-                                 as.integer(nv0),
-                                 as.integer(nobs0),
-                                 as.integer(nea0),
-                                 as.integer(nmes0),
-                                 as.integer(idiag0),
-                                 as.integer(nwg2),
-                                 as.integer(ncor0),
-                                 npm=as.integer(NPM2),
-                                 best=as.double(b1),
-                                 V=as.double(V2),
-                                 loglik=as.double(loglik),
-                                 niter=as.integer(ni),
-                                 conv=as.integer(istop),
-                                 gconv=as.double(gconv),
-                                 ppi2=as.double(ppi2),
-                                 resid_m=as.double(resid_m),
-                                 resid_ss=as.double(resid_ss),
-                                 pred_m_g=as.double(pred_m_g2),
-                                 pred_ss_g=as.double(pred_ss_g2),
-                                 predRE=as.double(predRE),
-                                 as.double(convB2),
-                                 as.double(convL2),
-                                 as.double(convG2),
-                                 as.integer(maxiter2),
-                                 as.integer(fix0),
-                                 as.integer(pbH0))
-
-                k <- NPROB
-                l <- 0
-                t<- 0
-                for (i in 1:nvar.exp)    {
-                    if(idg0[i]==1){
-                        l <- l+1
-                        t <- t+1
-                        b[k+t] <- init$best[l]
-                    }
-                    if(idg0[i]==2){
-                        l <- l+1
-                        for (g in 1:ng){
-                            t <- t+1
-                            if(init$conv==1) b[k+t] <- init$best[l]+(g-(ng+1)/2)*sqrt(init$V[l*(l+1)/2])
-                            else b[k+t] <- init$best[l]+(g-(ng+1)/2)*init$best[l]
-                        }
-                    }
-                }
-                b[(NPROB+NEF+1):(NPROB+NEF+NVC)] <- init$best[(NEF2+1):(NEF2+NVC)]
-                if (ncor0>0) {b[(NPROB+NEF+NVC+NW+1):(NPROB+NEF+NVC+NW+ncor0)] <- init$best[(NPM2-ncor0):(NPM2-1)]}
-                b[NPROB+NEF+NVC+NW+ncor0+1] <- init$best[NPM2]
-            } 
             if(ng0==1 ){
                 b <- b1
+            } else {
+                stop("Please specify initial values with argument 'B'")
             }
         }
         else
