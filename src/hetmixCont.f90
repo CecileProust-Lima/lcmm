@@ -5151,3 +5151,330 @@
       return
 
       end function vrais_cont_i
+
+
+
+
+      subroutine logliklcmmcont(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,ns0,ng0,nv0, &
+           nobs0,nea0,nmes0,idiag0,nwg0,ncor0,npm0,b0, &
+           ppi0,resid_m ,resid_ss,pred_m_g,pred_ss_g,pred_RE, &
+           epsY0,idlink0,nbzitr0,zitr0,marker,transfY,nsim0,Yobs,Ydiscret,vraisdiscret,&
+           UACV,rlindiv,V,fix0,nfix0,bfix0,estim0,loglik)
+        
+!      use parameters
+      use communc
+!      use optim
+
+      IMPLICIT NONE
+
+        !Declaration des variables en entree
+      integer,intent(in)::nv0,Ydiscret,estim0,nfix0
+      double precision,intent(in)::epsY0
+      integer,intent(in)::idlink0,nbzitr0
+      double precision,dimension(nbzitr0),intent(in)::zitr0
+
+      integer, intent(in)::ns0,ng0,nobs0,idiag0,nwg0,npm0,nea0,nsim0,ncor0
+      integer, dimension(nv0),intent(in)::idea0,idg0,idprob0,idcor0
+      integer, dimension(ns0),intent(in)::nmes0,prior0
+      double precision,dimension(nobs0),intent(in)::Y0
+      double precision,dimension(nobs0*nv0),intent(in)::X0
+      integer,dimension(npm0+nfix0),intent(in)::fix0
+      integer,dimension(nfix0),intent(in)::bfix0
+          
+        !Declaration des variable en entree et sortie
+      double precision, dimension(npm0+nfix0), intent(in) :: b0
+      double precision,dimension(npm0*(npm0+3)/2)::V ! pour computeUACV
+        !Declaration des variables en sortie
+      double precision,intent(out)::loglik,vraisdiscret,UACV
+      double precision,dimension(ns0*ng0),intent(out)::ppi0
+      double precision,dimension(ns0),intent(out)::rlindiv
+      double precision,dimension(nobs0),intent(out)::resid_m,resid_ss,Yobs
+      double precision,dimension(nobs0*ng0),intent(out)::pred_m_g
+      double precision,dimension(nobs0*ng0),intent(out)::pred_ss_g
+      double precision,dimension(ns0*nea0),intent(out)::pred_RE
+      double precision,dimension(nsim0),intent(out)::marker,transfY
+        !Variables locales
+      integer::jtemp,i,g,j,ij,ier,k,ktemp,ig,nmestot,it,nbfix
+      integer::k2,id,jd,npmtot0
+      double precision::thi,thj
+      double precision,dimension(ns0,ng0)::PPI
+      double precision,dimension(npm0+nfix0)::btot
+      double precision,external::funcpac
+
+         !print*,"debut fortran"
+! sorties initialisees
+
+       ppi0=0.d0
+       pred_ss_g=0.d0
+       pred_m_g=0.d0
+       pred_RE=0.d0
+       marker=0.d0
+       transfY=0.d0
+       resid_m=0.d0
+       resid_ss=0.d0
+       loglik=0.d0
+       Yobs=0.d0
+       vraisdiscret=0.d0
+       UACV=0.d0
+       rlindiv=0.d0
+
+
+
+! en prevision de l'extension au conjoint
+      nrisq=0
+      nvarxevt=0
+! fin en prevision
+
+      maxmes=0
+      do i=1,ns0
+         if (nmes0(i).gt.maxmes) then
+            maxmes=nmes0(i)
+         end if
+      end do
+
+
+      minY=zitr0(1)
+      maxY=zitr0(nbzitr0)
+
+      rangeY=0
+      if (Ydiscret.eq.1) rangeY=INT(maxY)-INT(minY)
+
+
+      epsY=epsY0
+      idlink=idlink0
+      if (idlink.eq.0) ntrtot=2
+      if (idlink.eq.1) ntrtot=4
+      if (idlink.eq.3) ntrtot=INT(zitr0(nbzitr0))-INT(zitr0(1))
+      if (idlink.eq.2) then
+         ntrtot=nbzitr0+2
+         allocate(zitr(-1:(ntrtot)))
+
+         allocate(mm(nobs0),mm1(nobs0),mm2(nobs0),im(nobs0),im1(nobs0),im2(nobs0))
+
+         zitr(1:nbzitr0)=zitr0(1:nbzitr0)
+         zitr(-1)=zitr(1)
+         zitr(0)=zitr(1)
+         zitr(ntrtot-1)=zitr(ntrtot-2)
+         zitr(ntrtot)=zitr(ntrtot-1)
+        else
+         allocate(zitr(1))
+         allocate(mm(1),mm1(1),mm2(1),im(1),im1(1),im2(1))
+      end if
+
+
+      allocate(Y(nobs0),idprob(nv0),X(nobs0,nv0) &
+      ,idea(nv0),idg(nv0),idcor(nv0),nmes(ns0),prior(ns0))
+
+             !print*,"apres alloc"
+! enrigstrement pour les modules
+      ns=ns0
+      ng=ng0
+      nv=nv0
+      nobs=nobs0
+          ncor=ncor0
+      if (nwg0.eq.0) then
+         nwg=0
+      else
+         nwg=ng-1
+      end if
+
+      idiag=idiag0
+
+      nmes=0
+      Y=0.d0
+      X=0.d0
+      idprob=0
+      idea=0
+      idg=0
+      idcor=0
+      nmestot=0
+      ktemp=0
+      do k=1,nv
+         idprob(k)=idprob0(k)
+         idea(k)=idea0(k)
+         idg(k)=idg0(k)
+         idcor(k)=idcor0(k)
+
+         jtemp=0
+         it=0
+         DO i=1,ns
+            if (k.eq.1) then
+               nmes(i)=nmes0(i)
+               prior(i)=prior0(i)
+               do j=1,nmes(i)
+                  nmestot=nmestot+1
+                  jtemp=jtemp+1
+                  Y(jtemp)=Y0(jtemp)
+               end do
+            end if
+
+            do j=1,nmes(i)
+               ktemp=ktemp+1
+               it=it+1
+               X(it,k)=X0(ktemp)
+            end do
+         end do
+         
+!         write(*,*)'X k:',X(1:50,k)
+      end do
+
+
+      ! prm fixes
+      npmtot0=npm0+nfix0
+      allocate(fix(npmtot0))
+      fix=0
+      fix(1:npmtot0)=fix0(1:npmtot0)
+      nbfix=sum(fix)
+      if(nbfix.eq.0) then
+         allocate(bfix(1))
+      else
+         allocate(bfix(nbfix))
+      end if
+      bfix(1:nbfix)=bfix0(1:nbfix)
+      
+
+
+
+
+! creation des parametres
+
+      nea=0
+      ncg=0
+      ncssg=0
+      nprob=ng-1
+      nvarprob=min(ng-1,1)
+      do k=1,nv
+         if (idg(k).eq.1) then
+            ncssg=ncssg+1      ! nb var. sans melange
+         else if (idg(k).eq.2) then
+            ncg=ncg+1      ! nb var. dans melange
+         end if
+         nea=nea+idea(k)
+         nprob=nprob+(idprob(k))*(ng-1)
+         nvarprob=nvarprob+idprob(k)
+      end do
+
+      if((ng.eq.1.and.ncg.gt.0).or.(ng.eq.1.and.nprob.gt.0)) then
+         go to 1589
+      end if
+
+
+!  nb effets fixes = nb effets fixes sans melange
+!                  + ng fois le nb de var dans melange
+
+
+      if (idiag.eq.1) then
+         nvc=nea
+      else if(idiag.eq.0) then
+         nvc=nea*(nea+1)/2
+      end if
+
+      nef=nprob+ncssg+ncg*ng+nvarxevt+nrisq-1
+      npmtot=nef+nvc+nwg+ntrtot+ncor
+
+             
+    !  if (nwg.gt.0) then
+    !     do i=1,nwg
+    !        btot(nef+nvc+i)=abs(btot(nef+nvc+i))
+    !     end do
+    !  end if
+
+
+      if (idlink.eq.2) then
+         call design_splines(ier)
+         if (ier.eq.-1) then
+            go to 1589
+         end if
+      end if
+
+
+
+! lancement de l'optimisation
+
+      IF (estim0.eq.1) then
+
+         id=0
+         jd=0
+         thi=0.d0
+         thj=0.d0
+         
+         loglik=funcpac(b0,npm0,id,thi,jd,thj)
+
+      else
+
+
+         !  injecter le b estime dans btot
+         btot=0.d0
+         k=0
+         k2=0
+         do j=1,npmtot
+            if(fix0(j).eq.0) then
+               k=k+1
+               btot(j)=b0(k)
+            else
+               k2=k2+1
+               btot(j)=bfix0(k2)
+            end if
+         end do
+
+           !if (verbose==1) write(*,*)'avant transfo'
+           call transfo_estimee(btot,npmtot,nsim0,marker,transfY)
+!         end if 
+
+! probas posteriori
+
+!     write(*,*)'avant postprobc'
+
+
+         !if (istop.eq.1) then
+            if (ng.gt.1) then
+               call postprobc(btot,npmtot,PPI)
+            end if
+
+
+
+!            write(*,*)'avant residuals'
+
+            call residualsc(btot,npmtot,ppi,resid_m,pred_m_g,resid_ss &
+          ,pred_ss_g,pred_RE,Yobs)
+            ig=0
+            ij=0
+            do i=1,ns
+               do g=1,ng0
+                  ig=ig+1
+                  ppi0(ig)=PPI(i,g)
+               end do
+            end do
+
+
+            if (Ydiscret.eq.1.and.ncor.eq.0) then
+               id=0
+               thi=0.d0
+               call vrais_discret(b0,npm0,id,thi,id,thi,vraisdiscret)
+
+!               write(*,*)'avant UACV'
+               call computUACV(b0,npm0,rlindiv,v,UACV)
+!               write(*,*)'arpes UACV'
+            end if
+
+         end if
+
+
+
+
+!      write(*,*)'avant deallocate'
+
+ 1589 continue
+
+      deallocate(Y,X,idprob,idea,idg,idcor,nmes,prior)
+
+      deallocate(zitr,mm,mm1,mm2,im,im1,im2)
+
+      deallocate(fix,bfix)
+
+
+!      write(*,*)'fin'
+      return
+    end subroutine logliklcmmCont
+
+

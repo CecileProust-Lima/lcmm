@@ -277,6 +277,11 @@
 #' @param returndata logical indicating if data used for computation should be
 #' returned. Default to FALSE, data are not returned.
 #' @param var.time optional character indicating the name of the time variable.
+#' @param mla integer indicating if the optimization should use the mla function
+#' from marqLevAlg package. Default to 0, the internal optimization algorithm is used.
+#' @param nproc if mla=1, the number cores for parallel computation.
+#' Default to 1 (sequential mode).
+#' @param clustertype optional character indicating the type of cluster for parallel computation.
 #' @return The list returned is: \item{loglik}{log-likelihood of the model}
 #' \item{best}{vector of parameter estimates in the same order as specified in
 #' \code{B} and detailed in section \code{details}} \item{V}{vector containing
@@ -447,7 +452,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                       cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,
                       nsim=100,prior=NULL,logscale=FALSE,subset=NULL,na.action=1,
                       posfix=NULL,partialH=FALSE,verbose=TRUE,returndata=FALSE,
-                      var.time=NULL)
+                      var.time=NULL,mla=0,nproc=1,clustertype=NULL)
     {
         
         ptm<-proc.time()
@@ -1880,7 +1885,9 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
    
             }
         else
-            {
+        {
+            if(ng>1) stop("Please specify initial values with argument 'B'")
+           
                 b <- rep(0,NPM)
                 for(i in 1:nbevt)
                     {
@@ -1944,260 +1951,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                         b[nprob+nrisqtot+nvarxevt+nef+nvc+nw+ncor0+2:ntrtot0] <- 0.1
                     }
 #cat("B inti pour ng=1 ", b,"\n")
-                if(ng>1)
-                    {
-                        prior02 <- rep(0,ns0)
-                        idprob02 <- rep(0,nv0)
-                        idg02 <- idg0
-                        idg02[idg02==2] <- 1
-                        ng02 <- 1
-                        nw2 <- 0
-                        nef2 <- sum(idg0!=0)
-                        if(idlink!=-1) nef2 <- nef2-1
-                        idspecif2 <- as.vector(t(idspecif))
-                        idspecif2[which(idspecif2==2)] <- 1
-                        risqcom2 <- rep(0,nbevt)
-                                                  
-                        NPM2 <- sum(nprisq)+nvarxevt2+nef2+nvc+ncor0+ntrtot0
-                        
-                        b2 <- c(sapply(1:nbevt,function(k) b[nprob+sum(nrisq[1:k])-nrisq[k]+1:nprisq[k]]),rep(0,nvarxevt2+nef2),b[nprob+nrisqtot+nvarxevt+nef+1:nvc],b[(nprob+nrisqtot+nvarxevt+nef+nvc+nw+1):length(b)])
-                        
-                        V2 <- rep(0,NPM2*(NPM2+1)/2)
-                        loglik2 <- 0
-                        ppi02 <- rep(0,ns0)
-                        ppitest02 <- rep(0,nobs0)
-                        pred_m_g2 <- rep(0,nobs0)
-                        pred_ss_g2 <- rep(0,nobs0)
-                        maxiter2 <- min(75,maxiter)
-                        convBLG2 <- c(max(0.01,convB), max(0.01,convL),max(0.01,convG))
-                        Hr02 <- 0
-                        risq_est2 <- matrix(0,nrow=nsim,ncol=nbevt)
-                        risqcum_est2 <- matrix(0,nrow=nsim,ncol=nbevt)
-
-                        ## pour reduire le nb d'arguments:
-                        int6 <- c(nw2,ncor0,idiag0,idtrunc,logspecif,maxiter2)
-                         
-                        init <- .Fortran(C_jointhet,
-                                         as.double(Y0),
-                                         as.double(X0),
-                                         as.integer(prior02),
-                                         as.double(tsurv0),
-                                         as.double(tsurv),
-                                         as.integer(devt),
-                                         as.integer(ind_survint),
-                                         as.integer(idprob02),
-                                         as.integer(idea0),
-                                         as.integer(idg02),
-                                         as.integer(idcor0),
-                                         as.integer(idcom),
-                                         as.integer(idspecif2),
-                                         as.integer(idtdv),
-                                         as.integer(idlink),
-                                         as.double(epsY),
-                                         as.integer(nbzitr),
-                                         as.double(zitr0),
-                                         as.double(uniqueY0),
-                                         as.integer(nvalSPL0),
-                                         as.integer(indiceY0),
-                                         as.integer(typrisq),
-                                         as.integer(risqcom2),
-                                         as.integer(nz),
-                                         as.double(zi),
-                                         as.integer(ns0),
-                                         as.integer(ng02),
-                                         as.integer(nv0),
-                                         as.integer(nobs0),
-                                         as.integer(nmes0),
-                                         as.integer(nbevt),
-                                         as.integer(nea0),
-                                         as.integer(int6),
-                                         as.integer(NPM2),
-                                         best=as.double(b2),
-                                         V=as.double(V2),
-                                         as.double(loglik),
-                                         as.integer(ni),
-                                         conv=as.integer(istop),
-                                         gconv=as.double(gconv),
-                                         as.double(ppi02),
-                                         as.double(ppitest02),
-                                         as.double(resid_m),
-                                         as.double(resid_ss),
-                                         as.double(pred_m_g2),
-                                         as.double(pred_ss_g2),
-                                         as.double(predRE),
-                                         as.double(convBLG2),
-                                         as.double(time),
-                                         as.double(risq_est2),
-                                         as.double(risqcum_est2),
-                                         as.double(marker),
-                                         as.double(transfY),
-                                         as.integer(nsim),
-                                         as.double(Yobs),
-                                         as.double(statglob),
-                                         as.double(statevt),
-                                         as.integer(pbH0),
-                                         as.integer(fix0))
-
-                        ## faire des valeurs initiales a partir de init
-#cat("B estime pour ng=1 ",init$best, "\n")
-                        ##pr risq
-                        for(ke in 1:nbevt)
-                            {
-                                if(risqcom[ke]==0)
-                                    {
-                                        indb <- nprob+sum(nrisq[1:ke])-nrisq[ke]+1:nrisq[ke]
-                                        indinit <- sum(nprisq[1:ke])-nprisq[ke]+1:nprisq[ke]
-                                       if(init$conv==1)
-                                           {
-                                               b[indb] <- abs(rep(init$best[indinit],ng0)+rep((1:ng0)-(ng0+1)/2,each=nprisq[ke])*rep(sqrt(init$V[indinit*(indinit+1)/2]),ng0))
-                                           }
-                                       else
-                                           {
-                                               b[indb] <- abs(rep(init$best[indinit],ng0)+rep((1:ng0)-(ng0+1)/2,each=nprisq[ke])*rep(init$best[indinit],ng0))
-                                           }
-                                    }
-
-                                if(risqcom[ke]==1)
-                                    {
-                                        b[nprob+sum(nrisq[1:ke])-nrisq[ke]+1:nrisq[ke]] <- init$best[sum(nrisq[1:ke])-nrisq[ke]+1:nprisq[ke]]
-                                    }
-
-                                if(risqcom[ke]==2)
-                                    {
-                                        b[nprob+sum(nrisq[1:ke])-nrisq[ke]+1:nrisq[ke]] <- c(init$best[sum(nprisq[1:ke])-nprisq[ke]+1:nprisq[ke]],0.5+(0:(ng0-2))*0.5)
-                                    }
-                            }
-
-                        ## pr bevt
-                        avtj <- nprob+nrisqtot
-                        avtj2 <- sum(nprisq)
-                        for(j in 1:nv0)
-                            {
-                                if(idcom[j]==0 & all(idspecif[,j]==0)) next
-                                
-                                if(idcom[j]==1 & all(idspecif[,j]==1))
-                                    {
-                                        b[avtj+1] <- init$best[avtj2+1]
-                                        avtj <- avtj+1
-                                        avtj2 <- avtj2+1
-                                    }
-
-                                if(idcom[j]==1 & all(idspecif[,j]==2))
-                                    {
-                                        if(init$conv==1) b[avtj+1:ng0] <- abs(rep(init$best[avtj2+1],ng0)+c(1:ng0-(ng0+1)/2)*rep(sqrt(init$V[(avtj2+1)*(avtj2+2)/2]),ng0))
-                                        else b[avtj+1:ng0] <- abs(rep(init$best[avtj2+1],ng0)+c(1:ng0-(ng0+1)/2)*rep(init$best[avtj2+1],ng0))
-
-                                        avtj <- avtj+ng0
-                                        avtj2 <- avtj2+1
-                                    }
-
-                                if(idcom[j]==0 & idcause[j]!=0)
-                                    {
-                                        for(k in 1:nbevt)
-                                            {
-                                                if(idspecif[k,j]==0) next
-
-                                                if(idspecif[k,j]==1)
-                                                    {
-                                                        b[avtj+1] <- init$best[avtj2+1]
-                                                        avtj <- avtj+1
-                                                        avtj2 <- avtj2+1
-                                                    }
-
-                                                if(idspecif[k,j]==2)
-                                                    {
-                                                        if(init$conv==1) b[avtj+1:ng0] <- abs(rep(init$best[avtj2+1],ng0)+c(1:ng0-(ng0+1)/2)*rep(sqrt(init$V[(avtj2+1)*(avtj2+2)/2]),ng0))
-                                                        else b[avtj+1:ng0] <- abs(rep(init$best[avtj2+1],ng0)+c(1:ng0-(ng0+1)/2)*rep(init$best[avtj2+1],ng0))
-
-                                                        avtj <- avtj+ng0
-                                                        avtj2 <- avtj2+1 
-                                                    }
-                                            }
-                                        
-                                    }
-                                    
-
-
-                                
-                                ## if(idxevt0[j]==1)
-                                ##     {
-                                ##         nn <- ifelse(idcausespecif[j]==1,nbevt,1)
-                                ##         b[nprob+nrisqtot+avtj+1:nn] <- init$best[sum(nprisq)+avtj2+1:nn]
-
-                                ##         avtj <- avtj+nn
-                                ##         avtj2 <- avtj2+nn
-                                ##     }
-
-                                ## if(idxevt0[j]==2)
-                                ##     {
-                                ##         nn <- ng0*ifelse(idcausespecif[j]==1,nbevt,1)
-                                ##         if(init$conv==1) b[nprob+nrisqtot+avtj+1:nn] <- abs(rep(init$best[sum(nprisq)+avtj2+1:(nn/ng0)],ng0)+rep((1:ng0)-(ng0+1)/2,nn/ng0)*rep(init$V[(sum(nprisq)+avtj2+1:(nn/ng0))*(sum(nprisq)+avtj2+1:(nn/ng0)+1)/2],ng0))
-                                ##         else b[nprob+nrisqtot+avtj+1:nn] <- abs(rep(init$best[sum(nprisq)+avtj2+1:(nn/ng0)],ng0)+rep((1:ng0)-(ng0+1)/2,nn/ng0)*rep(init$best[sum(nprisq)+avtj2+1:(nn/ng0)],ng0))
-
-                                ##         avtj <- avtj+nn
-                                ##         avtj2 <- avtj2+nn/ng0
-                                ##         #print(b[nprob+nrisqtot+avtj+1:nn])
-                                ##         #print(rep(init$best[sum(nprisq)+avtj2+1:(nn/ng0)],ng0))
-                                ##         #print(rep((1:ng0)-(ng0+1)/2,nn/ng0))
-                                ##         #print(rep(init$V[(sum(nprisq)+avtj2+1:nn/ng0)*(sum(nprisq)+avtj2+1:nn/ng0+1)/2],ng0))
-                                ##     }
-                            }
-
-                        
-                        ## pr nef
-                        avtj <- nprob+nrisqtot+nvarxevt
-                        avtj2 <- sum(nprisq)+nvarxevt2
-                        for(j in 1:nv0)
-                            {
-                                if(idg0[j]==1)
-                                    {
-                                        if(j==1 & idlink!=-1) next
-                                        else
-                                            {
-                                                if(init$conv==1) b[avtj+1] <- init$best[avtj2+1]
-                                                avtj <- avtj+1
-                                                avtj2 <- avtj2+1
-                                            }
-                                    }
-
-                                if(idg0[j]==2)
-                                    {
-                                        if(j==1)
-                                            {
-                                                if(idlink!=-1)
-                                                    {
-                                                        b[avtj+1:(ng0-1)] <- -0.5*(1:(ng0-1))
-
-                                                        avtj <- avtj+ng0-1
-                                                    }
-                                                else
-                                                    {
-                                                        b[avtj+1:ng0] <- init$best[avtj2+1]+(1:ng0-(ng0+1)/2)*init$best[avtj2+1]
-                                                        avtj <- avtj+ng0
-                                                        avtj2 <- avtj2+1
-                                                    }
-                                            }
-                                        else
-                                            {
-                                                if(init$conv==1) b[avtj+1:ng0] <- init$best[avtj2+1]+(1:ng0-(ng0+1)/2)*sqrt(init$V[(avtj2+1)*(avtj2+1+1)/2])
-                                                else b[avtj+1:ng0] <- init$best[avtj2+1]+(1:ng0-(ng0+1)/2)*init$best[avtj2+1]
-
-                                                avtj <- avtj+ng0
-                                                avtj2 <- avtj2+1
-                                            }
-                                        
-                                    }
-                            }
-
-                        ## pr nvc
-                        if(nvc>0)
-                            {
-                                b[nprob+nrisqtot+nvarxevt+nef+1:nvc] <- init$best[sum(nprisq)+nvarxevt2+nef2+1:nvc]
-                            }
-
-                        ## cor et transfo
-                        b[(nprob+nrisqtot+nvarxevt+nef+nvc+nw+1):NPM] <- init$best[(sum(nprisq)+nvarxevt2+nef2+nvc+1):NPM2]
-                    }
+               
             }
 #cat("B init a partir du modele pour ng=1 ", b,"\n")
 
@@ -2461,7 +2215,9 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
 #print(b)
 #### estimation
         idspecif <- as.vector(t(idspecif))
-#return(b)
+                                        #return(b)
+
+        if(mla==0){
         ## pour reduire le nb d'arguments:
         int6 <- c(nw,ncor0,idiag0,idtrunc,logspecif,maxiter)
         convBLG <- c(convB,convL,convG)
@@ -2526,7 +2282,175 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                         statevt=as.double(statevt),
                         as.integer(pbH0),
                         as.integer(fix0))
+        } else {
 
+            if(partialH) stop("partialH is not supported with mla optimization")
+            
+            nfix <- sum(fix0)
+            bfix <- 0
+            if(nfix>0)
+            {
+                bfix <- b[which(fix0==1)]
+                b <- b[which(fix0==0)]
+                NPM <- NPM-nfix
+            }
+
+            if(maxiter==0)
+            {
+                vrais <- loglikJointlcmm(b,Y0,X0,prior0,tsurv0,tsurv,devt,ind_survint,
+                                         idprob0,idea0,idg0,idcor0,idcom,idspecif,idtdv,
+                                         idlink,epsY,nbzitr,zitr0,uniqueY0,nvalSPL0,
+                                         indiceY0,typrisq,risqcom,nz,zi,ns0,ng0,nv0,
+                                         nobs0,nmes0,nbevt,nea0,nw,ncor0,idiag0,idtrunc,
+                                         logspecif,NPM,fix0,nfix,bfix)
+                
+                out <- list(conv=2, V=rep(NA, length(b)), best=b,
+                            ppi=rep(NA,ns0*ng0), ppitest=rep(NA,ns0*ng0),
+                            predRE=rep(NA,ns0*nea0), Yobs=rep(NA,nobs0),
+                            resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
+                            marker=rep(NA,nobs0), transfY=rep(NA,nobs0),
+                            pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
+                            time=rep(NA,nsim), risq_est=rep(NA,nsim*ng0*nbevt),
+                            risqcum_est=rep(NA,nsim*ng0*nbevt),
+                            statglob=NA, statevt=rep(NA,nbevt),
+                            gconv=rep(NA,3), niter=0, loglik=vrais)
+            }
+            else
+            {
+                res <- mla(b=b, m=length(b), fn=loglikJointlcmm,
+                           clustertype=clustertype,.packages=NULL,
+                           epsa=convB,epsb=convL,epsd=convG,
+                           digits=8,print.info=verbose,blinding=FALSE,
+                           multipleTry=25,file="",
+                           nproc=nproc,maxiter=maxiter,minimize=FALSE,
+                           Y0=Y0,X0=X0,prior0=prior0,tentr0=tsurv0,tevt0=tsurv,devt0=devt,
+                           ind_survint0=ind_survint,idprob0=idprob0,idea0=idea0,idg0=idg0,
+                           idcor0=idcor0,idcom0=idcom,idspecif0=idspecif,idtdv0=idtdv,
+                           idlink0=idlink,epsY0=epsY,nbzitr0=nbzitr,zitr0=zitr0,
+                           uniqueY0=uniqueY0,nvalSPL0=nvalSPL0,indiceY0=indiceY0,
+                           typrisq0=typrisq,risqcom0=risqcom,nz0=nz,zi0=zi,ns0=ns0,
+                           ng0=ng0,nv0=nv0,nobs0=nobs0,nmes0=nmes0,nbevt0=nbevt,nea0=nea0,
+                           nwg0=nw,ncor0=ncor0,idiag0=idiag0,idtrunc0=idtrunc,
+                           logspecif0=logspecif,npm0=NPM,fix0=fix0,nfix0=nfix,bfix0=bfix)
+                
+                out <- list(conv=res$istop, V=res$v, best=res$b,
+                            ppi=rep(NA,ns0*ng0), ppitest=rep(NA,ns0*ng0),
+                            predRE=rep(NA,ns0*nea0), Yobs=rep(NA,nobs0),
+                            resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
+                            marker=rep(NA,nobs0), transfY=rep(NA,nobs0),
+                            pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
+                            time=rep(NA,nsim), risq_est=rep(NA,nsim*ng0*nbevt),
+                            risqcum_est=rep(NA,nsim*ng0*nbevt),
+                            statglob=NA, statevt=rep(NA,nbevt),
+                            gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,
+                            loglik=res$fn.value)
+                
+                if(out$conv %in% c(1,2,3))
+                {
+                    estim0 <- 0
+                    ll <- 0
+                    ppi0 <- rep(0,ns0*ng0)
+                    ppitest0 <- rep(0,ns0*ng0)
+                    resid_m <- rep(0,nobs0)
+                    resid_ss <- rep(0,nobs0)
+                    pred_m_g <- rep(0,nobs0*ng0)
+                    pred_ss_g <- rep(0,nobs0*ng0)
+                    predRE <- rep(0,ns0*nea0)
+                    marker <- rep(0,nsim)
+                    transfY <- rep(0,nsim)
+                    Yobs <- rep(0,nobs0)
+                    risq_est <- rep(0,nsim*ng0*nbevt)
+                    risqcum_est <- rep(0,nsim*ng0*nbevt)
+                    statglob <- 0
+                    statevt <- rep(0,nbevt)
+                    estim0 <- 0
+                    post <- .Fortran(C_loglikjointlcmm,
+                             as.double(Y0),
+                             as.double(X0),
+                             as.integer(prior0),
+                             as.double(tsurv0),
+                             as.double(tsurv),
+                             as.integer(devt),
+                             as.integer(ind_survint),
+                             as.integer(idprob0),
+                             as.integer(idea0),
+                             as.integer(idg0),
+                             as.integer(idcor0),
+                             as.integer(idcom),
+                             as.integer(idspecif),
+                             as.integer(idtdv),
+                             as.integer(idlink),
+                             as.double(epsY),
+                             as.integer(nbzitr),
+                             as.double(zitr0),
+                             as.double(uniqueY0),
+                             as.integer(nvalSPL0),
+                             as.integer(indiceY0),
+                             as.integer(typrisq),
+                             as.integer(risqcom),
+                             as.integer(nz),
+                             as.double(zi),
+                             as.integer(ns0),
+                             as.integer(ng0),
+                             as.integer(nv0),
+                             as.integer(nobs0),
+                             as.integer(nmes0),
+                             as.integer(nbevt),
+                             as.integer(nea0),
+                             as.integer(nw),
+                             as.integer(ncor0),
+                             as.integer(idiag0),
+                             as.integer(idtrunc),
+                             as.integer(logspecif),
+                             as.integer(NPM),
+                             best=as.double(out$best),
+                             ppi=as.double(ppi0),
+                             ppitest=as.double(ppitest0),
+                             resid_m=as.double(resid_m),
+                             resid_ss=as.double(resid_ss),
+                             pred_m_g=as.double(pred_m_g),
+                             pred_ss_g=as.double(pred_ss_g),
+                             predRE=as.double(predRE),
+                             time=as.double(time),
+                             risq_est=as.double(risq_est),
+                             risqcum_est=as.double(risqcum_est),
+                             marker=as.double(marker),
+                             transfY=as.double(transfY),
+                             as.integer(nsim),
+                             Yobs=as.double(Yobs),
+                             statglob=as.double(statglob),
+                             statevt=as.double(statevt),
+                             as.integer(fix0),
+                             as.integer(nfix),
+                             as.double(bfix),
+                             as.integer(estim0),
+                             loglik=as.double(ll))
+
+                    out$ppi <- post$ppi
+                    out$ppitest <- post$ppitest
+                    out$predRE <- post$predRE
+                    out$Yobs <- post$Yobs
+                    out$resid_m <- post$resid_m
+                    out$resid_ss <- post$resid_ss
+                    out$marker <- post$marker
+                    out$transfY <- post$transfY
+                    out$pred_m_g <- post$pred_m_g
+                    out$pred_ss_g <- post$pred_ss_g
+                    out$risq_est <- post$risq_est
+                    out$risqcum_est <- post$risqcum_est
+                    out$statglob <- post$statglob
+                    out$statevt <- post$statevt
+                }
+            }
+            
+            ## creer best a partir de b et bfix
+            best <- rep(NA,length(fix0))
+            best[which(fix0==0)] <- out$best
+            best[which(fix0==1)] <- bfix
+            out$best <- best
+            NPM <- NPM+nfix
+        }
+        
 
 
  ### mettre NA pour les variances et covariances non calculees et  0 pr les prm fixes
@@ -2767,3 +2691,88 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
 #' @rdname Jointlcmm
 #' @export
 jlcmm <- Jointlcmm
+
+
+#' @export
+loglikJointlcmm <- function(b,Y0,X0,prior0,tentr0,tevt0,devt0,ind_survint0,idprob0,idea0,idg0,idcor0,idcom0,idspecif0,idtdv0,idlink0,epsY0,nbzitr0,zitr0,uniqueY0,nvalSPL0,indiceY0,typrisq0,risqcom0,nz0,zi0,ns0,ng0,nv0,nobs0,nmes0,nbevt0,nea0,nwg0,ncor0,idiag0,idtrunc0,logspecif0,npm0,fix0,nfix0,bfix0)
+{
+    res <- 0
+    ppi0 <- rep(0,ns0*ng0)
+    ppitest0 <- rep(0,ns0*ng0)
+    resid_m <- rep(0,nobs0)
+    resid_ss <- rep(0,nobs0)
+    pred_m_g <- rep(0,nobs0*ng0)
+    pred_ss_g <- rep(0,nobs0*ng0)
+    predRE <- rep(0,ns0*nea0)
+    nsim0 <- 0
+    marker <- rep(0,nsim0)
+    transfY <- rep(0,nsim0)
+    Yobs <- rep(0,nobs0)
+    time <- rep(0,nsim0)
+    risq_est <- rep(0,nsim0*ng0*nbevt0)
+    risqcum_est <- rep(0,nsim0*ng0*nbevt0)
+    statglob <- 0
+    statevt <- rep(0,nbevt0)
+    estim0 <- 1
+    .Fortran(C_loglikjointlcmm,
+             as.double(Y0),
+             as.double(X0),
+             as.integer(prior0),
+             as.double(tentr0),
+             as.double(tevt0),
+             as.integer(devt0),
+             as.integer(ind_survint0),
+             as.integer(idprob0),
+             as.integer(idea0),
+             as.integer(idg0),
+             as.integer(idcor0),
+             as.integer(idcom0),
+             as.integer(idspecif0),
+             as.integer(idtdv0),
+             as.integer(idlink0),
+             as.double(epsY0),
+             as.integer(nbzitr0),
+             as.double(zitr0),
+             as.double(uniqueY0),
+             as.integer(nvalSPL0),
+             as.integer(indiceY0),
+             as.integer(typrisq0),
+             as.integer(risqcom0),
+             as.integer(nz0),
+             as.double(zi0),
+             as.integer(ns0),
+             as.integer(ng0),
+             as.integer(nv0),
+             as.integer(nobs0),
+             as.integer(nmes0),
+             as.integer(nbevt0),
+             as.integer(nea0),
+             as.integer(nwg0),
+             as.integer(ncor0),
+             as.integer(idiag0),
+             as.integer(idtrunc0),
+             as.integer(logspecif0),
+             as.integer(npm0),
+             best=as.double(b),
+             ppi=as.double(ppi0),
+             ppitest=as.double(ppitest0),
+             resid_m=as.double(resid_m),
+             resid_ss=as.double(resid_ss),
+             pred_m_g=as.double(pred_m_g),
+             pred_ss_g=as.double(pred_ss_g),
+             predRE=as.double(predRE),
+             time=as.double(time),
+             risq_est=as.double(risq_est),
+             risqcum_est=as.double(risqcum_est),
+             marker=as.double(marker),
+             transfY=as.double(transfY),
+             as.integer(nsim0),
+             Yobs=as.double(Yobs),
+             statglob=as.double(statglob),
+             statevt=as.double(statevt),
+             as.integer(fix0),
+             as.integer(nfix0),
+             as.double(bfix0),
+             as.integer(estim0),
+             loglik=as.double(res))$loglik
+}

@@ -721,7 +721,6 @@
      end if
 
 
-
 !--------------- liberation de la memoire ------------------------
 
 
@@ -4276,3 +4275,604 @@ end subroutine jointhet
 
 
       end subroutine scoretest_comp
+
+
+
+
+      
+  subroutine loglikjointlcmm(Y0,X0,Prior0,Tentr0,Tevt0,Devt0,ind_survint0 &
+       ,idprob0,idea0,idg0,idcor0,idcom0,idspecif0,idtdv0,idlink0 &
+       ,epsY0,nbzitr0,zitr0,uniqueY0,nvalSPL0,indiceY0 &
+       ,typrisq0,risqcom0,nz0,zi0 &
+       ,ns0,ng0,nv0,nobs0,nmes0,nbevt0,nea0,nwg0,ncor0,idiag0,idtrunc0,logspecif0 &
+       ,npm0,b0,ppi0,ppitest0,resid_m &
+       ,resid_ss,pred_m_g,pred_ss_g,pred_RE &
+       ,time,risq_est,risqcum_est,marker,transfY,nsim,Yobs,statglob,statevt &
+       ,fix0,nfix0,bfix0,estim0,loglik)
+
+
+      use commun_comp
+
+      IMPLICIT NONE
+
+      !Declaration des variables en entree
+      integer,intent(in)::ns0,ng0,nv0,nobs0,nea0,npm0,nsim,nfix0
+      integer,intent(in)::nwg0,ncor0,idiag0,idtrunc0,logspecif0
+      double precision,dimension(nobs0),intent(in)::Y0
+      integer,dimension(nobs0),intent(in)::indiceY0
+      double precision,dimension(nobs0*nv0),intent(in)::X0
+      double precision, dimension(ns0),intent(in)::Tentr0,Tevt0
+      integer, dimension(ns0),intent(in)::ind_survint0,nmes0,Devt0,prior0
+      integer,dimension(nv0),intent(in)::idprob0,idea0,idg0,idcor0 
+      integer,intent(in)::idlink0,nbzitr0,nvalSPL0,nbevt0
+      integer, dimension(nv0),intent(in)::idcom0,idtdv0
+      integer, dimension(nv0*nbevt0),intent(in)::idspecif0
+      double precision,dimension(nbzitr0),intent(in)::zitr0
+      double precision,dimension(nvalSPL0),intent(in)::uniqueY0 
+      integer,dimension(nbevt0),intent(in)::typrisq0,risqcom0,nz0
+      double precision,dimension(maxval(nz0),nbevt0),intent(in)::zi0    
+      double precision,intent(in)::epsY0
+      integer,dimension(npm0+nfix0),intent(in)::fix0
+      double precision,dimension(nfix0),intent(in)::bfix0
+      integer,intent(in)::estim0 
+
+      !Declaration des variable en entree et sortie
+      double precision,dimension(npm0), intent(inout) :: b0
+
+      !Declaration des variables en sortie
+      double precision,intent(out)::loglik
+      double precision,dimension(ns0*ng0),intent(out)::ppi0,ppitest0
+      double precision,dimension(nobs0),intent(out)::resid_m,resid_ss,Yobs
+      double precision,dimension(nobs0*ng0),intent(out)::pred_m_g
+      double precision,dimension(nobs0*ng0),intent(out)::pred_ss_g
+      double precision,dimension(ns0*nea0),intent(out)::pred_RE
+      double precision,dimension(nsim),intent(out)::marker,transfY,time
+      double precision,dimension(nsim*ng0,nbevt0),intent(out)::risq_est,risqcum_est
+      double precision,intent(out)::statglob
+      double precision,dimension(nbevt0),intent(out)::statevt
+
+      !Variables locales
+      integer::jtemp,i,g,j,ier,k,ktemp,ig,it,ke,sumnrisq,dejaspl
+      integer::nbfix,npmtot0,k2,id,jd
+      double precision::thi,thj
+      double precision,dimension(ns0,ng0)::PPI,ppiy
+      double precision,dimension(npm0+nfix0)::btot
+      double precision,external::vrais_comp
+
+
+      ! sorties initialisees
+      ppi0=0.d0
+      pred_ss_g=0.d0
+      pred_m_g=0.d0
+      pred_RE=0.d0
+      marker=0.d0
+      transfY=0.d0
+      resid_m=0.d0
+      resid_ss=0.d0
+      loglik=0.d0
+      Yobs=0.d0
+      statglob=0.d0
+      statevt=0.d0
+
+      ! nmbre max de mesures pour 1 sujet
+      maxmes=0
+      do i=1,ns0
+         if (nmes0(i).gt.maxmes) then
+            maxmes=nmes0(i)
+         end if
+      end do
+
+
+      ! alloc pour partie modele mixte
+      minY=zitr0(1)
+      maxY=zitr0(nbzitr0)
+
+      rangeY=0
+      !if (Ydiscret.eq.1) rangeY=maxY-minY
+
+
+      epsY=epsY0
+      idlink=idlink0
+      nvalSPL=nvalSPL0
+      if (idlink.eq.-1) ntrtot=1 !sans trasnfo
+      if (idlink.eq.0) ntrtot=2  ! linear
+      if (idlink.eq.1) ntrtot=4  ! beta
+      if (idlink.eq.2) then      ! splines nbzitr0 noeuds
+         ntrtot=nbzitr0+2
+         allocate(zitr(-1:(ntrtot)))
+
+         allocate(mm(nvalSPL),mm1(nvalSPL),mm2(nvalSPL))
+         allocate(im(nvalSPL),im1(nvalSPL),im2(nvalSPL))
+
+         allocate(indiceY(nobs0),uniqueY(nvalSPL0))
+
+         zitr(1:nbzitr0)=zitr0(1:nbzitr0)
+         zitr(-1)=zitr(1)
+         zitr(0)=zitr(1)
+         zitr(ntrtot-1)=zitr(ntrtot-2)
+         zitr(ntrtot)=zitr(ntrtot-1)
+
+         indiceY(1:nobs0)=indiceY0(1:nobs0)
+         uniqueY(1:nvalSPL)=uniqueY0(1:nvalSPL0)
+      else
+         allocate(zitr(1))
+         allocate(mm(1),mm1(1),mm2(1),im(1),im1(1),im2(1))
+         allocate(indiceY(1),uniqueY(1))
+
+         zitr(1)=0.d0
+         mm(1)=0.d0
+         mm1(1)=0.d0
+         mm2(1)=0.d0
+         im(1)=0.d0
+         im1(1)=0.d0
+         im2(1)=0.d0
+         indiceY(1)=0
+         uniqueY(1)=0.d0
+      end if
+
+
+      allocate(Y(nobs0),idprob(nv0),X(nobs0,nv0) &
+      ,idea(nv0),idg(nv0),idcor(nv0),nmes(ns0),prior(ns0) &
+      ,idcom(nv0),idspecif(nv0*nbevt0),idtdv(nv0))
+
+      !  alloc pour partie survie
+
+      allocate(Tsurv0(ns0),Tsurv(ns0),Tsurvint(ns0),ind_survint(ns0),Devt(ns0))
+      allocate(risqcom(nbevt0),typrisq(nbevt0),nz(nbevt0),nprisq(nbevt0),nrisq(nbevt0), &
+           nxevtspec(nbevt0),nevtparx(nv0),nxcurr(nv0))
+
+
+
+
+
+      nbevt=nbevt0    
+      typrisq=typrisq0
+      risqcom=risqcom0
+      idtrunc=idtrunc0
+      Tsurv0=Tentr0   
+      Tsurv=Tevt0    
+      devt=devt0    
+      ind_survint=ind_survint0
+      logspecif=logspecif0 
+! Tsurvint defini plus loin
+      Tsurvint=Tsurv
+
+      ! zi : contient noeuds pour hazard (ou min et max si Weibull)
+      if(any(typrisq.eq.3)) then
+         allocate(zi(-2:maxval(nz0)+3,nbevt))
+      else
+         allocate(zi(maxval(nz0),nbevt))
+      end if
+
+
+
+! prm fixes
+      npmtot0=npm0+nfix0
+      allocate(fix(npmtot0))
+      fix=0
+      fix(1:npmtot0)=fix0(1:npmtot0)
+      nbfix=sum(fix)
+      if(nbfix.eq.0) then
+         allocate(bfix(1))
+      else
+         allocate(bfix(nbfix))
+      end if
+      bfix(1:nbfix)=bfix0(1:nbfix)
+
+
+      ! recopier le reste des parametres dans module commun_comp
+      ns=ns0
+      ng=ng0
+      ncor=ncor0
+      nv=nv0
+      nobs=nobs0
+      if (nwg0.eq.0) then
+         nwg=0
+      else
+         nwg=ng-1
+      end if
+      idiag=idiag0
+
+      nmes=nmes0
+      Y=0.d0
+      X=0.d0
+      idprob=0 !classmb
+      idea=0   !random
+      idg=0    !fixed
+      idcor=0  !cor
+      idcom=0 !survival
+      idtdv=0 !timedepvar
+      idspecif=0  !survival
+      idspecif(1:nv*nbevt)=idspecif0(1:nv*nbevt)
+
+      ktemp=0
+      do k=1,nv
+         idprob(k)=idprob0(k)
+         idea(k)=idea0(k)
+         idg(k)=idg0(k)
+         idcor(k)=idcor0(k)
+         idcom(k)=idcom0(k)
+         idtdv(k)=idtdv0(k)
+
+         jtemp=0
+         it=0
+         DO i=1,ns
+            if (k.eq.1) then
+               nmes(i)=nmes0(i)
+               prior(i)=prior0(i)
+               do j=1,nmes(i)
+                  jtemp=jtemp+1
+                  Y(jtemp)=Y0(jtemp)
+               end do
+            end if
+
+            do j=1,nmes(i)
+               ktemp=ktemp+1
+               it=it+1
+               X(it,k)=X0(ktemp)
+            end do
+         end do
+      end do
+
+! definition Tsurvint 
+      nvdepsurv=0
+      if(sum(ind_survint).gt.0) then
+         nvdepsurv=1
+         do k=1,nv
+            if (idtdv(k).eq.1) then
+               it=0
+               do i=1,ns
+                  Tsurvint(i)=X(it+1,k)
+                  it=it+nmes(i)
+               end do
+            end if
+         end do
+      end if
+
+
+
+      nprisq=0
+      nrisq=0
+      nrisqtot=0
+
+      do ke=1,nbevt
+
+         nz(ke)=nz0(ke) ! nb de noeuds pour hazard (ou 2 pr Weibull)
+
+         if (typrisq(ke).eq.1) then
+            nprisq(ke)=nz(ke)-1
+         end if
+         if (typrisq(ke).eq.2) then
+            nprisq(ke)=2
+         end if
+         if (typrisq(ke).eq.3) then
+            nprisq(ke)=nz(ke)+2
+         end if         
+
+         if (risqcom(ke).eq.1) then
+            nrisq(ke) = nprisq(ke)
+         end if
+         if (risqcom(ke).eq.2) then
+            nrisq(ke) = nprisq(ke)+ng-1
+         end if
+         if (risqcom(ke).eq.0) then
+            nrisq(ke) = nprisq(ke)*ng
+         end if
+
+         nrisqtot = nrisqtot+nrisq(ke)  ! nb total de prm pour hazards
+         zi(1:nz(ke),ke)=zi0(1:nz(ke),ke)
+      end do
+
+
+      ! nvarxevt = nombre total de coef pour survie (sans prm hazard)
+      nxevt=0
+      nxevtspec=0
+      nevtparx=0
+      do j=1,nv
+         if (idtdv(j).eq.1) then 
+            if(idcom(j).eq.1.and.idspecif(j).eq.1) then
+               nevtparx(j)=1
+            end if
+            if(idcom(j).eq.1.and.idspecif(j).eq.2) then 
+               nevtparx(j)=ng
+            end if
+            if(idcom(j).eq.0) then
+               do ke=1,nbevt
+                  if(idspecif((ke-1)*nv+j).eq.1) then
+                     nevtparx(j)=nevtparx(j)+1
+                  end if
+                  if(idspecif((ke-1)*nv+j).eq.2) then
+                     nevtparx(j)=nevtparx(j)+ng
+                  end if
+               end do
+            end if
+
+         else
+            
+            
+            if(idcom(j).eq.1.and.idspecif(j).eq.1) then
+               nevtparx(j)=1
+               do ke=1,nbevt
+                  nxevtspec(ke)=nxevtspec(ke)+1
+               end do
+            end if
+            if(idcom(j).eq.1.and.idspecif(j).eq.2) then
+               nevtparx(j)=ng
+               do ke=1,nbevt
+                  nxevtspec(ke)=nxevtspec(ke)+1
+               end do
+            end if
+            if(idcom(j).eq.0) then
+               do ke=1,nbevt
+                  if(idspecif((ke-1)*nv+j).eq.1) then
+                     nevtparx(j)=nevtparx(j)+1
+                     nxevtspec(ke)=nxevtspec(ke)+1
+                  end if
+                  if(idspecif((ke-1)*nv+j).eq.2) then
+                     nevtparx(j)=nevtparx(j)+ng
+                     nxevtspec(ke)=nxevtspec(ke)+1
+                  end if
+               end do
+            end if
+         end if
+         nvarxevt = sum(nevtparx)
+         nxevt=sum(nxevtspec)
+
+      end do
+
+
+      nea=0
+      ncg=0
+      ncssg=0
+      nprob=0 
+      nvarprob=0
+      do k=1,nv
+         if (idg(k).eq.1) then
+            ncssg=ncssg+1      ! nb var. sans melange
+         else if (idg(k).eq.2) then
+            ncg=ncg+1      ! nb var. dans melange
+         end if
+         nea=nea+idea(k)
+         nprob=nprob+(idprob(k))*(ng-1)
+         nvarprob=nvarprob+idprob(k)
+      end do
+
+
+      if((ng.eq.1.and.ncg.gt.0).or.(ng.eq.1.and.nprob.gt.0)) then
+         go to 1236
+      end if
+
+
+      if (idiag.eq.1) then
+         nvc=nea
+      else if(idiag.eq.0) then
+         nvc=nea*(nea+1)/2
+      end if
+
+
+      nef=ncssg+ncg*ng
+      if(idlink.ne.-1) nef=nef-1
+      npmtot=nprob+nrisqtot+nvarxevt+nef+nvc+nwg+ncor+ntrtot
+
+      if (npmtot.ne.npmtot0) then
+         goto 1236
+      end if
+
+
+      if (nwg.gt.0) then
+         do i=1,nwg
+            btot(nprob+nrisqtot+nvarxevt+nef+nvc+i)=abs(btot(nprob+nrisqtot+nvarxevt+nef+nvc+i))
+         end do
+      end if
+
+      ! creer base de splines si transfo splines
+      if (idlink.eq.2) then 
+         call design_splines_comp(ier)
+         if (ier.eq.-1) then          
+            go to 1236
+         end if
+      end if
+
+      ! creer base de splines si au moins un hazard splines
+      dejaspl=0
+      if(any(typrisq.eq.3)) then
+            allocate(Tmm(ns),Tmm1(ns),Tmm2(ns),Tmm3(ns),Tim(ns)         &
+                 ,Tim1(ns),Tim2(ns),Tim3(ns),Tmm0(ns),Tmm01(ns),Tmm02(ns)  &
+                 ,Tmm03(ns),Tim0(ns),Tim01(ns),Tim02(ns),Tim03(ns),          &
+                 Tmmt(ns),Tmmt1(ns),Tmmt2(ns),Tmmt3(ns),Timt(ns),Timt1(ns) &
+                 ,Timt2(ns),Timt3(ns))
+
+            do ke=1,nbevt
+               if(typrisq(ke).eq.3 .and. dejaspl.eq.0) then
+                  call splines(ke)
+                  dejaspl=1
+               end if
+            end do
+
+      end if
+
+      if (estim0.eq.1) then
+         
+         IF (npm0.eq.1) then
+            go to 1589
+         else
+            
+            id=0
+            jd=0
+            thi=0.d0
+            thj=0.d0
+            
+            loglik=vrais_comp(b0,npm0,id,thi,jd,thj)
+            
+         end if
+         
+      else            
+
+         !  injecter le b estime dans btot
+         k=0
+         k2=0
+         do j=1,npmtot
+            if(fix0(j).eq.0) then
+               k=k+1
+               btot(j)=b0(k)
+            else
+               k2=k2+1
+               btot(j)=bfix0(k2)
+            end if
+         end do
+         
+         
+         ! calculs post-estimation
+         
+
+      ! proba d'appartenance aux classes
+         ppi=0.d0
+         ppiy=0.d0
+         if(ng>1) then
+            call postprob_comp(btot,npmtot,ppi,ppiy)
+         end if
+!print*,"fin postprob"
+      ! residus et predictions des effets aleatoires
+         call residuals_comp(btot,npmtot,ppi,resid_m,pred_m_g,resid_ss,pred_ss_g,pred_RE,Yobs)
+
+!print*,"fin residuals"
+      ! recopier pour sortie
+         ig=0
+         do i=1,ns
+            do g=1,ng0
+               ig=ig+1
+               ppi0(ig)=PPI(i,g)
+               ppitest0(ig)=ppiy(i,g)
+            end do
+         end do     
+   
+
+      ! test independance conditionnelle
+         if(nea.gt.0) then
+            call scoretest_comp(btot,npmtot,statglob,statevt)
+         else
+            statglob=9999.d0
+            statevt=9999.d0
+         end if
+
+
+      ! grille de valeur pour les risques de base
+
+        allocate(brisq_est(maxval(nprisq)))
+
+        dejaspl=0
+        if(any(typrisq.eq.3)) then
+           allocate(Tmm_est(nsim),Tmm1_est(nsim),Tmm2_est(nsim),Tmm3_est(nsim), &
+                Tim_est(nsim),Tim1_est(nsim),Tim2_est(nsim),Tim3_est(nsim))
+
+           do ke=1,nbevt
+              if(typrisq(ke).eq.3 .and. dejaspl.eq.0) then
+                 call splines_estime_comp(time,nsim,ke)
+                 dejaspl=1
+              endif
+           end do
+        end if
+
+        sumnrisq=0
+        do ke=1,nbevt
+
+           brisq_est=0.d0
+
+           do g=1,ng
+
+              if (logspecif.eq.1) then
+                 if (risqcom(ke).eq.0) then
+                    do k=1,nprisq(ke)
+                       brisq_est(k)=exp(btot(nprob+sumnrisq+nprisq(ke)*(g-1)+k))
+                       if(g.eq.ng.and.k.eq.nprisq(ke))  sumnrisq = sumnrisq+nrisq(ke)
+                    end do
+                 elseif(risqcom(ke).eq.1) then
+                    do k=1,nprisq(ke)
+                       brisq_est(k)=exp(btot(nprob+sumnrisq+k))
+                       if(g.eq.ng.and.k.eq.nprisq(ke))  sumnrisq = sumnrisq+nrisq(ke)
+                    end do
+                 elseif (risqcom(ke).eq.2) then
+                    do k=1,nprisq(ke)
+                       brisq_est(k)=exp(btot(nprob+sumnrisq+k))
+                       if(g.eq.ng.and.k.eq.nprisq(ke))  sumnrisq = sumnrisq+nrisq(ke)
+                    end do
+                 end if
+                 
+              else
+                 if (risqcom(ke).eq.0) then
+                    do k=1,nprisq(ke)
+                       brisq_est(k)=btot(nprob+sumnrisq+nprisq(ke)*(g-1)+k) &
+                            *btot(nprob+sumnrisq+nprisq(ke)*(g-1)+k)
+                       if(g.eq.ng.and.k.eq.nprisq(ke))  sumnrisq = sumnrisq+nrisq(ke)
+                    end do
+                 elseif(risqcom(ke).eq.1) then
+                    do k=1,nprisq(ke)
+                       brisq_est(k)=btot(nprob+sumnrisq+k)*btot(nprob+sumnrisq+k)
+                       if(g.eq.ng.and.k.eq.nprisq(ke))  sumnrisq = sumnrisq+nrisq(ke)
+                    end do
+                 elseif (risqcom(ke).eq.2) then
+                    do k=1,nprisq(ke)
+                       brisq_est(k)=btot(nprob+sumnrisq+k)*btot(nprob+sumnrisq+k)
+                       if(g.eq.ng.and.k.eq.nprisq(ke))  sumnrisq = sumnrisq+nrisq(ke)
+                    end do
+                 end if
+              end if
+              
+              call fct_risq_estime_comp(ke,brisq_est,time,nsim,g,risq_est,risqcum_est)
+
+              if (risqcom(ke).eq.2.and.ng.gt.1.and.g.lt.ng) then
+                 do i=1,nsim
+                    risq_est((g-1)*nsim+i,ke)=risq_est((g-1)*nsim+i,ke)* &
+                         exp(btot(nprob+sumnrisq+nprisq(ke)+g))
+                    risqcum_est((g-1)*nsim+i,ke)=risqcum_est((g-1)*nsim+i,ke)* & 
+                         exp(btot(nprob+sumnrisq+nprisq(ke)+g))
+                 end do
+              end if
+              
+           end do
+
+        end do
+
+        deallocate(brisq_est)
+        if(any(typrisq.eq.3)) then 
+           deallocate(Tmm_est,Tmm1_est,Tmm2_est,Tmm3_est,Tim_est &
+                ,Tim1_est,Tim2_est,Tim3_est)
+        end if
+
+!print*,"fin risq"
+
+        ! grille de valeurs pour la transfo
+        call transfo_estimee_comp(btot,npmtot,nsim,marker,transfY)
+
+     end if
+
+     
+
+ 1589 continue
+
+
+
+!--------------- liberation de la memoire ------------------------
+
+
+      if (any(typrisq.eq.3)) then
+         deallocate(Tmm,Tmm1,Tmm2,Tmm3,Tim,Tim1,Tim2,Tim3,Tmm0,    &
+              Tmm01,Tmm02,Tmm03,Tim0,Tim01,Tim02,Tim03,Tmmt,Tmmt1,     &
+              Tmmt2,Tmmt3,Timt,Timt1,Timt2,Timt3)
+      endif
+
+
+ 1236 continue
+
+      deallocate(Y,X,idprob,idea,idg,idcor,nmes,Tsurv0,Tsurv,Tsurvint &
+     ,ind_survint,zi,devt,prior,zitr,mm,mm1,mm2,im,im1,im2 &
+     ,indiceY,uniqueY,risqcom,typrisq,nz,nprisq,nrisq,idcom,idspecif,idtdv &
+     ,nxevtspec,nevtparx,nxcurr)
+
+
+      deallocate(bfix,fix)
+
+      return
+
+
+end subroutine loglikjointlcmm
