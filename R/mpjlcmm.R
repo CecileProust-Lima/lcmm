@@ -58,9 +58,7 @@
 #' of the parameter space - usually 0).
 #' @param verbose logical indicating whether information about computation should be
 #' reported. Default to TRUE.
-#' @param mla integer indicating if the optimization should use the mla function
-#' from marqLevAlg package. Default to 0, the internal optimization algorithm is used.
-#' @param nproc if mla=1, the number cores for parallel computation.
+#' @param nproc the number cores for parallel computation.
 #' Default to 1 (sequential mode).
 #' @param clustertype optional character indicating the type of cluster for parallel computation.
 #' 
@@ -210,7 +208,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     hazard="Weibull",hazardtype="Specific",hazardnodes=NULL,TimeDepVar=NULL,
                     data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,
                     prior,logscale=FALSE,subset=NULL,na.action=1,posfix=NULL,
-                    partialH=FALSE,verbose=TRUE,mla=0,nproc=1,clustertype=NULL)
+                    partialH=FALSE,verbose=TRUE,nproc=1,clustertype=NULL)
     {
         
         ptm <- proc.time()
@@ -1408,6 +1406,8 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             pbH[Hr] <- 1
             pbH[posfix] <- 0
         }
+        indexHr <- NULL
+        if(sum(pbH)>0) indexHr <- which(pbH==1)
     
         ## gestion de B=random(mod)
 
@@ -1868,81 +1868,6 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         idspecif <- as.vector(t(idspecif))
                                         #return(b)
 
-        if(mla==0){
-        ## pour reduire le nb d'arguments:
-        int3 <- c(idtrunc,logspecif,maxiter)
-        convBLG <- c(convB,convL,convG)
-        
-        #browser()
-        out <- .Fortran(C_mpjhet,
-                        as.integer(K),
-                        as.integer(ny),
-                        as.integer(nbevt),
-                        as.integer(ng),
-                        as.integer(ns),
-                        as.double(Y0),
-                        as.integer(nobs0),
-                        as.double(X0),
-                        as.integer(nv),
-                        as.double(Xns0),
-                        as.integer(nv2),
-                        as.integer(prior),
-                        as.double(Tentry),
-                        as.double(Tevent),
-                        as.integer(Event),
-                        as.integer(ind_survint),
-                        as.integer(idnv0),
-                        as.integer(idnv2),
-                        as.integer(idspecif),
-                        as.integer(idlink),
-                        as.double(epsY),
-                        as.integer(nbzitr),
-                        as.double(zitr),
-                        as.double(uniqueY0),
-                        as.integer(nvalSPL0),
-                        as.integer(indiceY0),
-                        as.integer(typrisq),
-                        as.integer(risqcom),
-                        as.integer(nz),
-                        as.double(zi),
-                        as.integer(nmesM),
-                        as.integer(nea),
-                        as.integer(nw),
-                        as.integer(ncor),
-                        as.integer(nalea),
-                        as.integer(idiag),
-                        as.integer(int3),
-                        as.integer(NPM),
-                        best=as.double(b),
-                        V=as.double(V),
-                        loglik=as.double(loglik),
-                        niter=as.integer(ni),
-                        conv=as.integer(istop),
-                        gconv=as.double(gconv),
-                        ppi=as.double(ppi0),
-                        ppitest=as.double(ppitest0),
-                        resid_m=as.double(resid_m),
-                        resid_ss=as.double(resid_ss),
-                        pred_m_g=as.double(pred_m_g),
-                        pred_ss_g=as.double(pred_ss_g),
-                        predRE=as.double(predRE),
-                        predRE_Y=as.double(predRE_Y),
-                        as.double(convBLG),
-                        time=as.double(time),
-                        risq_est=as.double(risq_est),
-                        risqcum_est=as.double(risqcum_est),
-                        marker=as.double(marker),
-                        transfY=as.double(transfY),
-                        as.integer(nsim),
-                        Yobs=as.double(Yobs),
-                        statscoretest=as.double(statscoretest),
-                        as.integer(pbH),
-                        as.integer(fix),
-                        as.integer(contrainte),
-                        NAOK=TRUE)
-        } else{
-            
-        if(partialH) stop("partialH is not supported with mla optimization")
 
         nfix <- sum(fix)
         bfix <- 0
@@ -1956,10 +1881,10 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         if(maxiter==0)
         {
             vrais <- loglikmpjlcmm(b,K,ny,nbevt,ng,ns,Y0,nobs0,X0,nv,Xns0,nv2,prior,
-                          Tentry,Tevent,Event,ind_survint,idnv0,idnv2,idspecif,idlink,
-                          epsY,nbzitr,zitr,uniqueY0,nvalSPL0,indiceY0,typrisq,
-                          risqcom,nz,zi,nmesM,nea,nw,ncor,nalea,idiag,idtrunc,
-                          logspecif,NPM,fix,contrainte,nfix,bfix)
+                                   Tentry,Tevent,Event,ind_survint,idnv0,idnv2,idspecif,idlink,
+                                   epsY,nbzitr,zitr,uniqueY0,nvalSPL0,indiceY0,typrisq,
+                                   risqcom,nz,zi,nmesM,nea,nw,ncor,nalea,idiag,idtrunc,
+                                   logspecif,NPM,fix,contrainte,nfix,bfix)
             
             out <- list(conv=2, V=rep(NA, length(b)), best=b,
                         ppi=rep(NA,ns*ng), ppitest=rep(NA,ns*ng),
@@ -1976,7 +1901,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         {   
             res <- mla(b=b, m=length(b), fn=loglikmpjlcmm,
                        clustertype=clustertype,.packages=NULL,
-                       epsa=convB,epsb=convL,epsd=convG,
+                       epsa=convB,epsb=convL,epsd=convG,partialH=indexHr,
                        digits=8,print.info=verbose,blinding=FALSE,
                        multipleTry=25,file="",
                        nproc=nproc,maxiter=maxiter,minimize=FALSE,
@@ -2096,13 +2021,13 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             }
         }
 
-            ## creer best a partir de b et bfix
-            best <- rep(NA,length(fix))
-            best[which(fix==0)] <- out$best
-            best[which(fix==1)] <- bfix
-            out$best <- best
-            NPM <- NPM+nfix
-        }
+        ## creer best a partir de b et bfix
+        best <- rep(NA,length(fix))
+        best[which(fix==0)] <- out$best
+        best[which(fix==1)] <- bfix
+        out$best <- best
+        NPM <- NPM+nfix
+
         ## out$conv= 1 si toutok
         ##           2 si maxiter atteint
         ##           3 si converge avec H restreint
@@ -2362,6 +2287,8 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                       prior.name=nom.prior,TimeDepVar.name=nom.timedepvar)
 
 
+        cost <- proc.time()-ptm
+        
         res <-list(K=K,ny=ny,nbevt=nbevt,ng=ng,ns=ns,idprob=idprob,idcom=idcom,
                    idspecif=idspecif,idtdv=idtdv,idg=idg0,idcontr=idcontr0,idea=idea0,
                    idcor=idcor0,nv=nv,nv2=nv2,loglik=out$loglik,best=out$best,V=V,
@@ -2374,11 +2301,11 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                    hazardnodes=zi,nz=nz,scoretest=stats,na.action=linesNA,
                    contrainte=contrainte,
                    AIC=2*(length(out$best)-length(posfix)-out$loglik),
-                   BIC=(length(out$best)-length(posfix))*log(ns)-2*out$loglik)
+                   BIC=(length(out$best)-length(posfix))*log(ns)-2*out$loglik,
+                   runtime=cost[3])
 
         class(res) <- "mpjlcmm"
 
-        cost <- proc.time()-ptm
         if(verbose==TRUE) cat("The program took", round(cost[3],2), "seconds \n")
 
 
