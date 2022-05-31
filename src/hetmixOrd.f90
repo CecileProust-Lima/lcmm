@@ -821,7 +821,7 @@ double precision function vraisobs()
 
      npg=30
      ! on definit les points
-     call gaussher(gauss,npg)
+     call gausshermite(gauss,npg)
 
 
      ! boucle pour faire l'integration multiple

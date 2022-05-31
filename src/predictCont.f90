@@ -23,7 +23,7 @@ subroutine predictcont(X0,idprob,idea,idg,idcor &
      ,nbzitr,zitr0,nsim,methInteg,Ydiscret,Ymarg)
 
 
-  use optim
+!  use optim
   IMPLICIT NONE
 
   ! in input

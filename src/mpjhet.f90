@@ -83,9 +83,9 @@
 
 double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
   
-  use parameters
+!  use parameters
   use commun_mpj
-  use optim
+!  use optim
 
   implicit none
 
@@ -1734,7 +1734,7 @@ subroutine postprob_mpj(b,npm,ppi,ppiy)
 
 
   use commun_mpj
-  use optim
+!  use optim
 
   implicit none
 
@@ -2404,7 +2404,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
      pred_ss_g,pred_RE,pred_RE_Y,Yobs)
 
   use commun_mpj
-  use optim
+!  use optim
 
   implicit none
 

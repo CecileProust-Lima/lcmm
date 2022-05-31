@@ -41,7 +41,7 @@ subroutine cvpl(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0 &
 
   use commun_cvpl
   use commun_comp
-  use optim
+!  use optim
 
 
   implicit none
@@ -733,7 +733,7 @@ double precision function funcpi_condt(b,npm,id,thi,jd,thj,i,t1,valt)
 
   use commun_comp
   use commun_cvpl
-  use optim
+!  use optim
   IMPLICIT NONE
 
   integer ::i,j,k,l,m,g,l2,m2,id,jd,jj,npm,t1

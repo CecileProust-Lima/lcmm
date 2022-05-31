@@ -1,8 +1,3 @@
-###################### derniere mise a jour : 2012/03/16 ############"
-
-
-
-
 #' Estimation of latent class linear mixed models
 #' 
 #' This function fits linear mixed models and latent class linear mixed models

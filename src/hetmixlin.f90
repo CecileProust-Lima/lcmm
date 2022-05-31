@@ -99,7 +99,7 @@
       double precision function funcpa(b,npm,id,thi,jd,thj)
 
       use commun
-      use optim
+!      use optim
 
       IMPLICIT NONE
 
@@ -469,7 +469,7 @@
 
 
       use commun
-       use optim
+!       use optim
 
 
       implicit none
@@ -778,7 +778,7 @@
         pred_ss_g,pred_RE)
 
       use commun
-      use optim
+!      use optim
 
       implicit none
       integer ::i,j,k,l,m,g,l2,m2,jj,npm,nef,j1,j2

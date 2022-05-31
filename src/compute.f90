@@ -10,7 +10,6 @@
 !! nxpart
 !! mltrul
 !! hetmit
-!! gaussher
 !! beta_densite
 !! gammln
 !! betai
@@ -616,6 +615,7 @@ subroutine hrmtrl(s,n,f,minord,maxord,intval,intcls,work,fulsms,numsms)
   double precision,dimension(n+1,*)::fulsms
   double precision,dimension(*)::work
   integer,dimension(maxdim)::m,k
+  double precision,external::fweight
 
   d= minord + 1
   intcls = 0

@@ -2,7 +2,7 @@
 subroutine predictcondmult(X0,condRE_Y,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,idlink&
      ,nbzitr,zitr0,modalite,nbmod,nsim,Ymarg)  
 
-  use optim
+!  use optim
   IMPLICIT NONE
 
   ! in input

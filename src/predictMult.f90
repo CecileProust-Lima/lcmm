@@ -4,7 +4,7 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
      ,ng,ncor,nalea,nv,ny,maxmes,idiag,nwg,npm,b1,epsY,idlink &
      ,nbzitr,zitr0,modalite,nbmod,nsim,methInteg,Ymarg)  
 
-  use optim
+!  use optim
   IMPLICIT NONE
 
   ! in input

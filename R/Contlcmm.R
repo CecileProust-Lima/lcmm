@@ -1,7 +1,7 @@
 ############## last change 2012/03/16 #####################
 
 .Contlcmm <-
-    function(fixed,mixture,random,subject,classmb,ng,idiag,nwg,cor,data,B,convB,convL,convG,prior,maxiter,epsY,idlink0,ntrtot0,nbzitr0,zitr,nsim,call,Ydiscrete,subset,na.action,posfix,partialH,verbose,returndata,var.time,mla,nproc,clustertype){
+    function(fixed,mixture,random,subject,classmb,ng,idiag,nwg,cor,data,B,convB,convL,convG,prior,maxiter,epsY,idlink0,ntrtot0,nbzitr0,zitr,nsim,call,Ydiscrete,subset,na.action,posfix,partialH,verbose,returndata,var.time,nproc,clustertype){
         
         cl <- match.call()
 

@@ -42,9 +42,9 @@ end module donnees_indivmo
 
 double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i) 
 
-  use parameters
+!  use parameters
   use communmo
-  use optim
+!  use optim
   use donnees_indivmo,only:nmescur
 
   IMPLICIT NONE
@@ -1365,7 +1365,7 @@ end do
       
       subroutine postprobmo(b,npm,PPI)
         use communmo
-        use optim
+!        use optim
         implicit none
 
         integer ::i,j,k,l,m,g,l2,m2,jj,npm,ier,nmoins,kk,ii,ll,j1,j2,nmescur
@@ -2336,7 +2336,7 @@ end do
 
       use communmo
 
-      use optim
+!      use optim
 
       implicit none
       integer ::i,j,k,l,m,g,l2,m2,jj,npm,ll,ii,j1,j2,sumMesYk,q,yk

@@ -76,9 +76,9 @@
 
       double precision function vrais_comp_i(b,npm,id,thi,jd,thj,i)
 
-      use parameters
+!      use parameters
       use commun_comp
-      use optim
+!      use optim
      ! use donnees_indivm,only:nmescur
 
       IMPLICIT NONE
@@ -1377,7 +1377,7 @@
 
 
       use commun_comp
-      use optim
+!      use optim
 
       implicit none
 
@@ -2330,7 +2330,7 @@
       pred_ss_g,pred_RE,Yobs)
 
         use commun_comp
-      use optim
+!      use optim
 
       implicit none
 
@@ -2878,7 +2878,7 @@
       subroutine scoretest_comp(b,npm,statglob,statevt)
 
         use commun_comp
-        use optim
+!        use optim
 
 
         IMPLICIT NONE

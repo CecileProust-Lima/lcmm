@@ -89,7 +89,7 @@
       double precision function funcpac(b,npm,id,thi,jd,thj)
 
       use communc
-      use optim
+!      use optim
       IMPLICIT NONE
       integer ::i,j,k,l,m,g,l2,m2,id,jd,jj,npm,it,nmestot,ll,ii,j1,j2
       integer ::ier,nmoins,kk
@@ -592,7 +592,7 @@
 
       subroutine postprobc(b,npm,PPI)
       use communc
-      use optim
+!      use optim
       implicit none
 
       integer ::i,j,k,l,m,g,l2,m2,jj,it,npm,ier,nmoins,kk,nmestot,ii,ll,j1,j2
@@ -974,7 +974,7 @@
 
       use communc
 
-      use optim
+!      use optim
 
       implicit none
       integer ::i,j,k,l,m,g,l2,m2,jj,npm,nmestot,ll,ii,j1,j2
@@ -1869,7 +1869,7 @@
       double precision function vrais_discret_i(b,npm,id,thi,jd,thj,i)
 
         use communc
-        use optim
+!        use optim
         use donnees_indivc
 
         IMPLICIT NONE
@@ -2387,7 +2387,7 @@
 
       double precision function vraisobsc()
 
-        use lois_normalesc
+!        use lois_normalesc
         use donnees_indivc
         use communc
 
@@ -2435,7 +2435,7 @@
         else
               npg=30
               ! on definit les points
-              call gaussher(gauss,npg)
+              call gausshermite(gauss,npg)
 
               ! boucle pour faire l'integration multiple
               do j=1,npg
@@ -2661,7 +2661,7 @@
       double precision function vrais_cont_i(b,npm,id,thi,jd,thj,i) 
 
       use communc
-      use optim
+!      use optim
       use donnees_indivc,only:nmescur
       IMPLICIT NONE
       integer ::i,j,k,l,m,g,l2,m2,id,jd,jj,npm,nmestot,ll,ii

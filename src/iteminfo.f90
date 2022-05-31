@@ -2,7 +2,7 @@
 subroutine iteminfo(X0,condRE_Y,nalea,ny,maxmes,npm,b1,debut,nbzitr,idlink,&
     modalite,nbmod,nsim,ninfo,info)  
 
-  use optim
+!  use optim
   IMPLICIT NONE
 
   ! in input

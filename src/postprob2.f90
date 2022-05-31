@@ -20,7 +20,7 @@ subroutine postprob2(Y0,Xdata0,ns0,nmes0,nobs0,ng0,nv0,idiag0,nwg0, &
 
 
   use commun_comp
-  use optim
+!  use optim
 
   implicit none
 

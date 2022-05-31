@@ -28,7 +28,6 @@ mpjlcmm(
   posfix = NULL,
   partialH = FALSE,
   verbose = TRUE,
-  mla = 0,
   nproc = 1,
   clustertype = NULL
 )
@@ -115,10 +114,7 @@ of the parameter space - usually 0).}
 \item{verbose}{logical indicating whether information about computation should be
 reported. Default to TRUE.}
 
-\item{mla}{integer indicating if the optimization should use the mla function
-from marqLevAlg package. Default to 0, the internal optimization algorithm is used.}
-
-\item{nproc}{if mla=1, the number cores for parallel computation.
+\item{nproc}{the number cores for parallel computation.
 Default to 1 (sequential mode).}
 
 \item{clustertype}{optional character indicating the type of cluster for parallel computation.}
