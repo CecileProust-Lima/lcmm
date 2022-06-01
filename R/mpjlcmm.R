@@ -1858,6 +1858,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             }
             tmp <- tmp + npmtot[k]
         }
+        names_best <- names(b)
         
 
 #print(b)
@@ -2025,6 +2026,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         best <- rep(NA,length(fix))
         best[which(fix==0)] <- out$best
         best[which(fix==1)] <- bfix
+        names(best) <- names_best
         out$best <- best
         NPM <- NPM+nfix
 
@@ -2128,7 +2130,6 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 tmp <- tmp + npmtot[k]
             }
 
-        names(out$best) <- names(b)
         nom.unique[which(nom.unique=="(Intercept)")] <- "intercept"
 
                                         #print(cbind(b,out$best))

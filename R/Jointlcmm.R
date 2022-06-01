@@ -2209,6 +2209,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         if(idlink==0) names(b)[nprob+nrisqtot+nvarxevt+nef+nvc+nw+ncor0+1:2]<- c("Linear 1","Linear 2")
         if(idlink==1) names(b)[nprob+nrisqtot+nvarxevt+nef+nvc+nw+ncor0+1:4]<- paste("Beta",1:4,sep="")
         if(idlink==2) names(b)[nprob+nrisqtot+nvarxevt+nef+nvc+nw+ncor0+1:ntrtot0]<- paste("I-splines",c(1:ntrtot0),sep="")
+        names_best <- names(b)
 
 #browser()
 #print(b)
@@ -2377,6 +2378,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         best <- rep(NA,length(fix0))
         best[which(fix0==0)] <- out$best
         best[which(fix0==1)] <- bfix
+        names(best) <- names_best
         out$best <- best
         NPM <- NPM+nfix
         
@@ -2454,7 +2456,6 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                 ch <- NA
             }
 
-        names(out$best) <- names(b)
         nom.unique[which(nom.unique=="(Intercept)")] <- "intercept"
 
 ### predictions des effets aleatoires

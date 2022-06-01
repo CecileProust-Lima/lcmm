@@ -772,6 +772,7 @@
         if(NW!=0)names(b)[(NPROB+NEF+NVC+1):(NPROB+NEF+NVC+NW)] <- paste("varprop class",c(1:(ng0-1)))
 
         if (ncor0>0) {names(b)[(NPROB+NEF+NVC+NW+ntrtot0+1):(NPROB+NEF+NVC+NW+ntrtot0+ncor0)] <- paste("cor",1:ncor0,sep="")}
+        names_best <- names(b)
 
         N <- NULL
         N[1] <- NPROB
@@ -930,6 +931,7 @@
         best <- rep(NA,length(fix0))
         best[which(fix0==0)] <- out$best
         best[which(fix0==1)] <- bfix
+        names(best) <- names_best
         out$best <- best
         NPM <- NPM+nfix
         
@@ -1043,7 +1045,6 @@
             colnames(pred)<-c(nom.subject,"pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1,var.time)
         }
         
-        names(out$best) <- names(b)
         
         estimlink <- cbind(out$marker,out$transfY)
         colnames(estimlink) <- c("Y","transfY")

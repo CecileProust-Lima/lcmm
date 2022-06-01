@@ -1400,6 +1400,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
             fix0[posfix] <- 1
         }
     if(length(posfix)==NPM) stop("No parameter to estimate")
+    names_best <- names(b)
 
     
     ## pour H restreint
@@ -1567,6 +1568,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     best <- rep(NA,length(fix0))
     best[which(fix0==0)] <- out$best
     best[which(fix0==1)] <- bfix
+    names(best) <- names_best
     out$best <- best
     NPM <- NPM+nfix
     
@@ -1833,7 +1835,6 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                wRandom=wRandom,b0Random=b0Random,runtime=cost[3],CorrEA=CorrEA,
                levels=levels, var.time=var.time)
     
-    names(res$best) <- names(b)
     class(res) <-c("multlcmm")
 
     if(verbose==TRUE) cat("The program took", round(cost[3],2), "seconds \n")

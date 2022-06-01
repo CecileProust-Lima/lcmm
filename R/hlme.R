@@ -1095,6 +1095,7 @@ hlme <-
         if(NW!=0)names(b)[(NPROB+NEF+NVC+1):(NPROB+NEF+NVC+NW)] <- paste("varprop class",c(1:(ng0-1)))
         names(b)[NPM] <- "stderr"
         if(ncor0!=0) {names(b)[(NPROB+NEF+NVC+NW+1):(NPROB+NEF+NVC+NW+ncor0)] <- paste("cor",1:ncor0,sep="") }
+        names_best <- names(b)
 
         N <- NULL
         N[1] <- NPROB
@@ -1209,6 +1210,7 @@ hlme <-
         best <- rep(NA,length(fix0))
         best[which(fix0==0)] <- out$best
         best[which(fix0==1)] <- bfix
+        names(best) <- names_best
         out$best <- best
         NPM <- NPM+nfix
         
@@ -1328,9 +1330,6 @@ hlme <-
             colnames(pred)<-c(nom.subject,"pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1,var.time)
         }
 
-        names(out$best)<-names(b)
-        btest <- out$best[1:length(inddepvar.fixed.nom)]
-        names(btest) <-inddepvar.fixed.nom
         
 ### ad 2/04/2012
         if (!("intercept" %in% nom.X0)) X0.names2 <- X0.names2[-1]

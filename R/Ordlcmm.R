@@ -660,6 +660,7 @@
 
     if(NVC!=0)names(b)[(NPROB+NEF+1):(NPROB+NEF+NVC)] <- paste("varcov",c(1:(NVC)))
     if(NW!=0)names(b)[(NPROB+NEF+NVC+1):(NPROB+NEF+NVC+NW)] <- paste("varprop class",c(1:(ng0-1)))
+    names_best <- names(b)
 
     N <- NULL
     N[1] <- NPROB
@@ -811,6 +812,7 @@
     best <- rep(NA,length(fix0))
     best[which(fix0==0)] <- out$best
     best[which(fix0==1)] <- bfix
+    names(best) <- names_best
     out$best <- best
     NPM <- NPM+nfix
         
@@ -876,7 +878,6 @@
     rownames(ppi) <- 1:ns0
                                  
 
-    names(out$best)<-names(b)
                                        
     estimlink <- cbind(out$marker,out$transfY)
     colnames(estimlink) <- c("Y","transfY")
