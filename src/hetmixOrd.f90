@@ -1404,7 +1404,7 @@ subroutine logliklcmmord(Y0,X0,Prior0,idprob0,idea0,idg0,ns0,ng0,nv0,nobs0, &
   double precision,dimension(nobs0),intent(in)::Y0
   double precision,dimension(nobs0*nv0),intent(in)::X0
   integer,dimension(npm0+nfix0),intent(in)::fix0
-  integer,dimension(nfix0),intent(in)::bfix0
+  double precision,dimension(nfix0),intent(in)::bfix0
   !Declaration des variable en entree et sortie
   double precision, dimension(npm0), intent(in) :: b0
   double precision,dimension(npm0*(npm0+3)/2)::V ! pour computeUACV

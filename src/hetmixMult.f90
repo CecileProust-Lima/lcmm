@@ -2215,11 +2215,11 @@ end do
        numSPL = numSPL+1
         splaa=0.d0
 
-        splaa(1)=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
+        splaa(1)=b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
         do kk=2,ntrtot(yk)
-           splaa(kk)=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)*b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)
+           splaa(kk)=b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)*b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)
         end do
-        
+
         !calcul de H(y) pour remplacer call estim_splines..
         do j=1,nsim
 ! ou se trouve la valeur
@@ -2293,32 +2293,31 @@ end do
 
         else if (idlink(yk).eq.1) then
 
-            aa1=exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1))/ &
-             (1+exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)))
-            bb1=exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2))/ &
-             (1+exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2)))
+            aa1=exp(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+1))/ &
+             (1+exp(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+1)))
+            bb1=exp(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+2))/ &
+             (1+exp(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+2)))
             bb1=aa1*(1.d0-aa1)*bb1
-            cc1=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+3)
-            dd1=abs(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+4))
+            cc1=b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+3)
+            dd1=abs(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+4))
 
             aa=aa1*aa1*(1-aa1)/bb1-aa1
             bb=aa*(1-aa1)/aa1
-
             do j=1,nsim
-                  ytemp=(marker((yk-1)*nsim+j)-minY(yk)+epsY(yk))/(maxY(yk)-minY(yk)+2*epsY(yk))
-                  transfY((yk-1)*nsim+j)=(betai(aa,bb,ytemp)-cc1)/dd1
-                  if (transfY((yk-1)*nsim+j).eq.999.d0) then
-!                    write(*,*)'problem'
-                  end if
-
-               end do
+               ytemp=(marker((yk-1)*nsim+j)-minY(yk)+epsY(yk))/(maxY(yk)-minY(yk)+2*epsY(yk))
+               transfY((yk-1)*nsim+j)=(betai(aa,bb,ytemp)-cc1)/dd1
+               if (transfY((yk-1)*nsim+j).eq.999.d0) then
+                  !                    write(*,*)'problem'
+               end if
+               
+            end do
 
 
         else if (idlink(yk).eq.0) then
 
                  do j=1,nsim
-                    transfY((yk-1)*nsim+j)=(marker((yk-1)*nsim+j)-b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)) &
-                    /abs(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2))
+                    transfY((yk-1)*nsim+j)=(marker((yk-1)*nsim+j)-b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+1)) &
+                    /abs(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+2))
                  end do
         end if
         sumntrtot = sumntrtot + ntrtot(yk)
@@ -2379,7 +2378,7 @@ end do
          do j=2,nea
             do k=2,nea
                if (j.eq.k) then
-                  Ut(j,k)=b1(nef+j-1)
+                  Ut(j,k)=b1(nprob+nef+ncontr+j-1)
                else
                   Ut(j,k)=0.d0
                end if
@@ -2390,7 +2389,7 @@ end do
       If (idiag.eq.0) then
          do j=2,nea
             do k=1,j
-                 Ut(j,k)=b1(nef+k-1+j*(j-1)/2)
+                 Ut(j,k)=b1(nprob+nef+ncontr+k-1+j*(j-1)/2)
             end do
          end do
       end if
@@ -2442,10 +2441,12 @@ end do
          do j1=1,sum(nmes(i,:))
             do j2=1,sum(nmes(i,:))
                if (ncor.eq.1) then 
-                  Corr(j1,j2) = Corr(j1,j2)+b1(nef+nvc+nwg+ncor)*b1(nef+nvc+nwg+ncor)*min(tcor(j1),tcor(j2))
+                  Corr(j1,j2) = Corr(j1,j2)+b1(nprob+nef+ncontr+nvc+nwg+ncor)* &
+                       b1(nprob+nef+ncontr+nvc+nwg+ncor)*min(tcor(j1),tcor(j2))
                else if (ncor.eq.2) then
-                  Corr(j1,j2) = Corr(j1,j2)+b1(nef+nvc+nwg+ncor)*b1(nef+nvc+nwg+ncor)* &
-                                             exp(-b1(nef+nvc+nwg+1)*abs(tcor(j1)-tcor(j2)))
+                  Corr(j1,j2) = Corr(j1,j2)+b1(nprob+nef+ncontr+nvc+nwg+ncor)* &
+                       b1(nprob+nef+ncontr+nvc+nwg+ncor)* &
+                       exp(-b1(nprob+nef+ncontr+nvc+nwg+1)*abs(tcor(j1)-tcor(j2)))
                end if
             end do
          end do 
@@ -2461,11 +2462,11 @@ end do
       numSPL=0
       do yk=1,ny
          do j1=1,nmes(i,yk)
-            SigmaE(sumMesYk+j1,sumMesYk+j1) = b1(nef+nvc+nwg+ncor+yk)**2 !erreur du test yk
+            SigmaE(sumMesYk+j1,sumMesYk+j1) = b1(nprob+nef+ncontr+nvc+nwg+ncor+yk)**2 !erreur du test yk
          
             if (nalea.eq.ny) then
                do j2=1,nmes(i,yk)
-                  Valea(sumMesYk+j1,sumMesYk+j2) = b1(nef+nvc+nwg+ncor+ny+yk)**2
+                  Valea(sumMesYk+j1,sumMesYk+j2) = b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+yk)**2
               end do
          end if
       end do
@@ -2473,21 +2474,21 @@ end do
          if (idlink(yk).eq.0) then  ! Linear link
 
             do j=1,nmes(i,yk)
-               Y1(sumMesYk+j)=dble(Y(nmes_cur+sumMesYk+j)-b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1))&
-               /abs(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2))
+               Y1(sumMesYk+j)=dble(Y(nmes_cur+sumMesYk+j)-b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+1))&
+               /abs(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+2))
                Yobs(nmes_cur+sumMesYk+j)=Y1(sumMesYk+j)
             end do
 
          elseif (idlink(yk).eq.1) then  ! Beta link
 
 
-            aa1=exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1))/ &
-             (1+exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)))
-            bb1=exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2))/ &
-             (1+exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2)))
+            aa1=exp(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+1))/ &
+             (1+exp(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+1)))
+            bb1=exp(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+2))/ &
+             (1+exp(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+2)))
             bb1=aa1*(1.d0-aa1)*bb1
-            cc1=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+3)
-            dd1=abs(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+4))
+            cc1=b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+3)
+            dd1=abs(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+4))
 
             aa=aa1*aa1*(1-aa1)/bb1-aa1
             bb=aa*(1-aa1)/aa1
@@ -2527,10 +2528,11 @@ end do
            
            splaa=0.d0
            eta0=0.d0
-           eta0=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
+           eta0=b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
 
             do kk=2,ntrtot(yk)
-               splaa(kk-3)=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)*b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)
+               splaa(kk-3)=b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)* &
+                    b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)
             end do
 
             do j=1,nmes(i,yk)
@@ -2677,10 +2679,10 @@ end do
                      sumMesYk=sumMesYk+nmes(i,yk)
 ! creation vecteur parms des contrastes: b01
                      if (yk<ny) THEN
-                        b01((m-1)*ny+yk)=b1(nef-ncontr+(m-1)*(ny-1)+yk)
+                        b01((m-1)*ny+yk)=b1(nprob+nef+(m-1)*(ny-1)+yk)
                      else
-                        b01((m-1)*ny+ny) =-sum(b1(nef-ncontr+(m-1)*(ny-1)+1 &
-                             :nef-ncontr+(m-1)*(ny-1)+ny-1))
+                        b01((m-1)*ny+ny) =-sum(b1(nprob+nef+(m-1)*(ny-1)+1 &
+                             :nprob+nef+(m-1)*(ny-1)+ny-1))
                      end if
                   end do                  
                end if
@@ -2797,9 +2799,9 @@ end do
                      sumMesYk=sumMesYk+nmes(i,yk)
 ! creation vecteur parms des contrastes: b01
                      if (yk<ny) THEN
-                        b01((q-1)*ny+yk)=b1(nef-ncontr+(q-1)*(ny-1)+yk)
+                        b01((q-1)*ny+yk)=b1(nprob+nef+(q-1)*(ny-1)+yk)
                      else
-                        b01((q-1)*ny+ny) =-sum(b1(nef-ncontr+(q-1)*(ny-1)+1 &
+                        b01((q-1)*ny+ny) =-sum(b1(nprob+nef+(q-1)*(ny-1)+1 &
                              :nef-ncontr+(q-1)*(ny-1)+ny-1))
                      end if
                   end do                  
@@ -2884,7 +2886,7 @@ end do
                   if (g.eq.ng) then
                      Ut1=Ut
                   else
-                     Ut1=Ut*b1(nef+nvc+g)
+                     Ut1=Ut*b1(nprob+nef+ncontr+nvc+g)
                   end if
                end if
                P=0.d0
@@ -3019,7 +3021,7 @@ end do
         double precision,dimension(nobs0),intent(in)::Y0
         double precision,dimension(nobs0*nv0),intent(in)::X0
         integer,dimension(npm0+nfix0),intent(in)::fix0
-        integer,dimension(nfix0),intent(in)::bfix0
+        double precision,dimension(nfix0),intent(in)::bfix0
         double precision,dimension(dimMC0*nMC0),intent(in)::seqMC0
         integer,intent(in)::estim0 ! estim0=1 pour estimer ; estim0=0 pour faire le postfit
 
@@ -3371,7 +3373,6 @@ end do
                  btot(j)=bfix0(k2)
               end if
            end do
-           
            
               !if (verbose==1) write(*,*)'avant transfo'
               call transfos_estimees_2(btot,npmtot,nsim0,marker,transfY)

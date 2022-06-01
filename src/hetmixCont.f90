@@ -3133,7 +3133,7 @@
       double precision,dimension(nobs0),intent(in)::Y0
       double precision,dimension(nobs0*nv0),intent(in)::X0
       integer,dimension(npm0+nfix0),intent(in)::fix0
-      integer,dimension(nfix0),intent(in)::bfix0
+      double precision,dimension(nfix0),intent(in)::bfix0
           
         !Declaration des variable en entree et sortie
       double precision, dimension(npm0+nfix0), intent(in) :: b0
