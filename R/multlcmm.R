@@ -1449,7 +1449,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                     ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
                     predRE_Y=rep(NA,ns0*nalea0), Yobs=rep(NA,nobs0),
                     resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
-                    marker=rep(NA,nobs0), transfY=rep(NA,nobs0),
+                    marker=rep(NA,nsim*ny0), transfY=rep(NA,nsim*ny0),
                     pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
                     gconv=rep(NA,3), niter=0, loglik=vrais)
     }
@@ -1473,7 +1473,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                     ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
                     predRE_Y=rep(NA,ns0*nalea0), Yobs=rep(NA,nobs0),
                     resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
-                    marker=rep(NA,nobs0), transfY=rep(NA,nobs0),
+                    marker=rep(NA,nsim), transfY=rep(NA,nsim),
                     pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
                     gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,
                     loglik=res$fn.value)

@@ -137,6 +137,25 @@ summary.mpjlcmm <- function(object,...)
         ntr <- x$Nprm[3+7*K+1:sum(x$ny)]
         NPM <- length(x$best)
 
+        ## shorten names if > 20 characters
+        names_best <- names(x$best)
+        if(any(sapply(names_best, nchar)>20))
+        {
+            islong <- which(sapply(names_best, nchar)>20)
+            split_names_best <- strsplit(names_best, split=":", fixed=TRUE)
+            short_names_best <- lapply(split_names_best, gsub, pattern="\\(.*\\)", replacement="(...)")
+            new_names <- lapply(short_names_best, paste, collapse=":")
+            names_best[islong] <- unlist(new_names)[islong]
+            names(x$best) <- names_best
+            
+            islong <- which(sapply(x$Names$Xnames, nchar)>20)
+            if(length(islong))
+            {
+                x$Names$Xnames[islong] <- sapply(x$Names$Xnames[islong], gsub, pattern="\\(.*\\)", replacement="(...)")
+            }
+        }
+        
+
         se <- rep(NA,NPM)
         if (x$conv==1 | x$conv==3)
         {
