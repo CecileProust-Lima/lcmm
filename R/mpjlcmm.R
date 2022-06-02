@@ -1543,16 +1543,16 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                                 if(class(mk)=="multlcmm")
                                 {
                                     multRandom <- TRUE
-                                    cholRandom[[k]] <- sumnpmG+1:mk$N[4]
+                                    if(mk$N[4]>0) cholRandom[[k]] <- sumnpmG+1:mk$N[4]
                                 }
                                 else
                                 {
                                     multRandom <- FALSE
-                                    cholRandom[[k]] <- sumnpmG+mk$N[2]+1:mk$N[3]
+                                    if(mk$N[3]>0) cholRandom[[k]] <- sumnpmG+mk$N[2]+1:mk$N[3]
                                 }
 
                                 ## remplacer varcov par cholesky
-                                theta0[sum(nprisq)+nvarxevt2+sumnpm+B$Nprm[3+k]+B$Nprm[3+K+k]+1:B$Nprm[3+2*K+k]] <- B$cholesky[sumch+1:B$Nprm[3+2*K+k]]
+                                if(B$Nprm[3+2*K+k]>0) theta0[sum(nprisq)+nvarxevt2+sumnpm+B$Nprm[3+k]+B$Nprm[3+K+k]+1:B$Nprm[3+2*K+k]] <- B$cholesky[sumch+1:B$Nprm[3+2*K+k]]
 
 
                                 mkw <- max(w)+mk$wRandom

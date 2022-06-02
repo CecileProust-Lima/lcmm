@@ -55,6 +55,8 @@ Brandom <- function(theta0,v0,w,b0,chol=NULL,mult=0)
         }
         
         for(k in 1:length(nvc))
+        {
+            if(nvc[k]>0)
             {
                 if(mult==0) # cas general
                 {
@@ -76,6 +78,7 @@ Brandom <- function(theta0,v0,w,b0,chol=NULL,mult=0)
                     b[chol[[k]]] <- v[upper.tri(v,diag=TRUE)][-1]
                 }
             }
+        }
     }
     
 
