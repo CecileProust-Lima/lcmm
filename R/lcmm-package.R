@@ -106,6 +106,7 @@
 #' @importFrom randtoolbox sobol
 #' @importFrom parallel makeCluster clusterExport stopCluster parLapply clusterEvalQ clusterSetRNGStream parSapply parApply
 #' @importFrom nlme ranef fixef
+#' @importFrom marqLevAlg mla
 #' @useDynLib lcmm, .registration=TRUE, .fixes="C_"
 NULL
 
