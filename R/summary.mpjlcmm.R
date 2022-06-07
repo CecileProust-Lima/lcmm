@@ -410,12 +410,21 @@ summary.mpjlcmm <- function(object,...)
                 cat("\n")
             }
             
-            cat("\n")
-            cat("Variance-covariance matrix of the random-effects:\n" )
-            if(x$contrainte==2) cat("(the variance of the first random effect is not estimated)\n")
-            if(x$idiag[k]==1)
+            if(sum(x$idea[sumnv+1:x$nv[k]])>0) cat("Variance-covariance matrix of the random-effects:\n" )
+            if(x$contrainte==2)
             {
-                if (nvc[k]>0) 
+                cat("(the variance of the first random effect is not estimated)\n")
+                if(nvc[k]==0)
+                {
+                    Mat.cov <- matrix(1,nrow=1,ncol=1)
+                    colnames(Mat.cov) <- x$Names$Xnames[which(x$idea[sumnv+1:x$nv[k]]==1)]
+                    rownames(Mat.cov) <- x$Names$Xnames[which(x$idea[sumnv+1:x$nv[k]]==1)]
+                    prmatrix(Mat.cov)
+                }
+            }
+            if(nvc[k]>0)
+            {
+                if(x$idiag[k]==1)
                 {
                     if(x$contrainte==2)
                     {
@@ -425,19 +434,12 @@ summary.mpjlcmm <- function(object,...)
                     {
                         Mat.cov <- diag(coef[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]],nrow=nvc[k],ncol=nvc[k])
                     }
+                    Mat.cov[lower.tri(Mat.cov)] <- 0
+                    Mat.cov[upper.tri(Mat.cov)] <- NA
                 }
-                else
+                if(x$idiag[k]==0)
                 {
-                    Mat.cov <- matrix(1,ncol=1)
-                }
-                Mat.cov[lower.tri(Mat.cov)] <- 0
-                Mat.cov[upper.tri(Mat.cov)] <- NA
-            }
-            if(x$idiag[k]==0)
-            {
-                Mat.cov<-matrix(0,ncol=sum(x$idea[sumnv+1:x$nv[k]]),nrow=sum(x$idea[sumnv+1:x$nv[k]]))
-                if(nvc[k]>0) 
-                {
+                    Mat.cov<-matrix(0,ncol=sum(x$idea[sumnv+1:x$nv[k]]),nrow=sum(x$idea[sumnv+1:x$nv[k]]))
                     if(x$contrainte==2)
                     {
                         Mat.cov[upper.tri(Mat.cov,diag=TRUE)] <- c(1,coef[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]])
@@ -449,51 +451,48 @@ summary.mpjlcmm <- function(object,...)
                     Mat.cov <-t(Mat.cov)
                     Mat.cov[upper.tri(Mat.cov)] <- NA
                 }
+                colnames(Mat.cov) <- x$Names$Xnames[which(x$idea[sumnv+1:x$nv[k]]==1)]
+                rownames(Mat.cov) <- x$Names$Xnames[which(x$idea[sumnv+1:x$nv[k]]==1)]
+            
+            
+                if(any(posfix %in% c(nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k])))
+                {
+                    Mat.cov <- apply(Mat.cov,2,format,digits=5,nsmall=5)
+                    Mat.cov[upper.tri(Mat.cov)] <- ""
+                    pf <- sort(intersect(c(nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]),posfix))
+                    p <- matrix(0,sum(x$idea[sumnv+1:x$nv[k]]),sum(x$idea[sumnv+1:x$nv[k]]))
+                    if(x$idiag[k]==FALSE)
+                    {
+                        if(x$contrainte==2)
+                        {
+                            p[upper.tri(p,diag=TRUE)] <- c(0,nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k])
+                        }
+                        else
+                        {
+                            p[upper.tri(p,diag=TRUE)] <- nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]
+                        }
+                    }
+                    if(x$idiag[k]==TRUE)
+                    {
+                        if(x$contrainte==2)
+                        {
+                            diag(p) <- c(0,nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k])
+                        }
+                        else
+                        {
+                            diag(p) <- nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]
+                        }
+                    }
+                    Mat.cov[which(t(p) %in% pf)] <- paste(Mat.cov[which(t(p) %in% pf)],"*",sep="")
+                    print(Mat.cov,quote=FALSE)
+                }
                 else
                 {
-                    Mat.cov[1,1] <- 1
+                    prmatrix(round(Mat.cov,5),na.print="")
                 }
+                cat("\n")
             }
-            colnames(Mat.cov) <- x$Names$Xnames[which(x$idea[sumnv+1:x$nv[k]]==1)]
-            rownames(Mat.cov) <- x$Names$Xnames[which(x$idea[sumnv+1:x$nv[k]]==1)]
             
-            if(any(posfix %in% c(nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k])))
-            {
-                Mat.cov <- apply(Mat.cov,2,format,digits=5,nsmall=5)
-                Mat.cov[upper.tri(Mat.cov)] <- ""
-                pf <- sort(intersect(c(nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]),posfix))
-                p <- matrix(0,sum(x$idea[sumnv+1:x$nv[k]]),sum(x$idea[sumnv+1:x$nv[k]]))
-                if(x$idiag[k]==FALSE)
-                {
-                    if(x$contrainte==2)
-                    {
-                      p[upper.tri(p,diag=TRUE)] <- c(0,nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k])
-                    }
-                    else
-                    {
-                      p[upper.tri(p,diag=TRUE)] <- nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]
-                    }
-                }
-                if(x$idiag[k]==TRUE)
-                {
-                    if(x$contrainte==2)
-                    {
-                        diag(p) <- c(0,nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k])
-                    }
-                    else
-                    {
-                        diag(p) <- nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]
-                    }
-                }
-                Mat.cov[which(t(p) %in% pf)] <- paste(Mat.cov[which(t(p) %in% pf)],"*",sep="")
-                print(Mat.cov,quote=FALSE)
-            }
-            else
-            {
-                prmatrix(round(Mat.cov,5),na.print="")
-            }
-            cat("\n")
-
             std <- NULL
             nom <- NULL
             if(nw[k]>=1) 
