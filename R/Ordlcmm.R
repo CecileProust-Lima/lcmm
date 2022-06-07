@@ -698,6 +698,7 @@
     idlink0 <- 3
     idcor0 <- 0
     ncor0 <- 0
+    nsim <- 2*(maxY-minY+1)
     
     if(maxiter==0)
     {
@@ -740,7 +741,6 @@
         
         if(out$conv %in% c(1,2,3))
         {
-            nsim <- 2*(maxY-minY+1)
             estim0 <- 0
             ll <- 0
             ppi0 <- rep(0,ns0*ng0)
