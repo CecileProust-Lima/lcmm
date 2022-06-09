@@ -2019,6 +2019,8 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 out$transfY <- post$transfY
                 out$pred_m_g <- post$pred_m_g
                 out$pred_ss_g <- post$pred_ss_g
+                out$risq_est <- post$risq_est
+                out$risqcum_est <- post$risqcum_est
             }
         }
 
@@ -2227,16 +2229,16 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
 
         ## risques
         if(nbevt>0)
-            {
-        risqcum_est <- matrix(out$risqcum_est,nrow=nsim,ncol=ng*nbevt)
-        risq_est <- matrix(out$risq_est,nrow=nsim,ncol=ng*nbevt)
-        predSurv <- cbind(time,risq_est,risqcum_est)
-        
-        temp <- paste(paste("event",rep(1:nbevt,each=ng),".RiskFct",sep=""),1:ng,sep="")
-        temp1 <- paste(paste("event",rep(1:nbevt,each=ng),".CumRiskFct",sep=""),1:ng,sep="")
-        colnames(predSurv) <- c("time",temp,temp1)
-        rownames(predSurv) <- 1:nsim
-            }
+        {
+            risqcum_est <- matrix(out$risqcum_est,nrow=nsim,ncol=ng*nbevt)
+            risq_est <- matrix(out$risq_est,nrow=nsim,ncol=ng*nbevt)
+            predSurv <- cbind(time,risq_est,risqcum_est)
+            
+            temp <- paste(paste("event",rep(1:nbevt,each=ng),".RiskFct",sep=""),1:ng,sep="")
+            temp1 <- paste(paste("event",rep(1:nbevt,each=ng),".CumRiskFct",sep=""),1:ng,sep="")
+            colnames(predSurv) <- c("time",temp,temp1)
+            rownames(predSurv) <- 1:nsim
+        }
         else
         {
             predSurv <- NA
