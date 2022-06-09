@@ -1228,8 +1228,8 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
             b <- rep(0,NPM)
             if (nvc>0)
                 {
-                    if(idiag==1) b[nef+1:nvc] <- rep(1,nvc)
-                    if(idiag==0)
+                    if(idiag0==1) b[nef+1:nvc] <- rep(1,nvc)
+                    if(idiag0==0)
                         {
                             init.nvc <- diag(nea0)
                             init.nvc <- init.nvc[upper.tri(init.nvc, diag=TRUE)]

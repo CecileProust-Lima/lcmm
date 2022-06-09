@@ -1474,7 +1474,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                             {
                                 ## remplacer varcov des EA par les prm a estimer
                                 
-                                if(idiag==1)
+                                if(idiag0==1)
                                 {
                                     b[nprob+nrisqtot+nvarxevt+nef+1:nvc] <- sqrt(b[nprob+nrisqtot+nvarxevt+nef+1:nvc])
                                 }
@@ -1918,8 +1918,8 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                     } 
                 if (nvc>0)
                     {
-                        if(idiag==1) b[nprob+nrisqtot+nvarxevt+nef+1:nvc] <- rep(1,nvc)
-                        if(idiag==0)
+                        if(idiag0==1) b[nprob+nrisqtot+nvarxevt+nef+1:nvc] <- rep(1,nvc)
+                        if(idiag0==0)
                             {
                                 init.nvc <- diag(nea0)
                                 init.nvc <- init.nvc[upper.tri(init.nvc, diag=TRUE)]

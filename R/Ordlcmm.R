@@ -444,7 +444,7 @@
                         {
                             ## remplacer varcov des EA par les prm a estimer
                             
-                            if(idiag==1)
+                            if(idiag0==1)
                             {
                                 b[NPROB+NEF+1:NVC] <- sqrt(b[NPROB+NEF+1:NVC])
                             }
