@@ -283,7 +283,7 @@
 #' 
 #' 
 hlme <-
-    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=TRUE,returndata=FALSE,var.time=NULL,partialH=FALSE,nproc=1,clustertype=NULL){
+    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,pprior=NULL,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=TRUE,returndata=FALSE,var.time=NULL,partialH=FALSE,nproc=1,clustertype=NULL){
 
         ptm<-proc.time()
 
@@ -356,7 +356,6 @@ hlme <-
         int.fixed <- 0
         int.mixture <- 0
         int.random <- 0
-        int.classmb <- 0
                                         #7/05/2012
 ### Traitement des donnees manquantes
                                         # fixed
@@ -502,14 +501,10 @@ hlme <-
             if(any(colnames(X_classmb)=="(Intercept)")){
                 ii <- which(colnames(X_classmb)=="(Intercept)")
                 colnames(X_classmb)[ii] <- "intercept"
-                int.classmb <- 1
             }
             id.X_classmb <- 1
-            if(int.classmb>0) inddepvar.classmb <- colnames(X_classmb)[-ii]
-            inddepvar.classmb.nom <- colnames(X_classmb)
 	}
         else{
-            inddepvar.classmb <- inddepvar.classmb.nom <- "intercept"
             id.X_classmb <- 0
 	}	
         
@@ -667,6 +662,23 @@ hlme <-
         }
 ####
 
+        ##pprior : proba d'appartenance a chaque classe
+        if(is.null(pprior))
+        {
+            pprior0 <- matrix(0, length(IND), ng)            
+        }
+        else
+        {
+            if(ng==1) stop("pprior is only useful if ng>1")
+            if(classmb != ~-1) stop("classmb should be ~-1 if pprior is specified")
+            if(!is.character(pprior)) stop("pprior should be a character vector")
+            if(length(pprior) != ng) stop("pprior should be of length ng")
+            if(!all(pprior %in% colnames(newdata))) stop("pprior variables should be included in data")
+
+            pprior0 <- newdata[,pprior]
+        }
+
+        
         ng0 <- ng
         idiag0 <- as.integer(idiag)
         nwg0 <- as.integer(nwg)
@@ -694,12 +706,6 @@ hlme <-
         idcor0 <- rep(0,length(z.X0))  
         if (ncor0!=0) idcor0 <- as.numeric(nom.X0 %in% cor.var.time) 
 
-                                        #if((int.fixed+int.random)>0) idprob0[1] <- 0     
-        if(("intercept" %in% nom.X0) | ("(Intercept)" %in% nom.X0))
-            {
-                ii <- which(nom.X0 %in% c("intercept","(Intercept)"))
-                idprob0[ii] <- 0  
-            }
 
 
                                         # on ordonne les donn es suivants la variable IND
@@ -710,10 +716,10 @@ hlme <-
         #IDnum <- matYXord[,1]
         #IND <- matYXord[,2]
 
-        matYX <- cbind(IND,timeobs,PRIOR,Y0,X0)
+        matYX <- cbind(IND,timeobs,PRIOR,pprior0,Y0,X0)
         matYXord <- matYX[sort.list(matYX[,1]),]
-        Y0 <- as.numeric(matYXord[,4])
-        X0 <- apply(matYXord[,-c(1,2,3,4),drop=FALSE],2,as.numeric)
+        Y0 <- as.numeric(matYXord[,4+ng])
+        X0 <- apply(matYXord[,-c(1:(4+ng)),drop=FALSE],2,as.numeric)
         IND <- matYXord[,1]
         timeobs <- matYXord[,2]
 
@@ -743,6 +749,22 @@ hlme <-
         seqnG <- 0:ng0
         if (!(all(prior0  %in% seqnG))) stop ("The argument prior should contain integers between 0 and ng")
 #####
+
+        ## pprior de dim ns
+        if(!is.null(pprior))
+        {
+            pprior0 <- matYX[cumsum(nmes0),3+1:ng, drop=FALSE]
+            if(any(is.na(pprior0))) stop("pprior contains missing values")
+            if(any(pprior0 < 0)) stop("pprior should be non negative")
+            if(any(pprior0 > 1)) stop("pprior should be < 1")
+            if(!all.equal(as.numeric(apply(pprior0,1,sum)), rep(1,ns0))) stop("pprior should sum up to 1 for all subjects")
+        }
+        else
+        {
+            pprior0 <- matrix(0, ns0, ng0)
+        }
+        pprior0 <- t(pprior0)       
+        
 
 
         loglik <- as.double(0)
@@ -812,8 +834,8 @@ hlme <-
 
 #####cas 2 : ng>=2
         if(ng0>1){
-            NPROB <- (sum(idprob0==1)+1)*(ng0-1)
-            b[1:NPROB] <- 0
+            NPROB <- (sum(idprob0==1))*(ng0-1)
+            if(NPROB>0) b[1:NPROB] <- 0
             NEF <- sum(idg0==1)+(sum(idg0==2))*ng0
             if(idiag0==1) NVC <- sum(idea0==1)
             if(idiag0==0){
@@ -1020,7 +1042,7 @@ hlme <-
                                         
                                         b[c((NPROB+1):(NPROB+NEF+NVC),(NPROB+NEF+NVC+NW+1):NPM)] <- bb + Chol %*% rnorm(NPM-NPROB-NW)
 
-                                        b[1:NPROB] <- 0
+                                        if(NPROB>0) b[1:NPROB] <- 0
                                         if(NW>0) b[NPROB+NEF+NVC+1:NW] <- 1
                                    
                                     } 
@@ -1033,7 +1055,8 @@ hlme <-
         NPM2 <- NEF2+NVC+ncor0+1
 
         wRandom <- rep(0,NPM)
-        b0Random <- rep(0,ng-1) # nprob 
+        b0Random <- NULL
+        if(NPROB>0) b0Random <- rep(0,ng-1) # nprob 
         
         l <- 0
         t <- 0
@@ -1074,8 +1097,8 @@ hlme <-
         ##--------------------------------------------
 
 
-        if(ng0>=2){
-            nom <-rep(c("intercept",nom.X0[idprob0==1]),each=ng0-1)
+        if(ng0>=2 & NPROB>0){
+            nom <-rep(nom.X0[idprob0==1],each=ng0-1)
             nom1 <- paste(nom," class",c(1:(ng0-1)),sep="")
             names(b)[1:NPROB]<-nom1
         }
@@ -1096,6 +1119,23 @@ hlme <-
         names(b)[NPM] <- "stderr"
         if(ncor0!=0) {names(b)[(NPROB+NEF+NVC+NW+1):(NPROB+NEF+NVC+NW+ncor0)] <- paste("cor",1:ncor0,sep="") }
         names_best <- names(b)
+
+        ## pas de nprob si pprior
+        ## if(!is.null(pprior))
+        ## {
+        ##     if(NPROB>0)
+        ##     {
+        ##         b <- b[-c(1:NPROB)]
+        ##         names_best <- names_best[-c(1:NPROB)]
+        ##         fix0 <- fix0[-c(1:NPROB)]
+        ##         pbH0 <- pbH0[-c(1:NPROB)]
+        ##         NPM <- NPM - NPROB
+        ##         indexHr <- NULL
+        ##         if(sum(pbH0)>0) indexHr <- which(pbH0==1)
+        ##     }
+        ##     NPROB <- 0
+        ## }
+            
 
         N <- NULL
         N[1] <- NPROB
@@ -1124,7 +1164,7 @@ hlme <-
         
         if(maxiter==0)
         {
-            vrais <- loglikhlme(b,Y0,X0,prior0,idprob0,idea0,idg0,idcor0,
+            vrais <- loglikhlme(b,Y0,X0,prior0,pprior0,idprob0,idea0,idg0,idcor0,
                                 ns0,ng0,nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0,
                                 NPM,fix0,nfix,bfix)
             
@@ -1142,7 +1182,7 @@ hlme <-
                        digits=8,print.info=verbose,blinding=FALSE,
                        multipleTry=25,file="",
                        nproc=nproc,maxiter=maxiter,minimize=FALSE,
-                       Y0=Y0,X0=X0,prior0=prior0,idprob0=idprob0,idea0=idea0,
+                       Y0=Y0,X0=X0,prior0=prior0,pprior0=pprior0,idprob0=idprob0,idea0=idea0,
                        idg0=idg0,idcor0=idcor0,ns0=ns0,ng0=ng0,nv0=nv0,nobs=nobs0,
                        nea0=nea0,nmes0=nmes0,idiag=idiag0,nwg0=nwg0,ncor0=ncor0,
                        npm0=NPM,fix0=fix0,nfix0=nfix,bfix0=bfix)
@@ -1169,6 +1209,7 @@ hlme <-
                                  as.double(Y0),
                                  as.double(X0),
                                  as.integer(prior0),
+                                 as.double(pprior0),
                                  as.integer(idprob0),
                                  as.integer(idea0),
                                  as.integer(idg0),

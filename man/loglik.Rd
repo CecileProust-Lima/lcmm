@@ -14,6 +14,7 @@ loglikhlme(
   Y0,
   X0,
   prior0,
+  pprior0,
   idprob0,
   idea0,
   idg0,
@@ -203,6 +204,8 @@ loglikmpjlcmm(
 \item{X0}{the observed values of all covariates included in the model (dim nob0 * nv0)}
 
 \item{prior0}{the prior latent class (length ns0)}
+
+\item{pprior0}{the prior probabilty of each latent class (dim ns0 * ng0)}
 
 \item{idprob0}{indicator of presence in the class membership submodel (length nv0)}
 

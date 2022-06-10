@@ -20,6 +20,7 @@ hlme(
   convL = 1e-04,
   convG = 1e-04,
   prior,
+  pprior = NULL,
   maxiter = 500,
   subset = NULL,
   na.action = 1,
