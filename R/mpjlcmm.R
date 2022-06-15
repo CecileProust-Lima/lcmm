@@ -302,7 +302,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 if(k>1){if(subject != colnames(dataY)[1]) stop("Subject variable should be the same for all longitudinal models")}
 
                 ## pas de classmb
-                if(mod$N[1]>(ng-1)) stop("No classmb should be specified in the longitudunal models")
+                if(mod$N[1]>(ng-1)) stop("No classmb should be specified in the longitudinal models")
                 if(mod$ng!=ng) stop(paste("The longitudinal model (number ",k,") does not define the correct number of latent classes",sep=""))
                 
                 

@@ -162,22 +162,29 @@
 #' @param nproc the number cores for parallel computation.
 #' Default to 1 (sequential mode).
 #' @param clustertype optional character indicating the type of cluster for parallel computation.
-#' @return The list returned is: \item{ns}{number of grouping units in the
-#' dataset} \item{ng}{number of latent classes} \item{loglik}{log-likelihood of
-#' the model} \item{best}{vector of parameter estimates in the same order as
+#' @return The list returned is:
+#' \item{ns}{number of grouping units in the dataset}
+#' \item{ng}{number of latent classes}
+#' \item{loglik}{log-likelihood of the model} \
+#' item{best}{vector of parameter estimates in the same order as
 #' specified in \code{B} and detailed in section \code{details}}
-#' \item{V}{vector containing the upper triangle matrix of variance-covariance
-#' estimates of \code{Best} with exception for variance-covariance parameters
-#' of the random-effects for which \code{V} contains the variance-covariance
-#' estimates of the Cholesky transformed parameters displayed in
-#' \code{cholesky}} \item{gconv}{vector of convergence criteria: 1. on the
-#' parameters, 2. on the likelihood, 3. on the derivatives} \item{conv}{status
-#' of convergence: =1 if the convergence criteria were satisfied, =2 if the
-#' maximum number of iterations was reached, =4 or 5 if a problem occured
-#' during optimisation} \item{call}{the matched call} \item{niter}{number of
-#' Marquardt iterations} \item{N}{internal information
-#' used in related functions} \item{idiag}{internal information used in related
-#' functions} \item{pred}{table of individual predictions and residuals; it
+#' \item{V}{if the model converged (conv=1 or 3), vector containing the upper triangle
+#' matrix of variance-covariance estimates of \code{Best} with exception for
+#' variance-covariance parameters of the random-effects for which \code{V} contains
+#' the variance-covariance estimates of the Cholesky transformed parameters displayed in
+#' \code{cholesky}.
+#' If conv=2, \code{V} contains the second derivatives of the log-likelihood.}
+#' \item{gconv}{vector of convergence criteria: 1. on the parameters, 2. on the
+#' likelihood, 3. on the derivatives}
+#' \item{conv}{status of convergence: =1 if the convergence criteria were satisfied,
+#' =2 if the maximum number of iterations was reached, =3 if the convergence criteria were
+#' satisfied with a partial Hessian matrix, =4 or 5 if a problem occured
+#' during optimisation}
+#' \item{call}{the matched call}
+#' \item{niter}{number of Marquardt iterations}
+#' \item{N}{internal information used in related functions}
+#' \item{idiag}{internal information used in related functions}
+#' \item{pred}{table of individual predictions and residuals; it
 #' includes marginal predictions (pred_m), marginal residuals (resid_m),
 #' subject-specific predictions (pred_ss) and subject-specific residuals
 #' (resid_ss) averaged over classes, the observation (obs) and finally the
@@ -185,12 +192,12 @@
 #' the latent class: pred_m_1,pred_m_2,...,pred_ss_1,pred_ss_2,...). If \code{var.time}
 #' is specified, the corresponding measurement time is also included.}
 #' \item{pprob}{table of posterior classification and posterior individual
-#' class-membership probabilities} \item{Xnames}{list of covariates included in
-#' the model} 
+#' class-membership probabilities}
+#' \item{Xnames}{list of covariates included in the model} 
 #' \item{predRE}{table containing individual predictions of the random-effects
-#' : a column per random-effect, a line per subject} \item{cholesky}{vector
-#' containing the estimates of the Cholesky transformed parameters of the
-#' variance-covariance matrix of the random-effects}
+#' : a column per random-effect, a line per subject}
+#' \item{cholesky}{vector containing the estimates of the Cholesky transformed
+#' parameters of the variance-covariance matrix of the random-effects}
 #' \item{data}{the original data set (if returndata is TRUE)}
 #' @author Cecile Proust-Lima, Benoit Liquet and Viviane Philipps
 #' 

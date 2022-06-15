@@ -183,11 +183,12 @@ The list returned is: \item{ns}{number of grouping units in the
 dataset} \item{ng}{number of latent classes} \item{loglik}{log-likelihood of
 the model} \item{best}{vector of parameter estimates in the same order as
 specified in \code{B} and detailed in section \code{details}} 
-\item{V}{vector containing the upper triangle matrix of variance-covariance
-estimates of \code{Best} with exception for variance-covariance parameters
-of the random-effects for which \code{V} contains the variance-covariance
-estimates of the Cholesky transformed parameters displayed in
-\code{cholesky}} \item{gconv}{vector of convergence criteria: 1. on the
+\item{V}{if the model converged (conv=1 or 3), vector containing the upper triangle
+matrix of variance-covariance estimates of \code{Best} with exception for
+variance-covariance parameters of the random-effects for which \code{V} contains the
+variance-covariance estimates of the Cholesky transformed parameters displayed in
+\code{cholesky}.  If conv=2, \code{V} contains the second derivatives of the
+log-likelihood.}\item{gconv}{vector of convergence criteria: 1. on the
 parameters, 2. on the likelihood, 3. on the derivatives} \item{conv}{status
 of convergence: =1 if the convergence criteria were satisfied, =2 if the
 maximum number of iterations was reached, =4 or 5 if a problem occured

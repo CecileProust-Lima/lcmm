@@ -1380,7 +1380,7 @@
       ncg=0
       ncssg=0
       nprob=0 !ng-1
-      nvarprob=min(ng-1,1)
+      nvarprob=0 !min(ng-1,1)
       do k=1,nv
          if (idg(k).eq.1) then
             ncssg=ncssg+1      ! nb var. sans melange
