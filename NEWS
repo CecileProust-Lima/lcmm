@@ -10,6 +10,22 @@ https://doi.org/10.18637/jss.v078.i02
 
 And specific statistical models estimated are described in various statistical papers of the authors. 
 
+
+Changes in Version 2.0.0 (2022-06-15) :
+
+* the model's estimation is now available in parallel mode! 
+* The optimization relies on the parallelized marqLevAlg package.
+* models with latent classes (ng>1) require initial values
+* the hlme function has now a pprior argument
+* the mpjlcmm function can be used without a time-to-event model
+* the summary functions now shorten the parameters names
+* the log-likelihood functions are now exported
+* bug fixed in mpjlcmm when no random effect is included
+* bug fixed in Jointlcmm with Weibull hazards and competing risks
+* bug fixed in permut when used on Jointlcmm objects with competing risks
+* correction of the outputs of multlcmm models
+
+
 Changes in Version 1.9.4 (2022-01-03) :
 
 * the multlcmm function is now available for ordinal outcomes (link="thresholds") providing a longitudinal IRT model!
