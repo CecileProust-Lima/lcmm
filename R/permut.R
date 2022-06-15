@@ -69,7 +69,7 @@ permut <- function(m,order,estim=TRUE)
                                 ## echanger les coef
                                 bnew[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+1:nrisq[ke]] <- m$best[m$N[1]+sum(nrisq[1:ke])-nrisq[ke]+sapply(order,function(x,np) {(x-1)*np+1:np},np=nprisq[ke])]
                             }
-                        if(hazardtype=="PH")
+                        if(hazardtype[ke]=="PH")
                         {
                             if(order[ng]==ng)
                             {
