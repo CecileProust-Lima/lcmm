@@ -98,7 +98,7 @@
 #' specified with ''.
 #' @param classmb optional one-sided formula describing the covariates in the
 #' class-membership multinomial logistic model. Covariates included are
-#' separated by \code{+}.  No intercept should be included in this formula.
+#' separated by \code{+}. By default, classmb=~1 if ng>1.
 #' @param ng optional number of latent classes considered. If \code{ng=1} (by
 #' default) no \code{mixture} nor \code{classmb} should be specified. If
 #' \code{ng>1}, \code{mixture} is required.
@@ -299,7 +299,8 @@ hlme <-
         if(!missing(classmb) & ng==1) stop("No classmb can be specified with ng=1")
         if(missing(random)) random <- ~-1
         if(missing(fixed)) stop("The argument Fixed must be specified in any model")
-        if(missing(classmb)) classmb <- ~-1
+        if(missing(classmb) & ng==1) classmb <- ~-1
+        if(missing(classmb) & ng>1) classmb <- ~1
         if(missing(mixture)) mixture <- ~-1
         if(ng==1&nwg==TRUE) stop ("The argument nwg should be FALSE for ng=1")
 

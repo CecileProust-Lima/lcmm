@@ -57,7 +57,7 @@ specified with ''.}
 
 \item{classmb}{optional one-sided formula describing the covariates in the
 class-membership multinomial logistic model. Covariates included are
-separated by \code{+}.  No intercept should be included in this formula.}
+separated by \code{+}. By default, classmb=~1 if ng>1.}
 
 \item{ng}{optional number of latent classes considered. If \code{ng=1} (by
 default) no \code{mixture} nor \code{classmb} should be specified. If
