@@ -1,6 +1,13 @@
 #' Estimation of multi-process joint latent class mixed models
 #'
-#' @param longitudinal list of longitudinal models of type hlme, lcmm or multlcmm
+#' This function fits multi-process joint latent class models. It is a multivariate
+#' extension of the Jointlcmm function. It handles multiple latent processes, possibly
+#' measured by sereval continuous markers (Gaussian or curvilinear). Theses processes are
+#' independent given the latent classes. The optional survival part handles competing
+#' risks, right censoring and left truncation.
+#'
+#' @param longitudinal list of longitudinal models of type hlme, lcmm or multlcmm. Each
+#' model defines the structure of one latent process.
 #' @param subject name of the covariate representing the grouping structure
 #' (called subject identifier)
 #' @param classmb optional one-sided formula describing the covariates in the

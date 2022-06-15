@@ -33,7 +33,8 @@ mpjlcmm(
 )
 }
 \arguments{
-\item{longitudinal}{list of longitudinal models of type hlme, lcmm or multlcmm}
+\item{longitudinal}{list of longitudinal models of type hlme, lcmm or multlcmm. Each
+model defines the structure of one latent process.}
 
 \item{subject}{name of the covariate representing the grouping structure
 (called subject identifier)}
@@ -120,7 +121,11 @@ Default to 1 (sequential mode).}
 \item{clustertype}{optional character indicating the type of cluster for parallel computation.}
 }
 \description{
-Estimation of multi-process joint latent class mixed models
+This function fits multi-process joint latent class models. It is a multivariate
+extension of the Jointlcmm function. It handles multiple latent processes, possibly
+measured by sereval continuous markers (Gaussian or curvilinear). Theses processes are
+independent given the latent classes. The optional survival part handles competing
+risks, right censoring and left truncation.
 }
 \examples{
 \dontrun{
