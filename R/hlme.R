@@ -1194,59 +1194,60 @@ hlme <-
                         pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
                         gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,
                         loglik=res$fn.value)
-            
-            if(out$conv %in% c(1,2,3))
-            {
-                estim0 <- 0
-                ll <- 0
-                ppi0 <- rep(0,ns0*ng0)
-                resid_m <- rep(0,nobs0)
-                resid_ss <- rep(0,nobs0)
-                pred_m_g <- rep(0,nobs0*ng0)
-                pred_ss_g <- rep(0,nobs0*ng0)
-                predRE <- rep(0,ns0*nea0)
-                
-                post <- .Fortran(C_loglikhlme,
-                                 as.double(Y0),
-                                 as.double(X0),
-                                 as.integer(prior0),
-                                 as.double(pprior0),
-                                 as.integer(idprob0),
-                                 as.integer(idea0),
-                                 as.integer(idg0),
-                                 as.integer(idcor0),
-                                 as.integer(ns0),
-                                 as.integer(ng0),
-                                 as.integer(nv0),
-                                 as.integer(nobs0),
-                                 as.integer(nea0),
-                                 as.integer(nmes0),
-                                 as.integer(idiag0),
-                                 as.integer(nwg0),
-                                 as.integer(ncor0),
-                                 as.integer(NPM),
-                                 as.double(out$best),
-                                 ppi=as.double(ppi0),
-                                 resid_m=as.double(resid_m),
-                                 resid_ss=as.double(resid_ss),
-                                 pred_m_g=as.double(pred_m_g),
-                                 pred_ss_g=as.double(pred_ss_g),
-                                 predRE=as.double(predRE),
-                                 as.integer(fix0),
-                                 as.integer(nfix),
-                                 as.double(bfix),
-                                 as.integer(estim0),
-                                 loglik=as.double(ll))
-                
-                out$ppi2 <- post$ppi
-                out$predRE <- post$predRE
-                out$resid_m <- post$resid_m
-                out$resid_ss <- post$resid_ss
-                out$pred_m_g <- post$pred_m_g
-                out$pred_ss_g <- post$pred_ss_g
-            }
-            
         }
+            
+        if(out$conv %in% c(1,2,3))
+        {
+            estim0 <- 0
+            ll <- 0
+            ppi0 <- rep(0,ns0*ng0)
+            resid_m <- rep(0,nobs0)
+            resid_ss <- rep(0,nobs0)
+            pred_m_g <- rep(0,nobs0*ng0)
+            pred_ss_g <- rep(0,nobs0*ng0)
+            predRE <- rep(0,ns0*nea0)
+            
+            post <- .Fortran(C_loglikhlme,
+                             as.double(Y0),
+                             as.double(X0),
+                             as.integer(prior0),
+                             as.double(pprior0),
+                             as.integer(idprob0),
+                             as.integer(idea0),
+                             as.integer(idg0),
+                             as.integer(idcor0),
+                             as.integer(ns0),
+                             as.integer(ng0),
+                             as.integer(nv0),
+                             as.integer(nobs0),
+                             as.integer(nea0),
+                             as.integer(nmes0),
+                             as.integer(idiag0),
+                             as.integer(nwg0),
+                             as.integer(ncor0),
+                             as.integer(NPM),
+                             as.double(out$best),
+                             ppi=as.double(ppi0),
+                             resid_m=as.double(resid_m),
+                             resid_ss=as.double(resid_ss),
+                             pred_m_g=as.double(pred_m_g),
+                             pred_ss_g=as.double(pred_ss_g),
+                             predRE=as.double(predRE),
+                             as.integer(fix0),
+                             as.integer(nfix),
+                             as.double(bfix),
+                             as.integer(estim0),
+                             loglik=as.double(ll))
+            
+            out$ppi2 <- post$ppi
+            out$predRE <- post$predRE
+            out$resid_m <- post$resid_m
+            out$resid_ss <- post$resid_ss
+            out$pred_m_g <- post$pred_m_g
+            out$pred_ss_g <- post$pred_ss_g
+        }
+        
+        
         
         ## creer best a partir de b et bfix
         best <- rep(NA,length(fix0))

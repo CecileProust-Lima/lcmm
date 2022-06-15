@@ -1477,92 +1477,93 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                     pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
                     gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,
                     loglik=res$fn.value)
-
-        if(out$conv %in% c(1,2,3))
-        {
-            estim0 <- 0
-            ll <- 0
-            ppi0 <- rep(0,ns0*ng0)
-            resid_m <- rep(0,nobs0)
-            resid_ss <- rep(0,nobs0)
-            pred_m_g <- rep(0,nobs0*ng0)
-            pred_ss_g <- rep(0,nobs0*ng0)
-            predRE <- rep(0,ns0*nea0)
-            predRE_Y <- rep(0,ns0*nalea0)
-            marker <- rep(0,nsim*ny0)
-            transfY <- rep(0,nsim*ny0)
-            Yobs <- rep(0,nobs0)
-            Ydiscret <- 0
-            vraisdiscret <- 0
-            UACV <- 0
-            rlindiv <- rep(0,ns0)
-            post <- .Fortran(C_loglikmultlcmm,
-                             as.double(Y0),
-                             as.double(X0),
-                             as.integer(prior0),
-                             as.integer(idprob0),
-                             as.integer(idea0),
-                             as.integer(idg0),
-                             as.integer(idcor0),
-                             as.integer(idcontr0),
-                             as.integer(ny0),
-                             as.integer(ns0),
-                             as.integer(ng0),
-                             as.integer(nv0),
-                             as.integer(nobs0),
-                             as.integer(nea0),
-                             as.integer(nmes0),
-                             as.integer(idiag0),
-                             as.integer(nwg0),
-                             as.integer(ncor0),
-                             as.integer(nalea0),
-                             as.integer(NPM),
-                             best=as.double(out$best),
-                             ppi2=as.double(ppi0),
-                             resid_m=as.double(resid_m),
-                             resid_ss=as.double(resid_ss),
-                             pred_m_g=as.double(pred_m_g),
-                             pred_ss_g=as.double(pred_ss_g),
-                             predRE=as.double(predRE),
-                             predRE_Y=as.double(predRE_Y),
-                             as.double(epsY),
-                             as.integer(idlink0),
-                             as.integer(nbzitr0),
-                             as.double(zitr),
-                             as.double(uniqueY0),
-                             as.integer(indiceY0),
-                             as.integer(nvalSPLORD0),
-                             marker=as.double(marker),
-                             transfY=as.double(transfY),
-                             as.integer(nsim),
-                             Yobs=as.double(Yobs),
-                             as.integer(Ydiscret),
-                             vraisdiscret=as.double(vraisdiscret),
-                             UACV=as.double(UACV),
-                             rlindiv=as.double(rlindiv),
-                             as.integer(fix0),
-                             as.integer(nfix),
-                             as.double(bfix),
-                             as.integer(methInteg),
-                             as.integer(nMC),
-                             as.integer(dimMC),
-                             as.double(seqMC),
-                             as.integer(chol),
-                             as.integer(estim0),
-                             as.double(ll))
-
-            out$ppi2 <- post$ppi2
-            out$predRE <- post$predRE
-            out$predRE_Y <- post$predRE_Y
-            out$Yobs <- post$Yobs
-            out$resid_m <- post$resid_m
-            out$resid_ss <- post$resid_ss
-            out$marker <- post$marker
-            out$transfY <- post$transfY
-            out$pred_m_g <- post$pred_m_g
-            out$pred_ss_g <- post$pred_ss_g
-        }
     }
+    
+    if(out$conv %in% c(1,2,3))
+    {
+        estim0 <- 0
+        ll <- 0
+        ppi0 <- rep(0,ns0*ng0)
+        resid_m <- rep(0,nobs0)
+        resid_ss <- rep(0,nobs0)
+        pred_m_g <- rep(0,nobs0*ng0)
+        pred_ss_g <- rep(0,nobs0*ng0)
+        predRE <- rep(0,ns0*nea0)
+        predRE_Y <- rep(0,ns0*nalea0)
+        marker <- rep(0,nsim*ny0)
+        transfY <- rep(0,nsim*ny0)
+        Yobs <- rep(0,nobs0)
+        Ydiscret <- 0
+        vraisdiscret <- 0
+        UACV <- 0
+        rlindiv <- rep(0,ns0)
+        post <- .Fortran(C_loglikmultlcmm,
+                         as.double(Y0),
+                         as.double(X0),
+                         as.integer(prior0),
+                         as.integer(idprob0),
+                         as.integer(idea0),
+                         as.integer(idg0),
+                         as.integer(idcor0),
+                         as.integer(idcontr0),
+                         as.integer(ny0),
+                         as.integer(ns0),
+                         as.integer(ng0),
+                         as.integer(nv0),
+                         as.integer(nobs0),
+                         as.integer(nea0),
+                         as.integer(nmes0),
+                         as.integer(idiag0),
+                         as.integer(nwg0),
+                         as.integer(ncor0),
+                         as.integer(nalea0),
+                         as.integer(NPM),
+                         best=as.double(out$best),
+                         ppi2=as.double(ppi0),
+                         resid_m=as.double(resid_m),
+                         resid_ss=as.double(resid_ss),
+                         pred_m_g=as.double(pred_m_g),
+                         pred_ss_g=as.double(pred_ss_g),
+                         predRE=as.double(predRE),
+                         predRE_Y=as.double(predRE_Y),
+                         as.double(epsY),
+                         as.integer(idlink0),
+                         as.integer(nbzitr0),
+                         as.double(zitr),
+                         as.double(uniqueY0),
+                         as.integer(indiceY0),
+                         as.integer(nvalSPLORD0),
+                         marker=as.double(marker),
+                         transfY=as.double(transfY),
+                         as.integer(nsim),
+                         Yobs=as.double(Yobs),
+                         as.integer(Ydiscret),
+                         vraisdiscret=as.double(vraisdiscret),
+                         UACV=as.double(UACV),
+                         rlindiv=as.double(rlindiv),
+                         as.integer(fix0),
+                         as.integer(nfix),
+                         as.double(bfix),
+                         as.integer(methInteg),
+                         as.integer(nMC),
+                         as.integer(dimMC),
+                         as.double(seqMC),
+                         as.integer(chol),
+                         as.integer(estim0),
+                         as.double(ll))
+
+        out$ppi2 <- post$ppi2
+        out$predRE <- post$predRE
+        out$predRE_Y <- post$predRE_Y
+        out$Yobs <- post$Yobs
+        out$resid_m <- post$resid_m
+        out$resid_ss <- post$resid_ss
+        out$marker <- post$marker
+        out$transfY <- post$transfY
+        out$pred_m_g <- post$pred_m_g
+        out$pred_ss_g <- post$pred_ss_g
+    }
+    
     
     ## creer best a partir de b et bfix
     best <- rep(NA,length(fix0))

@@ -1926,102 +1926,102 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                         risqcum_est=rep(NA,nsim*ng*nbevt), statscoretest=rep(NA,1+nbevt),
                         gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,
                         loglik=res$fn.value)
-
-            if(out$conv %in% c(1,2,3))
-            {
-                estim0 <- 0
-                ll <- 0
-                ppi0 <- rep(0,ns*ng)
-                ppitest0 <- rep(0,ns*ng)
-                resid_m <- rep(0,nobs0)
-                resid_ss <- rep(0,nobs0)
-                pred_m_g <- rep(0,nobs0*ng)
-                pred_ss_g <- rep(0,nobs0*ng)
-                predRE <- rep(0,ns*sum(nea))
-                predRE_Y <- rep(0,ns*sum(nalea))
-                marker <- rep(0,nsim*sum(ny))
-                transfY <- rep(0,nsim*sum(ny))
-                Yobs <- rep(0,nobs0)
-                statscoretest <- rep(0,1+nbevt)
-                post <- .Fortran(C_loglikmpjlcmm,
-                                 as.integer(K),
-                                 as.integer(ny),
-                                 as.integer(nbevt),
-                                 as.integer(ng),
-                                 as.integer(ns),
-                                 as.double(Y0),
-                                 as.integer(nobs0),
-                                 as.double(X0),
-                                 as.integer(nv),
-                                 as.double(Xns0),
-                                 as.integer(nv2),
-                                 as.integer(prior),
-                                 as.double(Tentry),
-                                 as.double(Tevent),
-                                 as.integer(Event),
-                                 as.integer(ind_survint),
-                                 as.integer(idnv0),
-                                 as.integer(idnv2),
-                                 as.integer(idspecif),
-                                 as.integer(idlink),
-                                 as.double(epsY),
-                                 as.integer(nbzitr),
-                                 as.double(zitr),
-                                 as.double(uniqueY0),
-                                 as.integer(nvalSPL0),
-                                 as.integer(indiceY0),
-                                 as.integer(typrisq),
-                                 as.integer(risqcom),
-                                 as.integer(nz),
-                                 as.double(zi),
-                                 as.integer(nmesM),
-                                 as.integer(nea),
-                                 as.integer(nw),
-                                 as.integer(ncor),
-                                 as.integer(nalea),
-                                 as.integer(idiag),
-                                 as.integer(idtrunc),
-                                 as.integer(logspecif),
-                                 as.integer(NPM),
-                                 best=as.double(out$best),
-                                 ppi=as.double(ppi0),
-                                 ppitest=as.double(ppitest0),
-                                 resid_m=as.double(resid_m),
-                                 resid_ss=as.double(resid_ss),
-                                 pred_m_g=as.double(pred_m_g),
-                                 pred_ss_g=as.double(pred_ss_g),
-                                 predRE=as.double(predRE),
-                                 predRE_Y=as.double(predRE_Y),
-                                 time=as.double(time),
-                                 risq_est=as.double(risq_est),
-                                 risqcum_est=as.double(risqcum_est),
-                                 marker=as.double(marker),
-                                 transfY=as.double(transfY),
-                                 as.integer(nsim),
-                                 Yobs=as.double(Yobs),
-                                 statscoretest=as.double(statscoretest),
-                                 as.integer(fix),
-                                 as.integer(contrainte),
-                                 as.integer(nfix),
-                                 as.double(bfix),
-                                 as.integer(estim0),
-                                 as.double(ll),
-                                 NAOK=TRUE)
-                
-                out$ppi <- post$ppi
-                out$ppitest <- post$ppitest
-                out$predRE <- post$predRE
-                out$predRE_Y <- post$predRE_Y
-                out$Yobs <- post$Yobs
-                out$resid_m <- post$resid_m
-                out$resid_ss <- post$resid_ss
-                out$marker <- post$marker
-                out$transfY <- post$transfY
-                out$pred_m_g <- post$pred_m_g
-                out$pred_ss_g <- post$pred_ss_g
-                out$risq_est <- post$risq_est
-                out$risqcum_est <- post$risqcum_est
-            }
+        }
+        
+        if(out$conv %in% c(1,2,3))
+        {
+            estim0 <- 0
+            ll <- 0
+            ppi0 <- rep(0,ns*ng)
+            ppitest0 <- rep(0,ns*ng)
+            resid_m <- rep(0,nobs0)
+            resid_ss <- rep(0,nobs0)
+            pred_m_g <- rep(0,nobs0*ng)
+            pred_ss_g <- rep(0,nobs0*ng)
+            predRE <- rep(0,ns*sum(nea))
+            predRE_Y <- rep(0,ns*sum(nalea))
+            marker <- rep(0,nsim*sum(ny))
+            transfY <- rep(0,nsim*sum(ny))
+            Yobs <- rep(0,nobs0)
+            statscoretest <- rep(0,1+nbevt)
+            post <- .Fortran(C_loglikmpjlcmm,
+                             as.integer(K),
+                             as.integer(ny),
+                             as.integer(nbevt),
+                             as.integer(ng),
+                             as.integer(ns),
+                             as.double(Y0),
+                             as.integer(nobs0),
+                             as.double(X0),
+                             as.integer(nv),
+                             as.double(Xns0),
+                             as.integer(nv2),
+                             as.integer(prior),
+                             as.double(Tentry),
+                             as.double(Tevent),
+                             as.integer(Event),
+                             as.integer(ind_survint),
+                             as.integer(idnv0),
+                             as.integer(idnv2),
+                             as.integer(idspecif),
+                             as.integer(idlink),
+                             as.double(epsY),
+                             as.integer(nbzitr),
+                             as.double(zitr),
+                             as.double(uniqueY0),
+                             as.integer(nvalSPL0),
+                             as.integer(indiceY0),
+                             as.integer(typrisq),
+                             as.integer(risqcom),
+                             as.integer(nz),
+                             as.double(zi),
+                             as.integer(nmesM),
+                             as.integer(nea),
+                             as.integer(nw),
+                             as.integer(ncor),
+                             as.integer(nalea),
+                             as.integer(idiag),
+                             as.integer(idtrunc),
+                             as.integer(logspecif),
+                             as.integer(NPM),
+                             best=as.double(out$best),
+                             ppi=as.double(ppi0),
+                             ppitest=as.double(ppitest0),
+                             resid_m=as.double(resid_m),
+                             resid_ss=as.double(resid_ss),
+                             pred_m_g=as.double(pred_m_g),
+                             pred_ss_g=as.double(pred_ss_g),
+                             predRE=as.double(predRE),
+                             predRE_Y=as.double(predRE_Y),
+                             time=as.double(time),
+                             risq_est=as.double(risq_est),
+                             risqcum_est=as.double(risqcum_est),
+                             marker=as.double(marker),
+                             transfY=as.double(transfY),
+                             as.integer(nsim),
+                             Yobs=as.double(Yobs),
+                             statscoretest=as.double(statscoretest),
+                             as.integer(fix),
+                             as.integer(contrainte),
+                             as.integer(nfix),
+                             as.double(bfix),
+                             as.integer(estim0),
+                             as.double(ll),
+                             NAOK=TRUE)
+            
+            out$ppi <- post$ppi
+            out$ppitest <- post$ppitest
+            out$predRE <- post$predRE
+            out$predRE_Y <- post$predRE_Y
+            out$Yobs <- post$Yobs
+            out$resid_m <- post$resid_m
+            out$resid_ss <- post$resid_ss
+            out$marker <- post$marker
+            out$transfY <- post$transfY
+            out$pred_m_g <- post$pred_m_g
+            out$pred_ss_g <- post$pred_ss_g
+            out$risq_est <- post$risq_est
+            out$risqcum_est <- post$risqcum_est
         }
 
         ## creer best a partir de b et bfix
