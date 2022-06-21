@@ -464,9 +464,12 @@
         pbH0 <- rep(0,NPM)
         if(is.logical(partialH))
         {
-            if(idlink0==2) pbH0[NPROB+NEF+NVC+NW+1:ntrtot0] <- 1
-            pbH0[posfix] <- 0
-            if(sum(pbH0)==0 & Hr0==1) stop("No partial Hessian matrix can be defined")
+            if(isTRUE(partialH))
+            {
+                if(idlink0==2) pbH0[NPROB+NEF+NVC+NW+1:ntrtot0] <- 1
+                pbH0[posfix] <- 0
+                if(sum(pbH0)==0 & Hr0==1) stop("No partial Hessian matrix can be defined")
+            }
         }
         else
         {
@@ -816,7 +819,7 @@
                                 NPM,epsY,idlink0,nbzitr0,zitr,minY0,maxY0,ide0,
                                 fix0,nfix,bfix)
             
-            out <- list(conv=2, V=rep(NA, length(b)), best=b,
+            out <- list(conv=2, V=rep(0, length(b)), best=b,
                         ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         marker=rep(NA,nsim), transfY=rep(NA,nsim),

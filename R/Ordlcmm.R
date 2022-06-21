@@ -408,9 +408,12 @@
     pbH0 <- rep(0,NPM)
     if(is.logical(partialH))
     {
-        if(partialH) pbH0 <- rep(1,NPM)
-        pbH0[posfix] <- 0
-        if(sum(pbH0)==0 & Hr0==1) stop("No partial Hessian matrix can be defined")
+        if(isTRUE(partialH))
+        {
+            if(partialH) pbH0 <- rep(1,NPM)
+            pbH0[posfix] <- 0
+            if(sum(pbH0)==0 & Hr0==1) stop("No partial Hessian matrix can be defined")
+        }
     }
     else
     {
