@@ -22,10 +22,10 @@
     if(ng==1&nwg==TRUE) stop ("The argument nwg should be FALSE for ng=1")
 
 
-    if(class(fixed)!="formula") stop("The argument fixed must be a formula")
-    if(class(mixture)!="formula") stop("The argument mixture must be a formula")
-    if(class(random)!="formula") stop("The argument random must be a formula")
-    if(class(classmb)!="formula") stop("The argument classmb must be a formula")
+    if(!inherits(fixed,"formula")) stop("The argument fixed must be a formula")
+    if(!inherits(mixture,"formula")) stop("The argument mixture must be a formula")
+    if(!inherits(random,"formula")) stop("The argument random must be a formula")
+    if(!inherits(classmb,"formula")) stop("The argument classmb must be a formula")
 
     if(missing(data)){ stop("The argument data should be specified and defined as a data.frame")} 
     if(missing(subject)){ stop("The argument subject must be specified in any model even without random-effects")} 
@@ -469,7 +469,7 @@
                 }
             else
                 {
-                    if(class(B)!="lcmm") stop("B should be either a vector or an object of class lcmm")
+                    if(!inherits(B,"lcmm")) stop("B should be either a vector or an object of class lcmm")
                          
                     if(ng>1 & B$ng==1)
                         {

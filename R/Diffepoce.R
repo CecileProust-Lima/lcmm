@@ -85,10 +85,10 @@
 Diffepoce <- function(epoceM1,epoceM2){
 
 cl <- match.call()
-if(class(epoceM1)=="Jointlcmm") stop("Diffepoce allows only arguments of classes 'epoce'. Please run function epoce on the Jointlcmm objects before running Diffepoce.")
-if(class(epoceM2)=="Jointlcmm") stop("Diffepoce allows only arguments of classes 'epoce'. Please run function epoce on the Jointlcmm objects before running Diffepoce.")
-if(class(epoceM1)!="epoce") stop("Diffepoce allows only arguments of classes 'epoce'.")
-if(class(epoceM2)!="epoce") stop("Diffepoce allows only arguments of classes 'epoce'.")
+if(inherits(epoceM1,"Jointlcmm")) stop("Diffepoce allows only arguments of classes 'epoce'. Please run function epoce on the Jointlcmm objects before running Diffepoce.")
+if(inherits(epoceM2,"Jointlcmm")) stop("Diffepoce allows only arguments of classes 'epoce'. Please run function epoce on the Jointlcmm objects before running Diffepoce.")
+if(!inherits(epoceM1,"epoce")) stop("Diffepoce allows only arguments of classes 'epoce'.")
+if(!inherits(epoceM2,"epoce")) stop("Diffepoce allows only arguments of classes 'epoce'.")
 
 if(!(all.equal(epoceM1$EPOCE[,1],epoceM2$EPOCE[,1]))) stop("The two epoce objects should have the same prediction times")
 

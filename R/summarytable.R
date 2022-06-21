@@ -37,12 +37,12 @@
 summarytable <- function(m1, ..., which=c("G","loglik","npm","BIC","%class"), display=TRUE)
     {
         if(missing(m1)) stop("At least one model should be specified")
-        if(!(class(m1) %in% c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("Use with 'hlme', 'lcmm' , 'multlcmm', 'Jointlcmm' or 'mpjlcmm' objects only")
+        if(!inherits(m1,c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("Use with 'hlme', 'lcmm' , 'multlcmm', 'Jointlcmm' or 'mpjlcmm' objects only")
         if(any(!(which %in% c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "scoretest","ICL","%class")))) stop(paste("which should contain elements among",paste(c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "scoretest", "%class"),collapse=", ")))
 
         dots <- list(...)
 
-        ismodel <- sapply(dots, function(m) ifelse(class(m) %in% class(m1),TRUE,FALSE))
+        ismodel <- sapply(dots, function(m) ifelse(inherits(m,class(m1)),TRUE,FALSE))
         models <- which(ismodel==TRUE)
         nbmodels <- length(models)
         
@@ -117,7 +117,7 @@ summarytable <- function(m1, ..., which=c("G","loglik","npm","BIC","%class"), di
 
         ## tous les indicateurs pour le modele m1
         pscoretest <- NA
-        if(class(m1)=="Jointlcmm") pscoretest <- round((1-pchisq(m1$scoretest[1],sum(m1$idea))),4)
+        if(inherits(m1,"Jointlcmm")) pscoretest <- round((1-pchisq(m1$scoretest[1],sum(m1$idea))),4)
         tmp <- c(m1$ng,m1$loglik,m1$conv,length(m1$best)-length(eval(m1$call$posfix)),m1$AIC,m1$BIC,sabic(m1),entropy(m1),pscoretest,ICL(m1))
         for(g in 1:m1$ng)
             {
@@ -135,7 +135,7 @@ summarytable <- function(m1, ..., which=c("G","loglik","npm","BIC","%class"), di
                     {
                         m <- get(paste("m",i,sep=""))
                         pscoretest <- NA
-                        if(class(m)=="Jointlcmm") pscoretest <- round((1-pchisq(m$scoretest[1],sum(m$idea))),4)
+                        if(inherits(m,"Jointlcmm")) pscoretest <- round((1-pchisq(m$scoretest[1],sum(m$idea))),4)
                         tmp <- c(m$ng,m$loglik,m$conv,length(m$best)-length(eval(m$call$posfix)),m$AIC,m$BIC,sabic(m),entropy(m),pscoretest,ICL(m))
                         
                         for(g in 1:m$ng)

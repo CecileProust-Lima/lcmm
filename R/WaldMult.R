@@ -7,7 +7,7 @@
 #' 
 #' @param Mod an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
 #' \code{Jointlcmm}
-#' @param pos a vector containing the indices in Mod\$best of the parameters to
+#' @param pos a vector containing the indices in \code{Mod$best} of the parameters to
 #' test
 #' @param contrasts a numeric vector of same length as pos.  If NULL (the
 #' default), a simultaneous test of the appropriate parameters is realised.  If

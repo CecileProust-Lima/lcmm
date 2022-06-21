@@ -407,10 +407,10 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     if(ng==1&nwg==TRUE) stop ("The argument nwg should be FALSE for ng=1")
 
 
-    if(class(fixed)!="formula") stop("The argument fixed must be a formula")
-    if(class(mixture)!="formula") stop("The argument mixture must be a formula")
-    if(class(random)!="formula") stop("The argument random must be a formula")
-    if(class(classmb)!="formula") stop("The argument classmb must be a formula")
+    if(!inherits(fixed,"formula")) stop("The argument fixed must be a formula")
+    if(!inherits(mixture,"formula")) stop("The argument mixture must be a formula")
+    if(!inherits(random,"formula")) stop("The argument random must be a formula")
+    if(!inherits(classmb,"formula")) stop("The argument classmb must be a formula")
     if(missing(data)){ stop("The argument data should be specified and defined as a data.frame")}
     if(nrow(data)==0) stop("Data should not be empty")
     if(missing(subject)){ stop("The argument subject must be specified")}
@@ -971,7 +971,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
         Brandom <- FALSE
         if(length(cl$B)==2)
             {
-                if(class(eval(cl$B[[2]]))!="multlcmm") stop("The model specified in B should be of class multlcmm")
+                if(!inherits(eval(cl$B[[2]]),"multlcmm")) stop("The model specified in B should be of class multlcmm")
                 if(as.character(cl$B[1])!="random") stop("Please use random() to specify random initial values")
                 
                 Brandom <- TRUE
@@ -1024,7 +1024,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                 }
             else
                 {
-                    if(class(B)!="multlcmm") stop("B should be either a vector or an object of class multlcmm")
+                    if(!inherits(B,"multlcmm")) stop("B should be either a vector or an object of class multlcmm")
 
                     if(ng==1 & B$ng==1)
                         {

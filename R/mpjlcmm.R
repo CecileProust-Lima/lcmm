@@ -234,7 +234,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         if(ng==1) hazardtype <- "Specific"
         if(any(!(hazardtype %in% c("Common","Specific","PH")))) stop("'hazardtype' should be either 'Common' or 'Specific' or 'PH'")
         
-        if(class(classmb) != "formula") stop("The argument classmb must be a formula")
+        if(!inherits(classmb,"formula")) stop("The argument classmb must be a formula")
         if(missing(data)){ stop("The argument data should be specified and defined as a data.frame")}
         if(nrow(data)==0) stop("Data should not be empty")
         if(missing(subject)){ stop("The argument subject must be specified in any model")}
@@ -1422,10 +1422,10 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         if(!missing(B))
         {
             B <- try(eval(B),silent=TRUE)
-            if(class(B)=="try-error")
+            if(inherits(B,"try-error"))
             {
                 if(length(cl$B)==1) stop(B)
-                if(class(eval(cl$B[[2]]))!="mpjlcmm") stop("The model specified in B should be of class mpjlcmm")
+                if(!inherits(eval(cl$B[[2]]),"mpjlcmm")) stop("The model specified in B should be of class mpjlcmm")
                 if(as.character(cl$B[1])!="random") stop("Please use random() to specify random initial values")
                 
                 Brandom <- TRUE
@@ -1492,7 +1492,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     }
                 else
                     {
-                        if(class(B)!="mpjlcmm") stop("B should be either a vector or an object of class mpjlcmm")
+                        if(!inherits(B,"mpjlcmm")) stop("B should be either a vector or an object of class mpjlcmm")
                         nef2 <- p1+p2
                         if(contrainte!=0) nef2 <- p1+p2-1
                         NPM2 <- sum(nprisq)+nvarxevt2+sum(nef2)+sum(ncontr)+sum(nvc)+
@@ -1547,7 +1547,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                             for (k in 1:K) #m1,..,mK
                             {
                                 mk <- get(paste("mod",k,sep=""))
-                                if(class(mk)=="multlcmm")
+                                if(inherits(mk,"multlcmm"))
                                 {
                                     multRandom <- TRUE
                                     if(mk$N[4]>0) cholRandom[[k]] <- sumnpmG+1:mk$N[4]

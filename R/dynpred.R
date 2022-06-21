@@ -78,7 +78,7 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                     fun.time=identity,na.action=1,draws=FALSE,ndraws=2000)    
 {                                                       
     if(missing(model)) stop("The argument model must be specified")
-    if(class(model)!="Jointlcmm") stop("The argument model must be a 'Jointlcmm' object")
+    if(!inherits(model,"Jointlcmm")) stop("The argument model must be a 'Jointlcmm' object")
     if(missing(newdata)) stop("The argument newdata should be specified")
     if (!inherits(newdata, "data.frame")) stop("newdata should be a data.frame object")
     if(length(event)>1) stop("Please specify only one event")
@@ -501,7 +501,7 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
             
             ## nb de sujets
             id.subject <- newdata1[,model$Names$ID]
-            if(class(id.subject)=="factor") id.subject <- factor(id.subject,levels=unique(id.subject))
+            if(is.factor(id.subject)) id.subject <- factor(id.subject,levels=unique(id.subject))
             ns <- length(unique(id.subject))
             
             ## vecteur Y et indiceY,uniqueY,nvalSPL

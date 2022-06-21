@@ -141,6 +141,10 @@
 #' values in 0,1,...,ng. Value 0 indicates no prior for the subject while a
 #' value in 1,...,ng indicates that the subject belongs to the corresponding
 #' latent class.
+#' @param pprior optional vector specifying the names of the covariates containing the
+#' prior probabilities to belog to each latent class. These probabilities should be
+#' between 0 and 1 and should sum up to 1 for each subject. If pprior is specified, the
+#' multinomial logistic model should be removed with classmb=~-1.
 #' @param maxiter optional maximum number of iterations for the Marquardt
 #' iterative algorithm. By default, maxiter=500.
 #' @param subset a specification of the rows to be used: defaults to all rows.
@@ -312,10 +316,10 @@ hlme <-
         if(ng==1&nwg==TRUE) stop ("The argument nwg should be FALSE for ng=1")
 
 
-        if(class(fixed)!="formula") stop("The argument fixed must be a formula")
-        if(class(mixture)!="formula") stop("The argument mixture must be a formula")
-        if(class(random)!="formula") stop("The argument random must be a formula")
-        if(class(classmb)!="formula") stop("The argument classmb must be a formula")
+        if(!inherits(fixed,"formula")) stop("The argument fixed must be a formula")
+        if(!inherits(mixture,"formula")) stop("The argument mixture must be a formula")
+        if(!inherits(random,"formula")) stop("The argument random must be a formula")
+        if(!inherits(classmb,"formula")) stop("The argument classmb must be a formula")
         if(missing(data)){ stop("The argument data should be specified and defined as a data.frame")}
         if(nrow(data)==0) stop("Data should not be empty") 
         if(missing(subject)){ stop("The argument subject must be specified in any model even without random-effects")}
@@ -798,7 +802,7 @@ hlme <-
         Brandom <- FALSE
         if(length(cl$B)==2)
             {
-                if(class(eval(cl$B[[2]]))!="hlme") stop("The model specified in B should be of class hlme")
+                if(!inherits(eval(cl$B[[2]]),"hlme")) stop("The model specified in B should be of class hlme")
                 if(as.character(cl$B[1])!="random") stop("Please use random() to specify random initial values")
                 
                 Brandom <- TRUE
@@ -933,7 +937,7 @@ hlme <-
                     }
                 else
                     { 
-                        if(class(B)!="hlme") stop("B should be either a vector or an object of class hlme")
+                        if(!inherits(B,"hlme")) stop("B should be either a vector or an object of class hlme")
 
                         ## B est le meme modele mais pr ng=1 :
                         if(ng>1 & B$ng==1)

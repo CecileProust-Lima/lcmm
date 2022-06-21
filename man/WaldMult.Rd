@@ -10,7 +10,7 @@ WaldMult(Mod, pos = NULL, contrasts = NULL, name = NULL, value = NULL)
 \item{Mod}{an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
 \code{Jointlcmm}}
 
-\item{pos}{a vector containing the indices in Mod\$best of the parameters to
+\item{pos}{a vector containing the indices in \code{Mod$best} of the parameters to
 test}
 
 \item{contrasts}{a numeric vector of same length as pos.  If NULL (the

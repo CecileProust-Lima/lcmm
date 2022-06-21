@@ -59,9 +59,9 @@
 #' 
 predictYcond <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,...)
 {
-    if((!class(x) %in% c("lcmm","multlcmm","Jointlcmm"))) stop("Use only with lcmm, multlcmm or Jointlcmm objects")
-    if((class(x)=="lcmm") & any(x$linktype==3)) stop("This function is not available for ordinal outcome")
-    if((class(x)=="Jointlcmm") & any(x$linktype==-1)) stop("This function is not available without any link function")
+    if(!inherits(x,c("lcmm","multlcmm","Jointlcmm"))) stop("Use only with lcmm, multlcmm or Jointlcmm objects")
+    if(inherits(x,"lcmm") & any(x$linktype==3)) stop("This function is not available for ordinal outcome")
+    if(inherits(x,"Jointlcmm") & any(x$linktype==-1)) stop("This function is not available without any link function")
     
     if(x$conv!=1 & draws==TRUE)
     {
@@ -73,7 +73,7 @@ predictYcond <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2
     
     if(x$conv %in% c(1,2,3))
     {
-        if(class(x)=="multlcmm")
+        if(inherits(x,"multlcmm"))
         {
             ## cas multlcmm:
             debut <- x$N[3]+x$N[4]+x$N[5]+x$N[7] # nef+nvc+nw+ncor
@@ -85,7 +85,7 @@ predictYcond <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2
         }
         else
         {
-            if(class(x)=="lcmm") # lcmm continu
+            if(inherits(x,"lcmm")) # lcmm continu
             {
                 debut <- sum(x$N[1:4])-1 # nprob+nef+nvc+nw-1
             }
@@ -102,7 +102,7 @@ predictYcond <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2
         
         npm <- length(x$best)
         nbzitr <- rep(2,ny)
-        if(class(x)=="multlcmm")
+        if(inherits(x,"multlcmm"))
         {
             nbzitr[which(x$linktype==2)] <- x$nbnodes
         }

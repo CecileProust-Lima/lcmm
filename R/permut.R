@@ -22,7 +22,7 @@ permut <- function(m,order,estim=TRUE)
     {
         ng <- m$ng
 
-        if(!(class(m) %in% c("hlme","lcmm","multlcmm","Jointlcmm"))) stop("Please use this function only with hlme, lcmm, multlcmm or Jointlcmm models")
+        if(!inherits(m,c("hlme","lcmm","multlcmm","Jointlcmm"))) stop("Please use this function only with hlme, lcmm, multlcmm or Jointlcmm models")
         if(ng==1) stop("Please use this function only with latent classes")
         if(length(order)!=ng) stop(paste("Argument 'order' should be of length",ng))
         if(!all(order %in% 1:ng)) stop(paste("Please specify classes between 1 and",ng,"in argument 'order'",collapse=" "))
@@ -43,7 +43,7 @@ permut <- function(m,order,estim=TRUE)
         bnew[1:m$N[1]] <- coefnew
 
         ## coef survie pour Jointlcmm
-        if(class(m)=="Jointlcmm")
+        if(inherits(m,"Jointlcmm"))
             {
                 ## risque de base
                 nbevt <- length(m$hazard[[1]])
@@ -152,21 +152,21 @@ permut <- function(m,order,estim=TRUE)
             } # fin partie survie
 
         ## effets fixes modele mixte:
-        if(class(m) %in% c("hlme","lcmm"))
+        if(inherits(m,c("hlme","lcmm")))
             {
                 avtnef <- m$N[1]
                 nef <- m$N[2]
                 ny <- 1
                 avttr <- sum(m$N[1:4]) # ne servira que pour lcmm
             }
-        if(class(m)=="multlcmm")
+        if(inherits(m,"multlcmm"))
             {
                 avtnef <- m$N[1]
                 nef <- m$N[3]-m$N[1]-m$N[2]
                 ny <- m$N[8]
                 avttr <- sum(m$N[3:8])
             }
-        if(class(m)=="Jointlcmm")
+        if(inherits(m,"Jointlcmm"))
             {
                 avtnef <- m$N[1]+m$N[2]+m$N[3]
                 nef <- m$N[4]
@@ -176,7 +176,7 @@ permut <- function(m,order,estim=TRUE)
         tmpnef <- 0
         if(m$idg[1]==2) # intercept en mixture
             {
-                if((class(m)=="hlme") | ((class(m)=="Jointlcmm") & isTRUE(m$linktype==-1)))
+                if(inherits(m,"hlme") | (inherits(m,"Jointlcmm") & isTRUE(m$linktype==-1)))
                     {
                         bnew[avtnef+1:ng] <- m$best[avtnef+order] # echanger
                         tmpnef <- tmpnef+ng
@@ -209,19 +209,19 @@ permut <- function(m,order,estim=TRUE)
             }
 
         ## coef nw:
-        if(class(m) %in% c("hlme","lcmm"))
+        if(inherits(m,c("hlme","lcmm")))
         {
             avtnw <- m$N[1]+m$N[2]+m$N[3]
             nw <- m$N[4]
             nvc <- m$N[3]
         }
-        if(class(m)=="multlcmm")
+        if(inherits(m,"multlcmm"))
         {
             avtnw <- m$N[3]+m$N[4]
             nw <- m$N[5]
             nvc <- m$N[4]
         }
-        if(class(m)=="Jointlcmm")
+        if(inherits(m,"Jointlcmm"))
         {
             avtnw <- m$N[1]+m$N[2]+m$N[3]+m$N[4]+m$N[5]
             nw <- m$N[6]
@@ -246,7 +246,7 @@ permut <- function(m,order,estim=TRUE)
         ## coef transfo
         if(any(m$linktype>-1))
         {
-            if(class(m) %in% c("lcmm","Jointlcmm")) m$nbnodes <- length(m$linknodes)
+            if(inherits(m,c("lcmm","Jointlcmm"))) m$nbnodes <- length(m$linknodes)
             
             sumntr <- 0
             for(k in 1:ny)

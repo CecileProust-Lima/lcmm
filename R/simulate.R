@@ -75,7 +75,7 @@ simulate.lcmm <- function(object, nsim, seed, times, tname=NULL, n,
     ng <- object$ng
     if(any(object$linktype==1)) stop("Beta link functions are not implemented yet")
     
-    if(class(object) == "multlcmm")
+    if(inherits(object,"multlcmm"))
     {
         nprob <- object$N[1]
         ncontr <- object$N[2]
@@ -120,7 +120,7 @@ simulate.lcmm <- function(object, nsim, seed, times, tname=NULL, n,
         if(ncor>0) corr <- object$best[nprob+nef+ncontr+nvc+nw+1:ncor]
     }
 
-    if(class(object)=="hlme")
+    if(inherits(object,"hlme"))
     {
         nprob <- object$N[1]
         nef <- object$N[2]
@@ -144,7 +144,7 @@ simulate.lcmm <- function(object, nsim, seed, times, tname=NULL, n,
         if(ncor>0) corr <- object$best[nprob+nef+nvc+nw+1:ncor]
     }
 
-    if(class(object)=="lcmm")
+    if(inherits(object,"lcmm"))
     {
         nprob <- object$N[1]
         nrisqtot <- 0
@@ -182,7 +182,7 @@ simulate.lcmm <- function(object, nsim, seed, times, tname=NULL, n,
         if(ncor>0) corr <- object$best[nprob+nef+nvc+nw+ntr+1:ncor]
     }
     
-    if(class(object)=="Jointlcmm")
+    if(inherits(object,"Jointlcmm"))
     {
         nprob <- object$N[1]
         nrisqtot <- object$N[2]
@@ -620,7 +620,7 @@ simulate.lcmm <- function(object, nsim, seed, times, tname=NULL, n,
         for(k in 1:ny)
         {
             a <- try(yk <- sapply(ytransf[,k],transfinv,k=k), silent=TRUE)
-            if(class(a)=="try-error")
+            if(inherits(a,"try-error"))
             {
                 ok <- FALSE
                 break
@@ -696,7 +696,7 @@ simulate.lcmm <- function(object, nsim, seed, times, tname=NULL, n,
                                             zl=zl,bl=bl,
                                             expXb=exp(xbsurv+ph[ke,class]),p=unif),
                                     silent=TRUE)
-                        if(class(zero)!="try-error") tevt[ke] <- zero$root
+                        if(!inherits(zero,"try-error")) tevt[ke] <- zero$root
                     }
                     else
                     {
@@ -718,7 +718,7 @@ simulate.lcmm <- function(object, nsim, seed, times, tname=NULL, n,
                                                 zl=zl,bl=bl,
                                                 expXb=exp(xbsurv+ph[ke,class]),p=unif),
                                         silent=TRUE)
-                            if(class(zero)!="try-error") tevt[ke] <- zero$root
+                            if(!inherits(zero,"try-error")) tevt[ke] <- zero$root
                         }
                     }
                 }

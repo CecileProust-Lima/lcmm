@@ -472,10 +472,10 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         if(ng==1) hazardtype <- "Specific"  #??
         if(any(!(hazardtype %in% c("Common","Specific","PH")))) stop("'hazardtype' should be either 'Common' or 'Specific' or 'PH'")
         
-        if(class(fixed) != "formula") stop("The argument fixed must be a formula")
-        if(class(mixture) != "formula") stop("The argument mixture must be a formula")
-        if(class(random) != "formula") stop("The argument random must be a formula")
-        if(class(classmb) != "formula") stop("The argument classmb must be a formula")
+        if(!inherits(fixed,"formula")) stop("The argument fixed must be a formula")
+        if(!inherits(mixture,"formula")) stop("The argument mixture must be a formula")
+        if(!inherits(random,"formula")) stop("The argument random must be a formula")
+        if(!inherits(classmb,"formula")) stop("The argument classmb must be a formula")
         if(missing(data)){ stop("The argument data should be specified and defined as a data.frame")}
         if(nrow(data)==0) stop("Data should not be empty")
         if(missing(subject)){ stop("The argument subject must be specified in any model even without random-effects")}
@@ -1455,7 +1455,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         Brandom <- FALSE
         if(length(cl$B)==2)
             {
-                if(class(eval(cl$B[[2]]))!="Jointlcmm") stop("The model specified in B should be of class Jointlcmm")
+                if(!inherits(eval(cl$B[[2]]),"Jointlcmm")) stop("The model specified in B should be of class Jointlcmm")
                 if(as.character(cl$B[1])!="random") stop("Please use random() to specify random initial values")
                 
                 Brandom <- TRUE
@@ -1502,7 +1502,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                     }
                 else
                     {
-                        if(class(B)!="Jointlcmm") stop("B should be either a vector or an object of class Jointlcmm")
+                        if(!inherits(B,"Jointlcmm")) stop("B should be either a vector or an object of class Jointlcmm")
 
                         b <- rep(0,NPM)
 

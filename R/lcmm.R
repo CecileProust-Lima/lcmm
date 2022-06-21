@@ -470,7 +470,7 @@ if (!is.null(cor.char))
 
         if(length(mm$B)==2)
             {
-                if(class(eval(mm$B[[2]]))!="lcmm") stop("The model specified in B should be of class lcmm")
+                if(!inherits(eval(mm$B[[2]]),"lcmm")) stop("The model specified in B should be of class lcmm")
                 if(as.character(mm$B[1])!="random") stop("Please use random() to specify random initial values")
                 B <- eval(mm$B[[2]])   
                 B$Brandom <- TRUE
@@ -496,7 +496,7 @@ if(na.action==1){
 ### Traitement des donnees manquantes
 # fixed
 if(missing(fixed)) stop("The argument Fixed must be specified in any model")
-if(class(fixed)!="formula") stop("The argument fixed must be a formula")
+if(!inherits(fixed,"formula")) stop("The argument fixed must be a formula")
 m <- match.call()[c(1,match(c("data","subset","na.action"),names(match.call()),0))]
 m$formula <- terms(fixed)
 m$na.action <- na.action
@@ -506,7 +506,7 @@ na.fixed <- attr(m,"na.action")
 
 # mixture
 if(!missing(mixture)){
-	if(class(mixture)=="formula"){	
+	if(inherits(mixture,"formula")){	
 	m <- match.call()[c(1,match(c("data","subset","na.action"),names(match.call()),0))]
 	m$formula <- terms(mixture)
 	m$na.action <- na.action
@@ -520,7 +520,7 @@ if(!missing(mixture)){
 
 # random
 if(!missing(random)){
-	if(class(random)=="formula"){	
+	if(inherits(random,"formula")){	
 	m <- match.call()[c(1,match(c("data","subset","na.action"),names(match.call()),0))]
 	m$formula <- terms(random)
 	m$na.action <- na.action
@@ -534,7 +534,7 @@ if(!missing(random)){
 
 # classmb
 if(!missing(classmb)){ 
-	if(class(classmb)=="formula"){	
+	if(inherits(classmb,"formula")){	
 	m <- match.call()[c(1,match(c("data","subset","na.action"),names(match.call()),0))]	
 	m$formula <- terms(classmb)
 	m$na.action <- na.action

@@ -116,12 +116,12 @@ epoce <- function(model,pred.times,var.time,fun.time=identity,newdata=NULL,subse
     if(missing(var.time)) stop("The argument var.time should be specified")
     if (!inherits(var.time, "character")) stop("the class of var.time should be character")
     if(missing(model)) stop("The argument model must be specified")
-    if(class(model)!="Jointlcmm") stop("The argument model must be a class 'Jointlcmm'")
+    if(!inherits(model,"Jointlcmm")) stop("The argument model must be a class 'Jointlcmm'")
     if(!is.function(fun.time)) stop("'fun.time' should be a function")
 
     if(!missing(newdata))
         {
-            if(class(newdata)!="data.frame") stop("The argument newdata must be a 'data.frame'")
+            if(!is.data.frame(newdata)) stop("The argument newdata must be a 'data.frame'")
             nomsvar <- unique(c(model$Names$Xnames2,model$Names$Ynames,model$Names$ID,model$Names$Tnames,model$Names$prior.name,model$Names$TimeDepVar.name))
             if(!all(nomsvar %in% colnames(newdata))) stop(paste("newdata should include the following covariates: \n",paste(nomsvar,collapse=" ")))
             if(!(var.time %in% names(newdata))) stop("The new dataset should contain the var.time argument")	

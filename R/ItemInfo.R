@@ -73,7 +73,7 @@
 #' 
 ItemInfo <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,...)
 {
-    if((!class(x) %in% c("lcmm","multlcmm"))) stop("Use only with lcmm or multlcmm objects")
+    if(!inherits(x, c("lcmm","multlcmm"))) stop("Use only with lcmm or multlcmm objects")
     if(all(x$linktype!=3)) stop("This function is only available for ordinal outcome")
     
     if(x$conv!=1 & draws==TRUE)
@@ -86,7 +86,7 @@ ItemInfo <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,
     
     if(x$conv %in% c(1,2,3))
     {
-        if(class(x)=="multlcmm")
+        if(inherits(x,"multlcmm"))
         {
             ## cas multlcmm:
             debut <- x$N[3]+x$N[4]+x$N[5]+x$N[7] # nef+nvc+nw+ncor
@@ -111,7 +111,7 @@ ItemInfo <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,
         
         npm <- length(x$best)
         nbzitr <- rep(2,ny)
-        if(class(x)=="multlcmm")
+        if(inherits(x,"multlcmm"))
         {
             nbzitr[which(x$linktype==2)] <- x$nbnodes
         }

@@ -6,7 +6,7 @@
   ##colonnes qui correspondent aux predictions 
   colonne <- 1:m$ng
   ny <- 1
-  if(class(m)=="multlcmm")
+  if(inherits(m,"multlcmm"))
   {
     colonne <- 2:(m$ng+1)
     ny <- length(m$Ynames)
@@ -91,7 +91,7 @@
     pred <- matrix(med,nrow=ny*nrow(newdata),ncol=m$ng)
   }
   
-  if(class(m)=="multlcmm") pred <- data.frame(Yname=rep(m$Ynames,each=nrow(newdata)),pred)
+  if(inherits(m,"multlcmm")) pred <- data.frame(Yname=rep(m$Ynames,each=nrow(newdata)),pred)
   
   colnames(pred) <- colnames(res.list$pred)  
   res.list$pred <- pred
