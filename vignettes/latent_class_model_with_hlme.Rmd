@@ -339,7 +339,9 @@ Latent class mixed models can be estimated for other types of data within lcmm R
 
 - with multlcmm function for multiple longitudinal markers measuring the same underlying latent process
 
-- with Jointlcmm function for longitudinal markers and time to event (possibly with competing risks)
+- with Jointlcmm (or shortcut jlcmm) function for longitudinal markers measuring a unique longitudinal dimension and time to event (possibly with competing risks)
+
+- with mpjlcmm function for multivariate longitudinal dimensions (i.e., markers or processes measured by several markers) and time to event (possibly with competing risks)
 
 - with other functions to come ... !
 

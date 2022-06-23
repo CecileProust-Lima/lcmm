@@ -32,9 +32,8 @@ Function multlcmm treats this idea and extend the linear mixed model theory to s
 
 ## The latent process mixed model for multivariate markers 
 
-<p align="justify">The latent process mixed model is introduced in Proust-Lima et al. (2006 - https://doi.org/10.1111/j.1541-0420.2006.00573.x
-and 2013 - https://doi.org/10.1111/bmsp.12000
-). 
+<p align="justify">The latent process mixed model is introduced in Proust-Lima et al. (2006 - https://doi.org/10.1111/j.1541-0420.2006.00573.x, 2013 - https://doi.org/10.1111/bmsp.12000 and 2022 - https://doi.org/10.1016/j.ymeth.2022.01.005
+).
 
 The quantity of interest defined as a latent process is modeled according to time using a linear mixed model:
 
@@ -65,11 +64,15 @@ where:
 - $\epsilon_{ijk}$ an independent Gaussian error with mean zero and variance $\sigma_{\epsilon_k}^2$;
 - $H_k$ the link function (parameterized by $\eta_k$) that transforms the latent process into the scale and metric of marker $k$. 
 
-**Only continuous link functions are considered in multlcmm for the moment**. These are the same as in the univariate case (in lcmm). $H^{-1}$ is a parametric family of increasing monotonic functions among:
+The link functions are the same as in the univariate case (in lcmm). For continuous outcomes, $H^{-1}$ is a parametric family of increasing monotonic functions among:
 
 - the linear transformation: this reduces to the linear mixed model (2 parameters)
 - the Beta cumulative distribution family rescaled (4 parameters)
 - the basis of quadratic I-splines with m knots (m+2 parameters)
+
+For binary and ordinal outcomes, $H_k$ links each level of the variable with an interval of values for the latent process plus measurement errors. This corresponds to the (cumulative) probit model.
+
+We describe below a case with continuous link functions. For ordinal markers, see vignette https://cran.r-project.org/package=lcmm/vignettes/latent_process_model_with_multlcmm_IRT.html
 
 
 ## Identifiability
@@ -309,6 +312,6 @@ The latent process mixed model for multivariate markers extends to the heterogen
 
 ## joint analysis of a time to event
 
-The latent process mixed model for multivariate markers extends to the case of a joint model. This is done in Jointlcmm.
-<!--(see https://cran.r-project.org/package=lcmm/vignettes/joint_latent_class_model_with_Jointlcmm.html).-->
+The latent process mixed model for multivariate markers extends to the case of a joint model. This is done in Jointlcmm when one latent process is involved
+(see https://cran.r-project.org/package=lcmm/vignettes/joint_latent_class_model_with_Jointlcmm.html) or mpjlcmm when multivariate latent processes are considered (vignette to come)
 

@@ -30,14 +30,17 @@ knitr::opts_chunk$set(
 - mixed models and latent class mixed models for Gaussian longitudinal outcomes (hlme),
 - curvilinear and ordinal univariate longitudinal outcomes (lcmm)
 - curvilinear multivariate outcomes (multlcmm)
-- joint latent class mixed models (Jointlcmm) for a (Gaussian or curvilinear) longitudinal outcome and a time-to-event that can be possibly left-truncated right-censored and defined in a competing setting. 
+- joint latent class mixed models (jlcmm and mpjlcmm) for (Gaussian and/or curvilinear) longitudinal outcomes and a time-to-event that can be possibly left-truncated right-censored and defined in a competing setting. 
 
 
-<p align="justify">The package lcmm includes 4 main functions: lcmm, hlme, multlcmm and Jointlcmm. Each function is described in a different vignette. These functions apply to longitudinal markers, even those that have limited metrological properties but the functions can also be used in cross-sectional context.</p>
+<p align="justify">The package lcmm includes 5 main functions: lcmm, hlme, multlcmm, jlcmm and mpjlcmm. Each function is described in a different vignette. These functions apply to longitudinal markers, even those that have limited metrological properties but the functions can also be used in cross-sectional context.</p>
 
 
-For each model, maximum likelihood estimators are obtained using a modified Marquardt algorithm with strict convergence criteria based on the parameters and likelihood stability, and on the negativity of the second derivatives. The package also provides various post-fit functions including goodness-of-fit analyses, classification, plots, predicted trajectories, individual dynamic prediction of the event and predictive accuracy assessment.</p>
+For each model, maximum likelihood estimators are obtained using a modified Marquardt algorithm with strict convergence criteria based on the parameters and likelihood stability, and on the negativity of the second derivatives. The algorithm is implemented in the R package marqLevAlg with parallel computation. </p>
 
+The package also provides various post-fit functions including goodness-of-fit analyses, classification, plots, predicted trajectories, individual dynamic prediction of the event and predictive accuracy assessment. </p>
+
+Any question question or issue should be addressed on the github page: https://github.com/CecileProust-Lima/lcmm/issues </p>
 
 
 # Calls functions
@@ -55,7 +58,7 @@ hlme(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALS
 
 ## lcmm 
 
-This function is used to estimate mixed models when the outcome does not have a Gaussian distribution. The method is called "latent process model". As hlme, the method also handles heterogeneous profiles of trajectories in a "latent process and latent class mixed model". 
+This function is used to estimate mixed models when the outcome does not have a Gaussian distribution. The method is called "latent process model". It currently handles curvilinear or non-Gaussian continuous markers using continuous link functions, and binary and ordinal markers using the probit framework with piecewise constant link functions. As hlme, the method also handles heterogeneous profiles of trajectories in a "latent process and latent class mixed model". 
 
 ```
 lcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALSE, link = "linear", intnodes = NULL, epsY = 0.5, cor = NULL, data, B, convB = 1e-04, convL = 1e-04, convG = 1e-04,  maxiter = 100, nsim = 100, prior, range = NULL, subset = NULL, na.action = 1, posfix = NULL,  partialH = FALSE)
@@ -63,14 +66,14 @@ lcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALS
 
 ## multlcmm
 
-This function extends lcmm function when more than one marker measures the same underlying construct of interest. Again the function handles either homogeneous or heterogeneous profiles of trajectories.
+This function extends lcmm function when more than one marker measures the same underlying construct of interest. The function handles the same natures of markers as lcmm (possibly mixed into the same model): curvilinear or non-Gaussian continuous markers using continuous link functions, and binary and ordinal markers using the probit framework with piecewise constant link functions. With only binary/ordinal markers, multlcmm defines a continuous-time longitudinal IRT model. In addition, as other functions, multlcmm handles either homogeneous or heterogeneous profiles of trajectories.
 
 ```
 multlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg = FALSE, randomY = FALSE, link = "linear", intnodes = NULL, epsY = 0.5, cor = NULL, data, B, convB = 1e-04, convL = 1e-04, convG = 1e-04, maxiter = 100, nsim = 100, prior, range = NULL, subset = NULL, na.action = 1, posfix = NULL, partialH = FALSE)
 ``` 
 
 
-## Jointlcmm 
+## jlcmm 
 
 This function extends hlme, lcmm and multlcmm to jointly analyze times to event (in a competing setting). The latent structure shared between the longitudinal outcome(s) and the time(s) to event is latent classes. 
 
@@ -79,6 +82,18 @@ Jointlcmm(fixed, mixture, random, subject, classmb, ng = 1, idiag = FALSE, nwg =
 ``` 
 
 
+
+## mpjlcmm 
+
+This function is a multivariate version of jlcmm: it models multivariate longitudinal markers (possibly regrouped in several latent processes), and may also jointly analyze times to event (in a competing setting). The latent structure shared between the latent processes and the time(s) to event is latent classes. 
+
+```
+mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
+      hazard="Weibull",hazardtype="Specific",hazardnodes=NULL,TimeDepVar=NULL,
+      data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,
+      prior,logscale=FALSE,subset=NULL,na.action=1,posfix=NULL,
+      partialH=FALSE,verbose=TRUE,nproc=1,clustertype=NULL)
+``` 
 
 # Package installation
 

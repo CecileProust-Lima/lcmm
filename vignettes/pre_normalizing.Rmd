@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 ```
 &nbsp;
 
-Functions lcmm, multlcmm and jointlcmm handle dependent variables that are not necessarily Gaussian. These functions rely on the simultaneous normalization of the variable and estimation of the regression parameters using parameterized link functions (argument "link=").
+Functions lcmm, multlcmm, Jointlcmm and mpjlcmm handle dependent variables that are not necessarily Gaussian. These functions rely on the simultaneous normalization of the variable and estimation of the regression parameters using parameterized link functions (argument "link=").
 
 However in some cases, one may want to pre-normalize once for all a dependent variable so that standard methods for Gaussian outcomes can then be used without caution. 
 

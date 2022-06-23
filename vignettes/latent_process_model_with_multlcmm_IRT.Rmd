@@ -1,5 +1,5 @@
 ---
-title: 'Continuous-time longitudinal IRT model of PREDIALA study'
+title: 'Continuous-time longitudinal IRT model'
 output: 
   rmarkdown::html_vignette:
     toc: true # table of content true
@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette illustrates how to estimate a longitudinal IRT following the methodology described in Proust-Lima et al. (2021 - https://arxiv.org/abs/2109.13064). The model combines a graded response measurement model to link a series of ordinal items measured repeatedly over time with their underlying latent process. Simultaneously, a linear mixed model describes the trajectory of the underlying latent process over time. 
+This vignette illustrates how to estimate a longitudinal IRT following the methodology described in Proust-Lima et al. (2022 - https://doi.org/10.1016/j.ymeth.2022.01.005). The model combines a graded response measurement model to link a series of binary or ordinal items measured repeatedly over time with their underlying latent process. Simultaneously, a linear mixed model describes the trajectory of the underlying latent process over time. 
 
 ```{r, results='hide',message=FALSE,warning=FALSE, echo=FALSE}
 load("models_IRT.RData")

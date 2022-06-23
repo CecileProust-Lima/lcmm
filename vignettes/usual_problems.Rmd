@@ -41,10 +41,10 @@ It sometimes happens that a model does not converge correctly. This is due most 
 
 1. When the time variable (or more generally a variable with random effects) is in a unit which induces too small associated parameters (for very small changes per day). In that case, changing the scale (for instance with months or years) may solve the problem.
 
-2. In models with splines in the link function (lcmm, multlcmm, Jointlcmm) or with splines in the baseline risk function (Jointlcmm), a parameter associated with splines very close to zero may prevent for correct convergence as it is at the border of the parameter space. In that case, this parameter can be fixed to 0 and convergence should be reached immediately.
+2. In models with splines in the link function (lcmm, multlcmm, Jointlcmm, mpjlcmm) or with splines in the baseline risk function (Jointlcmm, mpjlcmm), a parameter associated with splines very close to zero may prevent for correct convergence as it is at the border of the parameter space. In that case, this parameter can be fixed to 0 and convergence should be reached immediately.
    
 3. When the data are not rich enough and/or the model is too complicated. In that case, this is a problem of numerical non identifiability. There are not many solutions (other than simplifying the model) but some directions may be :
-    * Be patient, it happens that after some iterations the derivatives might be inversible and the model converges (you can change maxiter or rerun the program from the estimates at the non convergence point). But this is usually no necessary to specify more than 100 or 200 iterations. The iterative algorithm is used to converge in a few dozen of iterations. 
+    * Be patient, it happens that after some iterations the derivatives might be invertible and the model converges (you can change maxiter or rerun the program from the estimates at the non convergence point). But this is usually no necessary to specify more than 100 or 200 iterations. The iterative algorithm is used to converge in a few dozen of iterations. 
     * You can try to assume a less stringent threshold (e.g., 0.01) but be careful, convergence might be of lower quality.   
     * Run the model from different initial values.
 
@@ -71,7 +71,7 @@ https://cran.r-project.org/package=lcmm/vignettes/latent_class_model_with_hlme.h
 &nbsp;
 
  
-# How to evaluate the quality of a classification ?
+# How to evaluate the quality of a classification?
 
 Good discrimination of classes is usually sought when fitting latent class mixed models. Discriminatory power can be assessed using the entropy criterion (provided in summarytable) but also using the classification table (with command postprob). The description of the classes may also help comprehend the latent class structure. 
 
@@ -82,7 +82,7 @@ for further details)
 
 &nbsp;
 
-# How to evaluate the fit of a model ? 
+# How to evaluate the fit of a model? 
 
 Different techniques can be used in this package to evaluate the goodness of fit. As in mixed models, one can compare the subject-specific predictions with the observations or plot the subject-specific residuals.
 
@@ -93,7 +93,7 @@ Each vignette includes a section on the evaluation of the model.
 
 &nbsp;
 
-# How to pre-normalize a variable using lcmm ? 
+# How to pre-normalize a variable using lcmm? 
   
 This is detailed in vignette on pre-normalizing:  https://cran.r-project.org/package=lcmm/vignettes/pre_normalizing.html
 

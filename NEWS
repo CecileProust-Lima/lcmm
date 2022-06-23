@@ -14,7 +14,7 @@ And specific statistical models estimated are described in various statistical p
 Changes in Version 2.0.0 (2022-06-15) :
 
 * the model's estimation is now available in parallel mode! 
-* The optimization relies on the parallelized marqLevAlg package.
+* The optimization relies on the parallelized marqLevAlg R package.
 * models with latent classes (ng>1) require initial values
 * the hlme function has now a pprior argument
 * the mpjlcmm function can be used without a time-to-event model

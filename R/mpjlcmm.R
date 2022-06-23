@@ -1,10 +1,13 @@
-#' Estimation of multi-process joint latent class mixed models
+#' Estimation of multivariate joint latent class mixed models
 #'
-#' This function fits multi-process joint latent class models. It is a multivariate
-#' extension of the Jointlcmm function. It handles multiple latent processes, possibly
-#' measured by sereval continuous markers (Gaussian or curvilinear). Theses processes are
-#' independent given the latent classes. The optional survival part handles competing
-#' risks, right censoring and left truncation.
+#' This function fits joint latent class models for multivariate longitudinal markers
+#' and competing causes of event. It is a multivariate
+#' extension of the Jointlcmm function. It defines each longitudinal dimension as a 
+#' latent process (mp in mpjlcmm is for multivariate processes), possibly
+#' measured by sereval continuous markers (Gaussian or curvilinear). For the moment, 
+#' theses processes are assumed independent given the latent classes. 
+#' The (optional) survival part handles competing risks, right censoring and left truncation.
+#' The specification of the function is similar to other estimating functions of the package. 
 #'
 #' @param longitudinal list of longitudinal models of type hlme, lcmm or multlcmm. Each
 #' model defines the structure of one latent process.
@@ -33,7 +36,8 @@
 #' the exact same structure of model but with ng=1. The program will
 #' automatically generate initial values from this model. Note that due to possible
 #' local maxima, the \code{B} vector should be specified and several different
-#' starting points should be tried.
+#' starting points should be tried. This can be done automatically using 
+#' gridsearch function.
 #' @param convB optional threshold for the convergence criterion based on the
 #' parameter stability
 #' @param convL optional threshold for the convergence criterion based on the
