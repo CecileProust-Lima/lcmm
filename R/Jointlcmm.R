@@ -1460,8 +1460,8 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                 
                 Brandom <- TRUE
                 B <- eval(cl$B[[2]])
-
-                if(length(posfix)) stop("Argument posfix is not compatible with random intial values")
+                if(B$conv != 1) stop("Model in argument B did not converge properly")
+                #if(length(posfix)) stop("Argument posfix is not compatible with random intial values")
             }
     
         ##valeurs initiales

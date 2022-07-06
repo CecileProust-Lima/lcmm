@@ -474,7 +474,7 @@ if (!is.null(cor.char))
                 if(as.character(mm$B[1])!="random") stop("Please use random() to specify random initial values")
                 B <- eval(mm$B[[2]])   
                 B$Brandom <- TRUE
-                
+                if(B$conv != 1) stop("Model in argument B did not converge properly")
                 #if(length(posfix)) stop("Argument posfix is not compatible with random intial values")
             }
 
