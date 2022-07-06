@@ -936,9 +936,10 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             }
             else
             {
-                uniqueY0 <- ym
-                indiceY0 <- c(1:length(ym))
-                nvalSPL0 <- c(nvalSPL0,length(ym))
+                uniqueY0 <- c(uniqueY0, ym)
+                indiceY0 <- c(indiceY0, c(1:length(ym)))
+                nb <- nb + length(ym)
+                nvalSPL0 <- c(nvalSPL0, length(ym))
             }
         }
     }
