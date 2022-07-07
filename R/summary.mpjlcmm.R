@@ -127,14 +127,16 @@ summary.mpjlcmm <- function(object,...)
         nprob <- x$N[1]
         nrisqtot <- x$N[2]
         nvarxevt <- x$N[3]
-        nef <- x$Nprm[3+1:K]
-        ncontr <- x$Nprm[3+K+1:K]
-        nvc <- x$Nprm[3+2*K+1:K]
-        nw <- x$Nprm[3+3*K+1:K]
-        ncor <- x$Nprm[3+4*K+1:K]
-        nerr <- x$Nprm[3+5*K+1:K]
-        nalea <- x$Nprm[3+6*K+1:K]
-        ntr <- x$Nprm[3+7*K+1:sum(x$ny)]
+        l <- 3
+        if(nbevt>1) l <- 2+nbevt
+        nef <- x$Nprm[l+1:K]
+        ncontr <- x$Nprm[l+K+1:K]
+        nvc <- x$Nprm[l+2*K+1:K]
+        nw <- x$Nprm[l+3*K+1:K]
+        ncor <- x$Nprm[l+4*K+1:K]
+        nerr <- x$Nprm[l+5*K+1:K]
+        nalea <- x$Nprm[l+6*K+1:K]
+        ntr <- x$Nprm[l+7*K+1:sum(x$ny)]
         NPM <- length(x$best)
 
         ## shorten names if > 20 characters
