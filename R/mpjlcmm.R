@@ -772,11 +772,16 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                         zitr <- cbind(zitr,ztmp)
                     }
                     epsY[sum(ny[1:k])-ny[k]+1:ny[k]] <- mod$epsY
+                    mspl <- 0
                     for (m in 1:ny[k])
                     {
                         if(mod$linktype[m]==0) ntr[sum(ny[1:k])-ny[k]+m] <- 2
                         if(mod$linktype[m]==1) ntr[sum(ny[1:k])-ny[k]+m] <- 4
-                        if(mod$linktype[m]==2) ntr[sum(ny[1:k])-ny[k]+m] <- mod$nbnodes[m]+2
+                        if(mod$linktype[m]==2)
+                        {
+                            mspl <- mspl +1
+                            ntr[sum(ny[1:k])-ny[k]+m] <- mod$nbnodes[mspl]+2
+                        }
                     }
                 }
                 if(contrainte==1)
@@ -1355,7 +1360,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         NPM <- nprob + nrisqtot + nvarxevt +
             neftot + ncontrtot + nvctot + nwtot + ncortot +
             naleatot + ntrtot + nerrtot
-                  
+               
         V <- rep(0, NPM*(NPM+1)/2)  #pr variance des parametres
 
         ## prm fixes
