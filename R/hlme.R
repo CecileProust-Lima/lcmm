@@ -677,12 +677,12 @@ hlme <-
         ##pprior : proba d'appartenance a chaque classe
         if(is.null(pprior))
         {
-            pprior0 <- matrix(0, length(IND), ng)            
+            pprior0 <- matrix(1, length(IND), ng)            
         }
         else
         {
             if(ng==1) stop("pprior is only useful if ng>1")
-            if(classmb != ~-1) stop("classmb should be ~-1 if pprior is specified")
+            ##if(classmb != ~-1) stop("classmb should be ~-1 if pprior is specified")
             if(!is.character(pprior)) stop("pprior should be a character vector")
             if(length(pprior) != ng) stop("pprior should be of length ng")
             if(!all(pprior %in% colnames(newdata))) stop("pprior variables should be included in data")
@@ -767,13 +767,13 @@ hlme <-
         {
             pprior0 <- matYX[cumsum(nmes0),3+1:ng, drop=FALSE]
             if(any(is.na(pprior0))) stop("pprior contains missing values")
-            if(any(pprior0 < 0)) stop("pprior should be non negative")
-            if(any(pprior0 > 1)) stop("pprior should be < 1")
-            if(!all.equal(as.numeric(apply(pprior0,1,sum)), rep(1,ns0))) stop("pprior should sum up to 1 for all subjects")
+            #if(any(pprior0 < 0)) stop("pprior should be non negative")
+            #if(any(pprior0 > 1)) stop("pprior should be < 1")
+            #if(!all.equal(as.numeric(apply(pprior0,1,sum)), rep(1,ns0))) stop("pprior should sum up to 1 for all subjects")
         }
         else
         {
-            pprior0 <- matrix(0, ns0, ng0)
+            pprior0 <- matrix(1, ns0, ng0)
         }
         pprior0 <- t(pprior0)       
         

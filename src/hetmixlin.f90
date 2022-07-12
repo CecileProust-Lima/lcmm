@@ -304,14 +304,8 @@
                 pi=0.d0
                 pi(prior(i))=1.d0
              else
-                if(nprob.eq.0) then
-                   !! on prend pprior
-                   pi=0.d0
-                   do g=1,ng
-                      pi(g) = pprior(i,g)
-                   end do
-                   
-                else
+                pi=1.d0   
+                if(nprob.gt.0) then
                    
                    ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
                    Xprob=0.d0
@@ -343,6 +337,14 @@
                       pi(g)=pi(g)*pi(ng)
                    end do
                 end if
+
+                !if(nprob.eq.0) then
+                !! on prend pprior
+                !pi=0.d0
+                do g=1,ng
+                   pi(g) = pi(g)*pprior(i,g)
+                end do
+                
              end if
 
 ! creation des vecteurs de variables explicatives
@@ -636,16 +638,8 @@
           pi=0.d0
           pi(prior(i))=1.d0
        else
-
-          if(nprob.eq.0) then
-             
-             !! on prend pprior
-             pi=0.d0
-             do g=1,ng
-                pi(g) = pprior(i,g)
-             end do
-
-          else
+          pi=1.d0
+          if(nprob.gt.0) then
              ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
              Xprob=0.d0
              !Xprob(1)=1
@@ -677,6 +671,15 @@
                 pi(g)=pi(g)*pi(ng)
              end do
           end if
+
+          !if(nprob.eq.0) then
+             
+             !! on prend pprior
+             !pi=0.d0
+             do g=1,ng
+                pi(g) = pi(g)*pprior(i,g)
+             end do
+
        endif
 !     write(*,*)'pi',(pi(g),g=1,ng)
 
@@ -1035,16 +1038,9 @@
                pi=0.d0
                pi(prior(i))=1.d0
             else
+               pi=1.d0
+               if(nprob.gt.0) then
 
-               if(nprob.eq.0) then
-
-                   !! on prend pprior
-                   pi=0.d0
-                   do g=1,ng
-                      pi(g) = pprior(i,g)
-                   end do
-
-               else
                   !     transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
                   Xprob=0.d0
                   !Xprob(1)=1.d0
@@ -1076,6 +1072,13 @@
                      pi(g)=pi(g)*pi(ng)
                   end do
                end if
+
+               !! on prend pprior
+               !pi=0.d0
+               do g=1,ng
+                  pi(g) = pi(g)*pprior(i,g)
+               end do
+               
             end if
 !     write(*,*)'pi',(pi(g),g=1,ng)
 
