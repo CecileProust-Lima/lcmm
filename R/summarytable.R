@@ -80,7 +80,7 @@ summarytable <- function(m1, ..., which=c("G","loglik","npm","BIC","%class"), di
         
         entropy <- function(x)
         {
-            z <- as.matrix(log(x$pprob[,c(3:(x$ng+2))])*x$pprob[,c(3:(x$ng+2))])
+            z <- log(as.matrix(x$pprob[,c(3:(x$ng+2))]))*as.matrix(x$pprob[,c(3:(x$ng+2))])
             if(any(!is.finite(z)))
             {
                 z[which(!is.finite(z))] <- 0
