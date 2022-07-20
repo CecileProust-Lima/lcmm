@@ -293,7 +293,7 @@ mj3b <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, mixture =~ age65 + I(age6
 # For the 4 class model, we can start from the three class model:
 Binit <- rep(0, length(mj3b$best) + 2 + 3 + 1)
 Binit[c(1, 2, 4:7, 10:15, 17:19, 21:23, 25:length(Binit))] <- mj3b$best
-Binit[c(3, 8, 9, 16, 20, 24)] <- c(0, 0.1, 10, 60, 5, -10)
+Binit[c(3, 8, 9, 16, 20, 24)] <- c(-1, 0.1, 10, 60, 5, -10)
 mj4b <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, mixture =~ age65 + I(age65^2),
                   random =~ age65 + I(age65^2), survival = Surv(age_init, agedem, dem) 
                   ~ CEP + male, hazard = "Weibull", subject = 'ID', data = paquidS, 
@@ -322,15 +322,11 @@ From the summary, we choose the 4 class model.
 summarytable(mj1,mj2,mj3,mj3b,mj3c,mj4,mj4b,mj4c)
 # summary table with other measures for those who converged: 
 summarytable(mj1,mj2,mj3c,mj4b,which=c("npm","conv","loglik","BIC","SABIC","entropy","scoretest"))
-tab <- summarytable(mj1,mj2,mj3c,mj4b,which=c("npm","loglik","BIC","SABIC","entropy"))
 # plots
-ng <- 1:4
-par(mfrow=c(1,2))
-plot(tab[,"BIC"] ~ ng,type="l",bty='n')
-plot(tab[,"entropy"] ~ ng,type="l",bty='n')
+summaryplot(mj1,mj2,mj3c,mj4b,which=c("BIC","entropy"))
 # score test statistics for the independence assumption
 ST <- c(mj1$scoretest[1],mj2$scoretest[1],mj3c$scoretest[1],mj4b$scoretest[1]) 
-plot(ST ~ ng,type="l",bty='n')
+plot(ST ~ c(1:4),type="l",bty='n')
 ```
 
 The score test statistics rejects the conditional independence at the 5% level but the shape of the curve of ST according to the number of class (with the asymptot) tells us that we will probably never reach the significance level.
@@ -381,31 +377,6 @@ The residuals of the longitudinal part:
 ```{r, include=T}
 plot(mj4b)
 ```
-
-
-For the survival part, predictive survival can be compared to a weighted kaplan-meier but this is not automatic yet in the package. It needs to be programmed manually so we will not see it today. 
-
-
-<!-- ```{r, include=T} -->
-<!-- # Comparison with Kaplan-Meier -->
-<!-- require(survey) -->
-<!-- s <- list(NULL) -->
-
-<!-- paquidS_unique<-paquidS[-which(duplicated(paquidS$ID)==T),] -->
-<!-- for (g in 1:4){ -->
-<!--   prob <- mj4b$pprob[,2+g] -->
-<!--   names(prob) <- "prob" -->
-<!--   psaKM <- cbind(paquidS_unique,prob) -->
-<!--   dpbc<-svydesign(id=~ID,weights=~prob, data=psaKM) -->
-<!--   s[[g]]<-svykm(Surv(agedem,dem)~1, design=dpbc) -->
-<!--   lines( s[[g]],col=g) -->
-<!--   plot(s[[g]],lwd=2,col=color[g],bty="l",ylim=ylim,xlim=xlim1,xlab="" -->
-<!--        ,lty=1,pch=2,ylab="") -->
-<!--   par(new=TRUE) -->
-<!-- } -->
-<!-- ``` -->
-
-
 
 
 ## 4.4. Graph of predicted trajectories according to a profile of covariates
