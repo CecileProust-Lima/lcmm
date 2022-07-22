@@ -66,7 +66,7 @@ We use the paquid sample included in the package. Please refer to the introducti
 paquidS <- paquid[which(paquid$agedem > paquid$age_init),]
 ```
 
-We laso create some variables that will be used in the example :
+We also create some variables that will be used in the example :
 
 ```{r, include=T}
 library(NormPsy)
@@ -99,26 +99,26 @@ In the application, the risk of dementia is described according to age so we hav
 
 We try different families of baseline risks (Weibull, Splines, piecewise constant) and we systematically adjust on CEP and male.
 
-```{r, include=T,eval=F}
+```{r, include=T,eval=TRUE}
 # Weibull distribution
 mj1 <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, random =~ age65 + I(age65^2), 
                  survival = Surv(age_init, agedem, dem) ~ CEP + male, hazard = "Weibull",
-                 subject = 'ID', data = paquidS)
+                 subject = 'ID', data = paquidS, verbose=FALSE)
 mj1$best
 # Note that to reduce computation time, we could fix the parameters of the longitudinal 
 #part to those of the linear mixed model 
 binit <- c(1,1,1,1,lmm$best)
 mj1bis <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, random =~ age65 + I(age65^2),
                     survival = Surv(age_init, agedem, dem) ~ CEP + male, hazard = "Weibull",
-                    subject = 'ID', data = paquidS,B=binit, posfix=5:15)
+                    subject = 'ID', data = paquidS,B=binit, posfix=5:15, verbose=FALSE)
 # Piecewise constant hazard
 mjP1 <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, random =~ age65 + I(age65^2),
                   survival = Surv(age_init, agedem, dem) ~ CEP + male, hazard = "piecewise",
-                  subject = 'ID', data = paquidS)
+                  subject = 'ID', data = paquidS, verbose=FALSE)
 # Hazard approximated by cubic splines (3 intern knots located at the quantiles by default
 mjS1 <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, random =~ age65 + I(age65^2),
                   survival = Surv(age_init, agedem, dem) ~ CEP + male, hazard = "splines",
-                  subject = 'ID', data = paquidS)
+                  subject = 'ID', data = paquidS, verbose=FALSE)
 ```
 
 The Weibull model gives the best fit. 
@@ -132,11 +132,11 @@ summary(mj1)
 ```
 It is possible to change the parameterization of the survival model (with log instead of +/-sqrt)
 
-```{r, include=T,eval=F}
+```{r, include=T,eval=TRUE}
 binit <- c(1,1,1,1,lmm$best)
 mj1ter <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, random =~ age65 + I(age65^2),
                     survival = Surv(age_init, agedem, dem) ~ CEP + male, hazard = "Weibull",
-                    subject = 'ID', data = paquidS,B=binit, posfix=5:15,logscale = TRUE)
+                    subject = 'ID', data = paquidS,B=binit, posfix=5:15,logscale = TRUE, verbose=FALSE)
 # Same loglikelihood, HR, only the parameters of the baseline risk function change.
 summary(mj1ter)
 ```
@@ -151,7 +151,7 @@ This is a cumbersome step in the analysis since the estimation has to be replica
 
 ### 3.1  Model with two latent classes
 
-```{r, include=T,eval=F}
+```{r, include=T,eval=TRUE}
 # Model with 2 latent classes and class-specific baseline risks
 # The starting values are determined by the model under G=1
 # CAUTION: Try to specify argument B=. Otherwise, the program internally estimated a 
@@ -159,12 +159,12 @@ This is a cumbersome step in the analysis since the estimation has to be replica
 mj2 <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, mixture =~ age65 + I(age65^2), 
                  random =~ age65 + I(age65^2), survival = Surv(age_init, agedem, dem) 
                  ~ CEP
-                 + male, hazard = "Weibull", subject = 'ID', data = paquidS, ng=2,B=mj1)
+                 + male, hazard = "Weibull", subject = 'ID', data = paquidS, ng=2,B=mj1, verbose=FALSE)
 # model with 2 latent classes and proportional hazards in each class
 mj2_prop <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, mixture =~ age65 + I(age65^2),
                       random =~ age65 + I(age65^2), survival = Surv(age_init, agedem, dem)
                       ~ CEP + male, hazard = "Weibull", subject = 'ID', data = paquidS,
-                      ng=2,B=mj1, hazardtype='PH')
+                      ng=2,B=mj1, hazardtype='PH', verbose=FALSE)
 # comparison
 summarytable(mj2,mj2_prop,which=c("npm","loglik","AIC"))
 ```
@@ -187,11 +187,17 @@ summary(mj2)
 
 From this first model, we can look at different output functions available in the package to evaluate the quality of fit of the model. 
 
-```{r, include=T,eval=F}
+```{r, include=T,eval=TRUE}
 # quality of the classification
 postprob(mj2)
+```
+
+```{r, include=T,eval=TRUE, fig.height=6, fig.width=7, fig.align = "center"}
 # residuals
 plot(mj2)
+```
+
+```{r, include=T,eval=TRUE, fig.height=4, fig.width=5, fig.align = "center"}
 # fit of the longitudinal model: marginal predictions
 plot(mj2,which="fit",var.time="age")
 # fit of the longitudinal model: subject-specific predictions
@@ -200,7 +206,7 @@ plot(mj2,which="fit",var.time="age",marg=FALSE)
 
 And the predictions of the model:
 
-```{r, include=T,eval=F}
+```{r, include=T,eval=TRUE, fig.height=4, fig.width=5, fig.align = "center"}
 # plot of the baseline risk functions and survival functions
 plot(mj2,which="baselinerisk",var.time="age")
 plot(mj2,which="survival",var.time="age")
@@ -216,7 +222,7 @@ The model obtained with the first call of jointlcmm is not necessarily the maxim
 
 The grid search can take a lot of time as replicating R model estimation. I recommend to use 100 random departures and if possible between 30-50 iterations. Here, we will illustrate the procedure with less replicates and iterations to reduce the processing time. 
 
-```{r, include=T,eval=F}
+```{r, include=T,eval=TRUE}
 # model with 2 latent classes and class-specific risk functions.
 # multiple departures using a grid search 
 # (here, only a small gridsearch with 15 replicates and 10 iterations 
@@ -236,12 +242,12 @@ binit <- c(0,0.10,5,0.11,5.1,0,0,70,60,3,8,0,-5,13,mj1$best[9:15])
 mj2c <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, mixture =~ age65 + I(age65^2), 
                   random =~ age65 + I(age65^2), survival = Surv(age_init, agedem, dem)
                   ~ CEP + male, hazard = "Weibull", subject = 'ID', data = paquidS,
-                  ng=2,B=binit)
+                  ng=2,B=binit, verbose=FALSE)
 # We can also start with a random departure:
 mj2d <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, mixture =~ age65 + I(age65^2), 
                   random =~ age65 + I(age65^2), survival = Surv(age_init, agedem, dem)
                   ~ CEP + male, hazard = "Weibull", subject = 'ID', data = paquidS,
-                  ng=2,B=random(mj1))
+                  ng=2,B=random(mj1), verbose=FALSE)
 
 ```
 
@@ -257,11 +263,11 @@ summarytable(mj2,mj2b,mj2c,mj2d)
 Estimation of the models with 3 and 4 classes from default values (based on G=1 model estimates).
 
 
-```{r, include=T,eval=F}
+```{r, include=T,eval=TRUE}
 mj3 <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, mixture =~ age65 + I(age65^2),
                  random =~ age65 + I(age65^2), survival = Surv(age_init, agedem, dem) 
                  ~ CEP + male, hazard = "Weibull", subject = 'ID', data = paquidS, 
-                 ng = 3, B = mj1) 
+                 ng = 3, B = mj1, verbose=FALSE) 
 
 mj4 <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, mixture =~ age65 + I(age65^2),
                  random =~ age65 + I(age65^2), survival = Surv(age_init, agedem, dem) 
@@ -278,7 +284,11 @@ summarytable(mj1,mj2,mj3,mj4)
 
 Such a problem may happen and the user should be careful with this issue. We can use other initial values to search for the global maximum in another part of the parameter space: 
 
-```{r, include=T,eval=F}
+```{r, include=FALSE,eval=TRUE}
+load("gridsearch_jlcmm.RData")
+```
+
+```{r, include=T,eval=FALSE}
 # For 3 classes, we need 6 additional parameters compared to the 2 class model: 
 # 1 proba + 2 Weibull + 3 polynomial parameters. 
 
@@ -288,7 +298,7 @@ Binit[c(1, 3, 4, 11, 14, 17)] <- c(0, 0.11, 4, 70, 0, 0)
 mj3b <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, mixture =~ age65 + I(age65^2), 
                   random =~ age65 + I(age65^2), survival = Surv(age_init, agedem, dem)
                   ~ CEP + male, hazard = "Weibull", subject = 'ID', data = paquidS, 
-                  ng = 3, B = Binit) 
+                  ng = 3, B = Binit, verbose=FALSE) 
 
 # For the 4 class model, we can start from the three class model:
 Binit <- rep(0, length(mj3b$best) + 2 + 3 + 1)
@@ -297,7 +307,7 @@ Binit[c(3, 8, 9, 16, 20, 24)] <- c(-1, 0.1, 10, 60, 5, -10)
 mj4b <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, mixture =~ age65 + I(age65^2),
                   random =~ age65 + I(age65^2), survival = Surv(age_init, agedem, dem) 
                   ~ CEP + male, hazard = "Weibull", subject = 'ID', data = paquidS, 
-                  ng = 4, B = Binit) 
+                  ng = 4, B = Binit, verbose=FALSE) 
 
 # The best way is to use the grid search (although for the class, we consider only 
 # 10 replicates and 15 iterations at max so that it is not too long)
@@ -306,18 +316,18 @@ mj4b <- Jointlcmm(normMMSE ~ age65 + I(age65^2) + CEP, mixture =~ age65 + I(age6
 mj3c <- gridsearch(rep = 10, maxiter = 15, minit = mj1, Jointlcmm(normMMSE ~ age65 +
                   I(age65^2) + CEP, mixture =~ age65 + I(age65^2), random =~ age65 +
                     I(age65^2), survival = Surv(age_init, agedem, dem) ~ CEP + male,
-                   hazard = "Weibull", subject = 'ID', data = paquidS, ng =3)) 
+                   hazard = "Weibull", subject = 'ID', data = paquidS, ng =3, verbose=FALSE)) 
  
 # 4 class model with gridsearch
 mj4c <- gridsearch(rep = 10, maxiter = 15, minit = mj1, Jointlcmm(normMMSE ~ age65 +
                   I(age65^2) + CEP, mixture =~ age65 + I(age65^2), random =~ age65 +
                     I(age65^2), survival = Surv(age_init, agedem, dem) ~ CEP + male,
-                  hazard = "Weibull", subject = 'ID', data = paquidS, ng = 4),verbose=F)
+                  hazard = "Weibull", subject = 'ID', data = paquidS, ng = 4,verbose=F))
 ```
 
 From the summary, we choose the 4 class model. 
 
-```{r, include=T}
+```{r, include=T, fig.height=4, fig.width=7, fig.align = "center"}
 # summarytable by default
 summarytable(mj1,mj2,mj3,mj3b,mj3c,mj4,mj4b,mj4c)
 # summary table with other measures for those who converged: 
@@ -326,7 +336,7 @@ summarytable(mj1,mj2,mj3c,mj4b,which=c("npm","conv","loglik","BIC","SABIC","entr
 summaryplot(mj1,mj2,mj3c,mj4b,which=c("BIC","entropy"))
 # score test statistics for the independence assumption
 ST <- c(mj1$scoretest[1],mj2$scoretest[1],mj3c$scoretest[1],mj4b$scoretest[1]) 
-plot(ST ~ c(1:4),type="l",bty='n')
+plot(ST ~ c(1:4),type="l",bty='n',main="Score test", xlab="number of classes", ylab="")
 ```
 
 The score test statistics rejects the conditional independence at the 5% level but the shape of the curve of ST according to the number of class (with the asymptot) tells us that we will probably never reach the significance level.
@@ -358,7 +368,7 @@ postprob(mj4b)
 
 We can assess the fit of the model by comparing the predictions to the observations by time intervals. 
 
-```{r, include=T}
+```{r, include=T, fig.height=4, fig.width=7, fig.align = "center"}
 # overall
 plot(mj4b, which = "fit", var.time = "age65", marg = F, break.times = 10, bty = "l", 
      ylab = "normMMSE", xlab = "Age in decades from 65 years",shades=T)
@@ -374,14 +384,14 @@ plot(mj4b, which = "fit", var.time = "age65", marg = F, break.times = 10, bty = 
 
 The residuals of the longitudinal part:
 
-```{r, include=T}
+```{r, include=T,eval=TRUE, fig.height=6, fig.width=7, fig.align = "center"}
 plot(mj4b)
 ```
 
 
 ## 4.4. Graph of predicted trajectories according to a profile of covariates
 
-```{r, include=T}
+```{r, include=T, fig.height=4, fig.width=5, fig.align = "center"}
 datnew <- data.frame(age65 = seq(0, 3, length=100))
 datnew$male <- 0
 datnew$CEP <- 0
@@ -395,11 +405,13 @@ plot(mj4b.pred, bty = "l", ylim = c(0, 80), legend.loc = "bottomleft",
 ## 4.5. Graph of predicted cumulative incidence according to a profile of covariates
 
 
-```{r, include=T}
+```{r, include=T, fig.height=4, fig.width=5, fig.align = "center"}
 # graph of predicted survival trajectory for the reference group
 plot(mj4b, which = "survival", lwd = 2, legend.loc = F, bty = "l",
      xlab = "age in years", ylab = "dementia-free probability")
+```
 
+```{r, include=T, fig.height=4, fig.width=7, fig.align = "center"}
 # computation of the cumulative incidence for a specific profile of covariates
 cuminc0 <- cuminc(mj4b,time = seq(65,95,by=1))
 cuminc1 <- cuminc(mj4b,time = seq(65,95,by=1),CEP=1,male=1)
@@ -418,7 +430,7 @@ plot(cuminc1,lty=2,title="CEP=1 and male=1")
 
 The joint latent class model can be used to provide individual dynamic prediction of the event from the observed repeated measures of the marker. This is usually done for a "new" subject (not in the estimation data) but for the class, we focus on subject 72:
 
-```{r, include=T}
+```{r, include=T, fig.height=4, fig.width=5, fig.align = "center"}
 paq72 <- paquidS[which(paquidS$ID == 72), ]
 # prediction computation
 dynp <- dynpred(mj4b, paq72, landmark = c(80, 90), var.time = "age65", 
@@ -438,7 +450,7 @@ The package has an internal measure, the EPOCE which quantifies the pronostic in
 
 Here is an example of the use of EPOCE: 
 
-```{r, include=T,message=F,eval=F}
+```{r, include=T,message=F,eval=TRUE}
 # definition of the prediction times
 landmark <- c(70, 72, 75, 77, 80, 82, 85, 87, 90)
 # calculation of the measure for each model. Be careful with the function which links 
@@ -454,7 +466,7 @@ epoce4 <- epoce(mj4b, pred.times = landmark, var.time = "age65",fun.time =
 ```
 
 
-```{r, include=T,message=F}
+```{r, include=T,message=F, fig.height=4, fig.width=7, fig.align = "center"}
 # computation of the differences in EPOCE
 diff23 <- Diffepoce(epoce2, epoce3)
 diff34 <- Diffepoce(epoce3, epoce4)
@@ -482,7 +494,7 @@ Here the model with 3 latent classes seems to have a better predictive power tha
 Jointlcmm function can account for competing risks with the same structure of call. The only difference is in the definition of the time to event which is the minimum time between all the causes of event and the censoring. The indicator of event also indicates 0 for censoring or k for cause k. 
 Suppose we have further information in the paquidS sample, namely a variable Age_CR that includes the first event between dementia and death, and Indic_CR that indicates the cause of event, dementia or death before dementia. In the following we give some examples of joint latent class models with competing risks.
 
-```{r, include=T,eval=F}
+```{r, include=T,eval=FALSE}
 # model with G=1 with Weibull for both events
 mj1_CR <- Jointlcmm(normMMSE ~ age65+I(age65^2) + CEP, random =~  age65+I(age65^2), 
                          survival = Surv(age_init, Age_CR, Indic_CR) ~ CEP + male, 
@@ -491,7 +503,7 @@ mj1_CR <- Jointlcmm(normMMSE ~ age65+I(age65^2) + CEP, random =~  age65+I(age65^
 
 In the regression, we can consider specific effects with cause() :
 
-```{r, include=T,eval=F}
+```{r, include=T,eval=FALSE}
 # model with G=1 and cause-specific effects of CEP and male
 mj1_CR_CS <- Jointlcmm(normMMSE ~ age65+I(age65^2) + CEP, random =~ age65+I(age65^2), 
                  survival = Surv(age_init, Age_CR, Indic_CR)  ~ cause(CEP) 
@@ -502,7 +514,7 @@ mj1_CR_CS <- Jointlcmm(normMMSE ~ age65+I(age65^2) + CEP, random =~ age65+I(age6
 
 Note that different baseline risk functions can be considered for the two events:
 
-```{r, include=T,eval=F}
+```{r, include=T,eval=FALSE}
 mj1_CR_WS <- Jointlcmm(normMMSE ~ age65+I(age65^2) + CEP, random =~  age65+I(age65^2), 
                          survival = Surv(age_init, Age_CR, Indic_CR) ~ CEP + male, 
                          hazard = c("Weibull","splines"), subject = 'ID', data = paquidS_CR, ng = 1)
