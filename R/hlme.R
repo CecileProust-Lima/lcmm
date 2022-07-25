@@ -1049,10 +1049,10 @@ hlme <-
                                         up <- vbb[upper.tri(vbb,diag=TRUE)]
                                         vbb <- t(vbb)
                                         vbb[upper.tri(vbb,diag=TRUE)] <- up
-                                        Chol <- chol(vbb)
-                                        Chol <- t(Chol)
+                                        ##Chol <- chol(vbb)
+                                        ##Chol <- t(Chol)
                                         
-                                        b[c((NPROB+1):(NPROB+NEF+NVC),(NPROB+NEF+NVC+NW+1):NPM)] <- bb + Chol %*% rnorm(NPM-NPROB-NW)
+                                        b[c((NPROB+1):(NPROB+NEF+NVC),(NPROB+NEF+NVC+NW+1):NPM)] <- rmvnorm(n=1,mean=bb,sigma = vbb) #bb + Chol %*% rnorm(NPM-NPROB-NW)
 
                                         if(NPROB>0) b[1:NPROB] <- 0
                                         if(NW>0) b[NPROB+NEF+NVC+1:NW] <- 1

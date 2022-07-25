@@ -601,17 +601,17 @@
                                     up <- vbb[upper.tri(vbb,diag=TRUE)]
                                     vbb <- t(vbb)
                                     vbb[upper.tri(vbb,diag=TRUE)] <- up
-                                    Chol <- chol(vbb)
-                                    Chol <- t(Chol)
+                                    ##Chol <- chol(vbb)
+                                    ##Chol <- t(Chol)
 
                                     if(idg0[1]>1)
                                         {
-                                            b[c((NPROB+ng):(NPROB+NEF+NVC),(NPROB+NEF+NVC+NW+1):NPM)] <- bb + Chol %*% rnorm(length(bb))
+                                            b[c((NPROB+ng):(NPROB+NEF+NVC),(NPROB+NEF+NVC+NW+1):NPM)] <- rmvnorm(n=1,mean=bb,sigma = vbb) #bb + Chol %*% rnorm(length(bb))
                                             b[NPROB+1:(ng-1)] <- 0
                                         } 
                                     else
                                         {
-                                            b[c((NPROB+1):(NPROB+NEF+NVC),(NPROB+NEF+NVC+NW+1):NPM)] <- bb + Chol %*% rnorm(length(bb))
+                                            b[c((NPROB+1):(NPROB+NEF+NVC),(NPROB+NEF+NVC+NW+1):NPM)] <- rmvnorm(n=1,mean=bb,sigma = vbb) #bb + Chol %*% rnorm(length(bb))
                                         }
 
                                     b[1:NPROB] <- 0

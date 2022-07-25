@@ -28,9 +28,9 @@ Brandom <- function(theta0,v0,w,b0,chol=NULL,mult=0)
     ## tirer aleatoirement
     if(any(vbb!=0))
     {
-        ch <- chol(vbb)
-        ch <- t(ch)
-        br <- bb + ch %*% rnorm(length(bb))
+        ##ch <- chol(vbb)
+        ##ch <- t(ch)
+        br <- rmvnorm(n=1,mean=bb,sigma = vbb) #bb + ch %*% rnorm(length(bb))
     }
     else
     {

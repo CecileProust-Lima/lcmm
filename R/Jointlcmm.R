@@ -1824,10 +1824,10 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                                                 vbb <- vbb[-(sum(nrisq)-(ng-1)*sum(length(which(risqcom==2)))+nvarxevt+1:(ng-1)),-(sum(nrisq)-(ng-1)*sum(length(which(risqcom==2)))+nvarxevt+1:(ng-1))]
                                             }
 
-                                        Chol <- chol(vbb)
-                                        Chol <- t(Chol)
+                                        ##Chol <- chol(vbb)
+                                        ##Chol <- t(Chol)
                                         
-                                        bb <- bb + Chol %*% rnorm(length(bb))
+                                        bb <- rmvnorm(n=1,mean=bb,sigma = vbb) #bb + Chol %*% rnorm(length(bb))
 
                                         
                                         b[1:nprob] <- 0
