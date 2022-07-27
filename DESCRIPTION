@@ -1,7 +1,7 @@
 Package: lcmm
 Type: Package
 Title: Extended Mixed Models Using Latent Classes and Latent Processes
-Version: 2.0.0
+Version: 2.0.1
 Date: 2022-06-15
 Author: Cecile Proust-Lima, Viviane Philipps, Amadou Diakite and Benoit Liquet
 Maintainer: Cecile Proust-Lima <cecile.proust-lima@inserm.fr>
@@ -9,7 +9,7 @@ Description: Estimation of various extensions of the mixed models including late
 License: GPL (>= 2.0)
 Depends: R (>= 3.5.0), survival (>= 2.37-2), parallel, mvtnorm, randtoolbox, marqLevAlg (> 2.0)
 Imports: nlme
-Suggests: knitr,rmarkdown,lattice,NormPsy,ggplot2,ggpubr,dplyr,splines,gridExtra
+Suggests: knitr,rmarkdown,lattice,NormPsy,ggplot2,ggpubr,dplyr,splines,gridExtra,ggalluvial
 BugReports: https://github.com/CecileProust-Lima/lcmm/issues
 LazyLoad: yes
 LazyData: true

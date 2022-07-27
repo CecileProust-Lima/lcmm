@@ -1,0 +1,398 @@
+---
+title: "How to estimate a multivariate latent class mixed model using mpjlcmm function"
+output: 
+  rmarkdown::html_vignette:
+    toc: true # table of content true
+    toc_depth : 3
+vignette: >
+  %\VignetteIndexEntry{Multivariate latent class model with mpjlcmm}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+# Background and definitions
+
+<p align="justify">The latent class mixed model consists in assuming that the population is heterogeneous and composed of $G$ latent classes. In the multivariate case, the latent classes are defined according to $K$ longitudinal outcomes, resulting in $G$ groups characterized by $G$ sets of $K$ mean profiles of trajectories.</p>
+
+
+## The multivariate latent class mixed model
+
+<p align="justify">Latent class membership is defined by a discrete random variable $c_{i}$ that equals $g$ if subject $i$ belongs to latent class $g$ ($g$ = 1, ...,$G$). The variable $c_{i}$ is latent; its probability is described using a multinomial logistic model according to covariates $X_{ci}$:
+
+$\pi_{ig}= P(c_{i} = g|X_{ci}) = \frac{\exp(\xi_{0g}+X_{ci}\xi_{1g})}{ \sum_{l=1}^{G}\exp(\xi_{0l}+X_{ci}\xi_{1l})}$
+
+where $\xi_{0g}$ is the intercept for class $g$ and $\xi_{1g}$ is the q1-vector of class-specific parameters associated with the q1-vector of time-independent covariates $X_{ci}$. For identifiability, $\xi_{0G} = 0$ and $\xi_{1G} = 0$. When no covariate predicts the latent class membership, this model reduces to a class-specific probability.</p>
+
+
+<p align="justify">The trajectories of each $Y_k$ for $k=1,..,K$ are defined conditionally to the latent class. For Gaussian outcomes, conditional on class $g$, the model is a linear mixed model defined for subject $i$ at occasion $j$ by:</p>
+  
+
+$$Y_{kij}|_{c_{i}=g} = X_{2kij}\beta_k+X_{3kij}\gamma_{kg}+Z_{kij}b_{ki}+\epsilon_{kij}$$ 
+
+
+
+<p align="justify">where $X_{2kij}$, $X_{3kij}$ and $Z_{kij}$ are vectors of covariates respectively associated with common fixed effects over classes $\beta_k$, class-specific fixed effects $\gamma_{kg}$ and with individual random effects $b_{ki}|_{ci=g}$ called $b_{kig}$ whose distributions are now class-specific. $X_{2k}$ and $X_{3k}$ can't have common variables. </p>
+
+<p align="justify"> Neither the random effects nor the error measurements are correlated between outcomes. So conditionally to the latent classes the $K$ outcomes are independent. </p> 
+
+&nbsp;
+
+For curvilinear outcomes, we use a latent process model defined by:</p>
+
+&nbsp;
+
+$$Y_{ijk}|_{c_{i}=g} = H_k(~ X_{2ijk}\beta_k+X_{3ijk}\gamma_{gk}+Z_{ijk}b_{ik}+\epsilon_{ijk} ~; \eta_k)$$
+
+&nbsp;
+
+where $H_k$ is a link function parameterized by $\eta_k$. $H^{-1}$ can belong to the family of linear functions, rescaled Beta cumulative distribution function, or quadractic I-splines functions. Note however that the mpjlcmm function only supports continuous outcomes, so the IRT models are not available for the moment.
+
+&nbsp;
+
+## Posterior classification 
+
+<p align="justify">In models involving latent classes, a posterior classification of the subjects in each latent class can be made. It is based on the posterior calculation of the class-membership probabilities and is used to characterize the classification of the subjects as well as to evaluate the goodness-of-fit of the model.</p>
+
+<p align="justify">Posterior class-membership probabilities are computed using the Bayes theorem as the probability of belonging to a latent class given the whole information collected. In a longitudinal model, they are defined for subject $i$ and latent class $g$ as:</p>
+
+&nbsp;
+
+$$\hat{\pi}_{ig}^Y=P(c_{i}=g|X_{i},Y_{i},\hat{\theta}_{G})$$   
+
+*where :* $\hat{\theta}_{G}$ is the vector of parameters estimated in the $G$ latent class model.
+
+&nbsp;
+
+&nbsp;
+
+# A bivariate example
+
+<p align="justify">In this example we study simultaneously the trajectories of a cognitive marker (**MMSE**) and a depression scale (**CESD**) in a sample of old people (aged 65 years old and over at inclusion) followed for up to 15 years. The two outcomes have a skewed distribution, so we will use latent process models with I-splines link functions.</p>
+
+
+## Model considered 
+
+<p align="justify">We consider class specific linear trajectories with age without further ajustement. For class $g$, subejct $i$ and repeated measurement $j$, the model is:</p>
+
+&nbsp;
+
+$$MMSE_{ij}|_{c_{i}=g}=\beta_{10g}+\beta_{11g}age_{ij}+u_{10ig}+u_{11ig}age_{ij}+\epsilon_{1ij}$$
+
+$$CESD_{ij}|_{c_{i}=g}=\beta_{20g}+\beta_{21g}age_{ij}+u_{20ig}+u_{21ig}age_{ij}+\epsilon_{2ij}$$
+
+&nbsp;
+
+*Where :*  $u_{kig} \sim \mathcal{N}(0,B_{kg})$ and $\epsilon_{ij}  \sim \mathcal{N}(0,\sigma^2)$.
+
+
+&nbsp;
+
+
+
+## Estimate the model with only one class (G=1)
+
+To estimate a multivariate model, we define first each univariate submodel with the appropriate function. As we use here latent process models, we use the lcmm function.
+
+&nbsp;
+
+We begin with the MMSE :
+
+```{r, comment=''}
+mMMSE <- lcmm(MMSE ~ I((age-65)/10), random =~I((age-65)/10), subject='ID', data = paquid,
+              link ="5-quant-splines", verbose=FALSE)
+summary(mMMSE)
+```
+&nbsp;
+
+We see in the summary that one of the I-splines parameters is very small. To avoid numerical issues in more complex models, we fix this parameter to zero :
+
+```{r, comment=''}
+binit <- mMMSE$best
+binit[7] <- 0
+mMMSE1 <- lcmm(MMSE ~ I((age-65)/10), random =~I((age-65)/10), subject='ID', data = paquid,
+               link ="5-quant-splines", verbose=FALSE, B=binit, posfix=7)
+summary(mMMSE1)
+```
+&nbsp;
+
+We use the same specification for CESD. Note however that the specification can differ between the outcomes.
+
+```{r, comment=''}
+mCESD1 <- lcmm(CESD ~ I((age-65)/10), random =~I((age-65)/10), subject='ID', data = paquid,
+               link ="5-quant-splines", verbose=FALSE)
+summary(mCESD1)
+```
+&nbsp;
+
+Based on these two submodels, the multivariate model can then be estimated.
+
+```{r, comment=''}
+mm1 <- mpjlcmm(list(mMMSE1,mCESD1), subject="ID", data=paquid, ng=1, posfix=7, verbose=FALSE)
+```
+
+&nbsp;
+
+As the two outcomes are independent conditionaly to the latent classes and that we only have one class, the multivariate model is equivalent to the two separated submodel. We can check that the estimations are the same :
+
+```{r, comment=''}
+cbind(mm1$best, c(mMMSE1$best, mCESD1$best))
+```
+
+&nbsp;
+
+## Estimate the model with more than one class (G > 1)
+
+```{r, comment='', include=FALSE, eval=TRUE}
+load("models_mpj.RData")
+```
+&nbsp;
+
+<p align="justify">With more than one class, we begin also with univariate models and then we estimate the multivariate model. The univariate models do not need to be optimized here. We therefore use the option maxiter=0. We also fix one I-spline parameter to zero as before.</p>
+
+
+```{r, comment='', include=TRUE, eval=TRUE}
+mMMSE2 <- lcmm(MMSE~I((age-65)/10),random=~I((age-65)/10),subject="ID",
+ link="5-quant-splines",data=paquid,ng=2,mixture=~I((age-65)/10),
+ B=random(mMMSE1),maxiter=0, posfix=10)
+
+mCESD2 <- lcmm(CESD~I((age-65)/10),random=~I((age-65)/10),subject="ID",
+ link="5-quant-splines",data=paquid,ng=2,mixture=~I((age-65)/10),
+ B=random(mCESD1),maxiter=0)
+```
+```{r, comment='', include=TRUE, eval=FALSE}
+mm2_a <- mpjlcmm(longitudinal=list(mMMSE2,mCESD2),subject="ID",ng=2,data=paquid,posfix=10)
+```
+
+&nbsp;
+
+The later model does not specify initial values. They are then extracted from the univariate models. Alternatively, we can use the one class model as starting point, or use a grid search.
+
+```{r, comment='', include=TRUE, eval=FALSE}
+mm2_b <- mpjlcmm(longitudinal=list(mMMSE2,mCESD2), subject="ID", ng=2, data=paquid,
+                 B=mm1, posfix=10)
+
+mm2_c <- gridsearch(mpjlcmm(longitudinal=list(mMMSE2,mCESD2), subject="ID", ng=2,
+                    data=paquid, posfix=10), minit=mm1, rep=50, maxiter=50)
+```
+
+&nbsp;
+
+<p align="justify">We estimate in the following the same model with 3, 4, and 5 classes.</p>
+
+```{r, comment='', include=TRUE, eval=FALSE}
+## 3 classes
+
+mMMSE3 <- lcmm(MMSE~I((age-65)/10), random=~I((age-65)/10), subject="ID",
+ link="5-quant-splines", data=paquid, ng=3, mixture=~I((age-65)/10),
+ B=random(mMMSE1), maxiter=0, posfix=13)
+
+mCESD3 <- lcmm(CESD~I((age-65)/10), random=~I((age-65)/10), subject="ID",
+ link="5-quant-splines", data=paquid, ng=3, mixture=~I((age-65)/10),
+ B=random(mCESD1), maxiter=0)
+
+mm3_a <- mpjlcmm(longitudinal=list(mMMSE3,mCESD3), subject="ID", ng=3, data=paquid, posfix=13)
+mm3_b <- mpjlcmm(longitudinal=list(mMMSE3,mCESD3), subject="ID", ng=3, data=paquid, posfix=13, B=mm1)
+
+mm3_c <- gridsearch(mpjlcmm(longitudinal=list(mMMSE3,mCESD3), subject="ID", ng=3,
+ data=paquid, posfix=13), minit=mm1, rep=50, maxiter=50)
+                                                   
+## 4 classes
+
+mMMSE4 <- lcmm(MMSE~I((age-65)/10), random=~I((age-65)/10), subject="ID",
+ link="5-quant-splines", data=paquid, ng=4, mixture=~I((age-65)/10),
+ B=random(mMMSE1), maxiter=0, posfix=16)
+
+mCESD4 <- lcmm(CESD~I((age-65)/10), random=~I((age-65)/10), subject="ID",
+ link="5-quant-splines", data=paquid, ng=4, mixture=~I((age-65)/10),
+ B=random(mCESD1), maxiter=0)
+
+mm4_a <- mpjlcmm(longitudinal=list(mMMSE4,mCESD4), subject="ID", ng=4, data=paquid, posfix=16)
+
+mm4_b <- mpjlcmm(longitudinal=list(mMMSE4,mCESD4), subject="ID", ng=4, data=paquid, posfix=16, B=mm1)
+                                                                                       
+mm4_c <- gridsearch(mpjlcmm(longitudinal=list(mMMSE4,mCESD4), subject="ID", ng=4,
+                    data=paquid, posfix=16), minit=mm1, rep=50, maxiter=50)
+
+
+## 5 classes
+
+mMMSE5 <- lcmm(MMSE~I((age-65)/10), random=~I((age-65)/10), subject="ID",
+ link="5-quant-splines", data=paquid, ng=5, mixture=~I((age-65)/10),
+ B=random(mMMSE1), maxiter=0 ,posfix=19)
+
+mCESD5 <- lcmm(CESD~I((age-65)/10), random=~I((age-65)/10), subject="ID",
+ link="5-quant-splines", data=paquid, ng=5, mixture=~I((age-65)/10),
+ B=random(mCESD1), maxiter=0)
+
+mm5_a <- mpjlcmm(longitudinal=list(mMMSE5,mCESD5), subject="ID", ng=5, data=paquid, posfix=19)
+
+mm5_b <- mpjlcmm(longitudinal=list(mMMSE5,mCESD5), subject="ID", ng=5, data=paquid, posfix=19, B=mm1)
+
+mm5_c <- gridsearch(mpjlcmm(longitudinal=list(mMMSE5,mCESD5), subject="ID", ng=5,
+                    data=paquid, posfix=19), minit=mm1, rep=50, maxiter=50)
+```
+
+&nbsp;
+
+We summarize and compare all these estimations with summarytable function :
+
+```{r,comment=''}
+summarytable(mm1, mm2_a, mm2_b, mm2_c, mm3_a, mm3_b, mm3_c, mm4_a, mm4_b, mm4_c, mm5_a, mm5_b, mm5_c)
+```
+
+&nbsp;
+
+We keep the best model for each number of latent classes and we plot some statistical criteria used to select the optimal number of classes :
+
+```{r,comment='', fig.width=7, fig.height=4}
+summaryplot(mm1, mm2_b, mm3_b, mm4_c, mm5_c)
+```
+
+In this application, we will select the 2-class model, which presents better BIC and ICL.
+
+&nbsp;
+
+We can represent the relation the classes and the flow of the subjects with a sankey plot. This is not yet done automatically in the package. 
+
+```{r,comment='', fig.width=7, fig.height=4, message=FALSE}
+library(ggalluvial)
+library(ggplot2)
+
+## We merge the classification of the 5 models :
+class12 <- merge(mm1$pprob[,1:2], mm2_b$pprob[,1:2], by="ID")
+colnames(class12) <- c("ID","mm1","mm2_b")
+class123 <- merge(class12, mm3_b$pprob[,1:2], by="ID")
+colnames(class123) <- c("ID","mm1","mm2_b","mm3_b")
+class1234 <- merge(class123, mm4_c$pprob[,1:2], by="ID")
+colnames(class1234) <- c("ID","mm1","mm2_b","mm3_b","mm4_c")
+class <- merge(class1234, mm5_c$pprob[,1:2], by="ID")
+colnames(class) <- c("ID","mm1","mm2_b","mm3_b","mm4_c","mm5_c")
+
+## We plot the flows :
+ggplot(class,
+       aes(axis1 = mm1, axis2 = mm2_b, axis3 = mm3_b, axis4 = mm4_c, axis5 = mm5_c, 
+           fill = after_stat(stratum), label = after_stat(stratum))) +
+    scale_x_discrete(limits = c("mm1","mm2_b","mm3_b","mm4_c","mm5_c")) +
+  geom_flow() +
+  geom_stratum() +
+    geom_text(stat = "stratum", size = 6) +
+  theme(legend.position = "right",
+        axis.title = element_text(size = 18),
+      axis.text = element_text(size = 16),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 14)) +
+  labs(y = "Number of subjects",
+       x = "Model",
+       fill = "Class")
+```
+
+&nbsp;
+
+## Description of the 2-class model  
+
+### Summary of the model 
+
+```{r, comment=''}
+summary(mm2_b)
+```
+
+### Update the univariate models
+
+The update function returns the $K$ univariate models used to specify the mpjlcmm model, with updated outputs. The parameters and their estimated variance are replaced by the one optimized in the multivariate framework.
+
+```{r, comment=''}
+upd_mm2_b <- update(mm2_b)
+mMMSE2_biv <- upd_mm2_b[[1]]
+mCESD2_biv <- upd_mm2_b[[2]]
+```
+
+The prediction functions are called on the mMMSE2_biv and mCESD2_biv objects.
+
+### Predictions of the trajectories
+
+<p align="justify">Class-specific predictions can be computed for any data contained in a dataframe as soon as all the covariates specified in the model are included in the dataframe. In the next lines, such a dataframe is created by generating a vector of $age$ values between 65 and 95. The predictions are computed with `predictY` and plotted with the associated `plot` function.</p>
+
+&nbsp;
+
+```{r,comment=''}
+## predicted trajectories of the MMSE score
+pred_MMSE <- predictY(mMMSE2_biv, data.frame(age=seq(65,95,length.out=50)), var.time = "age")
+## predicted trajectories of the CESD score
+pred_CESD <- predictY(mCESD2_biv, data.frame(age=seq(65,95,length.out=50)), var.time = "age")
+```
+
+&nbsp;
+
+```{r,comment='', fig.height=4, fig.width=7}
+par(mfrow=c(1,2))
+plot(pred_MMSE, lwd=3, ylab="MMSE", main="Predicted trajectories for MMSE", legend.loc="bottomleft")
+plot(pred_CESD, lwd=3, ylab="CESD", main="Predicted trajectories for CESD", legend=NULL)
+```
+
+To add point by point confidence bands, we use the option draws=TRUE in the predictY call.
+
+&nbsp;
+
+
+## Evaluation of the model
+
+### Plot of the residuals
+
+```{r, eval=FALSE}
+plot(mMMSE2_biv)
+plot(mCESD2_biv)
+```
+
+&nbsp;
+
+### Graph of the predictions versus observations 
+
+&nbsp;
+
+<p align="justify">In order to evaluate the fit of the selected model, we plot simultaneously the observations and the predicted values for each latent class.</p>
+
+&nbsp;
+
+```{r, eval=FALSE}
+plot(mMMSE2_biv, which="fit", var.time="age", marg=FALSE, shades = TRUE)
+plot(mCESD2_biv, which="fit", var.time="age", marg=FALSE, shades = TRUE)
+```
+&nbsp;
+
+### Classification 
+
+The posterior classification of the model is obtained with: 
+
+&nbsp;
+
+```{r, comment=''}
+postprob(mm2_b) 
+```
+
+&nbsp; 
+
+<p align="justify">`Class 1` is composed of 107 subjects (21.4%), whereas 393 are in the second class. 
+
+We can also see a good discrimination power of the model with a mean posterior probability of 0.8280 for class 1 and 0.8926 for class 2. A satisfactory proportion of subject are also classified with a posterior probability above 0.7.
+
+&nbsp;
+
+# Multivariate joint models
+
+The mpjclmm function also allows the modelisation of a time-to-event outcome with a proportional hazard model, possibly with competing risks.
+
+To add the time to dementia to the previous model, the call is :
+
+```{r, comment='', include=TRUE, eval=FALSE}
+mmS2 <- mpjlcmm(longitudinal=list(mMMSE2,mCESD2), subject="ID", ng=2, data=paquid,
+                survival=Surv(age_init,agedem,dem)~1)
+```
