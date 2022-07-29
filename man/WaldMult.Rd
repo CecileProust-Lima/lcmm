@@ -7,8 +7,8 @@
 WaldMult(Mod, pos = NULL, contrasts = NULL, name = NULL, value = NULL)
 }
 \arguments{
-\item{Mod}{an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
-\code{Jointlcmm}}
+\item{Mod}{an object of class \code{hlme}, \code{lcmm}, \code{multlcmm},
+\code{Jointlcmm} or \code{mpjlcmm}}
 
 \item{pos}{a vector containing the indices in \code{Mod$best} of the parameters to
 test}
@@ -35,8 +35,8 @@ and the associated p-value.
 }
 \description{
 This function provides multivariate and univariate Wald tests for
-combinations of parameters from \code{hlme}, \code{lcmm}, \code{multlcmm} or
-\code{Jointlcmm} models.
+combinations of parameters from \code{hlme}, \code{lcmm}, \code{multlcmm},
+\code{Jointlcmm} or \code{mpjlcmm} models.
 }
 \author{
 Cecile Proust-Lima, Lionelle Nkam and Viviane Philipps
