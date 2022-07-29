@@ -1,12 +1,12 @@
 #' Multivariate Wald Test
 #' 
 #' This function provides multivariate and univariate Wald tests for
-#' combinations of parameters from \code{hlme}, \code{lcmm}, \code{multlcmm} or
-#' \code{Jointlcmm} models.
+#' combinations of parameters from \code{hlme}, \code{lcmm}, \code{multlcmm},
+#' \code{Jointlcmm} or \code{mpjlcmm} models.
 #' 
 #' 
-#' @param Mod an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
-#' \code{Jointlcmm}
+#' @param Mod an object of class \code{hlme}, \code{lcmm}, \code{multlcmm},
+#' \code{Jointlcmm} or \code{mpjlcmm}
 #' @param pos a vector containing the indices in \code{Mod$best} of the parameters to
 #' test
 #' @param contrasts a numeric vector of same length as pos.  If NULL (the
@@ -30,53 +30,13 @@
 #' 
 WaldMult <- function(Mod,pos=NULL,contrasts=NULL,name=NULL,value=NULL)
 { 
-    if (!(class(Mod) %in% c("hlme","lcmm","multlcmm","Jointlcmm"))) stop("applies to \"hlme\" or \"lcmm\" or \"multlcmm\" or \"Jointlcmm\" objects only")
-    
-    if(inherits(Mod,"hlme") | inherits(Mod,"lcmm"))
-        {
-            nea<-sum(Mod$idea) # Nombre d'effets aleatoires
-            nef<-Mod$N[2]      # Nombre d'effets fixes
-            nvc<-Mod$N[3]      # Nombre de parametres effets aleatoires
-            nprob<-Mod$N[1]
-            idiag <- ifelse(Mod$idiag==1,TRUE,FALSE)
-        }
-    if(inherits(Mod,"multlcmm"))
-        {
-            nea <- sum(Mod$idea0)
-            nef <- Mod$N[3]
-            nvc <- Mod$N[4]
-            nprob <- 0 #nef contient deja nprob
-            idiag <- ifelse(Mod$idiag==1,TRUE,FALSE)
-        }
-    
-    if(inherits(Mod,"Jointlcmm"))
-        {
-            nea <- sum(Mod$idea)
-            nef <- Mod$N[4]
-            nvc <- Mod$N[5]
-            nprob <- sum(Mod$N[1:3]) #nprob+nvarxevt+nristot
-            idiag <- ifelse(Mod$idiag==1,TRUE,FALSE)
-        }
+    if (!(class(Mod) %in% c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("applies to \"hlme\" or \"lcmm\" or \"multlcmm\" or \"Jointlcmm\" or \"mpjlcmm\" objects only")
 
-    
-    ## On remplace les varcov de $best par les parametres de cholesky
-    if(nvc>0)
-        {   
-            debut <- nprob+nef+1
-            fin <- nprob+nef+nvc
-            cholesky <- Mod$cholesky
-            if(inherits(Mod,"multlcmm")) cholesky[1] <- NA
 
-            if(isTRUE(idiag)) cholesky[setdiff(1:(nea*(nea+1)/2),1:nea*(1:nea+1)/2)] <- NA
-            
-            Mod$best[debut:fin] <- na.omit(cholesky)
-        }
+    ## prm estimes et leur variance
+    Mod$best <- estimates(Mod)
+    V <- VarCov(Mod)
     
-    ## On rend symetrique la matrice des varcov des parametres estimes par le modele
-    l <- length(Mod$best)
-    V <- matrix(0,nrow=l,ncol=l)
-    V[upper.tri(V,diag=TRUE)] <- Mod$V  
-    V[lower.tri(V,diag=FALSE)] <- t(V)[lower.tri(V,diag=FALSE)]
     
     ## On teste si pos est un vecteur
     if (is.null(pos))
