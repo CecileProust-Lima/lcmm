@@ -68,28 +68,40 @@ coef.Jointlcmm <- function(object,...)
     {
         estimates.Jointlcmm(object)
     }
+#' @export
+coef.mpjlcmm <- function(object,...)
+    {
+        estimates.mpjlcmm(object)
+    }
+
 
 # variance-covariance matrix of the estimates
 #' @export
 vcov.hlme <- function(object,...)
     {
-        VarCov.hlme(object)
+        VarCov(object)
     }
 #' @export
 vcov.lcmm <- function(object,...)
     {
-        VarCov.lcmm(object)
+        VarCov(object)
     }
 #' @export
 vcov.multlcmm <- function(object,...)
     {
-        VarCov.multlcmm(object)
+        VarCov(object)
     }
 #' @export
 vcov.Jointlcmm <- function(object,...)
     {
-        VarCov.Jointlcmm(object)
+        VarCov(object)
     }
+#' @export
+vcov.mpjlcmm <- function(object,...)
+    {
+        VarCov(object)
+    }
+
 
 
 

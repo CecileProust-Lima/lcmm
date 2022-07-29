@@ -2,7 +2,7 @@
 % Please edit documentation in R/mpjlcmm.R
 \name{mpjlcmm}
 \alias{mpjlcmm}
-\title{Estimation of multi-process joint latent class mixed models}
+\title{Estimation of multivariate joint latent class mixed models}
 \usage{
 mpjlcmm(
   longitudinal,
@@ -70,7 +70,8 @@ survival part (3) when ng>1, a mpjlcmm object is entered. It should correspond t
 the exact same structure of model but with ng=1. The program will
 automatically generate initial values from this model. Note that due to possible
 local maxima, the \code{B} vector should be specified and several different
-starting points should be tried.}
+starting points should be tried. This can be done automatically using 
+gridsearch function.}
 
 \item{convB}{optional threshold for the convergence criterion based on the
 parameter stability}
@@ -121,11 +122,14 @@ Default to 1 (sequential mode).}
 \item{clustertype}{optional character indicating the type of cluster for parallel computation.}
 }
 \description{
-This function fits multi-process joint latent class models. It is a multivariate
-extension of the Jointlcmm function. It handles multiple latent processes, possibly
-measured by sereval continuous markers (Gaussian or curvilinear). Theses processes are
-independent given the latent classes. The optional survival part handles competing
-risks, right censoring and left truncation.
+This function fits joint latent class models for multivariate longitudinal markers
+and competing causes of event. It is a multivariate
+extension of the Jointlcmm function. It defines each longitudinal dimension as a 
+latent process (mp in mpjlcmm is for multivariate processes), possibly
+measured by sereval continuous markers (Gaussian or curvilinear). For the moment, 
+theses processes are assumed independent given the latent classes. 
+The (optional) survival part handles competing risks, right censoring and left truncation.
+The specification of the function is similar to other estimating functions of the package.
 }
 \examples{
 \dontrun{
