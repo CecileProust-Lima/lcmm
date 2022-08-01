@@ -15,7 +15,7 @@ estimates.mpjlcmm <- function(x,cholesky=TRUE)
             K <- x$K
             ny <- x$ny
             l <- 3
-            if(x$nbevt>1) l <- 2+nbevt
+            if(x$nbevt>1) l <- 2+x$nbevt
             nef <- x$Nprm[l+1:K]
             ncontr <- x$Nprm[l+K+1:K]
             nvc <- x$Nprm[l+2*K+1:K]

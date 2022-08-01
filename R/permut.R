@@ -22,12 +22,15 @@ permut <- function(m,order,estim=TRUE)
     {
         ng <- m$ng
 
-        if(!inherits(m,c("hlme","lcmm","multlcmm","Jointlcmm"))) stop("Please use this function only with hlme, lcmm, multlcmm or Jointlcmm models")
         if(ng==1) stop("Please use this function only with latent classes")
         if(length(order)!=ng) stop(paste("Argument 'order' should be of length",ng))
         if(!all(order %in% 1:ng)) stop(paste("Please specify classes between 1 and",ng,"in argument 'order'",collapse=" "))
         if(!all(c(1:ng) %in% order)) stop("Please specify all the classes in argument 'order'")
 
+        if(inherits(m, "mpjlcmm")) {return(permutmpj(m,order=order,estim=estim))}
+        
+        if(!inherits(m,c("hlme","lcmm","multlcmm","Jointlcmm"))) stop("Please use this function only with hlme, lcmm, multlcmm or Jointlcmm models")
+        
         bnew <- m$best
 
         ## coef de classmb reordonnes:
