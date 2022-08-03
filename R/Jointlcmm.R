@@ -1528,11 +1528,11 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                                                         indinit <- sum(nprisq[1:ke])-nprisq[ke]+1:nprisq[ke]
                                                         if(B$conv==1)
                                                             {
-                                                                b[indb] <- abs(rep(B$best[indinit],ng0)+rep((1:ng0)-(ng0+1)/2,each=nprisq[ke])*rep(sqrt(B$V[indinit*(indinit+1)/2]),ng0))
+                                                                b[indb] <- rep(B$best[indinit],ng0)+rep((1:ng0)-(ng0+1)/2,each=nprisq[ke])*rep(sqrt(B$V[indinit*(indinit+1)/2]),ng0)
                                                             }
                                                         else
                                                             {
-                                                                b[indb] <- abs(rep(B$best[indinit],ng0)+rep((1:ng0)-(ng0+1)/2,each=nprisq[ke])*rep(B$best[indinit],ng0))
+                                                                b[indb] <- rep(B$best[indinit],ng0)+rep((1:ng0)-(ng0+1)/2,each=nprisq[ke])*rep(B$best[indinit],ng0)
                                                             }
                                                     }
 

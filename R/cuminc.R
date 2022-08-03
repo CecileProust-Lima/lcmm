@@ -5,7 +5,7 @@
 #' Confidence bands can be computed by a Monte-Carlo method.
 #' 
 #' 
-#' @param x an object inheriting from class \code{Jointlcmm}
+#' @param x an object inheriting from class \code{Jointlcmm} or \code{mpjlcmm}
 #' @param time a vector of times at which the cumulative incidence is
 #' calculated
 #' @param draws optional boolean specifying whether a Monte Carlo approximation
@@ -41,20 +41,30 @@
 #' @export
 cuminc <- function(x,time,draws=FALSE,ndraws=2000,integrateOptions=NULL,...)
     {   
-        if(!inherits(x,"Jointlcmm")) stop("The argument 'x' must be a'Jointlcmm' object")
+        if(!inherits(x,c("Jointlcmm","mpjlcmm"))) stop("The argument 'x' must be a'Jointlcmm' or 'mpjlcmm' object")
         if(isTRUE(draws) & x$conv!=1) stop("No confidence interval can be provided since the model did not converge properly") 
        
         ## infos sur le modele
-        nbevt <- length(x$hazard[[1]])
-#        if(nbevt<2) stop("Culmulative incidence is only available in a competing risks setting.")
-        ng <- x$ng
-
-        typrisq <- x$hazard[[1]]
-        risqcom <- x$hazard[[2]]
-        zi <- x$hazard[[3]]
-        nz <- x$hazard[[4]]
+        if(inherits(x,"Jointlcmm"))
+        {
+            nbevt <- length(x$hazard[[1]])
+            typrisq <- x$hazard[[1]]
+            risqcom <- x$hazard[[2]]
+            zi <- x$hazard[[3]]
+            nz <- x$hazard[[4]]
+        }
+        else
+        {
+            nbevt <- x$nbevt
+            typrisq <- x$typrisq
+            risqcom <- x$hazardtype
+            zi <- x$hazardnodes
+            nz <- x$nz
+        }
+        
         carre <- 0
         if(any(typrisq==2)) carre <- 1-x$logspecif
+        ng <- x$ng
 
         nprisq <- sapply(1:nbevt, function(k) 2*(typrisq[k]==2)+(nz[k]-1)*(typrisq[k]==1)+(nz[k]+2)*(typrisq[k]==3))
 
@@ -106,28 +116,9 @@ cuminc <- function(x,time,draws=FALSE,ndraws=2000,integrateOptions=NULL,...)
                 ## sous-vecteur de best avec que les prm des risques/covariables
                 if(idraw>0)
                     {
-                        posfix <- eval(x$call$posfix)
-
-                        npm <- length(x$best)
-                        Mat <- matrix(0,ncol=npm,nrow=npm)
-                        Mat[upper.tri(Mat,diag=TRUE)]<- x$V
-                        if(length(posfix))
-                            {
-                                Mat2 <- Mat[-posfix,-posfix]
-                                Chol2 <- chol(Mat2)
-                                Chol <- matrix(0,npm,npm)
-                                Chol[setdiff(1:npm,posfix),setdiff(1:npm,posfix)] <- Chol2
-                                Chol <- t(Chol)
-                            }
-                        else
-                            {
-                                Chol <- chol(Mat)
-                                Chol <- t(Chol)
-                            }
- 
-
-                        bdraw <- rnorm(length(x$best))
-                        bdraw <- x$best + Chol %*% bdraw
+                        b <- estimates(x)
+                        V <- VarCov(x)
+                        bdraw <- rmvnorm(1,mean=b,sigma=V)
 
                         brisqtot <- as.vector(bdraw[x$N[1]+1:x$N[2]])
                         if(x$N[3]>0) bvarxevt <- as.vector(bdraw[sum(x$N[1:2])+1:x$N[3]]) 

@@ -7,7 +7,7 @@
 cuminc(x, time, draws = FALSE, ndraws = 2000, integrateOptions = NULL, ...)
 }
 \arguments{
-\item{x}{an object inheriting from class \code{Jointlcmm}}
+\item{x}{an object inheriting from class \code{Jointlcmm} or \code{mpjlcmm}}
 
 \item{time}{a vector of times at which the cumulative incidence is
 calculated}
