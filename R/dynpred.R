@@ -211,106 +211,97 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
 
             Xnames2 <- model$Names$Xnames2
 
-            ##donnees de l estimation
-            if(!is.null(model$data))
+            ## transform to factor is the variable appears in levels$levelsdata
+            for(v in colnames(newdata1))
             {
-                olddata <- model$data
-            }
-            else
-            {
-                olddata <- eval(model$call$data)
-            }
-            
-            ##cas ou une variable du dataset est un facteur
-            for(v in Xnames2[-1])
+                if(v %in% names(model$levels$levelsdata))
                 {
-                    if (is.factor(olddata[,v]) & !(is.factor(newdata[,v])))
-                        {
-                            mod <- levels(olddata[,v])
-                            if (!(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-                            newdata1[,v] <- factor(newdata1[,v], levels=mod)
-                        }
+                    if(!is.null(model$levels$levelsdata[[v]]))
+                    {
+                        newdata1[,v] <- factor(newdata1[,v], levels=model$levels$levelsdata[[v]])
+                    }
                 }
+            }
 
-            ##cas ou on a factor() dans l'appel
-            z <- all.names(as.formula(paste("~",call_fixed)))
-            ind_factor <- which(z=="factor")
-            if(length(ind_factor))
-                {
-                    nom.factor <- z[ind_factor+1]
-                    for (v in nom.factor)
-                        {
-                            mod <- levels(as.factor(olddata[,v]))
-                            if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-                            newdata1[,v] <- factor(newdata1[,v], levels=mod)
+            ## ##cas ou on a factor() dans l'appel
+            ## z <- all.names(as.formula(paste("~",call_fixed)))
+            ## ind_factor <- which(z=="factor")
+            ## if(length(ind_factor))
+            ##     {
+            ##         nom.factor <- z[ind_factor+1]
+            ##         for (v in nom.factor)
+            ##             {
+            ##                 mod <- levels(as.factor(olddata[,v]))
+            ##                 if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
+            ##                 newdata1[,v] <- factor(newdata1[,v], levels=mod)
 
-                            fv <- paste("factor\\(",v,"\\)",sep="")
-                            if(length(grep(fv,model$Names$Xnames)))
-                                {
-                                    model$Names$Xnames <- gsub(fv,v,model$Names$Xnames)
-                                }
-                        }
-                }
+            ##                 fv <- paste("factor\\(",v,"\\)",sep="")
+            ##                 if(length(grep(fv,model$Names$Xnames)))
+            ##                     {
+            ##                         model$Names$Xnames <- gsub(fv,v,model$Names$Xnames)
+            ##                     }
+            ##             }
+            ##     }
             call_fixed <- gsub("factor","",call_fixed)
 
-            z <- all.names(as.formula(paste("~",call_random)))
-            ind_factor <- which(z=="factor")
-            if(length(ind_factor))
-                {
-                    nom.factor <- z[ind_factor+1]
-                    for (v in nom.factor)
-                        {
-                            mod <- levels(as.factor(olddata[,v]))
-                            if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-                            newdata1[,v] <- factor(newdata1[,v], levels=mod)
+            ## z <- all.names(as.formula(paste("~",call_random)))
+            ## ind_factor <- which(z=="factor")
+            ## if(length(ind_factor))
+            ##     {
+            ##         nom.factor <- z[ind_factor+1]
+            ##         for (v in nom.factor)
+            ##             {
+            ##                 mod <- levels(as.factor(olddata[,v]))
+            ##                 if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
+            ##                 newdata1[,v] <- factor(newdata1[,v], levels=mod)
 
-                            fv <- paste("factor\\(",v,"\\)",sep="")
-                            if(length(grep(fv,model$Names$Xnames)))
-                                {
-                                    model$Names$Xnames <- gsub(fv,v,model$Names$Xnames)
-                                }
-                        }
-                }
+            ##                 fv <- paste("factor\\(",v,"\\)",sep="")
+            ##                 if(length(grep(fv,model$Names$Xnames)))
+            ##                     {
+            ##                         model$Names$Xnames <- gsub(fv,v,model$Names$Xnames)
+            ##                     }
+            ##             }
+            ##     }
             call_random <- gsub("factor","",call_random)
 
-            z <- all.names(as.formula(paste("~",call_classmb)))
-            ind_factor <- which(z=="factor")
-            if(length(ind_factor))
-                {
-                    nom.factor <- z[ind_factor+1]
-                    for (v in nom.factor)
-                        {
-                            mod <- levels(as.factor(olddata[,v]))
-                            if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-                            newdata1[,v] <- factor(newdata1[,v], levels=mod)
+            ## z <- all.names(as.formula(paste("~",call_classmb)))
+            ## ind_factor <- which(z=="factor")
+            ## if(length(ind_factor))
+            ##     {
+            ##         nom.factor <- z[ind_factor+1]
+            ##         for (v in nom.factor)
+            ##             {
+            ##                 mod <- levels(as.factor(olddata[,v]))
+            ##                 if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
+            ##                 newdata1[,v] <- factor(newdata1[,v], levels=mod)
 
-                            fv <- paste("factor\\(",v,"\\)",sep="")
-                            if(length(grep(fv,model$Names$Xnames)))
-                                {
-                                    model$Names$Xnames <- gsub(fv,v,model$Names$Xnames)
-                                }
-                        }
-                }
+            ##                 fv <- paste("factor\\(",v,"\\)",sep="")
+            ##                 if(length(grep(fv,model$Names$Xnames)))
+            ##                     {
+            ##                         model$Names$Xnames <- gsub(fv,v,model$Names$Xnames)
+            ##                     }
+            ##             }
+            ##     }
             call_classmb <- gsub("factor","",call_classmb)
 
-            z <- all.names(as.formula(paste("~",call_survival)))
-            ind_factor <- which(z=="factor")
-            if(length(ind_factor))
-                {
-                    nom.factor <- z[ind_factor+1]
-                    for (v in nom.factor)
-                        {
-                            mod <- levels(as.factor(olddata[,v]))
-                            if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-                            newdata1[,v] <- factor(newdata1[,v], levels=mod)
+            ## z <- all.names(as.formula(paste("~",call_survival)))
+            ## ind_factor <- which(z=="factor")
+            ## if(length(ind_factor))
+            ##     {
+            ##         nom.factor <- z[ind_factor+1]
+            ##         for (v in nom.factor)
+            ##             {
+            ##                 mod <- levels(as.factor(olddata[,v]))
+            ##                 if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
+            ##                 newdata1[,v] <- factor(newdata1[,v], levels=mod)
 
-                            fv <- paste("factor\\(",v,"\\)",sep="")
-                            if(length(grep(fv,model$Names$Xnames)))
-                                {
-                                    model$Names$Xnames <- gsub(fv,v,model$Names$Xnames)
-                                }
-                        }
-                }
+            ##                 fv <- paste("factor\\(",v,"\\)",sep="")
+            ##                 if(length(grep(fv,model$Names$Xnames)))
+            ##                     {
+            ##                         model$Names$Xnames <- gsub(fv,v,model$Names$Xnames)
+            ##                     }
+            ##             }
+            ##     }
             call_survival <- gsub("factor","",call_survival)
 
 
@@ -329,45 +320,51 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
 
             ## random
             if(!is.null(model$call$random))
-                {
-                    m <- mcall
-                    m$formula <- formula(paste("~",call_random,sep=""))
-                    m[[1]] <- as.name("model.frame")
-                    m <- eval(m, sys.parent())
-                    na.random <- attr(m,"na.action")
-                }
+            {
+                id.X_random <- 1
+                m <- mcall
+                m$formula <- formula(paste("~",call_random,sep=""))
+                m[[1]] <- as.name("model.frame")
+                m <- eval(m, sys.parent())
+                na.random <- attr(m,"na.action")
+            }
             else
-                {
-                    na.random <- NULL
-                }
-
+            {
+                id.X_random <- 0
+                na.random <- NULL
+            }
+            
             ## classmb
             if(!is.null(model$call$classmb))
-                {
-                    m <- mcall
-                    m$formula <- formula(paste("~",call_classmb,sep=""))
-                    m[[1]] <- as.name("model.frame")
-                    m <- eval(m, sys.parent())
-                    na.classmb <- attr(m,"na.action")
-                }
+            {
+                id.X_classmb <- 1
+                m <- mcall
+                m$formula <- formula(paste("~",call_classmb,sep=""))
+                m[[1]] <- as.name("model.frame")
+                m <- eval(m, sys.parent())
+                na.classmb <- attr(m,"na.action")
+            }
             else
-                {
-                    na.classmb <- NULL
-                }
+            {
+                id.X_classmb <- 0
+                na.classmb <- NULL
+            }
 
             ##survival
             if(!is.null(model$call$survival))
-                {
-                    m <- mcall
-                    m$formula <- formula(paste("~",call_survival,sep=""))
-                    m[[1]] <- as.name("model.frame")
-                    m <- eval(m, sys.parent())
-                    na.survival <- attr(m,"na.action")
-                }
+            {
+                id.X_survival <- 1
+                m <- mcall
+                m$formula <- formula(paste("~",call_survival,sep=""))
+                m[[1]] <- as.name("model.frame")
+                m <- eval(m, sys.parent())
+                na.survival <- attr(m,"na.action")
+            }
             else
-                {
-                    na.survival <- NULL
-                }
+            {
+                id.X_survival <- 0
+                na.survival <- NULL
+            }
             
             ##cor
             na.cor <- NULL
@@ -552,17 +549,66 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                     Devent <- Devent[cumsum(nmes)]   
                 } 
 
+            ## create one data frame for each formula (useful with factors)
+            newdata1fixed <- newdata1
+            for(v in colnames(newdata1fixed))
+            {
+                if(v %in% names(model$levels$levelsfixed))
+                {
+                    if(!is.null(model$levels$levelsfixed[[v]]))
+                    {
+                        newdata1fixed[,v] <- factor(newdata1fixed[,v], levels=model$levels$levelsfixed[[v]])
+                        if(any(is.na(newdata1fixed[,v]))) stop(paste("Wrong factor level in variable",v))
+                    }
+                }
+            }
+            newdata1random <- newdata1
+            for(v in colnames(newdata1random))
+            {
+                if(v %in% names(model$levels$levelsrandom))
+                {
+                    if(!is.null(model$levels$levelsrandom[[v]]))
+                    {
+                        newdata1random[,v] <- factor(newdata1random[,v], levels=model$levels$levelsrandom[[v]])
+                        if(any(is.na(newdata1random[,v]))) stop(paste("Wrong factor level in variable",v))
+                    }
+                }
+            }
+            newdata1classmb <- newdata1
+            for(v in colnames(newdata1classmb))
+            {
+                if(v %in% names(model$levels$levelsclassmb))
+                {
+                    if(!is.null(model$levels$levelsclassmb[[v]]))
+                    {
+                        newdata1classmb[,v] <- factor(newdata1classmb[,v], levels=model$levels$levelsclassmb[[v]])
+                        if(any(is.na(newdata1classmb[,v]))) stop(paste("Wrong factor level in variable",v))
+                    }
+                }
+            }
+            newdata1surv <- newdata1
+            for(v in colnames(newdata1surv))
+            {
+                if(v %in% names(model$levels$levelssurv))
+                {
+                    if(!is.null(model$levels$levelssurv[[v]]))
+                    {
+                        newdata1surv[,v] <- factor(newdata1surv[,v], levels=model$levels$levelssurv[[v]])
+                        if(any(is.na(newdata1surv[,v]))) stop(paste("Wrong factor level in variable",v))
+                    }
+                }
+            }
 
             ## Construction de nouvelles var explicatives sur la nouvelle table :
 
             X_intercept <- model.matrix(~1,data=newdata1)
-            
-            ## fixed
+            colnames(X_intercept) <- "intercept"
 
-            X_fixed <- model.matrix(formula(paste("~",call_fixed,sep="")),data=newdata1)
+            ## fixed
+            X_fixed <- model.matrix(formula(paste("~",call_fixed,sep="")),data=newdata1fixed)
             if(colnames(X_fixed)[1]=="(Intercept)")
                 {
-                    colnames(X_fixed)[1] <- "intercept"
+                    X_fixed <- X_fixed[,-1,drop=FALSE]
                 }
 
             ## mixture pas besoin car les variables sont dans fixed
@@ -570,7 +616,7 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
             ## random
             if(!is.null(model$call$random))
                 {
-                    X_random <- model.matrix(formula(paste("~",call_random,sep="")),data=newdata1)
+                    X_random <- model.matrix(formula(paste("~",call_random,sep="")),data=newdata1random)
                     if(colnames(X_random)[1]=="(Intercept)")
                         {
                             colnames(X_random)[1] <- "intercept"
@@ -584,7 +630,7 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
             ## classmb
             if(!is.null(model$call$classmb))
                 {
-                    X_classmb <- model.matrix(formula(paste("~",call_classmb,sep="")),data=newdata1)
+                    X_classmb <- model.matrix(formula(paste("~",call_classmb,sep="")),data=newdata1classmb)
                     colnames(X_classmb)[1] <- "intercept"
                 }
             else
@@ -595,7 +641,7 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
             ## survival
             if(!is.null(model$call$survival))
                 {
-                    X_survival <- model.matrix(formula(paste("~",call_survival,sep="")),data=newdata1)
+                    X_survival <- model.matrix(formula(paste("~",call_survival,sep="")),data=newdata1surv)
                     if(ncol(X_survival)) colnames(X_survival)[1] <- "intercept"
                 }
             else
@@ -620,19 +666,72 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
                                         #  temps deja dans la bonne echelle
             
 
-            ## Construction de newdata1 dans le bon ordre
-            X <- cbind(X_intercept,X_fixed,X_random,X_classmb,X_survival,X_cor)
-            colX <- strsplit(colnames(X),split=":",fixed=TRUE)
-            colX <- lapply(colX,sort)
-            colX <- lapply(colX,paste,collapse=":")
-            colnames(X) <- unlist(colX)
+            ## Construction de X dans le bon ordre
+            X <- cbind(X_intercept,X_fixed)
+            colX <- c("intercept",colnames(X_fixed))
+            if(id.X_random == 1)
+                {
+                    for(i in 1:length(colnames(X_random)))
+                        {
+                            if((colnames(X_random)[i] %in% colnames(X))==FALSE)
+                                {
+                                    X <- cbind(X,X_random[,i])
+                                    colnames(X) <- c(colX,colnames(X_random)[i])
+                                    colX <- colnames(X)
+                                }	 
+                        }
+                }
+            if(id.X_classmb == 1)
+                {
+                    for(i in 1:length(colnames(X_classmb)))
+                        {
+                            if((colnames(X_classmb)[i] %in% colnames(X))==FALSE)
+                                {
+                                    X <- cbind(X,X_classmb[,i])
+                                    colnames(X) <- c(colX,colnames(X_classmb)[i])
+                                    colX <- colnames(X)
+                                }	
+                        }
+                }
+            if(id.X_survival == 1)
+                {
+                    for(i in 1:length(colnames(X_survival)))
+                        {
+                            if((colnames(X_survival)[i] %in% colnames(X))==FALSE)
+                                {
+                                    X <- cbind(X,X_survival[,i])
+                                    colnames(X) <- c(colX,colnames(X_survival)[i])
+                                    colX <- colnames(X)
+                                }
+                        }
+                }
 
-            Xnames <- strsplit(model$Names$Xnames,split=":",fixed=TRUE)
-            Xnames <- lapply(Xnames,sort)
-            Xnames <- lapply(Xnames,paste,collapse=":")
-            Xnames <- unlist(Xnames)
+            if(model$N[7]>0)
+                {
+                    idspecif <- matrix(model$idspecif,nbevt,length(model$idg),byrow=TRUE)
+                    if(model$idea[z]==0 & model$idprob[z]==0 & model$idg[z]==0 & model$idcom[z]==0 & all(idspecif[,z]==0))
+                        {
+                            X <- cbind(X,X_cor)
+                            colnames(X) <- c(colX,model$Names$Xnames[z])
+                            colX <- colnames(X)
+                        }
+                    
+                }
+
+
             
-            X <- X[,Xnames,drop=FALSE]
+            ## X <- cbind(X_intercept,X_fixed,X_random,X_classmb,X_survival,X_cor)
+            ## colX <- strsplit(colnames(X),split=":",fixed=TRUE)
+            ## colX <- lapply(colX,sort)
+            ## colX <- lapply(colX,paste,collapse=":")
+            ## colnames(X) <- unlist(colX)
+
+            ## Xnames <- strsplit(model$Names$Xnames,split=":",fixed=TRUE)
+            ## Xnames <- lapply(Xnames,sort)
+            ## Xnames <- lapply(Xnames,paste,collapse=":")
+            ## Xnames <- unlist(Xnames)
+            ## browser()
+            ## X <- X[,Xnames,drop=FALSE]
 
 
             
@@ -753,10 +852,9 @@ dynpred <- function(model,newdata,event=1,landmark,horizon,var.time,
 
 ### ok differents profils reperes
 
-            
+           
             ## fonction d'integration
             integrate2 <- function(...) return(integrate(...)$value)
-
 
             
             if(!isTRUE(draws))

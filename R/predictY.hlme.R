@@ -255,7 +255,7 @@ predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, marg=T
             ## create one data frame for each formula (useful with factors)
             newdata1fixed <- newdata1
             for(v in colnames(newdata1fixed))
-            {0
+            {
                 if(v %in% names(x$levels$levelsfixed))
                 {
                     if(!is.null(x$levels$levelsfixed[[v]]))

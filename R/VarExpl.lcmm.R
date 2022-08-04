@@ -34,51 +34,34 @@ VarExpl.lcmm <- function(x,values)
    if(!all(vars %in% colnames(values))) stop(paste(c("values should give a value for each of the following covariates: ","\n",vars),collapse=" "))
 
    ### pour les facteurs
-   ##donnees de l estimation
-   if(!is.null(x$data))
+   for(v in colnames(values))
    {
-       olddata <- x$data
+       if(v %in% names(x$levels$levelsdata))
+       {
+           if(!is.null(x$levels$levelsdata[[v]]))
+           {
+               values[,v] <- factor(values[,v], levels=x$levels$levelsdata[[v]])
+           }
+       }
+       if(v %in% names(x$levels$levelsrandom))
+       {
+           if(!is.null(x$levels$levelsrandom[[v]]))
+           {
+               values[,v] <- factor(values[,v], levels=x$levels$levelsrandom[[v]])
+               if(any(is.na(values[,v]))) stop(paste("Wrong factor level in variable",v))
+           }
+       }
    }
-   else
-      {
-          olddata <- eval(x$call$data)
-      }
-
-   #cas ou une variable du dataset est un facteur
-   for(v in setdiff(vars,"intercept"))
-   {
-    if(is.factor(olddata[,v]))
-    {
-     mod <- levels(olddata[,v])
-     if (!(levels(as.factor(values[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-     values[,v] <- factor(values[,v], levels=mod)
-    }
-   }
-
-   #cas ou on a factor() dans l'appel
+   
    call_random <- x$call$random[2]
-   z <- all.names(call_random)
-   ind_factor <- which(z=="factor")
-   if(length(ind_factor))
-   {
-    nom.factor <- z[ind_factor+1]
-    for (v in nom.factor)
-    {
-     mod <- levels(as.factor(olddata[,v]))
-     if (!all(levels(as.factor(values[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-     values[,v] <- factor(values[,v], levels=mod)
-    }
-   }
    call_random <- gsub("factor","",call_random)
 
-   if (!is.null(name.cor)) values1 <- model.matrix(formula(paste("~",paste(call_random,name.cor,sep="+"))),data=values)
-   else values1 <- model.matrix(formula(paste("~",call_random,sep="")),data=values)
+   if(nrow(values)>1) warning("only the first line of values is used")
 
-   if(colnames(values1)[1]=="(Intercept)") colnames(values1)[1] <- "intercept"
-
-   if(nrow(values1)>1) warning("only the first line of values is used")
-   var.random <- values1[1,names.random]
-   var.cor <- values1[1,name.cor]
+   values1 <- values[1,,drop=FALSE]
+   var.random <- model.matrix(formula(paste("~",call_random,sep="")),data=values1)
+   var.cor <- values1[,name.cor]
+   if(!is.null(name.cor)) var.cor <- model.matrix(formula(paste("~-1+",name.cor,sep="")),data=values1)
 
    nea <- sum(x$idea0==1)
    VarU <- matrix(0,nea,nea)
@@ -93,12 +76,12 @@ VarExpl.lcmm <- function(x,values)
     VarU[lower.tri(VarU,diag=TRUE)] <- x$best[x$N[1]+x$N[2]+1:x$N[3]]
    }
 
-   numer <- t(var.random) %*% VarU %*% var.random
-   if(x$ng>0)
+   numer <- var.random %*% VarU %*% t(var.random)
+   if(x$ng>1)
    {
     nw <- rep(1,x$ng)
     if(x$N[4]>0) nw <- c((x$best[x$N[1]+x$N[2]+x$N[3]+1:x$N[4]])^2,1)
-    numer <- numer * nw
+    numer <- rep(numer,x$ng) * nw
    }
 
    Corr <- 0

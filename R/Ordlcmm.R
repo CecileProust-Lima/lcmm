@@ -890,9 +890,49 @@
     if (!("intercept" %in% nom.X0)) X0.names2 <- X0.names2[-1]
 ### ad
 
+    ## levels = modalites des variables dans X0 (si facteurs)
+    levelsdata <- vector("list", length(X0.names2))
+    levelsfixed <- vector("list", length(X0.names2))
+    levelsrandom <- vector("list", length(X0.names2))
+    levelsmixture <- vector("list", length(X0.names2))
+    levelsclassmb <- vector("list", length(X0.names2))
+    names(levelsdata) <- X0.names2
+    names(levelsfixed) <- X0.names2
+    names(levelsrandom) <- X0.names2
+    names(levelsmixture) <- X0.names2
+    names(levelsclassmb) <- X0.names2
+    for(v in X0.names2)
+    {
+        if(v == "intercept") next
+        
+        if(is.factor(data[,v]))
+        {
+            levelsdata[[v]] <- levels(data[,v])
+        }
+        if(length(grep(paste("factor\\(",v,"\\)",sep=""), fixed)))
+        {
+            levelsfixed[[v]] <- levels(as.factor(data[,v]))
+        }
+        if(length(grep(paste("factor\\(",v,"\\)",sep=""), random)))
+        {
+            levelsrandom[[v]] <- levels(as.factor(data[,v]))
+        }
+        if(length(grep(paste("factor\\(",v,"\\)",sep=""), mixture)))
+        {
+            levelsmixture[[v]] <- levels(as.factor(data[,v]))
+        }
+        if(length(grep(paste("factor\\(",v,"\\)",sep=""), classmb)))
+        {
+            levelsclassmb[[v]] <- levels(as.factor(data[,v]))
+        }
+        
+    }
+    levels <- list(levelsdata=levelsdata, levelsfixed=levelsfixed, levelsrandom=levelsrandom,
+                   levelsmixture=levelsmixture, levelsclassmb=levelsclassmb)
+    
     cost<-proc.time()-ptm
     
-    res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=rep(0,nvar.exp),loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=call,niter=out$niter,N=N,idiag=idiag0,pprob=ppi,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,estimlink=estimlink,linktype=3,linknodes=zitr,ide=ide,Ydiscrete=Ydiscrete,discrete_loglik=out$loglik,UACV=out$UACV,IndivContrib=out$rlindiv,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn, var.time=var.time, runtime=cost[3])
+    res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=rep(0,nvar.exp),loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=call,niter=out$niter,N=N,idiag=idiag0,pprob=ppi,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,estimlink=estimlink,linktype=3,linknodes=zitr,ide=ide,Ydiscrete=Ydiscrete,discrete_loglik=out$loglik,UACV=out$UACV,IndivContrib=out$rlindiv,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn, levels=levels, var.time=var.time, runtime=cost[3])
     class(res) <-c("lcmm")  
 
     if(verbose==TRUE) cat("The program took", round(cost[3],2), "seconds \n")

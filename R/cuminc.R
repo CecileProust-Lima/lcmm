@@ -56,6 +56,7 @@ cuminc <- function(x,time,draws=FALSE,ndraws=2000,integrateOptions=NULL,...)
         else
         {
             nbevt <- x$nbevt
+            if(nbevt==0) stop("No survival part in the model.")
             typrisq <- x$typrisq
             risqcom <- x$hazardtype
             zi <- x$hazardnodes

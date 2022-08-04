@@ -683,11 +683,14 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         nbzitr <- rep(0,sum(ny))
         ntr <- rep(0,sum(ny))
         zitr <- matrix(0,nrow=0,ncol=0)
+        levelsFRM <- vector("list",K)
         for(k in 1:K)
             {   
                 mod <- get(paste("mod",k,sep=""))
                 namesmod <- c(namesmod,names(mod$best))
 
+                ## levels fixed random and mixture
+                levelsFRM[[k]] <- mod$levels
 
                 ## formule k
                 formf <- gsub("contrast","",mod$call$fixed[3])
@@ -2306,7 +2309,37 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                       ID=nom.subject,Tnames=c(nom.Tentry,nom.Tevent,nom.Event),
                       prior.name=nom.prior,TimeDepVar.name=nom.timedepvar)
 
+        ## levels = modalites des variables dans X0 (si facteurs)
+        levelsdata <- vector("list", length(nomsX))
+        levelsclassmb <- vector("list", length(nomsX))
+        levelssurv <- vector("list", length(nomsX))
+        names(levelsdata) <- nomsX
+        names(levelsclassmb) <- nomsX
+        names(levelssurv) <- nomsX
+        for(v in nomsX)
+        {
+            if(v == "intercept") next
+            
+            if(is.factor(data[,v]))
+            {
+                levelsdata[[v]] <- levels(data[,v])
+            }
+            if(length(grep(paste("factor\\(",v,"\\)",sep=""), classmb)))
+            {
+                levelsclassmb[[v]] <- levels(as.factor(data[,v]))
+            }
+            if(nbevt>0)
+            {
+                if(length(grep(paste("factor\\(",v,"\\)",sep=""), form.surv)))
+                {
+                    levelssurv[[v]] <- levels(as.factor(data[,v]))
+                }
+            }
+        }
+        levels <- list(levelsdata=levelsdata, levelsclassmb=levelsclassmb,
+                       levelssurv=levelssurv, levelsFRM=levelsFRM)
 
+        
         cost <- proc.time()-ptm
         
         res <-list(K=K,ny=ny,nbevt=nbevt,ng=ng,ns=ns,idprob=idprob,idcom=idcom,
@@ -2319,7 +2352,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                    epsY=epsY,linktype=idlink,nbzitr=nbzitr,linknodes=zitr,
                    predSurv=predSurv,typrisq=typrisq,hazardtype=hazardtype,
                    hazardnodes=zi,nz=nz,scoretest=stats,na.action=linesNA,
-                   contrainte=contrainte,
+                   contrainte=contrainte, levels=levels,
                    AIC=2*(length(out$best)-length(posfix)-out$loglik),
                    BIC=(length(out$best)-length(posfix))*log(ns)-2*out$loglik,
                    runtime=cost[3])

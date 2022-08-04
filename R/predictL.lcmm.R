@@ -52,82 +52,95 @@ if(na.action==1){
 }
 
 ### pour les facteurs
-    ##donnees de l estimation
-    if(!is.null(x$data))
+ ##    ##donnees de l estimation
+ ##    if(!is.null(x$data))
+ ##    {
+ ##        olddata <- x$data
+ ##    }
+ ##    else
+ ##    {
+ ##        olddata <- eval(x$call$data)
+ ##    }
+    
+ ## #cas ou une variable du dataset est un facteur
+ ##  for(v in x$Xnames2[-1])
+ ## {
+ ##  if (is.factor(olddata[,v]) & !(is.factor(newdata[,v])))
+ ##  {
+ ##   mod <- levels(olddata[,v])
+ ##   if (!(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
+ ##   newdata1[,v] <- factor(newdata1[,v], levels=mod)
+ ##  }
+ ## }
+
+    ## transform to factor is the variable appears in levels$levelsdata
+    for(v in colnames(newdata1))
     {
-        olddata <- x$data
-    }
-    else
-    {
-        olddata <- eval(x$call$data)
+        if(v %in% names(x$levels$levelsdata))
+        {
+            if(!is.null(x$levels$levelsdata[[v]]))
+            {
+                newdata1[,v] <- factor(newdata1[,v], levels=x$levels$levelsdata[[v]])
+            }
+        }
     }
     
- #cas ou une variable du dataset est un facteur
-  for(v in x$Xnames2[-1])
- {
-  if (is.factor(olddata[,v]) & !(is.factor(newdata[,v])))
-  {
-   mod <- levels(olddata[,v])
-   if (!(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-   newdata1[,v] <- factor(newdata1[,v], levels=mod)
-  }
- }
- 
- #cas ou on a factor() dans l'appel
- z <- all.names(call_fixed)
- ind_factor <- which(z=="factor")
- if(length(ind_factor))
- {
-  nom.factor <- z[ind_factor+1]  
-  for (v in nom.factor)
-  {
-   mod <- levels(as.factor(olddata[,v]))
-   if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-   newdata1[,v] <- factor(newdata1[,v], levels=mod)
-  }
- }
+    
+ ##cas ou on a factor() dans l'appel
+ ## z <- all.names(call_fixed)
+ ## ind_factor <- which(z=="factor")
+ ## if(length(ind_factor))
+ ## {
+ ##  nom.factor <- z[ind_factor+1]  
+ ##  for (v in nom.factor)
+ ##  {
+ ##   mod <- levels(as.factor(olddata[,v]))
+ ##   if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
+ ##   newdata1[,v] <- factor(newdata1[,v], levels=mod)
+ ##  }
+ ## }
  call_fixed <- gsub("factor","",call_fixed)
 
- z <- all.names(call_random)
- ind_factor <- which(z=="factor")
- if(length(ind_factor))
- {
-  nom.factor <- z[ind_factor+1]
-  for (v in nom.factor)
-  {
-   mod <- levels(as.factor(olddata[,v]))
-   if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-   newdata1[,v] <- factor(newdata1[,v], levels=mod)
-  }
- }
+ ## z <- all.names(call_random)
+ ## ind_factor <- which(z=="factor")
+ ## if(length(ind_factor))
+ ## {
+ ##  nom.factor <- z[ind_factor+1]
+ ##  for (v in nom.factor)
+ ##  {
+ ##   mod <- levels(as.factor(olddata[,v]))
+ ##   if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
+ ##   newdata1[,v] <- factor(newdata1[,v], levels=mod)
+ ##  }
+ ## }
  call_random <- gsub("factor","",call_random)
        
- z <- all.names(call_classmb)
- ind_factor <- which(z=="factor")
- if(length(ind_factor))
- {
-  nom.factor <- z[ind_factor+1]
-  for (v in nom.factor)
-  {
-   mod <- levels(as.factor(olddata[,v]))
-   if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-   newdata1[,v] <- factor(newdata1[,v], levels=mod)
-  }
- }
+ ## z <- all.names(call_classmb)
+ ## ind_factor <- which(z=="factor")
+ ## if(length(ind_factor))
+ ## {
+ ##  nom.factor <- z[ind_factor+1]
+ ##  for (v in nom.factor)
+ ##  {
+ ##   mod <- levels(as.factor(olddata[,v]))
+ ##   if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
+ ##   newdata1[,v] <- factor(newdata1[,v], levels=mod)
+ ##  }
+ ## }
  call_classmb <- gsub("factor","",call_classmb)
         
- z <- all.names(call_mixture)
- ind_factor <- which(z=="factor")
- if(length(ind_factor))
- {
-  nom.factor <- z[ind_factor+1]
-  for (v in nom.factor)
-  {
-   mod <- levels(as.factor(olddata[,v]))
-   if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
-   newdata1[,v] <- factor(newdata1[,v], levels=mod)
-  }
- }
+ ## z <- all.names(call_mixture)
+ ## ind_factor <- which(z=="factor")
+ ## if(length(ind_factor))
+ ## {
+ ##  nom.factor <- z[ind_factor+1]
+ ##  for (v in nom.factor)
+ ##  {
+ ##   mod <- levels(as.factor(olddata[,v]))
+ ##   if (!all(levels(as.factor(newdata1[,v])) %in% mod)) stop(paste("invalid level in factor", v))
+ ##   newdata1[,v] <- factor(newdata1[,v], levels=mod)
+ ##  }
+ ## }
  call_mixture <- gsub("factor","",call_mixture)   
      
  
@@ -205,19 +218,68 @@ if(!is.null(na.action)){
 }
 
 
+    ## create one data frame for each formula (useful with factors)
+    newdata1fixed <- newdata1
+    for(v in colnames(newdata1fixed))
+    {
+        if(v %in% names(x$levels$levelsfixed))
+        {
+            if(!is.null(x$levels$levelsfixed[[v]]))
+            {
+                newdata1fixed[,v] <- factor(newdata1fixed[,v], levels=x$levels$levelsfixed[[v]])
+                if(any(is.na(newdata1fixed[,v]))) stop(paste("Wrong factor level in variable",v))
+            }
+        }
+    }
+    newdata1mixture <- newdata1
+    for(v in colnames(newdata1mixture))
+    {
+        if(v %in% names(x$levels$levelsmixture))
+        {
+            if(!is.null(x$levels$levelsmixture[[v]]))
+            {
+                newdata1mixture[,v] <- factor(newdata1mixture[,v], levels=x$levels$levelsmixture[[v]])
+                if(any(is.na(newdata1mixture[,v]))) stop(paste("Wrong factor level in variable",v))
+            }
+        }
+    }
+    newdata1random <- newdata1
+    for(v in colnames(newdata1random))
+    {
+        if(v %in% names(x$levels$levelsrandom))
+        {
+            if(!is.null(x$levels$levelsrandom[[v]]))
+            {
+                newdata1random[,v] <- factor(newdata1random[,v], levels=x$levels$levelsrandom[[v]])
+                if(any(is.na(newdata1random[,v]))) stop(paste("Wrong factor level in variable",v))
+            }
+        }
+    }
+    newdata1classmb <- newdata1
+    for(v in colnames(newdata1classmb))
+    {
+        if(v %in% names(x$levels$levelsclassmb))
+        {
+            if(!is.null(x$levels$levelsclassmb[[v]]))
+            {
+                newdata1classmb[,v] <- factor(newdata1classmb[,v], levels=x$levels$levelsclassmb[[v]])
+                if(any(is.na(newdata1classmb[,v]))) stop(paste("Wrong factor level in variable",v))
+            }
+        }
+    }
+    
 
-
-## Construction de nouvelles var eplicatives sur la nouvelle table
-## fixed
+    ## Construction de nouvelles var eplicatives sur la nouvelle table
+    ## fixed
 	
-	X_fixed <- model.matrix(formula(paste("~",call_fixed,sep="")),data=newdata1)
+	X_fixed <- model.matrix(formula(paste("~",call_fixed,sep="")),data=newdata1fixed)
 	if(colnames(X_fixed)[1]=="(Intercept)"){
 		colnames(X_fixed)[1] <- "intercept"
 		int.fixed <- 1
 	}
 ## mixture
 	if(!is.null(x$call$mixture)){
-		X_mixture <- model.matrix(formula(paste("~",call_mixture,sep="")),data=newdata1)	
+		X_mixture <- model.matrix(formula(paste("~",call_mixture,sep="")),data=newdata1mixture)	
 		if(colnames(X_mixture)[1]=="(Intercept)"){
 			colnames(X_mixture)[1] <- "intercept"
 			int.mixture <- 1
@@ -228,7 +290,7 @@ if(!is.null(na.action)){
 	}	
 ## random
 	if(!is.null(x$call$random)){
-		X_random <- model.matrix(formula(paste("~",call_random,sep="")),data=newdata1)	
+		X_random <- model.matrix(formula(paste("~",call_random,sep="")),data=newdata1random)	
 		if(colnames(X_random)[1]=="(Intercept)"){
 			colnames(X_random)[1] <- "intercept"
 			int.random <- 1
@@ -239,7 +301,7 @@ if(!is.null(na.action)){
 	}	
 ## classmb
 	if(!is.null(x$call$classmb)){ 
-		X_classmb <- model.matrix(formula(paste("~",call_classmb,sep="")),data=newdata1)
+		X_classmb <- model.matrix(formula(paste("~",call_classmb,sep="")),data=newdata1classmb)
 		colnames(X_classmb)[1] <- "intercept"
 		id.X_classmb <- 1
 	}else{

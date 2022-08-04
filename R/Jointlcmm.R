@@ -2599,6 +2599,55 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                       ID=nom.subject,Tnames=noms.surv,prior.name=nom.prior,
                       TimeDepVar.name=nom.timedepvar)
 
+        
+        ## levels = modalites des variables dans X0 (si facteurs)
+        levelsdata <- vector("list", length(ttesLesVar))
+        levelsfixed <- vector("list", length(ttesLesVar))
+        levelsrandom <- vector("list", length(ttesLesVar))
+        levelsmixture <- vector("list", length(ttesLesVar))
+        levelsclassmb <- vector("list", length(ttesLesVar))
+        levelssurv <- vector("list", length(ttesLesVar))
+        names(levelsdata) <- ttesLesVar
+        names(levelsfixed) <- ttesLesVar
+        names(levelsrandom) <- ttesLesVar
+        names(levelsmixture) <- ttesLesVar
+        names(levelsclassmb) <- ttesLesVar
+        names(levelssurv) <- ttesLesVar
+        for(v in ttesLesVar)
+        {
+            if(v == "intercept") next
+            
+            if(is.factor(data[,v]))
+            {
+                levelsdata[[v]] <- levels(data[,v])
+            }
+            if(length(grep(paste("factor\\(",v,"\\)",sep=""), fixed)))
+            {
+                levelsfixed[[v]] <- levels(as.factor(data[,v]))
+            }
+            if(length(grep(paste("factor\\(",v,"\\)",sep=""), random)))
+            {
+                levelsrandom[[v]] <- levels(as.factor(data[,v]))
+            }
+            if(length(grep(paste("factor\\(",v,"\\)",sep=""), mixture)))
+            {
+                levelsmixture[[v]] <- levels(as.factor(data[,v]))
+            }
+            if(length(grep(paste("factor\\(",v,"\\)",sep=""), classmb)))
+            {
+                levelsclassmb[[v]] <- levels(as.factor(data[,v]))
+            }
+            if(length(grep(paste("factor\\(",v,"\\)",sep=""), form.surv)))
+            {
+                levelssurv[[v]] <- levels(as.factor(data[,v]))
+            }
+            
+        }
+        levels <- list(levelsdata=levelsdata, levelsfixed=levelsfixed, levelsrandom=levelsrandom,
+                       levelsmixture=levelsmixture, levelsclassmb=levelsclassmb,
+                       levelssurv=levelssurv)
+
+        
         cost<-proc.time()-ptm
         
         res <-list(ns=ns0,ng=ng0,idprob=idprob0,idcom=idcom,
@@ -2612,7 +2661,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                    scoretest=stats,na.action=linesNA,
                    AIC=2*(length(out$best)-length(posfix)-out$loglik),
                    BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,
-                   data=datareturn,var.time=var.time,runtime=cost[3])
+                   data=datareturn,levels=levels,var.time=var.time,runtime=cost[3])
 
         class(res) <-c("Jointlcmm")
 
