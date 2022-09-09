@@ -73,6 +73,7 @@ simulate.lcmm <- function(object, nsim, seed, times, tname=NULL, n,
 
     nRE <- sum(object$idea0)
     ng <- object$ng
+    if(ng>1 & is.null(object$call$classmb[2])) modele$classmb <- ~1
     if(any(object$linktype==1)) stop("Beta link functions are not implemented yet")
     
     if(inherits(object,"multlcmm"))
