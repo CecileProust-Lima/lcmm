@@ -38,22 +38,45 @@ predictClass <- function(model, newdata, subject=NULL){
   if(!is.null(subject)){
     arguments[['subject']] <- subject
   }
-  if(length(arguments[["link"]])){
-      if(grepl("-quant-", arguments[["link"]]) | grepl("-equi-", arguments[["link"]])){
+  ## specify manually the spline nodes to be sure that they are the same as initially
+  if(any(model$linktype %in% c(1,2))){
+      alink <- eval(arguments[["link"]])
+      if(any(grepl("-quant-", alink)) | any(grepl("-equi-", alink))){
+          arguments[["link"]] <- alink
           arguments[["link"]] <- gsub("-quant-", "-manual-", arguments[["link"]])
           arguments[["link"]] <- gsub("-equi-", "-manual-", arguments[["link"]])
+      }
+      if(is.matrix(model$linknodes)){ # multlcmm case
+          arguments[["intnodes"]] <- as.numeric(apply(model$linknodes[,which(model$linktype == 2)],2,function(x){x[2:(which(x==max(x,na.rm=TRUE))-1)]}))
+          arguments[["range"]] <- as.numeric(apply(model$linknodes[,which(model$linktype %in% c(1,2))],2,function(x){range(x,na.rm=TRUE)}))
+      } else { # other models
           arguments[["intnodes"]] <- model$linknodes[-c(1, length(model$linknodes))]
           arguments[["range"]] <- model$linknodes[c(1, length(model$linknodes))]
       }
   }
-  if(length(arguments[["hazard"]])){
-      if(grepl("-quant-", arguments[["hazard"]]) | grepl("-equi-", arguments[["hazard"]])){
-          arguments[["hazard"]] <- gsub("-quant-", "-manual-", arguments[["hazard"]])
-          arguments[["hazard"]] <- gsub("-equi-", "-manual-", arguments[["hazard"]])
-          hnodes <- model$hazard[[3]]
-          arguments[["hazardnodes"]] <- as.numeric(hnodes[-c(1, nrow(hnodes)),])
-          arguments[["hazardrange"]] <- as.numeric(hnodes[c(1, nrow(hnodes)),])
+  ## for Jointlcmm, specify hazard nodes
+  if(any(model$hazard[[1]] %in% c(1,3))){
+      ahazard <- eval(arguments[["hazard"]])
+      if(any(grepl("-quant-", ahazard)) | any(grepl("-equi-", ahazard))){
+          arguments[["hazard"]] <- ahazard
+          arguments[["hazard"]] <- gsub("-quant-", "-manual-",  arguments[["hazard"]])
+          arguments[["hazard"]] <- gsub("-equi-", "-manual-",  arguments[["hazard"]])
       }
+      hnodes <- model$hazard[[3]] # matrix zi
+      hcall <- eval(model$call$hazard)
+      nbevt <- length(model$hazard[[1]])
+      if(length(hcall)==1 | all(model$hazard[[1]]==3))
+      {
+          arguments[["hazardnodes"]] <- as.numeric(hnodes[-c(1, nrow(hnodes)),1])
+          arguments[["hazardrange"]] <- as.numeric(hnodes[c(1, nrow(hnodes)),1])
+      }
+      else
+      {
+          kk <- order(na.omit(c(which(model$hazard[[1]]==1), which(model$hazard[[1]]==3)[1]))) # all piecewise and first spline
+          arguments[["hazardnodes"]] <- as.numeric(apply(hnodes[,kk],2,function(x){x[2:(which(x==max(x,na.rm=TRUE))-1)]}))
+          arguments[["hazardrange"]] <- as.numeric(apply(hnodes[,kk],2,function(x){range(x,na.rm=TRUE)}))
+      }
+      
   }
   w <- options()$warn
   options(warn=-1)

@@ -1061,6 +1061,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         nprisq <- rep(2,nbevt) 
 
         nbnodes <- 0 #longueur de hazardnodes
+        nbrange <- 0 #longueur de hazardrange
         ii <- 0
         dejaspl <- 0
         if(any(hazard!="Weibull"))
@@ -1086,7 +1087,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                                         if(length(arghaz)>1 | i==1 )
                                             {
                                                 nbnodes <- nbnodes + nz[i]-2
-
+                                                nbrange <- nbrange + 2
                                             }
                                     }
                                 if(typrisq[i]==3) dejaspl <- 1
@@ -1137,10 +1138,14 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         
         if(!is.null(hazardrange))
         {
-            if(length(hazardrange) != (nbevt[which(hazard != "Weibull")]*2)) stop(paste("Vector hazardrange should be of length", (nbevt[which(hazard != "Weibull")]*2)))
+            if(length(hazardrange) != nbrange) stop(paste("Vector hazardrange should be of length", nbrange))
 
             if(any(hazardrange[seq(2,length(hazardrange), 2)] < maxT1) | any(hazardrange[seq(1,length(hazardrange), 2)] > minT1)) stop("The hazard range specified do not cover the entire range of the data")
 
+            if(nbevt>1 & length(arghaz)==1)
+            {
+                hazardrange <- rep(hazardrange,length.out=nbrange*nbevt)
+            }
         }
         
         
