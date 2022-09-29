@@ -902,7 +902,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
            vrais_Y = vrais_Y + pi(g)*exp((-det-Y4)/2.d0)
         end do
 
-        vrais_Y = -sum(nmes(i,:))*dlog(dble(2*3.14159265)) + log(vrais_Y)
+        vrais_Y = -dble(sum(nmes(i,:))/2.d0)*dlog(dble(2*3.14159265)) + log(vrais_Y)
 
      else
         !! au moins 1 ordinal
