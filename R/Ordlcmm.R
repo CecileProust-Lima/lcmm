@@ -710,7 +710,7 @@
                             NPM,epsY0,idlink0,nbzitr0,zitr0,minY,maxY,ide,
                             fix0,nfix,bfix)
         
-        out <- list(conv=2, V=rep(NA, length(b)), best=b,
+        out <- list(conv=2, V=rep(0, length(b)), best=b,
                     ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0), Yobs=rep(NA,nobs0),
                     resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                     marker=rep(NA,nsim), transfY=rep(NA,nsim),
