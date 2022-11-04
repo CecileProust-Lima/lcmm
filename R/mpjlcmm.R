@@ -294,19 +294,20 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         for(k in 1:K)
             {
                 ## modele k
-                if(length(longitudinal[[k]]$call))
-                    {
-                        z <- longitudinal[[k]]$call
-                        z$data <- data
-                        z$maxiter <- 0
-                        z$B <- longitudinal[[k]]$best
-                        z$verbose <- FALSE
-                        mod <- eval(z)
-                    }
-                else
-                    {
-                        mod <- eval(longitudinal[[k]])
-                    }
+                ## if(length(longitudinal[[k]]$call))
+                ##     {
+                ##         z <- longitudinal[[k]]$call
+                ##         z$data <- data
+                ##         z$maxiter <- 0
+                ##         z$B <- longitudinal[[k]]$best
+                ##         z$verbose <- FALSE
+                ##         mod <- eval(z)
+                ##     }
+                ## else
+                ##     {
+                ##         mod <- eval(longitudinal[[k]])
+                ##     }
+                mod <- longitudinal[[k]]
                 assign(paste("mod",k,sep=""),mod)
 
                 subject <- mod$call$subject
