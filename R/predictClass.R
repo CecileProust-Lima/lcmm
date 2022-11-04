@@ -34,12 +34,13 @@ predictClass <- function(model, newdata, subject=NULL){
   arguments[["data"]] <- newdata
   arguments[["B"]] <- model$best 
   arguments[["maxiter"]] <- 0
+  arguments[["posfix"]] <- NULL
   arguments[["verbose"]] <- FALSE
   if(!is.null(subject)){
     arguments[['subject']] <- subject
   }
   ## specify manually the spline nodes to be sure that they are the same as initially
-  if(any(model$linktype %in% c(1,2))){
+  if(any(model$linktype %in% c(1,2)) & !inherits(model, "mpjlcmm")){
       alink <- eval(arguments[["link"]])
       if(any(grepl("-quant-", alink)) | any(grepl("-equi-", alink))){
           arguments[["link"]] <- alink
