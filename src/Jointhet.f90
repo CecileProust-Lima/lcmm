@@ -2686,12 +2686,12 @@
                pi(prior(i))=1.d0
             else
                Xprob=0.d0
-               Xprob(1)=1.d0
+               !Xprob(1)=1.d0
                l=0
                do k=1,nv
                   if (idprob(k).eq.1) then
                      l=l+1
-                     Xprob(1+l)=X(it+1,k)
+                     Xprob(l)=X(it+1,k)
                   end if
                end do
 !     write(*,*)'l apres Xprob',l,(Xprob(j),j=1,10)
