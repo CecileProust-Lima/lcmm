@@ -87,8 +87,9 @@ loglikhlme <- function(b,Y0,X0,prior0,pprior0,idprob0,idea0,idg0,idcor0,
     pred_m_g <- rep(0,nobs0*ng0)
     pred_ss_g <- rep(0,nobs0*ng0)
     predRE <- rep(0,ns0*nea0)
+    varRE <- rep(0,ns0*nea0*(nea0+1)/2)
     estim0 <- 1
-    .Fortran(C_loglikhlme,as.double(Y0),as.double(X0),as.integer(prior0),as.double(pprior0),as.integer(idprob0),as.integer(idea0),as.integer(idg0),as.integer(idcor0),as.integer(ns0),as.integer(ng0),as.integer(nv0),as.integer(nobs0),as.integer(nea0),as.integer(nmes0),as.integer(idiag0),as.integer(nwg0),as.integer(ncor0),as.integer(npm0),as.double(b),as.double(ppi0),as.double(resid_m),as.double(resid_ss),as.double(pred_m_g),as.double(pred_ss_g),as.double(predRE),as.integer(fix0),as.integer(nfix0),as.double(bfix0),as.integer(estim0),loglik=as.double(res))$loglik
+    .Fortran(C_loglikhlme,as.double(Y0),as.double(X0),as.integer(prior0),as.double(pprior0),as.integer(idprob0),as.integer(idea0),as.integer(idg0),as.integer(idcor0),as.integer(ns0),as.integer(ng0),as.integer(nv0),as.integer(nobs0),as.integer(nea0),as.integer(nmes0),as.integer(idiag0),as.integer(nwg0),as.integer(ncor0),as.integer(npm0),as.double(b),as.double(ppi0),as.double(resid_m),as.double(resid_ss),as.double(pred_m_g),as.double(pred_ss_g),as.double(predRE),as.double(varRE),as.integer(fix0),as.integer(nfix0),as.double(bfix0),as.integer(estim0),loglik=as.double(res))$loglik
 }
 
 

@@ -792,6 +792,7 @@ hlme <-
         pred_ss_g <- rep(0,nobs0*ng0)
         nea0 <- sum(idea0==1)
         predRE <- rep(0,nea0*ns0)
+        varRE <- rep(0,nea0*(nea0+1)/2*ns0)
 
         ##---------------------------------------------------------------------------
         ##definition du vecteur de parametres + initialisation
@@ -1182,6 +1183,7 @@ hlme <-
             
             out <- list(conv=2, V=rep(NA, NPM*(NPM+1)/2), best=b,
                         ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
+                        varRE=rep(NA,ns0*nea0*(nea0+1)/2),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
                         gconv=rep(NA,3), niter=0, loglik=vrais)
@@ -1201,6 +1203,7 @@ hlme <-
             
             out <- list(conv=res$istop, V=res$v, best=res$b,
                         ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
+                        varRE=rep(NA,ns0*nea0*(nea0+1)/2),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
                         gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,
@@ -1217,6 +1220,7 @@ hlme <-
             pred_m_g <- rep(0,nobs0*ng0)
             pred_ss_g <- rep(0,nobs0*ng0)
             predRE <- rep(0,ns0*nea0)
+            varRE <- rep(0,ns0*nea0*(nea0+1)/2)
             
             post <- .Fortran(C_loglikhlme,
                              as.double(Y0),
@@ -1244,6 +1248,7 @@ hlme <-
                              pred_m_g=as.double(pred_m_g),
                              pred_ss_g=as.double(pred_ss_g),
                              predRE=as.double(predRE),
+                             varRE=as.double(varRE),
                              as.integer(fix0),
                              as.integer(nfix),
                              as.double(bfix),
@@ -1252,6 +1257,7 @@ hlme <-
             
             out$ppi2 <- post$ppi
             out$predRE <- post$predRE
+            out$varRE <- post$varRE
             out$resid_m <- post$resid_m
             out$resid_ss <- post$resid_ss
             out$pred_m_g <- post$pred_m_g
@@ -1443,7 +1449,7 @@ hlme <-
         
         cost<-proc.time()-ptm
         
-        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random, levels=levels, var.time=var.time, runtime=cost[3])
+        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,varRE=out$varRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random, levels=levels, var.time=var.time, runtime=cost[3])
         class(res) <-c("hlme") 
 
         if(verbose==TRUE) cat("The program took", round(cost[3],2), "seconds \n")
