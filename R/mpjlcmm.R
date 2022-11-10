@@ -307,7 +307,49 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 ##     {
                 ##         mod <- eval(longitudinal[[k]])
                 ##     }
-                mod <- longitudinal[[k]]
+                
+                modk <- longitudinal[[k]]
+                z <- modk$call
+                z$data <- data
+                z$maxiter <- 0
+                z$B <- modk$best
+                z$verbose <- FALSE
+                if(any(modk$linktype == 2))
+                {
+                    if(length(modk$linktype == 1))
+                    {
+                        ## lcmm
+                        nb <- length(modk$linknodes)
+                        z$link <- paste(nb,"-manual-splines",sep="")
+                        z$range <- modk$linknodes[c(1,nb)]
+                        z$intnodes <- modk$linknodes[c(2:(nb-1))]
+                    }
+                    else
+                    {
+                        ## multlcmm
+                        nspl <- 0
+                        link <- rep(NA,length(modk$linktype))
+                        intnodes <- NULL
+                        range <- NULL
+                        for (yk in 1:length(modk$linktype))
+                        {
+                            if(modk$linktype[yk] == 2)
+                            {
+                                nspl <- nspl+1
+                                nb <- modk$nbnodes[nspl]
+                                link[yk] <- paste(nb,"-manual-splines",sep="")
+                                intnodes <- c(intnodes, modk$linknodes[2:(nb-1),yk])
+                                range <- c(range, modk$linknodes[c(1,nb)])
+                            }
+                        }
+                        z$link <- link
+                        z$intnodes <- intnodes
+                        z$range <- range
+                    }
+                }
+                mod <- eval(z)
+                
+##                mod <- longitudinal[[k]]
                 assign(paste("mod",k,sep=""),mod)
 
                 subject <- mod$call$subject
@@ -457,8 +499,8 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             Tevent <- getElement(object=data,name=nom.Tevent)
             Event <- getElement(object=data,name=nom.Event)  
             nbevt <- length(attr(do.call("Surv",list(time=Tevent,event=Event,type="mstate")),"states"))
-            #nbevt <- length(which(names(table(data[,nom.Event]))>0))    #length(unique(Event))-1   
-            if(nbevt<1) stop("No observed event in the data")
+            ##nbevt <- length(which(names(table(data[,nom.Event]))>0))    #length(unique(Event))-1   
+            if(nbevt<1) nbevt <- 1 #stop("No observed event in the data")
             
 
             ## pour la formule pour survivial, creer 3 formules : 
