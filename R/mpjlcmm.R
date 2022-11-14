@@ -219,7 +219,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     hazard="Weibull",hazardtype="Specific",hazardnodes=NULL,TimeDepVar=NULL,
                     data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,
                     prior,logscale=FALSE,subset=NULL,na.action=1,posfix=NULL,
-                    partialH=FALSE,verbose=TRUE,nproc=1,clustertype=NULL)
+                    partialH=FALSE,verbose=FALSE,nproc=1,clustertype=NULL)
     {
         
         ptm <- proc.time()

@@ -294,7 +294,7 @@
 #' 
 #' 
 hlme <-
-    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,pprior=NULL,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=TRUE,returndata=FALSE,var.time=NULL,partialH=FALSE,nproc=1,clustertype=NULL){
+    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,pprior=NULL,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=FALSE,returndata=FALSE,var.time=NULL,partialH=FALSE,nproc=1,clustertype=NULL){
 
         ptm<-proc.time()
 
