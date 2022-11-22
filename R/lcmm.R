@@ -266,6 +266,8 @@
 #' @param nproc the number cores for parallel computation.
 #' Default to 1 (sequential mode).
 #' @param clustertype optional character indicating the type of cluster for parallel computation.
+#' @param computeDiscrete optional logical indicating if a dscrete likelihood and UACV
+#' should be computed. By default, if the outcome only consists of integers computeDiscrete=TRUE.
 #' @return The list returned is: \item{ns}{number of grouping units in the
 #' dataset} \item{ng}{number of latent classes} \item{loglik}{log-likelihood of
 #' the model} \item{best}{vector of parameter estimates in the same order as
@@ -437,7 +439,7 @@
 #' 
 #' 
 #' 
-lcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=FALSE,returndata=FALSE,var.time=NULL,nproc=1,clustertype=NULL)
+lcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=FALSE,returndata=FALSE,var.time=NULL,nproc=1,clustertype=NULL,computeDiscrete=NULL)
 {
 
 mm <- match.call()
@@ -739,14 +741,15 @@ cat("Argument 'epsY' should be a definite positive real. It is changed to the de
 }
 }
 
-
-Ydiscrete <- 1
-if (idlink0!=3) {
-        if(!(all.equal(minY0,as.integer(minY0))==T) | !(all.equal(maxY0,as.integer(maxY0))==T)|!all(Y0 %in% minY0:maxY0)){
+    Ydiscrete <- as.numeric(computeDiscrete)
+    if(is.null(computeDiscrete)) {
+        Ydiscrete <- 1
+        if (idlink0!=3) {
+            if(!(all.equal(minY0,as.integer(minY0))==T) | !(all.equal(maxY0,as.integer(maxY0))==T)|!all(Y0 %in% minY0:maxY0)){
 		Ydiscrete <- 0
-	}
-
-}
+            }
+        }
+    }
 
 
 

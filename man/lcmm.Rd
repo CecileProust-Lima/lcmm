@@ -32,11 +32,12 @@ lcmm(
   na.action = 1,
   posfix = NULL,
   partialH = FALSE,
-  verbose = TRUE,
+  verbose = FALSE,
   returndata = FALSE,
   var.time = NULL,
   nproc = 1,
-  clustertype = NULL
+  clustertype = NULL,
+  computeDiscrete = NULL
 )
 }
 \arguments{
@@ -177,6 +178,9 @@ returned. Default to FALSE, data are not returned.}
 Default to 1 (sequential mode).}
 
 \item{clustertype}{optional character indicating the type of cluster for parallel computation.}
+
+\item{computeDiscrete}{optional logical indicating if a dscrete likelihood and UACV
+should be computed. By default, if the outcome only consists of integers computeDiscrete=TRUE.}
 }
 \value{
 The list returned is: \item{ns}{number of grouping units in the

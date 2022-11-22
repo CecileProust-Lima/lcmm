@@ -25,7 +25,7 @@ hlme(
   subset = NULL,
   na.action = 1,
   posfix = NULL,
-  verbose = TRUE,
+  verbose = FALSE,
   returndata = FALSE,
   var.time = NULL,
   partialH = FALSE,

@@ -27,7 +27,7 @@ mpjlcmm(
   na.action = 1,
   posfix = NULL,
   partialH = FALSE,
-  verbose = TRUE,
+  verbose = FALSE,
   nproc = 1,
   clustertype = NULL
 )
