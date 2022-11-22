@@ -932,7 +932,7 @@
     
     cost<-proc.time()-ptm
     
-    res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=rep(0,nvar.exp),loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=call,niter=out$niter,N=N,idiag=idiag0,pprob=ppi,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,estimlink=estimlink,linktype=3,linknodes=zitr,ide=ide,Ydiscrete=Ydiscrete,discrete_loglik=out$loglik,UACV=out$UACV,IndivContrib=out$rlindiv,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn, levels=levels, var.time=var.time, runtime=cost[3])
+    res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=rep(0,nvar.exp),loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=call,niter=out$niter,N=N,idiag=idiag0,pprob=ppi,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,estimlink=estimlink,epsY=0,linktype=3,linknodes=zitr,ide=ide,Ydiscrete=Ydiscrete,discrete_loglik=out$loglik,UACV=out$UACV,IndivContrib=out$rlindiv,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn, levels=levels, var.time=var.time, runtime=cost[3])
     class(res) <-c("lcmm")  
 
     if(verbose==TRUE) cat("The program took", round(cost[3],2), "seconds \n")
