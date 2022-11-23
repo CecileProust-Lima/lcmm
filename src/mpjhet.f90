@@ -46,9 +46,9 @@
       integer,save::nbK,ns,ng,nv2,ncssg,ncg,  &
       nvarprob,maxmes,nobs,nvarxevt,nySPL,ntotvalSPL, &
       nbevt,logspecif,idtrunc,nvdepsurv,nrisqtot,nxevt,npmtot
-      integer,save::contraint,ntrtot,nprob,nmescur
+      integer,save::ntrtot,nprob,nmescur
       integer,dimension(:),allocatable,save::nef,ncontr,nvc,nw,ncor,nerr, &
-           nalea,ntr,ny,nea,idiag,nv
+           nalea,ntr,ny,nea,idiag,nv,contraint
       integer,dimension(:),allocatable,save::risqcom,typrisq,nz,nprisq,nrisq,nxevtspec,nevtparx,nxcurr
       double precision,dimension(:),allocatable,save::Y,uniqueY,minY,maxY,epsY
       integer,dimension(:),allocatable,save::indiceY
@@ -443,7 +443,7 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
         Ut=0.d0
         if (nea(k)>0) then
            
-           if(contraint.eq.2) then
+           if(contraint(k).eq.2) then
               Ut=0.d0
               Ut(1,1)=1.d0
               if (nea(k)>1) then 
@@ -539,7 +539,7 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
         sumMesYk = 0
         do yk=1,ny(k)
            do j1=1,nmes(i,sumny+yk)
-              if(contraint.eq.1) then
+              if(contraint(k).eq.1) then
                  Corr(sumMesYk+j1,sumMesYk+j1) =  Corr(sumMesYk+j1,sumMesYk+j1) + 1
               else
                  Corr(sumMesYk+j1,sumMesYk+j1) =  Corr(sumMesYk+j1,sumMesYk+j1) + &
@@ -616,7 +616,7 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
               do j=1,nmesparK(i,k)
                  X00(j,l)=dble(X(nmescur+sumparK+j,sumnv+kk))  
               end do
-                 if (kk.eq.1.and.contraint.ne.0) then
+                 if (kk.eq.1.and.contraint(k).ne.0) then
                     b0(l)=0.d0 ! intercept fixe a 0
                  else
                     ll=ll+1
@@ -861,7 +861,7 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
            Ut=0.d0
            if (nea(k)>0) then
 
-              if(contraint.eq.2) then
+              if(contraint(k).eq.2) then
                  Ut=0.d0
                  Ut(1,1)=1.d0
                  if (nea(k)>1) then 
@@ -964,7 +964,7 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
            sumMesYk=0
            do yk=1,ny(k)
               do j1=1,nmes(i,sumny+yk)
-                 if(contraint.eq.1) then
+                 if(contraint(k).eq.1) then
                     Corr(sumMesYk+j1,sumMesYk+j1) =  Corr(sumMesYk+j1,sumMesYk+j1) + 1
                  else
                     Corr(sumMesYk+j1,sumMesYk+j1) =  Corr(sumMesYk+j1,sumMesYk+j1) + &
@@ -1048,7 +1048,7 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
                  do j=1,nmesparK(i,k)
                     X00(j,m)=dble(X(nmescur+sumparK+j,sumnv+kk))
                  end do
-                 if (kk.eq.1.and.contraint.ne.0) then
+                 if (kk.eq.1.and.contraint(k).ne.0) then
                     b0(m)=0.d0
                  else
                     b0(m)=b1(nprob+nrisqtot+nvarxevt+tmp+nmoins+1)
@@ -1061,7 +1061,7 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
                  do j=1,nmesparK(i,k)
                     X2(j,l)=dble(X(nmescur+sumparK+j,sumnv+kk))
                  end do
-                 if (kk.eq.1.and.contraint.ne.0) then
+                 if (kk.eq.1.and.contraint(k).ne.0) then
                     if (g.eq.1) then
                        b2(l)=0.d0
                        nmoins=nmoins+ng-1
@@ -2114,7 +2114,7 @@ subroutine postprob_mpj(b,npm,ppi,ppiy)
            Ut=0.d0
            if (nea(k)>0) then
 
-              if(contraint.eq.2) then
+              if(contraint(k).eq.2) then
                  Ut=0.d0
                  Ut(1,1)=1.d0
                  if (nea(k)>1) then 
@@ -2217,7 +2217,7 @@ subroutine postprob_mpj(b,npm,ppi,ppiy)
            sumMesYk=0
            do yk=1,ny(k)
               do j1=1,nmes(i,sumny+yk)
-                 if(contraint.eq.1) then
+                 if(contraint(k).eq.1) then
                     Corr(sumMesYk+j1,sumMesYk+j1) =  Corr(sumMesYk+j1,sumMesYk+j1) + 1
                  else
                     Corr(sumMesYk+j1,sumMesYk+j1) =  Corr(sumMesYk+j1,sumMesYk+j1) + &
@@ -2299,7 +2299,7 @@ subroutine postprob_mpj(b,npm,ppi,ppiy)
                  do j=1,nmesparK(i,k)
                     X00(j,m)=dble(X(it+sumparK+j,sumnv+kk))
                  end do
-                 if (kk.eq.1.and.contraint.ne.0) then
+                 if (kk.eq.1.and.contraint(k).ne.0) then
                     b0(m)=0.d0
                  else
                     b0(m)=b1(nprob+nrisqtot+nvarxevt+tmp+nmoins+1)
@@ -2312,7 +2312,7 @@ subroutine postprob_mpj(b,npm,ppi,ppiy)
                  do j=1,nmesparK(i,k)
                     X2(j,l)=dble(X(it+sumparK+j,sumnv+kk))
                  end do
-                 if (kk.eq.1.and.contraint.ne.0) then
+                 if (kk.eq.1.and.contraint(k).ne.0) then
                     if (g.eq.1) then
                        b2(l)=0.d0
                        nmoins=nmoins+ng-1
@@ -2600,7 +2600,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
            Ut=0.d0
            if (nea(k)>0) then
 
-              if(contraint.eq.2) then
+              if(contraint(k).eq.2) then
                  Ut=0.d0
                  Ut(1,1)=1.d0
                  if (nea(k)>1) then 
@@ -2700,7 +2700,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
            SigmaE=0.d0
            do yk=1,ny(k)
               do j1=1,nmes(i,sumny+yk)
-                 if(contraint.eq.1) then
+                 if(contraint(k).eq.1) then
                     SigmaE(sumMesYk+j1,sumMesYk+j1) = 1
                  else
                     SigmaE(sumMesYk+j1,sumMesYk+j1) =   b1(nprob+nrisqtot+nvarxevt+tmp+&
@@ -2780,7 +2780,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
                  do j=1,nmesparK(i,k)
                     X0(j,l)=dble(X(it+sumparK+j,sumnv+kk))  
                  end do
-                 if (kk.eq.1.and.contraint.ne.0) then
+                 if (kk.eq.1.and.contraint(k).ne.0) then
                     b0(l)=0.d0 ! intercept fixe a 0
                  else
                     ll=ll+1
@@ -2911,7 +2911,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
               Ut=0.d0
               if (nea(k)>0) then
 
-                 if(contraint.eq.2) then
+                 if(contraint(k).eq.2) then
                     Ut=0.d0
                     Ut(1,1)=1.d0
                     if (nea(k)>1) then 
@@ -3016,7 +3016,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
               Valea=0.d0
               do yk=1,ny(k)
                  do j1=1,nmes(i,sumny+yk)
-                    if(contraint.eq.1) then
+                    if(contraint(k).eq.1) then
                        SigmaE(sumMesYk+j1,sumMesYk+j1) = 1
                     else
                        SigmaE(sumMesYk+j1,sumMesYk+j1) = b1(nprob+nrisqtot+nvarxevt+tmp+&
@@ -3107,7 +3107,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
                     do j=1,nmesparK(i,k)
                        X0(j,m)=dble(X(it+sumparK+j,sumnv+kk))
                     end do
-                    if (kk.eq.1.and.contraint.ne.0) then
+                    if (kk.eq.1.and.contraint(k).ne.0) then
                        b0(m)=0.d0
                     else
                        b0(m)=b1(nprob+nrisqtot+nvarxevt+tmp+nmoins+1)
@@ -3120,7 +3120,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
                     do j=1,nmesparK(i,k)
                        X2(j,l)=dble(X(it+sumparK+j,sumnv+kk))
                     end do
-                    if (kk.eq.1.and.contraint.ne.0) then
+                    if (kk.eq.1.and.contraint(k).ne.0) then
                        if (g.eq.1) then
                           b2(l)=0.d0
                           nmoins=nmoins+ng-1
@@ -3611,8 +3611,8 @@ subroutine loglikmpjlcmm(K0,ny0,nbevt0,ng0,ns0,Y0,nobs0,X0,nv0,Xns0,nv20, &
   IMPLICIT NONE
 
   !Declaration des variables en entree
-  integer,intent(in)::K0,nbevt0,ns0,ng0,nv20,nobs0,npm0,nsim,contrainte0
-  integer,dimension(K0)::ny0,nv0,nea0,nw0,ncor0,nalea0,idiag0
+  integer,intent(in)::K0,nbevt0,ns0,ng0,nv20,nobs0,npm0,nsim
+  integer,dimension(K0)::ny0,nv0,nea0,nw0,ncor0,nalea0,idiag0,contrainte0
   integer,dimension(ns0,sum(ny0(:)))::nmes0   
   integer,intent(in)::idtrunc0,logspecif0,estim0,nfix0
   double precision,dimension(nfix0),intent(in)::bfix0
@@ -3694,12 +3694,13 @@ subroutine loglikmpjlcmm(K0,ny0,nbevt0,ng0,ns0,Y0,nobs0,X0,nv0,Xns0,nv20, &
   end do
 
   ! alloc pour partie modele mixte
-  contraint=contrainte0
   nbK=K0
   nytot = sum(ny0(:))
   allocate(minY(nytot),maxY(nytot),idlink(nytot),ntr(nytot),epsY(nytot))
-  allocate(nef(nbK),ncontr(nbK),nea(nbK),nvc(nbK),nw(nbK),ncor(nbK),nerr(nbK),nalea(nbK),ny(nbK),idiag(nbK),nv(nbK))
+  allocate(nef(nbK),ncontr(nbK),nea(nbK),nvc(nbK),nw(nbK),ncor(nbK),nerr(nbK),nalea(nbK),ny(nbK),idiag(nbK),nv(nbK),&
+       contraint(nbK))
 
+  contraint=contrainte0
   ny=ny0
   epsY=epsY0
   nySPL=0 
@@ -4007,15 +4008,15 @@ subroutine loglikmpjlcmm(K0,ny0,nbevt0,ng0,ns0,Y0,nobs0,X0,nv0,Xns0,nv20, &
 
         nef(k)=ncssg+ng*ncg
         ncontr(k)=ncontr(k)+idcontr(ll+l)*(ny(k)-1)
-        if(contraint.ne.0) nef(k)=nef(k)-1
+        if(contraint(k).ne.0) nef(k)=nef(k)-1
         nea(k)=nea(k)+idea(ll+l)
         if(idiag(k).eq.1) then
            nvc(k)=nea(k)
         else
            nvc(k)=nea(k)*(nea(k)+1)/2
         end if
-        if(contraint.eq.2) nvc(k)=nvc(k)-1
-        if(contraint.ne.1) nerr(k)=ny(k)
+        if(contraint(k).eq.2) nvc(k)=nvc(k)-1
+        if(contraint(k).ne.1) nerr(k)=ny(k)
      end do
      ll = ll+nv(k)
   end do
@@ -4319,7 +4320,7 @@ subroutine loglikmpjlcmm(K0,ny0,nbevt0,ng0,ns0,Y0,nobs0,X0,nv0,Xns0,nv20, &
 1236 continue
 
   deallocate(nmesparK,minY,maxY,idlink,ntr,epsY,nef,ncontr,nea,nvc,nw,ncor,nerr,&
-       nalea,ny,idiag,nvalSPL,nv)
+       nalea,ny,idiag,nvalSPL,nv,contraint)
 
   deallocate(Y,X,Xns,idprob,idea,idg,idcontr,idcor,nmes,prior,zitr,mm,mm1,mm2,im,im1,&
        im2,indiceY,uniqueY,idcom,idspecif,idtdv)

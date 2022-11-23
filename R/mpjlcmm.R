@@ -227,9 +227,9 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         cl <- match.call()
 
         if(!is.list(longitudinal)) stop("longitudinal should be a list of estimated models")
-        longclass <- unique(sapply(longitudinal,class))
+        longclass <- sapply(longitudinal,class)
         if(any(!(longclass %in% c("hlme","lcmm","multlcmm")))) stop("longitudinal should only contain hlme, lcmm or multlcmm objects")
-        if(length(longclass)!=1) stop("longitudinal should only contain objects of the same class")
+        #if(length(longclass)!=1) stop("longitudinal should only contain objects of the same class")
         if(!missing(classmb) & ng==1) stop("No classmb can be specified with ng=1")
         #if(missing(classmb) & ng==1) classmb <- ~-1
         #if(missing(classmb) & ng>1) classmb <- ~1
@@ -281,7 +281,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         attributes(data)$terms <- NULL
 
         ## contrainte selon le type de modele longitudinal
-        contrainte <- switch(longclass[1],"hlme"=0,"lcmm"=1,"multlcmm"=2)
+        contrainte <- as.numeric(sapply(longclass, function(x){switch(x,"hlme"=0,"lcmm"=1,"multlcmm"=2)}))
 
         ## ### donnees Y ### ##
         K <- length(longitudinal)
@@ -360,7 +360,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 if(mod$ng!=ng) stop(paste("The longitudinal model (number ",k,") does not define the correct number of latent classes",sep=""))
                 
                 
-                if(longclass=="multlcmm")
+                if(longclass[k]=="multlcmm")
                 {
                     Ynames[[k]] <- mod$Ynames
                     Xnames[[k]] <- mod$Xnames
@@ -378,7 +378,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     {
                         ## data frame de l'outcome m
                         colx <- c(subject,nomsX,Ynames[[k]][m])
-                        if(longclass=="multlcmm")
+                        if(longclass[k]=="multlcmm")
                             {
                                 if(length(mod$na.action[[m]]))
                                 {
@@ -791,14 +791,14 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 ctr[k] <- sum(mod$idcontr)
                 q[k] <- sum(mod$idea)
                 nvc[k] <- ifelse(idiag[k]==1,q[k],q[k]*(q[k]+1)/2)
-                ncor[k] <- mod$N[5+contrainte]
-                nw[k] <- ifelse(contrainte==2,mod$N[5],mod$N[4])
+                ncor[k] <- mod$N[5+contrainte[k]]
+                nw[k] <- ifelse(contrainte[k]==2,mod$N[5],mod$N[4])
                 
                 ## link
-                if(contrainte==0) idlink[sum(ny[1:k])-ny[k]+1:ny[k]] <- -1
+                if(contrainte[k]==0) idlink[sum(ny[1:k])-ny[k]+1:ny[k]] <- -1
                 else idlink[sum(ny[1:k])-ny[k]+1:ny[k]] <- mod$linktype
 
-                if(contrainte==2)
+                if(contrainte[k]==2)
                 {
                     ncontr[k] <- mod$N[2]
                     nalea[k] <- mod$N[6]
@@ -830,7 +830,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                         }
                     }
                 }
-                if(contrainte==1)
+                if(contrainte[k]==1)
                 {
                     nbzitr[k] <- length(mod$linknodes)
                     nodes <- c(nodes,as.vector(mod$linknodes))
@@ -1385,10 +1385,15 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         predRE <- rep(0,ns*sum(nea))
         predRE_Y <- rep(0,ns*sum(nalea))
 
-        if(contrainte==0) nef <- p1+ng*p2 else nef <- p1+ng*p2-1
-        if(contrainte==2) nvc <- nvc-1 else nvc <- nvc
-        if(contrainte==1) nerr <- rep(0,K) else nerr <- ny
-
+        nef <- rep(NA,K)
+        nerr <- rep(NA,K)
+        for(k in 1:K)
+        {
+            if(contrainte[k]==0) nef[k] <- p1[k]+ng*p2[k] else nef[k] <- p1[k]+ng*p2[k]-1
+            if(contrainte[k]==2) nvc[k] <- nvc[k]-1 else nvc[k] <- nvc[k]
+            if(contrainte[k]==1) nerr[k] <- 0 else nerr[k] <- ny[k]
+        }
+        
         ## nb prm
         nprob <- (ng-1)*sum(idprob)
         neftot <- sum(nef)
@@ -1396,7 +1401,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         nvctot <- sum(nvc)
         nwtot <- sum(nw)
         ncortot <- sum(ncor)
-        nerrtot <- ifelse(contrainte==1,0,sum(ny))
+        nerrtot <- sum(nerr)
         naleatot <- sum(nalea)
         ntrtot <- sum(ntr)
 
@@ -1518,7 +1523,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                                 else
                                 {
                                     mvc <- matrix(0,nea[k],nea[k])
-                                    if(contrainte==2)
+                                    if(contrainte[k]==2)
                                     {
                                         mvc[upper.tri(mvc,diag=TRUE)] <- c(1,b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+1:nvc[k]])
                                         mvc <- t(mvc)
@@ -1533,7 +1538,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
 
                                     ch <- chol(mvc)
 
-                                    if(contrainte==2)
+                                    if(contrainte[k]==2)
                                     {
                                         b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+1:nvc[k]] <- ch[upper.tri(ch,diag=TRUE)][-1]
                                     }
@@ -1550,7 +1555,8 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     {
                         if(!inherits(B,"mpjlcmm")) stop("B should be either a vector or an object of class mpjlcmm")
                         nef2 <- p1+p2
-                        if(contrainte!=0) nef2 <- p1+p2-1
+                        ##if(contrainte!=0) nef2 <- p1+p2-1
+                        nef2 <- sapply(1:K, function(k){ifelse(contrainte[k]!=0,p1[k]+p2[k]-1,nef[k])})
                         NPM2 <- sum(nprisq)+nvarxevt2+sum(nef2)+sum(ncontr)+sum(nvc)+
                             sum(ncor)+sum(nerr)+sum(nalea)+sum(ntr)
                         if(length(B$best)!=NPM2) stop(paste("B is not correct. The number of parameters should be",NPM2))
@@ -2158,7 +2164,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 if(nvc[k]>0)
                 {
                     Cholesky <- c(Cholesky,out$best[nprob+nrisqtot+nvarxevt+tmp+nef[k]+ncontr[k]+1:nvc[k]])
-                    if(contrainte==2)
+                    if(contrainte[k]==2)
                     {
                         ch <- c(1,out$best[nprob+nrisqtot+nvarxevt+tmp+nef[k]+ncontr[k]+1:nvc[k]])
                     }
@@ -2172,7 +2178,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                         U <- matrix(0,nea[k],nea[k])
                         U[upper.tri(U,diag=TRUE)] <- ch
                         z <- t(U) %*% U
-                        if(contrainte==2)
+                        if(contrainte[k]==2)
                         {
                             out$best[nprob+nrisqtot+nvarxevt+tmp+nef[k]+ncontr[k]+1:nvc[k]] <- z[upper.tri(z,diag=TRUE)][-1]
                         }
