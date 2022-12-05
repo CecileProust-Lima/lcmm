@@ -557,7 +557,7 @@ externVar = function(model,
     
     #cholesky not varcov
     whereRand = substr(names(est), 1, 7) == "varcov "
-    if(funIn == "mpjlcmm" | !all(model$idiag)){
+    if(funIn == "mpjlcmm" | !all(as.logical(model$idiag))){
       est[whereRand] = model$cholesky #Warning : quickest way to do this, but maybe not the best/safest
     } else {
       cholMatrix = matrix(NA, sum(whereRand), sum(whereRand))
