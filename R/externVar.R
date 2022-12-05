@@ -283,6 +283,15 @@ externVar = function(model,
     }
   }
   
+  #NVCin
+  if(funIn %in% c("multlcmm", "mpjlcmm")){
+    NVCin = model$N[6]
+  } else if(funIn == "Jointlcmm"){
+    NVCin = model$N[5]
+  } else {
+    NVCin = model$N[3]
+  }
+  
   
   #Change general model arguments
   if(method == "twoStageJoint"){
@@ -551,9 +560,9 @@ externVar = function(model,
     if(funIn == "mpjlcmm" | !all(model$idiag)){
       est[whereRand] = model$cholesky #Warning : quickest way to do this, but maybe not the best/safest
     } else {
-      chol = matrix(NA, sum(whereRand), sum(whereRand))
-      chol[upper.tri(chol, diag = T)] = model$cholesky
-      est[substr(names(est), 1, 7) == "varcov "] = diag(chol)
+      cholMatrix = matrix(NA, sum(whereRand), sum(whereRand))
+      cholMatrix[upper.tri(cholMatrix, diag = T)] = model$cholesky
+      est[substr(names(est), 1, 7) == "varcov "] = diag(cholMatrix)
     }
     
     Vin = matrix(0, length(est), length(est))
@@ -617,6 +626,18 @@ externVar = function(model,
       #Model Estimation
       modOut = do.call(funOut, c(arguments))
       
+      #cholesky not varcov as output in best
+      whereRand = substr(names(modOut$best), 1, 7) == "varcov "
+      whereRand[-iEst] = FALSE
+      if(class(modOut) == "mpjlcmm" | !all(modOut$idiag)){
+        modOut$best[whereRand] = modOut$cholesky[-(1:NVCin)] #Warning : quickest way to do this, but maybe not the best/safest
+      } else {
+        cholMatrix = matrix(NA, sum(whereRand), sum(whereRand))
+        cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:NVCin)]
+        modOut$best[whereRand] = diag(cholMatrix)
+      }
+      
+      #output V and betas
       bests[,i] = modOut$best[iEst]
       
       V = matrix(NA, nOut, nOut)
@@ -637,7 +658,6 @@ externVar = function(model,
     mb = apply(bests, 1, mean, na.rm = T)
     
     Vs = Vs[conv %in% c(1,3)]
-    
     V2 = Reduce("+", Vs)/Mconv
     V1 = (Mconv+1)/((Mconv-1)*Mconv) * Reduce("+", apply(bests, 2, function(best){
       (best-mb)%*%t(best-mb)
@@ -651,6 +671,14 @@ externVar = function(model,
     modOut$best[iEst] = mb
     modOut$V = V[upper.tri(V, diag = T)]
     modOut$Mconv = Mconv
+    
+    #replace chol for varcov in best
+    modOut$cholesky[-(1:NVCin)] = modOut$best[whereRand]
+    NVC = sqrt(2*(length(modOut$cholesky)-NVCin)+1/4)-1/2
+    cholMatrix = matrix(0, NVC, NVC)
+    cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$best[whereRand]
+    vc = t(cholMatrix)%*%cholMatrix
+    modOut$best[whereRand] = vc[upper.tri(vc, diag = T)]
   }
   
   if(method == "twoStageJoint" & !missing(fixed)) modOut$strMod = strMod
