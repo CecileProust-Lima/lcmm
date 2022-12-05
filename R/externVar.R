@@ -1,29 +1,54 @@
 #' Estimation of external variable latent class models
 #' 
 #' This function allows to model external variables in relationship with previously modeled
-#' latent class structures. The joint likelihood, for both external class
-#' predictors and external outcome of the class.
+#' latent class structures, either external outcomes or external class predictors.
+#' The joint likelihood, for both external class predictors and external outcome
+#' of the class. It returns a model object frome one of the lcmm package model classes.
 #' 
-#' @param model original model with latent class structure with which external variables
+#' A. DATA STRUCTURE
+#' 
+#' The \code{data} argument must follow specific structure for individual variables,
+#' aka variables with a unique constant value for each subject. For an individual variable
+#' given as external outcome, data value must be present only once per subject.
+#' For an individual variable given as external class predictor,
+#' data values must be present for each
+#' 
+#' B. VARIANCE ESTIMATION
+#' 
+#' FOr two stage estimation, parametrical bootstrap "paramBoot" estimation of variance
+#' (varest) takes generaly longer to compute than "calc" computation.
+#' Not taking into account first stage variance with specifing "none" may lead to
+#' underestimation of the final variance, even though it is much quicker.
+#' It can be used to get B starting values to use with other variance estimations methods
+#' 
+#' @param model original latent class structure model from which external variables
 #' must be modeled.
-#' @param method character string representing the method to be used :
-#' either "twoStageJoint"
-#' @param fixed two sided linear formula object for specifying the fixed-effects on external variable
-#' @param mixture one-sided formula object for the class-specific fixed effects in the linear mixed model
-#' By default, an intercept is included. If no intercept, \code{-1} should be the first term included.
-#' @param random optional one sided linear formula object for specifying the random-effects on external variable
-#' By default, an intercept is included. If no intercept, \code{-1} should be the first term included.
+#' @param fixed two sided linear formula object for specifying the
+#' fixed-effects on external outcome variable.
+#' The response outcome is on the left of \code{~} and the covariates are separated
+#' by \code{+} on the right of the \code{~}. By default, an intercept is included.
+#' @param mixture one-sided formula object for the class-specific fixed effects
+#' in the model for the external outcome. Among the list of covariates included in fixed,
+#' the covariates with class-specific regression parameters are entered in
+#' mixture separated by \code{+}. By default, an intercept is included.
+#' If no intercept, \code{-1} should be the first term included.
+#' @param random an optional one sided linear formula object for specifying the
+#' random-effects on external outcome. By default, no random effect is included.
 #' @param subject name of the covariate representing the grouping structure.
-#' Even without random effect, either the subject variable used in model or
-#' the subject variable specified as parameter must be present in data.
+#' Even without random effect. By default, the funciton will try to retrieve it
+#' from input model
 #' @param classmb optional one-sided formula describing the covariates in the
-#' class-membership multinomial logistic model
-#' @param varest character string indicating the method used to account for step one variability
-#' when computing the variance estimation.
-#' either "None", "ParamBoot" or "calc" ("calc" is for "twoStageJoint" method only)
+#' class-membership multinomial logistic model. These are external covariates or
+#' external class predictors in this function.
+#' @param varest character string indicating the method used to account for step one
+#' variability when computing the variance estimation.
+#' either "none", "paramBoot" or "calc" ("calc" is implemented for "twoStageJoint"
+#' method only) Defaults to \code{"paramBoot"}
+#' @param M integer number of parametrical boostrap iterations when varest is "paramBoot".
+#' Default to 200.
 #' @param idiag optional logical for the structure of the variance-covariance
 #' matrix of the random-effects. If \code{FALSE}, a non structured matrix of
-#' variance-covariance is considered (by default).  If \code{TRUE} a diagonal
+#' variance-covariance is considered (by default). If \code{TRUE} a diagonal
 #' matrix of variance-covariance is considered.
 #' @param nwg optional logical indicating if the variance-covariance of the
 #' random-effects is class-specific. If \code{FALSE} the variance-covariance
@@ -31,28 +56,149 @@
 #' class-specific proportional parameter multiplies the variance-covariance
 #' matrix in each class (the proportional parameter in the last latent class
 #' equals 1 to ensure identifiability).
-#' @param link link optional family of link functions to estimate for the external outcome. Defaults to NULL, corresponding to hlme function
-#' @param epsY 
-#' @param data : optional data frame containing the variables named used elsewhere.
-#' IMPORTANT : unique individual variables (such as gender or educational level)
-#' MUST only appear once per subject AND at the same visit time.
-#' @param B : optional specification for the initial values for the parameters.
-#' Two options are allowed: (1) a vector of initial values is entered.
+#' @param link link optional family of link functions to estimate for the external outcome.
+#' Defaults to NULL, corresponding to hlme function
+#' @param epsY optional definite positive real used to rescale the marker in (0,1)
+#' when the beta link function is used. By default, epsY=0.5.
+#' @param data Data frame containing the variables named in
+#' \code{fixed}, \code{mixture}, \code{random}, \code{classmb} and \code{subject},
+#' for both the current function arguments and the input models arguments
+#' Check \code{details} to get information on the data structure, especially with
+#' individual external outcomes
+#' @param method character string representing the method to be used :
+#' only joint likelihood two stage estimation "twoStageJoint" implemented at the moment
+#' @param B optional but recommanded specification for the initial values for the
+#' parameters. Two options are allowed: (1) a vector of initial values is entered.
 #' (2) nothing is specified. A preliminary analysis involving the
-#' estimation of a standard model is performed to choose initial
-#' values.
+#' estimation of a standard model is performed to choose initial values.
+#' @param convB optional threshold for the convergence criterion based on the
+#' parameter stability. By default, convB=0.0001.
+#' @param convL optional threshold for the convergence criterion based on the
+#' log-likelihood stability. By default, convL=0.0001.
+#' @param convG optional threshold for the convergence criterion based on the
+#' derivatives. By default, convG=0.0001.
 #' @param longitudinal optional list of longitudinal models of type hlme,
 #' lcmm or multlcmm used to build mpjlcmm input model for "twoStageJoint" method.
-#' By default, the function will try to retrieve it from input model call.
+#' By default, the function will try to retrieve it from the input model
 #' @param maxiter optional maximum number of iterations for the Marquardt
-#' iterative algorithm
+#' iterative algorithm. Defaults to 100
 #' @param posfix Optional vector specifying the indices in vector B of the
 #' parameters that should not be estimated. Default to NULL, all external parameters are
 #' estimated.
 #' @param verbose logical indicating whether information about computation should be
 #' reported. Default to TRUE.
-#' @param M integer number of parametrical boostrap iterations when varest is "paramBoot". Default to 200.
 #' @param nproc the number cores for parallel computation. Default to 1 (sequential mode).
+#' 
+#' 
+#' @examples
+#' 
+#' \dontrun{
+#' # Example with hlme input model
+#' mMMSE1_1 <- hlme(MMSE~age65+I(age65^2)+CEP,
+#'                  random=~age65+I(age65^2),
+#'                  subject="ID",
+#'                  data=paquid)
+#' mMMSE2_1 <- hlme(MMSE~age65+I(age65^2)+CEP,
+#'                  random=~age65+I(age65^2),
+#'                  subject="ID",
+#'                  data=paquid,
+#'                  ng=2,
+#'                  mixture=~age65+I(age65^2),
+#'                  B=random(mMMSE1_1))
+#' 
+#' modPlusCESDnone = externVar(mMMSE2_1,
+#'                             fixed = CESD~age65+I(age65^2)+male,
+#'                             random = ~age65+I(age65^2),
+#'                             mixture = ~age65+I(age65^2),
+#'                             subject="ID",
+#'                             data=paquid,
+#'                             verbose = T,
+#'                             varest = "none",
+#'                             method = "twoStageJoint",
+#'                             B = c(7.8, 6.5, -0.3, 6, 0.8, -0.5, -2.5, 74, -64, 106, 16, -29, 9, 5.4))
+#' 
+#' modPlusCESDboot = externVar(mMMSE2_1,
+#'                             fixed = CESD~age65+I(age65^2)+male,
+#'                             random = ~age65+I(age65^2),
+#'                             mixture = ~age65+I(age65^2),
+#'                             subject="ID",
+#'                             data=paquid,
+#'                             verbose = T,
+#'                             varest = "paramBoot",
+#'                             M = 10,
+#'                             method = "twoStageJoint",
+#'                             B = c(7.8, 6.5, -0.3, 6, 0.8, -0.5, -2.5, 74, -64, 106, 16, -29, 9, 5.4))
+#' 
+#' modPlusCESDcalc = externVar(mMMSE2_1,
+#'                             fixed = CESD~age65+I(age65^2)+male,
+#'                             random = ~age65+I(age65^2),
+#'                             mixture = ~age65+I(age65^2),
+#'                             subject="ID",
+#'                             data=paquid,
+#'                             verbose = T,
+#'                             varest = "calc",
+#'                             method = "twoStageJoint",
+#'                             B = c(7.8, 6.5, -0.3, 6, 0.8, -0.5, -2.5, 74, -64, 106, 16, -29, 9, 5.4))
+#'                             
+#' summary(modPlusCESDnone)
+#' summary(modPlusCESDboot)
+#' summary(modPlusCESDcalc)
+#' 
+#' # Example with Jointlcmm input model
+#' m1 <- Jointlcmm(fixed= Ydep1~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
+#' random=~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
+#' subject='ID',
+#' survival = Surv(Tevent,Event)~ X1+X2,
+#' hazard="Weibull",
+#' hazardtype="Specific",
+#' ng=1,
+#' data=data_lcmm)
+#' m2 <- Jointlcmm(fixed= Ydep1~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
+#'                 mixture=~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
+#'                 random=~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
+#'                 subject='ID',
+#'                 survival = Surv(Tevent,Event)~X1+mixture(X2),
+#'                 hazard=c("Weibull", "Weibull"),
+#'                 hazardtype=c("Specific", "Specific"),
+#'                 ng=2,
+#'                 data=data_lcmm,
+#'                 B=m1)
+#' 
+#' m2plusY2none = externVar(m2,
+#'                          method = "twoStageJoint",
+#'                          fixed = Ydep2~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
+#'                          random = ~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
+#'                          mixture=~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
+#'                          subject='ID',
+#'                          idiag = TRUE,
+#'                          varest = "none",
+#'                          data=data_lcmm)
+#' m2plusY2boot = externVar(m2,
+#'                          method = "twoStageJoint",
+#'                          fixed = Ydep2~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
+#'                          random = ~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
+#'                          mixture=~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
+#'                          subject='ID',
+#'                          idiag = TRUE,
+#'                          varest = "paramBoot",
+#'                          M = 10,
+#'                          data=data_lcmm,
+#'                          B = m2plusY2none$best[-m2plusY2none$call$posfix])
+#' m2plusY2calc = externVar(m2,
+#'                          method = "twoStageJoint",
+#'                          fixed = Ydep2~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
+#'                          random = ~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
+#'                          mixture=~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
+#'                          subject='ID',
+#'                          idiag = TRUE,
+#'                          varest = "calc",
+#'                          data=data_lcmm,
+#'                          B = m2plusY2none$best[-m2plusY2none$call$posfix])
+#' summary(m2plusY2none)
+#' summary(m2plusY2boot)
+#' summary(m2plusY2calc)
+#' }
+#'
 #' 
 #' @export
 #' 
@@ -61,7 +207,6 @@
 
 
 externVar = function(model,
-                     method,
                      fixed,
                      mixture,
                      random,
@@ -73,27 +218,29 @@ externVar = function(model,
                      intnodes=NULL,
                      epsY = 0.5,
                      data,
+                     longitudinal,
+                     method,
+                     varest = "paramBoot",
+                     M = 200,
                      B,
                      convB = 0.0001,
                      convL = 0.0001,
                      convG = 0.0001,
-                     longitudinal,
                      maxiter = 100,
                      posfix,
                      verbose = TRUE,
-                     varest = "none",
-                     M = 200,
                      nproc = 1){
   
+  if(missing(model)) stop("model argument must be given")
+  if(!class(model) %in% c("hlme", "lcmm", "multlcmm", "Jointlcmm", "mpjlcmm")) stop('input models class must be either "hlme", "lcmm", "multlcmm", "Jointlcmm" or "mpjlcmm"')
   if(missing(fixed) & missing(classmb)) stop("Either external outcome in fixed or external class predictor in classmb must be given")
-  if(!missing(fixed) & !missing(classmb)) stop("Both external outcome in fixed and external class predictor in classmb is not supported by this function at the moment")
+  if(!missing(fixed) & !missing(classmb)) stop("Either external outcome in fixed or external class predictor in classmb must be given")
   if(missing(method) | !method %in% c("twoStageJoint")) stop('Method must be either "twoStageJoint"')
-  if(missing(subject)) stop("The argument subject must be specified in any model even without random-effects")
   if(model$ng == 1) stop("Input model does not have latent class structure (ng=1)")
   if(!varest %in% c("none", "paramBoot", "calc")) stop('Variance estimation method "varest" must be either "none", "paramBoot" or "calc"')
   if(!is.null(link) & missing(fixed)) stop("The argument link is not to be used with external class predictor")
   
-  if(missing(random)) random = ~-1
+
   if(missing(posfix)) posfix = c()
     
   cl = match.call()
@@ -104,6 +251,15 @@ externVar = function(model,
   argumentsIn[[1]] = NULL
   ng = model$ng
   nIn = length(model$best)
+  
+  #Get subject
+  if(missing(subject)){
+    if (model$call$subject %in% colnames(data)){
+      subject = model$call$subject
+    } else {
+      stop("The argument subject must be specified if different from the subject argument used in the input model")
+    }
+  } 
   
   #Get longitudinal
   if(funIn == "mpjlcmm"){
@@ -159,6 +315,14 @@ externVar = function(model,
       funOut = "mpjlcmm"
       
       #Erreurs
+      
+      if(missing(mixture)) mixture = ~1
+      if(missing(random)) random = ~-1
+      
+      if(!inherits(fixed,"formula")) stop("The argument fixed must be a formula")
+      if(!inherits(mixture,"formula")) stop("The argument mixture must be a formula")
+      if(!inherits(random,"formula")) stop("The argument random must be a formula")
+      
       if(!class(model) %in% c("hlme", "lcmm", "multlcmm", "Jointlcmm", "mpjlcmm")){
         stop('The input model is not a supported class for the "twoStageJoint" method')
       }
@@ -271,6 +435,8 @@ externVar = function(model,
     }
     #X extern
     if(!missing(classmb)){
+      
+      if(!inherits(classmb,"formula")) stop("The argument classmb must be a formula")
       
       #changement de ma fonction en mpjlcmm (pour avec la variance)
       if(funIn != "mpjlcmm"){
@@ -444,6 +610,8 @@ externVar = function(model,
     Vs = list()
     conv = c()
     for(i in 1:M){
+      if(verbose) cat("==================== Bootstrap Iteration", i, "====================\n")
+      
       arguments[["B"]][iKeepOut] = coefss[,i]
       
       #Model Estimation
