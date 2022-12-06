@@ -233,6 +233,7 @@ externVar = function(model,
   
   if(missing(model)) stop("model argument must be given")
   if(!class(model) %in% c("hlme", "lcmm", "multlcmm", "Jointlcmm", "mpjlcmm")) stop('input models class must be either "hlme", "lcmm", "multlcmm", "Jointlcmm" or "mpjlcmm"')
+  if(model$conv == 2) warning("input model did not fully converge")
   if(missing(fixed) & missing(classmb)) stop("Either external outcome in fixed or external class predictor in classmb must be given")
   if(!missing(fixed) & !missing(classmb)) stop("Either external outcome in fixed or external class predictor in classmb must be given")
   if(missing(method) | !method %in% c("twoStageJoint")) stop('Method must be either "twoStageJoint"')
@@ -557,7 +558,7 @@ externVar = function(model,
     
     #cholesky not varcov
     whereRand = substr(names(est), 1, 7) == "varcov "
-    if(funIn == "mpjlcmm" | !all(as.logical(model$idiag))){
+    if(funIn %in% c("mpjlcmm", "Jointlcmm") | !all(as.logical(model$idiag))){
       est[whereRand] = model$cholesky #Warning : quickest way to do this, but maybe not the best/safest
     } else {
       cholMatrix = matrix(NA, sum(whereRand), sum(whereRand))
@@ -593,7 +594,9 @@ externVar = function(model,
         ncolRandMod = ncol(model.matrix(formula(varcovMod$call$random), data))
         
         if(varcovMod$idiag){
-          vc = chols[countChol:ncolRandMod]
+          nChol = ncolRandMod
+          
+          vc = chols[1:nChol+countChol]
           
           varcov = c(varcov, (vc^2))
         } else {
@@ -601,13 +604,13 @@ externVar = function(model,
           
           #cholMatrix
           cholMatrix = matrix(0, ncolRandMod, ncolRandMod)
-          cholMatrix[upper.tri(cholMatrix, diag = T)] = chols[countChol:nChol]
-          
-          countChol = countChol + nChol
+          cholMatrix[upper.tri(cholMatrix, diag = T)] = chols[1:nChol+countChol]
           
           vc = t(cholMatrix)%*%cholMatrix
           varcov = c(varcov, vc[upper.tri(vc, diag = T)])
         }
+        
+        countChol = countChol + nChol
       }
       coefs[whereRand] = varcov
       
@@ -674,11 +677,15 @@ externVar = function(model,
     
     #replace chol for varcov in best
     modOut$cholesky[-(1:NVCin)] = modOut$best[whereRand]
-    NVC = sqrt(2*(length(modOut$cholesky)-NVCin)+1/4)-1/2
-    cholMatrix = matrix(0, NVC, NVC)
-    cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$best[whereRand]
-    vc = t(cholMatrix)%*%cholMatrix
-    modOut$best[whereRand] = vc[upper.tri(vc, diag = T)]
+    if(idiag){
+      modOut$best[whereRand] = modOut$cholesky[-(1:NVCin)]^2
+    } else {
+      NVC = sqrt(2*(length(modOut$cholesky)-NVCin)+1/4)-1/2
+      cholMatrix = matrix(0, NVC, NVC)
+      cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$best[whereRand]
+      vc = t(cholMatrix)%*%cholMatrix
+      modOut$best[whereRand] = vc[upper.tri(vc, diag = T)]
+    }
   }
   
   if(method == "twoStageJoint" & !missing(fixed)) modOut$strMod = strMod
