@@ -86,7 +86,7 @@
 #' parameters that should not be estimated. Default to NULL, all external parameters are
 #' estimated.
 #' @param verbose logical indicating whether information about computation should be
-#' reported. Default to TRUE.
+#' reported. Default to FALSE.
 #' @param nproc the number cores for parallel computation. Default to 1 (sequential mode).
 #' 
 #' 
@@ -228,7 +228,7 @@ externVar = function(model,
                      convG = 0.0001,
                      maxiter = 100,
                      posfix,
-                     verbose = TRUE,
+                     verbose = FALSE,
                      nproc = 1){
   
   if(missing(model)) stop("model argument must be given")
