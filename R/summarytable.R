@@ -12,8 +12,8 @@
 #'  - SABIC (the lower the better) computed as -2L+ P log((N+2)/24)
 #'  - Entropy (the closer to one the better) computed as 1-sum[pi_ig*log(pi_ig)]/(N*log(G))
 #'    where pi_ig is the posterior probability that subject i belongs to class g
-#'  - ICL (the lower the better) computed as BIC -2*sum[c_ig*log(pi_ig)]
-#'    where c_ig is the posterior class membership
+#'  - ICL (the lower the better) computed in two ways : ICL1 = BIC - sum[pi_ig*log(pi_ig)]
+#'    or ICL2 = BIC - 2*sum(log(max(pi_ig)), where the max is taken over the classes for each subject.
 #'  - %Class computed as the proportion of each class based on c_ig
 #' 
 #' @param m1 an object of class \code{hlme}, \code{lcmm}, \code{multlcmm} or
@@ -22,7 +22,7 @@
 #' \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}
 #' @param which character vector indicating which results should be returned.
 #' Possible values are "G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
-#' "entropy", "ICL", "\%class".
+#' "entropy", "ICL", "ICL1", "ICL2", "\%class".
 #' @param display logical indicating whether the table should be printed (the default) or not (display=FALSE)
 #' @return a matrix giving for each model the values of the requested indexes.
 #' By default, the number a latent classes, the
@@ -38,7 +38,7 @@ summarytable <- function(m1, ..., which=c("G","loglik","npm","BIC","%class"), di
     {
         if(missing(m1)) stop("At least one model should be specified")
         if(!inherits(m1,c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("Use with 'hlme', 'lcmm' , 'multlcmm', 'Jointlcmm' or 'mpjlcmm' objects only")
-        if(any(!(which %in% c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "scoretest","ICL","%class")))) stop(paste("which should contain elements among",paste(c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "scoretest", "%class"),collapse=", ")))
+        if(any(!(which %in% c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "scoretest","ICL", "ICL1", "ICL2","%class")))) stop(paste("which should contain elements among",paste(c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "scoretest", "ICL", "ICL1", "ICL2", "%class"),collapse=", ")))
 
         dots <- list(...)
 
@@ -93,24 +93,22 @@ summarytable <- function(m1, ..., which=c("G","loglik","npm","BIC","%class"), di
         
         ICL <- function(x)
         {
-# Entropy with assignement to class (original ICL)
-            z <- rep(0,length=length(x$pprob[,1]))
+            ## ICL1 = BIC - sum(log(pprob)*pprob)
+            z1 <- log(as.matrix(x$pprob[,c(3:(x$ng+2))]))*as.matrix(x$pprob[,c(3:(x$ng+2))])
+            if(any(!is.finite(z1))){ z1[which(!is.finite(z1))] <- 0}
+            res1 <- x$BIC - sum(z1)
+            if(x$ng==1) res1 <- x$BIC
+            
+            ## ICL2 = BIC - 2*sum(log(pprobmax))
+            z2 <- rep(0,length=length(x$pprob[,1]))
             for(g in 1:x$ng)
             {
-                z[which(x$pprob[,2]==g)] <- x$pprob[which(x$pprob[,2]==g),2+g]
+                z2[which(x$pprob[,2]==g)] <- x$pprob[which(x$pprob[,2]==g),2+g]
             }
-# Entropy with posterior proba (modified one)
-            # z <- as.matrix(log(x$pprob[,c(3:(x$ng+2))])*x$pprob[,c(3:(x$ng+2))])
-            # if(any(!is.finite(z)))
-            # {
-            #     z[which(!is.finite(z))] <- 0
-            # }
-            # if(display){
-            #     prmatrix(res,na.print="")
-            # }
-            res <- x$BIC - 2*sum(z)
-            if(x$ng==1) res <- x$BIC
-            return(res)
+            res2 <- x$BIC - 2*sum(z2)
+            if(x$ng==1) res2 <- x$BIC
+            
+            return(c(res1, res2))
         }
         
         
@@ -125,8 +123,8 @@ summarytable <- function(m1, ..., which=c("G","loglik","npm","BIC","%class"), di
             }
         if(m1$ng<max(ng)) tmp <- c(tmp,rep(NA,max(ng)-m1$ng))
         
-        res <- matrix(tmp,nrow=1,ncol=10+max(ng))
-        colnames(res) <- c("G","loglik","conv","npm","AIC","BIC","SABIC","entropy","scoretest","ICL",paste("%class",1:max(ng),sep=""))
+        res <- matrix(tmp,nrow=1,ncol=11+max(ng))
+        colnames(res) <- c("G","loglik","conv","npm","AIC","BIC","SABIC","entropy","scoretest","ICL1", "ICL2",paste("%class",1:max(ng),sep=""))
 
         ## tous les indicateurs pour les autres modeles
         if(nbmodels>0)
@@ -150,6 +148,7 @@ summarytable <- function(m1, ..., which=c("G","loglik","npm","BIC","%class"), di
             }
 
         ## selection des indicateurs
+        if("ICL" %in% which) which <- unique(c(setdiff(which, "ICL"), "ICL1", "ICL2"))
         which2 <- setdiff(which,"%class")
         if("%class" %in% which) which2 <- c(which2,paste("%class",1:max(ng),sep=""))
         res <- res[,which2,drop=FALSE]
