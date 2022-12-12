@@ -101,6 +101,13 @@ summarytable <- function(m1, ..., which=c("G","loglik","npm","BIC","%class"), di
           
             ## ICL2 = BIC - 2*sum(log(pprobmax))
             z2 <- rep(0,length=length(x$pprob[,1]))
+            for(g in 1:x$ng)
+            {
+                z2[which(x$pprob[,2]==g)] <- x$pprob[which(x$pprob[,2]==g),2+g]
+            }
+            res2 <- x$BIC - 2*sum(z2)
+            if(x$ng==1) res2 <- x$BIC
+            
             return(c(res1, res2))
         }
         
