@@ -34,7 +34,7 @@ estimates.mpjlcmm <- function(x,cholesky=TRUE)
             {
                 if(nvc[k]>0)
                 {
-                    if(contrainte==2)
+                    if(contrainte[k]==2)
                     {
                         res[tmp + nef[k]+ncontr[k]+1:nvc[k]] <- ch[jch + 1+1:nvc[k]]
                         jch <- jch + 1 + nvc[k]
