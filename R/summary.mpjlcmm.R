@@ -283,7 +283,7 @@ summary.mpjlcmm <- function(object,...)
             {
                 interc <- "intercept"
             }
-            if(x$contrainte!=0)
+            if(x$contrainte[k]!=0)
             {
                 tmp <- matrix(c(0,NA,NA,NA),nrow=1,ncol=4)
                 interc <- paste(interc, "(not estimated)")
@@ -383,7 +383,7 @@ summary.mpjlcmm <- function(object,...)
                 pf <- sort(intersect(c(nprob+nrisqtot+nvarxevt+sumnpm+1:(nef[k]+ncontr[k])),posfix))
                 p <- rep(0,length(tmp[,1]))
                 a0 <- 1:nef[k]
-                if(x$contrainte!=0) a0 <- c(0,1:nef[k])
+                if(x$contrainte[k]!=0) a0 <- c(0,1:nef[k])
                 a1 <- rep(c(NA,1:(ny[k]-1),NA),sum(x$idcontr))
                 a2 <- rep(nef[k]+cumsum(c(0:(sum(x$idcontr)-1))),each=ny[k]+1)
                 a <- c(a0,a1+a2)
@@ -414,7 +414,7 @@ summary.mpjlcmm <- function(object,...)
             }
             
             if(sum(x$idea[sumnv+1:x$nv[k]])>0) cat("Variance-covariance matrix of the random-effects:\n" )
-            if(x$contrainte==2)
+            if(x$contrainte[k]==2)
             {
                 cat("(the variance of the first random effect is not estimated)\n")
                 if(nvc[k]==0)
@@ -429,7 +429,7 @@ summary.mpjlcmm <- function(object,...)
             {
                 if(x$idiag[k]==1)
                 {
-                    if(x$contrainte==2)
+                    if(x$contrainte[k]==2)
                     {
                         Mat.cov <- diag(c(1,coef[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]]))
                     }
@@ -443,7 +443,7 @@ summary.mpjlcmm <- function(object,...)
                 if(x$idiag[k]==0)
                 {
                     Mat.cov<-matrix(0,ncol=sum(x$idea[sumnv+1:x$nv[k]]),nrow=sum(x$idea[sumnv+1:x$nv[k]]))
-                    if(x$contrainte==2)
+                    if(x$contrainte[k]==2)
                     {
                         Mat.cov[upper.tri(Mat.cov,diag=TRUE)] <- c(1,coef[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]])
                     }
@@ -466,7 +466,7 @@ summary.mpjlcmm <- function(object,...)
                     p <- matrix(0,sum(x$idea[sumnv+1:x$nv[k]]),sum(x$idea[sumnv+1:x$nv[k]]))
                     if(x$idiag[k]==FALSE)
                     {
-                        if(x$contrainte==2)
+                        if(x$contrainte[k]==2)
                         {
                             p[upper.tri(p,diag=TRUE)] <- c(0,nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k])
                         }
@@ -477,7 +477,7 @@ summary.mpjlcmm <- function(object,...)
                     }
                     if(x$idiag[k]==TRUE)
                     {
-                        if(x$contrainte==2)
+                        if(x$contrainte[k]==2)
                         {
                             diag(p) <- c(0,nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k])
                         }
@@ -530,7 +530,7 @@ summary.mpjlcmm <- function(object,...)
                 cat("\n")
             }
 
-            if(x$contrainte==1)
+            if(x$contrainte[k]==1)
             {
                 cat("Residual standard error: 1 (not estimated)\n")
             }
