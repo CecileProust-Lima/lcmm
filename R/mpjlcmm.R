@@ -1478,17 +1478,21 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     }
                 }
             }
-            pbH[posfix] <- 0
+            #pbH[posfix] <- 0
             if(sum(pbH)==0 & Hr==1) stop("No partial Hessian matrix can be defined")
         }
         else
         {
             if(!all(Hr %in% 1:NPM)) stop("Indexes in partialH are not correct")
             pbH[Hr] <- 1
-            pbH[posfix] <- 0
+            #pbH[posfix] <- 0
         }
         indexHr <- NULL
-        if(sum(pbH)>0) indexHr <- which(pbH==1)
+        if(sum(pbH)>0)
+        {
+            if(length(posfix)) pbH1 <- pbH[-posfix] else pbH1 <- pbH
+            indexHr <- which(pbH1==1)
+        }
     
         ## gestion de B=random(mod)
 
