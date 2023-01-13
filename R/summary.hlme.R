@@ -83,6 +83,7 @@ summary.hlme <- function(object,...){
                 }
             }
             
+        
             se <- rep(1,NPM)
             if (x$conv==1)
                 {
@@ -113,6 +114,9 @@ summary.hlme <- function(object,...){
             coef[NPROB+NEF+NVC+NW+ncor+1] <- abs(coef[NPROB+NEF+NVC+NW+ncor+1])
 
 
+            
+            ow <- options("warn")
+            options(warn=-1) # to avoid warnings with conv=3
             ## convertir en character
             if(x$conv!=2)
                 {
@@ -125,7 +129,8 @@ summary.hlme <- function(object,...){
                 {
                     coefch <- format(as.numeric(sprintf("%.5f",coef)),nsmall=5,scientific=FALSE)
                 }
-
+            options(ow)
+            
             if(length(posfix))
                 {
                     coefch[posfix] <- paste(coefch[posfix],"*",sep="")

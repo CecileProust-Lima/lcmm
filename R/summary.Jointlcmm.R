@@ -170,7 +170,7 @@ summary.Jointlcmm <- function(object,...)
                     x$Names$Xnames[islong] <- sapply(x$Names$Xnames[islong], gsub, pattern="\\(.*\\)", replacement="(...)")
                 }
             }
-
+        
             
             se <- rep(NA,NPM)
             if (x$conv==1 | x$conv==3)
@@ -200,6 +200,8 @@ summary.Jointlcmm <- function(object,...)
             if(ntrtot==1) coef[nprob+nrisqtot+nvarxevt+nef+nvc+nw+ncor+1] <- abs(coef[nprob+nrisqtot+nvarxevt+nef+nvc+nw+ncor+1])
 
             
+            ow <- options("warn")
+            options(warn=-1) # to avoid warnings with conv=3
             if(x$conv!=2)
                 {
                     coefch <- format(as.numeric(sprintf("%.5f",coef)),nsmall=5,scientific=FALSE)
@@ -211,7 +213,7 @@ summary.Jointlcmm <- function(object,...)
                 {
                     coefch <- format(as.numeric(sprintf("%.5f",coef)),nsmall=5,scientific=FALSE)
                 }
-            
+            options(ow)
 
             if(length(posfix))
                 {
