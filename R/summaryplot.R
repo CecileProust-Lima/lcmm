@@ -12,8 +12,8 @@
 #'  - SABIC (the lower the better) computed as -2L+ P log((N+2)/24)
 #'  - Entropy (the closer to one the better) computed as 1-sum[pi_ig*log(pi_ig)]/(N*log(G))
 #'    where pi_ig is the posterior probability that subject i belongs to class g
-#'  - ICL (the lower the better) computed as BIC -2*sum[c_ig*log(pi_ig)]
-#'    where c_ig is the posterior class membership
+#'  - ICL (the lower the better) computed in two ways : ICL1 = BIC - sum[pi_ig*log(pi_ig)]
+#'    or ICL2 = BIC - 2*sum(log(max(pi_ig)), where the max is taken over the classes for each subject.
 #'  - %Class computed as the proportion of each class based on c_ig
 #' 
 #' @param m1 an object of class \code{hlme}, \code{lcmm}, \code{multlcmm},
@@ -23,7 +23,7 @@
 #' graphical parameters.
 #' @param which character vector indicating which results should be plotted.
 #' Possible values are "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
-#' "entropy", "ICL".
+#' "entropy", "ICL", "ICL1", "ICL2".
 #' @param mfrow for multiple plots, number of rows and columns to split the graphical device.
 #' Default to one line and length(which) columns. 
 #' @param xaxis the abscissa of the plot. Default to "G", the number of latent classes.
@@ -48,7 +48,7 @@
 
 summaryplot <- function(m1, ..., which=c("BIC", "entropy", "ICL"), mfrow=c(1,length(which)), xaxis="G")
 {
-    if(!all(which %in% c("loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "ICL"))) stop("Argument which should only contain elements among loglik, conv, npm, AIC, BIC, SABIC, entropy, ICL")
+    if(!all(which %in% c("loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "ICL", "ICL1", "ICL2"))) stop("Argument which should only contain elements among loglik, conv, npm, AIC, BIC, SABIC, entropy, ICL, ICL1, ICL2")
     
     dots <- list(...)
     names.plot <- c("adj","ann","asp","axes","bg","bty","cex","cex.axis","cex.lab",
@@ -83,6 +83,7 @@ summaryplot <- function(m1, ..., which=c("BIC", "entropy", "ICL"), mfrow=c(1,len
         dots.plot$lty <- 1
     }
 
+    if("ICL" %in% which) which <- unique(c(setdiff(which, "ICL"), "ICL1", "ICL2"))
     main <- which
     if(length(dots.plot$main))
     {
