@@ -1573,7 +1573,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                         if(!inherits(B,"mpjlcmm")) stop("B should be either a vector or an object of class mpjlcmm")
                         nef2 <- p1+p2
                         ##if(contrainte!=0) nef2 <- p1+p2-1
-                        nef2 <- sapply(1:K, function(k){ifelse(contrainte[k]!=0,p1[k]+p2[k]-1,nef[k])})
+                        nef2 <- sapply(1:K, function(k){ifelse(contrainte[k]!=0,p1[k]+p2[k]-1,p1[k]+p2[k])})
                         NPM2 <- sum(nprisq)+nvarxevt2+sum(nef2)+sum(ncontr)+sum(nvc)+
                             sum(ncor)+sum(nerr)+sum(nalea)+sum(ntr)
                         if(length(B$best)!=NPM2) stop(paste("B is not correct. The number of parameters should be",NPM2))
