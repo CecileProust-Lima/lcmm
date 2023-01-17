@@ -118,7 +118,7 @@ summary.multlcmm <- function(object,...)
                 }
             }
             
-            
+        
             se <- rep(NA,NPM)
             if (x$conv==1 | x$conv==3)
                 {
@@ -148,6 +148,10 @@ summary.multlcmm <- function(object,...)
             coef[nef+nvc+nw+ncor+1:ny] <- abs(coef[nef+nvc+nw+ncor+1:ny])
             if(nalea>0) coef[nef+nvc+nw+ncor+ny+1:ny] <- abs(coef[nef+nvc+nw+ncor+ny+1:ny])
 
+            
+            
+            ow <- options("warn") 
+            options(warn=-1) # to avoid warnings with conv=3
             if(x$conv!=2)
                 {
                     coefch <- format(as.numeric(sprintf("%.5f",coef)),nsmall=5,scientific=FALSE)
@@ -162,7 +166,7 @@ summary.multlcmm <- function(object,...)
                 {
                     coefch <- format(as.numeric(sprintf("%.5f",coef)),nsmall=5,scientific=FALSE)
                 }
-            
+            options(ow)
             
             if(length(posfix))
                 {

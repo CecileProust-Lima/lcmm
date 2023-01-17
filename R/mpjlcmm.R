@@ -316,7 +316,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 z$verbose <- FALSE
                 if(any(modk$linktype == 2))
                 {
-                    if(length(modk$linktype == 1))
+                    if(inherits(modk, "lcmm"))
                     {
                         ## lcmm
                         nb <- length(modk$linknodes)
@@ -339,7 +339,12 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                                 nb <- modk$nbnodes[nspl]
                                 link[yk] <- paste(nb,"-manual-splines",sep="")
                                 intnodes <- c(intnodes, modk$linknodes[2:(nb-1),yk])
-                                range <- c(range, modk$linknodes[c(1,nb)])
+                                range <- c(range, modk$linknodes[c(1,nb),yk])
+                            }
+                            else
+                            {
+                                if(modk$linktype[yk]==0) link[yk] <- "linear"
+                                if(modk$linktype[yk]==1) link[yk] <- "beta"
                             }
                         }
                         z$link <- link
@@ -737,7 +742,16 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
 
                 ## formule k
                 formf <- gsub("contrast","",mod$call$fixed[3])
-                formk <- paste("processK+outcomeM",paste(formf,collapse="+"),paste(mod$call$random[2],collapse="+"),sep="+")
+                formk <- paste("processK+outcomeM",paste(formf,collapse="+"), sep="+")
+                if(!is.null(mod$call$random[2]))
+                {
+                    formk <- paste(formk, paste(mod$call$random[2],collapse="+"),sep="+")
+                    terms_random <- terms(formula(paste("~",paste(mod$call$random[2],collapse="+"))))
+                }
+                else
+                {
+                    terms_random <- terms(~-1)
+                }
                 if(!is.null(mod$call$cor))
                     {
                         formk <- paste(formk,as.character(mod$call$cor)[2],sep="+")
@@ -747,7 +761,6 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 ## car pb si random=~-1, on n'a pas intercept dans formk
                 terms_formk <- terms(formula(paste("~",formk)))
                 terms_formf <- terms(formula(paste("~",paste(formf,collapse="+"))))
-                terms_random <- terms(formula(paste("~",paste(mod$call$random[2],collapse="+"))))
                 if(attr(terms_formf,"intercept") | attr(terms_random,"intercept"))
                 {
                     attr(terms_formk,"intercept") <- 1
@@ -1465,17 +1478,21 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     }
                 }
             }
-            pbH[posfix] <- 0
+            #pbH[posfix] <- 0
             if(sum(pbH)==0 & Hr==1) stop("No partial Hessian matrix can be defined")
         }
         else
         {
             if(!all(Hr %in% 1:NPM)) stop("Indexes in partialH are not correct")
             pbH[Hr] <- 1
-            pbH[posfix] <- 0
+            #pbH[posfix] <- 0
         }
         indexHr <- NULL
-        if(sum(pbH)>0) indexHr <- which(pbH==1)
+        if(sum(pbH)>0)
+        {
+            if(length(posfix)) pbH1 <- pbH[-posfix] else pbH1 <- pbH
+            indexHr <- which(pbH1==1)
+        }
     
         ## gestion de B=random(mod)
 
@@ -1556,7 +1573,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                         if(!inherits(B,"mpjlcmm")) stop("B should be either a vector or an object of class mpjlcmm")
                         nef2 <- p1+p2
                         ##if(contrainte!=0) nef2 <- p1+p2-1
-                        nef2 <- sapply(1:K, function(k){ifelse(contrainte[k]!=0,p1[k]+p2[k]-1,nef[k])})
+                        nef2 <- sapply(1:K, function(k){ifelse(contrainte[k]!=0,p1[k]+p2[k]-1,p1[k]+p2[k])})
                         NPM2 <- sum(nprisq)+nvarxevt2+sum(nef2)+sum(ncontr)+sum(nvc)+
                             sum(ncor)+sum(nerr)+sum(nalea)+sum(ntr)
                         if(length(B$best)!=NPM2) stop(paste("B is not correct. The number of parameters should be",NPM2))

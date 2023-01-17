@@ -158,7 +158,7 @@ summary.mpjlcmm <- function(object,...)
             }
         }
         
-
+        
         se <- rep(NA,NPM)
         if (x$conv==1 | x$conv==3)
         {
@@ -182,6 +182,9 @@ summary.mpjlcmm <- function(object,...)
             pwaldch <- rep(NA,length(coef))
         }
         
+        
+        ow <- options("warn")
+        options(warn=-1) # to avoid warnings with conv=3
         if(x$conv!=2)
         {
             coefch <- format(as.numeric(sprintf("%.5f",coef)),nsmall=5,scientific=FALSE)
@@ -193,7 +196,8 @@ summary.mpjlcmm <- function(object,...)
         {
             coefch <- format(as.numeric(sprintf("%.5f",coef)),nsmall=5,scientific=FALSE)
         }
-
+        options(ow)
+        
         if(length(posfix))
         {
             coefch[posfix] <- paste(coefch[posfix],"*",sep="")

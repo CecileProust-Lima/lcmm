@@ -411,7 +411,7 @@
         if(isTRUE(partialH))
         {
             if(partialH) pbH0 <- rep(1,NPM)
-            pbH0[posfix] <- 0
+            #pbH0[posfix] <- 0
             if(sum(pbH0)==0 & Hr0==1) stop("No partial Hessian matrix can be defined")
         }
     }
@@ -419,10 +419,14 @@
     {
         if(!all(Hr0 %in% 1:NPM)) stop("Indexes in partialH are not correct")
         pbH0[Hr0] <- 1
-        pbH0[posfix] <- 0
+        #pbH0[posfix] <- 0
     }
     indexHr <- NULL
-    if(sum(pbH0)>0) indexHr <- which(pbH0==1)
+    if(sum(pbH0)>0)
+    {
+        if(length(posfix)) pbH1 <- pbH0[-posfix] else pbH1 <- pbH0
+        indexHr <- which(pbH1==1)
+    }
 
     if(missing(B)){
 

@@ -141,6 +141,7 @@ summary.lcmm <- function(object,...)
             }
         }
         
+        
         se <- rep(NA,NPM)
         if (x$conv==1 | x$conv==3)
             {
@@ -169,6 +170,9 @@ summary.lcmm <- function(object,...)
         if(NW>0) coef[NPROB+NEF+NVC+1:NW] <- abs(coef[NPROB+NEF+NVC+1:NW])
         if(ncor>0) coef[NPROB+NEF+NVC+NW+ntrtot+ncor] <- abs(coef[NPROB+NEF+NVC+NW+ntrtot+ncor])
 
+        
+        ow <- options("warn")
+        options(warn=-1) # to avoid warnings with conv=3
         ## convertir en character
         if(x$conv!=2)
             {
@@ -181,7 +185,8 @@ summary.lcmm <- function(object,...)
             {
                 coefch <- format(as.numeric(sprintf("%.5f",coef)),nsmall=5,scientific=FALSE)
             }
-
+        options(ow)
+        
         if(length(posfix))
             {
                 coefch[posfix] <- paste(coefch[posfix],"*",sep="")
