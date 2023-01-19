@@ -300,7 +300,7 @@ externVar = function(model,
     #Arguments communs
     arguments = list()
     
-    arguments[["data"]] = substitute(data)
+    arguments[["data"]] = data
     arguments[["ng"]] = ng
     arguments[["subject"]] = subject
     #technical options
@@ -393,7 +393,7 @@ externVar = function(model,
         argumentsStrMod[["intnodes"]] = intnodes
         argumentsStrMod[["epsY"]] = epsY
       }
-      argumentsStrMod[["data"]] = substitute(data)
+      argumentsStrMod[["data"]] = data
       argumentsStrMod[["maxiter"]] = 0
       argumentsStrMod[["verbose"]] = FALSE
       
@@ -407,6 +407,9 @@ externVar = function(model,
       argumentsStrMod[["B"]] = as.name("strMod")
       
       strMod = do.call(argfunctionStrMod, c(argumentsStrMod))
+      
+      #Let's change strMod's saved call
+      strMod$call$data = substitute(data)
       
       #Now join the initial and the external outcome models
       
@@ -425,15 +428,16 @@ externVar = function(model,
       iEst = nIn+1:nEst
       
       #Liste des arguments
-      #on fixe nos paramètres
+      #on fixe nos parametres
       arguments[["posfix"]] = unique(c(iKeepOut, posfix))
-      #On donne les modèles
+      
+      #On donne les modeles
       if(funIn == "mpjlcmm"){
-        arguments[["longitudinal"]] = as.call(c(as.list(longCall), as.name("strMod")))
+        arguments[["longitudinal"]] = c(longitudinal, list(strMod))
       } else if(funIn == "Jointlcmm"){
-        arguments[["longitudinal"]] = as.call(list(as.name("list"), as.name("modNoSurv"), as.name("strMod")))
+        arguments[["longitudinal"]] = list(modNoSurv, strMod)
       } else {
-        arguments[["longitudinal"]] = as.call(list(as.name("list"), substitute(model), as.name("strMod")))
+        arguments[["longitudinal"]] = list(model, strMod)
       }
       
       #initial values
@@ -450,7 +454,7 @@ externVar = function(model,
       
       #changement de ma fonction en mpjlcmm (pour avec la variance)
       if(funIn != "mpjlcmm"){
-        argumentsMpj[["longitudinal"]] = as.call(list(as.name("list"), substitute(model)))
+        argumentsMpj[["longitudinal"]] = list(model)
         argumentsMpj[["maxiter"]] = 0
         argumentsMpj[["ng"]] = ng
         argumentsMpj[["subject"]] = subject
@@ -485,11 +489,11 @@ externVar = function(model,
       iKeepIn = (nInMB+1):nIn
       iEst = 1:nEst
       
-      #On recrée tous nos arguments
+      #On recree tous nos arguments
       if(is.null(argumentsIn[["longitudinal"]])){
-        arguments[["longitudinal"]] = as.call(list(as.name("list"), substitute(model)))
+        arguments[["longitudinal"]] = list(model)
       } else {
-        arguments[["longitudinal"]] = argumentsIn[["longitudinal"]]
+        arguments[["longitudinal"]] = longitudinal
       }
       arguments[["classmb"]] = classmb
       #on ajoute des valeurs de base pour nos nouveaux estimateurs
@@ -501,10 +505,10 @@ externVar = function(model,
         arguments[["B"]][iEst] = B
       }
       
-      #on fixe nos paramètres
+      #on fixe nos parametres
       arguments[["posfix"]] = unique(c(posfix, iKeepOut))
       
-      #### weird... Input model has been changed because we need to output model to be
+      #### weird... Input model has been changed because we need output model to be changed
       if(funIn != "mpjlcmm"){
         modelOld = model
         model = modelMpj
@@ -538,10 +542,8 @@ externVar = function(model,
     V22 = V22[iEst, iEst]
     n2 = modOut$ns
     
-    modOutModif = modOut
-    modOutModif$call$longitudinal = eval(modOutModif$call$longitudinal)
-    modOutModif$call$data = eval(modOutModif$call$data)
-    I12 = -hessienne(modOutModif)
+    modOut
+    I12 = -hessienne(modOut)
     I12 = I12[iEst, iKeepOut]
     
     V = V22*n2 + (V22*n2) %*% (I12/n2) %*% ((n2/n1)*(V11*n1)) %*% t(I12/n2) %*% (V22*n2)
@@ -580,7 +582,7 @@ externVar = function(model,
     #we just need to build back varcov into the coefs instead of cholesky matrix
     coefss = apply(coefss, 1, function(coefs, model, data, whereRand){
       if(funIn == "mpjlcmm"){
-        varcovMods = eval(model$call$longitudinal)
+        varcovMods = longitudinal
       } else {
         varcovMods = list(model)
       }
@@ -690,6 +692,27 @@ externVar = function(model,
   
   if(method == "twoStageJoint" & !missing(fixed)) modOut$strMod = strMod
   if(method == "twoStageJoint" & !missing(fixed) & funIn == "Jointlcmm") modOut$modNoSurv = modNoSurv
+  
+  modOut$call$data = substitute(data)
+  
+  #Il ne faut que les noms de variables dans le call sorti
+  #Selon si c'est Yext ou Xext
+  if(!missing(fixed)){
+    if(funIn == "mpjlcmm"){
+      modOut$call$longitudinal = as.call(c(as.list(longCall), as.name("strMod")))
+    } else if(funIn == "Jointlcmm"){
+      modOut$call$longitudinal = as.call(list(as.name("list"), as.name("modNoSurv"), as.name("strMod")))
+    } else {
+      modOut$call$longitudinal = as.call(list(as.name("list"), substitute(model), as.name("strMod")))
+    }
+  }
+  if(!missing(classmb)){
+    if(is.null(argumentsIn[["longitudinal"]])){
+      arguments[["longitudinal"]] = as.call(list(as.name("list"), substitute(model)))
+    } else {
+      arguments[["longitudinal"]] = argumentsIn[["longitudinal"]]
+    }
+  }
   
   return(modOut)
   
