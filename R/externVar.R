@@ -370,6 +370,7 @@ externVar = function(model,
         argumentsJoint[["nwg"]] = FALSE
         argumentsJoint[["B"]] = NULL
         argumentsJoint[["verbose"]] = FALSE
+        argumentsJoint[["data"]] = data
         
         modNoSurv = do.call(argfunJoint, argumentsJoint)
         
