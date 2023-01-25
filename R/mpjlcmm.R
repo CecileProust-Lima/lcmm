@@ -1686,11 +1686,11 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                         {
                             if(logspecif==1)
                             {  
-                                b[nprob+sum(nrisq[1:i])-nrisq[i]+1:nrisq[i]] <- c(rep(c(log(sum(Event==i)/sum(Tevent[Event==i])),0),ifelse(risqcom==0,ng,1)),rep(1,(ng-1)*(risqcom[i]==2)))  
+                                b[nprob+sum(nrisq[1:i])-nrisq[i]+1:nrisq[i]] <- c(rep(c(log(sum(Event==i)/sum(Tevent[Event==i])),0),ifelse(risqcom[i]==0,ng,1)),rep(1,(ng-1)*(risqcom[i]==2)))  
                             }
                             else
                             {
-                                b[nprob+sum(nrisq[1:i])-nrisq[i]+1:nrisq[i]] <- c(rep(c(sqrt(sum(Event==i)/sum(Tevent[Event==i])),1),ifelse(risqcom==0,ng,1)),rep(1,(ng-1)*(risqcom[i]==2)))
+                                b[nprob+sum(nrisq[1:i])-nrisq[i]+1:nrisq[i]] <- c(rep(c(sqrt(sum(Event==i)/sum(Tevent[Event==i])),1),ifelse(risqcom[i]==0,ng,1)),rep(1,(ng-1)*(risqcom[i]==2)))
                             }   
                         }
                         else
@@ -1973,7 +1973,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                                    risqcom,nz,zi,nmesM,nea,nw,ncor,nalea,idiag,idtrunc,
                                    logspecif,NPM,fix,contrainte,nfix,bfix)
             
-            out <- list(conv=2, V=rep(NA, length(b)), best=b,
+            out <- list(conv=2, V=rep(NA, length(b)*(length(b)+1)/2), best=b,
                         ppi=rep(NA,ns*ng), ppitest=rep(NA,ns*ng),
                         predRE=rep(NA,ns*sum(nea)), predRE_Y=rep(NA,ns*sum(nalea)),
                         Yobs=rep(NA,nobs0),
