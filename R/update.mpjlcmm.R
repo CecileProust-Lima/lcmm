@@ -25,14 +25,16 @@ update.mpjlcmm <- function(object,...)
     nprob <- object$N[1]
     nrisqtot <- object$N[2]
     nvarxevt <- object$N[3]
-    nef <- object$Nprm[3+1:K]
-    ncontr <- object$Nprm[3+K+1:K]
-    nvc <- object$Nprm[3+2*K+1:K]
-    nw <- object$Nprm[3+3*K+1:K]
-    ncor <- object$Nprm[3+4*K+1:K]
-    nerr <- object$Nprm[3+5*K+1:K]
-    nalea <- object$Nprm[3+6*K+1:K]
-    ntr <- object$Nprm[3+7*K+1:sum(ny)]
+    avt <- 3
+    if(object$nbevt>0) avt <- 2+object$nbevt
+    nef <- object$Nprm[avt+1:K]
+    ncontr <- object$Nprm[avt+K+1:K]
+    nvc <- object$Nprm[avt+2*K+1:K]
+    nw <- object$Nprm[avt+3*K+1:K]
+    ncor <- object$Nprm[avt+4*K+1:K]
+    nerr <- object$Nprm[avt+5*K+1:K]
+    nalea <- object$Nprm[avt+6*K+1:K]
+    ntr <- object$Nprm[avt+7*K+1:sum(ny)]
     ntrtotK <- sapply(1:K,function(k) sum(ntr[sum(ny[1:k])-ny[k]+1:ny[k]]))
 
     npmtot <- nef+ncontr+nvc+nw+ncor+nerr+nalea+ntrtotK
