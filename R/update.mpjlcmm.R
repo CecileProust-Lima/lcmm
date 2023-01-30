@@ -53,7 +53,7 @@ update.mpjlcmm <- function(object,...)
     for(k in 1:K)
     {
         ## le k-ieme modele mixte avec les estimations du conjoint:
-        mcall <- lK[[k]]$call
+        mcall <- object$longicall[[k]] #lK[[k]]$call
         fixk <- NULL
         if(ng>1)
         {
@@ -84,7 +84,7 @@ update.mpjlcmm <- function(object,...)
         mcall$posfix <- fixk
         mcall$maxiter <- 0
         mcall$verbose <- FALSE
-        m <- eval(mcall)
+        if(length(fixk) == (ng-1+npmtot[k])) m <- lK[[k]] else m <- eval(mcall)
 
         ## ajouter les variances
         if(ng>1)
