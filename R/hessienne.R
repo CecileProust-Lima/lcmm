@@ -1,4 +1,4 @@
-hessienne <- function(x, method="numDeriv")
+hessienne <- function(x, method="numDeriv", nproc=1)
 {
   if(!inherits(x, "mpjlcmm")) stop("Use only with mpjlcmm objects")
   
@@ -15,7 +15,14 @@ hessienne <- function(x, method="numDeriv")
   }
   else
   {
-    derivees <- do.call(marqLevAlg::deriva, c(list(funcpa=loglikmpjlcmm), argsloglik))
+      if(nproc > 1)
+      {
+          clustpar <- parallel::makeCluster(nproc)
+          doParallel::registerDoParallel(clustpar)
+      }
+      derivees <- do.call(marqLevAlg::deriva, c(list(funcpa=loglikmpjlcmm, nproc=nproc), argsloglik))
+      if(nproc > 1)  parallel::stopCluster(clustpar)
+      
     npm <- length(argsloglik$b)
     d2 <- -derivees$v[1:(npm*(npm+1)/2)]
     res <- matrix(0,npm,npm)
