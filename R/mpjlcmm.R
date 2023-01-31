@@ -290,6 +290,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         Ynames <- vector("list",K)
         Xnames <- vector("list",K)
         nomsX <- unique(unlist(sapply(longitudinal,function(x) setdiff(x$Xnames2,"intercept"))))
+        longicall <- vector("list",K)
         
         for(k in 1:K)
             {
@@ -353,6 +354,8 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     }
                 }
                 mod <- eval(z)
+                longicall[[k]] <- mod$call
+                longicall[[k]]$data <- cl$data
                 
 ##                mod <- longitudinal[[k]]
                 assign(paste("mod",k,sep=""),mod)
@@ -2417,7 +2420,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                    epsY=epsY,linktype=idlink,nbzitr=nbzitr,linknodes=zitr,
                    predSurv=predSurv,typrisq=typrisq,hazardtype=hazardtype,
                    hazardnodes=zi,nz=nz,scoretest=stats,na.action=linesNA,
-                   contrainte=contrainte, levels=levels,
+                   contrainte=contrainte, levels=levels, longicall=longicall,
                    AIC=2*(length(out$best)-length(posfix)-out$loglik),
                    BIC=(length(out$best)-length(posfix))*log(ns)-2*out$loglik,
                    runtime=cost[3])
