@@ -258,7 +258,7 @@ We keep the best model for each number of latent classes and we plot some statis
 summaryplot(mm1, mm2_b, mm3_b, mm4_c, mm5_c)
 ```
 
-In this application, we will select the 2-class model, which presents better BIC and ICL.
+In this application, we will select the 2-class model, which presents better BIC.
 
 &nbsp;
 

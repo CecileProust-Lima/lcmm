@@ -20,7 +20,7 @@ summarytable(
 
 \item{which}{character vector indicating which results should be returned.
 Possible values are "G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC",
-"entropy", "ICL", "\%class".}
+"entropy", "ICL", "ICL1", "ICL2", "\%class".}
 
 \item{display}{logical indicating whether the table should be printed (the default) or not (display=FALSE)}
 }
@@ -44,8 +44,8 @@ Can be reported the usual criteria used to assess the fit and the clustering
  - SABIC (the lower the better) computed as -2L+ P log((N+2)/24)
  - Entropy (the closer to one the better) computed as 1-sum[pi_ig*log(pi_ig)]/(N*log(G))
    where pi_ig is the posterior probability that subject i belongs to class g
- - ICL (the lower the better) computed as BIC -2*sum[c_ig*log(pi_ig)]
-   where c_ig is the posterior class membership
+ - ICL (the lower the better) computed in two ways : ICL1 = BIC - sum[pi_ig*log(pi_ig)]
+   or ICL2 = BIC - 2*sum(log(max(pi_ig)), where the max is taken over the classes for each subject.
  - %Class computed as the proportion of each class based on c_ig
 }
 \seealso{

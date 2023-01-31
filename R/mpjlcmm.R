@@ -1621,7 +1621,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
 
                             sumnpm <- 0
                             sumch <- 0
-                            sumnpmG <- nprob+nrisq+nvarxevt
+                            sumnpmG <- nprob+nrisqtot+nvarxevt
                             cholRandom <- vector("list",K)
                             for (k in 1:K) #m1,..,mK
                             {
@@ -1651,7 +1651,6 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                                 sumch <- sumch + B$Nprm[3+2*K+k]
                                 sumnpmG <- sumnpmG + npmtot[k]
                             }
-
 
 
                             ## gerer les posfix de B
