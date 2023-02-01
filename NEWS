@@ -11,8 +11,7 @@ https://doi.org/10.18637/jss.v078.i02
 And specific statistical models estimated are described in various statistical papers of the authors. 
 
 
-Changes in Version 2.0.1 (2023-01-30) :
-
+Changes in Version 2.0.1 (2023-02-01) :
 * new vignette 'Joint latent class model with Jointlcmm'
 * new vignette 'Multivariate latent class model with mpjlcmm'
 * new argument 'pprior' in the 'hlme' function
