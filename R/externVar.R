@@ -715,6 +715,15 @@ externVar = function(model,
     }
   }
   
+  #On remet longicall comme considéré dans l'environnement présent, pas dans celui de mpjlcmm
+  if(inherits(modOut, "mpjlcmm")){
+    longicall = vector("list", modOut$K)
+    for(k in 1:modOut$K){
+      longicall[[k]] = eval(modOut$call$longitudinal)[[k]]$call
+    }
+    modOut$longicall = longicall
+  }
+  
   return(modOut)
   
 }
