@@ -665,9 +665,9 @@ externVar = function(model,
     
     Vs = Vs[conv %in% c(1,3)]
     V2 = Reduce("+", Vs)/Mconv
-    V1 = (Mconv+1)/((Mconv-1)*Mconv) * Reduce("+", apply(bests, 2, function(best){
+    V1 = (Mconv+1)/((Mconv-1)*Mconv) * Reduce("+", lapply(bests, function(best){
       (best-mb)%*%t(best-mb)
-    }, simplify = F))
+    }))
     covar = V2 + V1
     V = matrix(0, nOut, nOut)
     V[iEst, iEst] = covar
