@@ -15,11 +15,10 @@
 #' 
 #' B. VARIANCE ESTIMATION
 #' 
-#' FOr two stage estimation, parametrical bootstrap "paramBoot" estimation of variance
-#' (varest) takes generaly longer to compute than "calc" computation.
-#' Not taking into account first stage variance with specifing "none" may lead to
+#' Not taking into account first stage variance with specifing \code{"none"} may lead to
 #' underestimation of the final variance, even though it is much quicker.
-#' It can be used to get B starting values to use with other variance estimations methods
+#' With big models it is recommended used variance estimation method \code{"none"} first before using
+#' method \code{"paramBoot"} with parameter \code{"B"} being given the resulting estimates values
 #' 
 #' @param model original latent class structure model from which external variables
 #' must be modeled.
@@ -231,6 +230,8 @@ externVar = function(model,
                      verbose = FALSE,
                      nproc = 1){
   
+  ptm <- proc.time()
+  
   if(missing(model)) stop("model argument must be given")
   if(!class(model) %in% c("hlme", "lcmm", "multlcmm", "Jointlcmm", "mpjlcmm")) stop('input models class must be either "hlme", "lcmm", "multlcmm", "Jointlcmm" or "mpjlcmm"')
   if(model$conv == 2) warning("input model did not fully converge")
@@ -243,7 +244,7 @@ externVar = function(model,
   
 
   if(missing(posfix)) posfix = c()
-    
+  
   cl = match.call()
   
   #Informations about input model
@@ -521,13 +522,13 @@ externVar = function(model,
   
   if(varest != "paramBoot"){
     arguments[["B"]][iKeepOut] = model$best[iKeepIn]
-    
+    if(verbose){cat("Model estimation...\n\n")}
     #Model Estimation
     modOut = do.call(funOut, c(arguments))
   }
   
   if(varest == "calc"){
-    
+    if(verbose){cat("Variance estimation...\n\n")}
     nb11 = length(model$best)
     V11 = matrix(0, nb11, nb11)
     V11[upper.tri(V11, diag=T)] = model$V
@@ -544,7 +545,11 @@ externVar = function(model,
     n2 = modOut$ns
     
     modOut
-    I12 = -hessienne(modOut)
+    if(nproc == 1){
+      I12 = -hessienne(modOut)
+    } else {
+      I12 = -hessienne(modOut, method = "deriva", nproc = nproc)
+    }
     I12 = I12[iEst, iKeepOut]
     
     V = V22*n2 + (V22*n2) %*% (I12/n2) %*% ((n2/n1)*(V11*n1)) %*% t(I12/n2) %*% (V22*n2)
@@ -557,6 +562,7 @@ externVar = function(model,
   
   #Get Bootstrap Models
   if(varest == "paramBoot"){
+    if(verbose){cat("Bootstrap estimation...\n\n")}
     est = model$best
     
     #cholesky not varcov
@@ -723,6 +729,10 @@ externVar = function(model,
     }
     modOut$longicall = longicall
   }
+  
+  cost = proc.time()-ptm
+  if(verbose){cat(paste("The externVar program took", round(cost[3],2), "seconds\n"))}
+  modOut$runtime = cost[3]
   
   return(modOut)
   
