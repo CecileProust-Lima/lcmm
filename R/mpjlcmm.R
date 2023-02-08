@@ -1633,15 +1633,33 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                                 {
                                     multRandom <- TRUE
                                     if(mk$N[4]>0) cholRandom[[k]] <- sumnpmG+1:mk$N[4]
+                                    if(idiag[k]==1)
+                                    {
+                                        names(cholRandom)[k] <- "diag"
+                                    }
+                                    else
+                                    {
+                                        names(cholRandom)[k] <- "full"
+                                    }
                                 }
                                 else
                                 {
                                     multRandom <- FALSE
                                     if(mk$N[3]>0) cholRandom[[k]] <- sumnpmG+mk$N[2]+1:mk$N[3]
+                                    if(idiag[k]==1)
+                                    {
+                                        names(cholRandom)[k] <- "diag"
+                                    }
+                                    else
+                                    {
+                                        names(cholRandom)[k] <- "full"
+                                    }
                                 }
 
                                 ## remplacer varcov par cholesky
-                                if(B$Nprm[3+2*K+k]>0) theta0[sum(nprisq)+nvarxevt2+sumnpm+B$Nprm[3+k]+B$Nprm[3+K+k]+1:B$Nprm[3+2*K+k]] <- B$cholesky[sumch+1:B$Nprm[3+2*K+k]]
+                                avt <- 3
+                                if(nbevt>1) avt <- 2+nbevt
+                                if(B$Nprm[avt+2*K+k]>0) theta0[sum(nprisq)+nvarxevt2+sumnpm+B$Nprm[avt+k]+B$Nprm[avt+K+k]+1:B$Nprm[avt+2*K+k]] <- B$cholesky[sumch+1:B$Nprm[avt+2*K+k]]
 
 
                                 mkw <- max(w)+mk$wRandom
@@ -1660,13 +1678,13 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                             ww <- w
                             for(j in fix1)
                             {
-                                ww[which(w>fix1)] <- ww[which(w>fix1)]-1
-                                b0 <- c(b0,rep(B$best[j],length(which(w==j))))
+                                ww[which(w>j)] <- ww[which(w>j)]-1
+                                b0 <- c(b0,rep(theta0[j],length(which(w==j))))
                             }
                             ww[which(w %in% fix1)] <- 0
                             theta1 <- theta0[setdiff(1:length(theta0),fix1)]
                             var1 <- var0[setdiff(1:length(B$best),fix1),setdiff(1:length(B$best),fix1)]
-                            b <- Brandom(theta0=theta1,v0=var1,w=ww,b0=b0,chol=cholRandom,mult=multRandom)
+                            b <- Brandom(theta0=theta1,v0=var1,w=ww,b0=b0,chol=NULL, mult=NULL) #chol=cholRandom,mult=multRandom)
 
                         } # fin random
                         
