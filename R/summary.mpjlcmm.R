@@ -148,7 +148,7 @@ summary.mpjlcmm <- function(object,...)
             short_names_best <- lapply(split_names_best, gsub, pattern="\\(.*\\)", replacement="(...)")
             new_names <- lapply(short_names_best, paste, collapse=":")
             names_best[islong] <- unlist(new_names)[islong]
-            names_best[nprob+1:nrisqtot] <- names(x$best)[nprob+1:nrisqtot]
+            if(nrisqtot>0) names_best[nprob+1:nrisqtot] <- names(x$best)[nprob+1:nrisqtot]
             names(x$best) <- names_best
             
             islong <- which(sapply(x$Names$Xnames, nchar)>20)
@@ -315,7 +315,7 @@ summary.mpjlcmm <- function(object,...)
             if(ncontr[k]>0)
             {
                 indice2 <- 1:NPM*(1:NPM+1)/2
-                nom.contr <- x$Names$Xnames[as.logical(x$idcontr[sumnv+1:x$nv[k]])]
+                nom.contr <- x$Names$Xnames[sumnv+as.logical(x$idcontr[sumnv+1:x$nv[k]])]
                 for (i in 1:sum(x$idcontr[sumnv+1:x$nv[k]]))
                 {
                     ##matrice de variance pour test et se du dernier coef
@@ -424,8 +424,8 @@ summary.mpjlcmm <- function(object,...)
                 if(nvc[k]==0)
                 {
                     Mat.cov <- matrix(1,nrow=1,ncol=1)
-                    colnames(Mat.cov) <- x$Names$Xnames[which(x$idea[sumnv+1:x$nv[k]]==1)]
-                    rownames(Mat.cov) <- x$Names$Xnames[which(x$idea[sumnv+1:x$nv[k]]==1)]
+                    colnames(Mat.cov) <- x$Names$Xnames[sumnv+which(x$idea[sumnv+1:x$nv[k]]==1)]
+                    rownames(Mat.cov) <- x$Names$Xnames[sumnv+which(x$idea[sumnv+1:x$nv[k]]==1)]
                     prmatrix(Mat.cov)
                 }
             }
@@ -458,8 +458,8 @@ summary.mpjlcmm <- function(object,...)
                     Mat.cov <-t(Mat.cov)
                     Mat.cov[upper.tri(Mat.cov)] <- NA
                 }
-                colnames(Mat.cov) <- x$Names$Xnames[which(x$idea[sumnv+1:x$nv[k]]==1)]
-                rownames(Mat.cov) <- x$Names$Xnames[which(x$idea[sumnv+1:x$nv[k]]==1)]
+                colnames(Mat.cov) <- x$Names$Xnames[sumnv+which(x$idea[sumnv+1:x$nv[k]]==1)]
+                rownames(Mat.cov) <- x$Names$Xnames[sumnv+which(x$idea[sumnv+1:x$nv[k]]==1)]
             
             
                 if(any(posfix %in% c(nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k])))

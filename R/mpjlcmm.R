@@ -746,31 +746,49 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 ## formule k
                 formf <- gsub("contrast","",mod$call$fixed[3])
                 formk <- paste("processK+outcomeM",paste(formf,collapse="+"), sep="+")
-                if(!is.null(mod$call$random[2]))
+####
+                ## if(!is.null(mod$call$random[2]))
+                ## {
+                ##     formk <- paste(formk, paste(mod$call$random[2],collapse="+"),sep="+")
+                ##     terms_random <- terms(formula(paste("~",paste(mod$call$random[2],collapse="+"))))
+                ## }
+                ## else
+                ## {
+                ##     terms_random <- terms(~-1)
+                ## }
+                ## if(!is.null(mod$call$cor))
+                ##     {
+                ##         formk <- paste(formk,as.character(mod$call$cor)[2],sep="+")
+                ##     }
+
+                ## ## garder l'intercept si intercept dans fixed ou dans random
+                ## ## car pb si random=~-1, on n'a pas intercept dans formk
+                ## terms_formk <- terms(formula(paste("~",formk)))
+                ## terms_formf <- terms(formula(paste("~",paste(formf,collapse="+"))))
+                ## if(attr(terms_formf,"intercept") | attr(terms_random,"intercept"))
+                ## {
+                ##     attr(terms_formk,"intercept") <- 1
+                ## }
+
+                ## ## X0 pour k
+                ## xk <- model.matrix(terms_formk,data=dataY[which(dataY$processK==k),,drop=FALSE])
+                ## va pas car pas ranges dans le bon ordre
+####
+                
+                xfk <- model.matrix(formula(paste("~",formk)), data=dataY[which(dataY$processK==k),,drop=FALSE])
+                xrk <- model.matrix(formula(paste("~",mod$call$random[2])), data=dataY[which(dataY$processK==k),,drop=FALSE])
+                
+                ## X0 dans le bon ordre
+                xk <- cbind(xfk, xrk)[,union(colnames(xfk),colnames(xrk)),drop=FALSE]
+                if( mod$N[5+contrainte[k]]>0)
                 {
-                    formk <- paste(formk, paste(mod$call$random[2],collapse="+"),sep="+")
-                    terms_random <- terms(formula(paste("~",paste(mod$call$random[2],collapse="+"))))
-                }
-                else
-                {
-                    terms_random <- terms(~-1)
-                }
-                if(!is.null(mod$call$cor))
+                    namescor <- as.character(mod$call$cor)[2]
+                    xck <- model.matrix(formula(paste("~-1+",namescor)), data=dataY[which(dataY$processK==k),,drop=FALSE])
+                    if(!(namescor %in% colnames(xk)))
                     {
-                        formk <- paste(formk,as.character(mod$call$cor)[2],sep="+")
+                        xk <- cbind(xk,xck)
                     }
-
-                ## garder l'intercept si intercept dans fixed ou dans random
-                ## car pb si random=~-1, on n'a pas intercept dans formk
-                terms_formk <- terms(formula(paste("~",formk)))
-                terms_formf <- terms(formula(paste("~",paste(formf,collapse="+"))))
-                if(attr(terms_formf,"intercept") | attr(terms_random,"intercept"))
-                {
-                    attr(terms_formk,"intercept") <- 1
                 }
-
-                ## X0 pour k
-                xk <- model.matrix(terms_formk,data=dataY[which(dataY$processK==k),,drop=FALSE])
                 nomxk[[k]] <- colnames(xk)
 
                 ## X0 merge (range par K)
