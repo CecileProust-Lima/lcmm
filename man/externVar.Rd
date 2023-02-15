@@ -27,7 +27,7 @@ externVar(
   convG = 1e-04,
   maxiter = 100,
   posfix,
-  verbose = TRUE,
+  verbose = FALSE,
   nproc = 1
 )
 }
@@ -118,7 +118,7 @@ parameters that should not be estimated. Default to NULL, all external parameter
 estimated.}
 
 \item{verbose}{logical indicating whether information about computation should be
-reported. Default to TRUE.}
+reported. Default to FALSE.}
 
 \item{nproc}{the number cores for parallel computation. Default to 1 (sequential mode).}
 }
@@ -139,11 +139,10 @@ data values must be present for each
 
 B. VARIANCE ESTIMATION
 
-FOr two stage estimation, parametrical bootstrap "paramBoot" estimation of variance
-(varest) takes generaly longer to compute than "calc" computation.
-Not taking into account first stage variance with specifing "none" may lead to
+Not taking into account first stage variance with specifing \code{"none"} may lead to
 underestimation of the final variance, even though it is much quicker.
-It can be used to get B starting values to use with other variance estimations methods
+With big models it is recommended used variance estimation method \code{"none"} first before using
+method \code{"paramBoot"} with parameter \code{"B"} being given the resulting estimates values
 }
 \examples{
 
