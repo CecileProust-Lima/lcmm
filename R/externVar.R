@@ -625,39 +625,82 @@ externVar = function(model,
       
       return(coefs)
     }, model = model, data = data, whereRand = whereRand)
-    
-    #estimate final models, extract usefull information
-    bests = as.data.frame(matrix(NA, nrow = nEst, ncol = M))
-    Vs = list()
-    conv = c()
-    for(i in 1:M){
-      if(verbose) cat("==================== Bootstrap Iteration", i, "====================\n")
+
+    if(nproc > 1)
+    {
+      cl <- parallel::makeCluster(nproc)
+      clusterEvalQ(cl, library(lcmm))
+      modOuts <- parApply(cl, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, NVCin){
+        arguments[["B"]][iKeepOut] = coefs
+        
+        #Model Estimation
+        modOut = do.call(funOut, c(arguments))
+        
+        #cholesky not varcov as output in best
+        whereRand = substr(names(modOut$best), 1, 7) == "varcov "
+        whereRand[-iEst] = FALSE
+        if(class(modOut) == "mpjlcmm" | !all(modOut$idiag)){
+          modOut$best[whereRand] = modOut$cholesky[-(1:NVCin)] #Warning : quickest way to do this, but maybe not the best/safest
+        } else {
+          cholMatrix = matrix(NA, sum(whereRand), sum(whereRand))
+          cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:NVCin)]
+          modOut$best[whereRand] = diag(cholMatrix)
+        }
+        
+        return(modOut)
+      }, arguments = arguments, iKeepOut = iKeepOut, funOut = funOut, iEst = iEst, NVCin = NVCin)
+      parallel::stopCluster(cl)
       
-      arguments[["B"]][iKeepOut] = coefss[,i]
-      
-      #Model Estimation
-      modOut = do.call(funOut, c(arguments))
-      
-      #cholesky not varcov as output in best
-      whereRand = substr(names(modOut$best), 1, 7) == "varcov "
-      whereRand[-iEst] = FALSE
-      if(class(modOut) == "mpjlcmm" | !all(modOut$idiag)){
-        modOut$best[whereRand] = modOut$cholesky[-(1:NVCin)] #Warning : quickest way to do this, but maybe not the best/safest
-      } else {
-        cholMatrix = matrix(NA, sum(whereRand), sum(whereRand))
-        cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:NVCin)]
-        modOut$best[whereRand] = diag(cholMatrix)
+      #format output
+      bests = as.data.frame(matrix(NA, nrow = nEst, ncol = M))
+      Vs = list()
+      conv = c()
+      for (i in 1:M){
+        modOut = modOuts[[i]]
+        #output V and betas
+        bests[,i] = modOut$best[iEst]
+        
+        V = matrix(NA, nOut, nOut)
+        V[upper.tri(V, diag = T)] = modOut$V
+        V[lower.tri(V, diag = F)] = t(V)[lower.tri(t(V), diag = F)]
+        Vs = c(Vs, list(V[iEst, iEst]))
+        
+        conv = c(conv, modOut$conv)
       }
-      
-      #output V and betas
-      bests[,i] = modOut$best[iEst]
-      
-      V = matrix(NA, nOut, nOut)
-      V[upper.tri(V, diag = T)] = modOut$V
-      V[lower.tri(V, diag = F)] = t(V)[lower.tri(t(V), diag = F)]
-      Vs = c(Vs, list(V[iEst, iEst]))
-      
-      conv = c(conv, modOut$conv)
+    } else {
+      #estimate final models, extract usefull information
+      bests = as.data.frame(matrix(NA, nrow = nEst, ncol = M))
+      Vs = list()
+      conv = c()
+      for(i in 1:M){
+        if(verbose) cat("==================== Bootstrap Iteration", i, "====================\n")
+        
+        arguments[["B"]][iKeepOut] = coefss[,i]
+        
+        #Model Estimation
+        modOut = do.call(funOut, c(arguments))
+        
+        #cholesky not varcov as output in best
+        whereRand = substr(names(modOut$best), 1, 7) == "varcov "
+        whereRand[-iEst] = FALSE
+        if(class(modOut) == "mpjlcmm" | !all(modOut$idiag)){
+          modOut$best[whereRand] = modOut$cholesky[-(1:NVCin)] #Warning : quickest way to do this, but maybe not the best/safest
+        } else {
+          cholMatrix = matrix(NA, sum(whereRand), sum(whereRand))
+          cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:NVCin)]
+          modOut$best[whereRand] = diag(cholMatrix)
+        }
+        
+        #output V and betas
+        bests[,i] = modOut$best[iEst]
+        
+        V = matrix(NA, nOut, nOut)
+        V[upper.tri(V, diag = T)] = modOut$V
+        V[lower.tri(V, diag = F)] = t(V)[lower.tri(t(V), diag = F)]
+        Vs = c(Vs, list(V[iEst, iEst]))
+        
+        conv = c(conv, modOut$conv)
+      }
     }
     
     Mconv = sum(conv %in% c(1,3))
@@ -685,6 +728,8 @@ externVar = function(model,
     modOut$Mconv = Mconv
     
     #replace chol for varcov in best
+    whereRand = substr(names(modOut$best), 1, 7) == "varcov "
+    whereRand[-iEst] = FALSE
     modOut$cholesky[-(1:NVCin)] = modOut$best[whereRand]
     if(idiag){
       modOut$best[whereRand] = modOut$cholesky[-(1:NVCin)]^2
