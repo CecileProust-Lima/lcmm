@@ -11,6 +11,26 @@ https://doi.org/10.18637/jss.v078.i02
 And specific statistical models estimated are described in various statistical papers of the authors. 
 
 
+Changes in Version 2.0.1 (2023-02-01) :
+* new vignette 'Joint latent class model with Jointlcmm'
+* new vignette 'Multivariate latent class model with mpjlcmm'
+* new argument 'pprior' in the 'hlme' function
+* new argument 'computeDiscrete' in the 'lcmm' function 
+* 'mpjlcmm' can be used with a mix of hlme/lcmm/multlcmm objects
+* 'summarytable' and 'summaryplot' implement two versions of ICL criterion
+* new output 'levels' in all estimating functions
+* new output 'varRE' in 'hlme'
+* check the convergence of the initial model when using B=random()
+* random parameters are generated with rmnvorm instead of using the Cholesky transformation
+* 'permut', 'cuminc', 'VarCov', 'coef', 'vcov' functions are available for mpjlcmm objects
+* corrections in 'mpjlcmm', especially with competing risks
+* correction in residuals for Jointlcmm models
+* bug fixed when using 'posfix' and 'partialH' simultaneously
+* correction in the likelihood for mutlcmm models
+* bug fixed in 'predictClass' and 'predictRE' when using splines
+* verbose=FALSE by default
+
+
 Changes in Version 2.0.0 (2022-06-15) :
 
 * the model's estimation is now available in parallel mode! 
