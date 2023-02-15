@@ -629,7 +629,14 @@ externVar = function(model,
     if(nproc > 1)
     {
       cl <- parallel::makeCluster(nproc)
-      clusterEvalQ(cl, library(lcmm))
+      
+      #load all loaded packages
+      packages = loadedNamespaces()
+      for(pack in packages){
+        clusterExport(cl, "pack", environment())
+        clusterEvalQ(cl, require(pack, character.only = T))
+      }
+      
       modOuts <- parApply(cl, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, NVCin){
         arguments[["B"]][iKeepOut] = coefs
         
