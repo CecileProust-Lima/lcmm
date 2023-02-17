@@ -767,9 +767,9 @@ externVar = function(model,
   }
   if(!missing(classmb)){
     if(is.null(argumentsIn[["longitudinal"]])){
-      arguments[["longitudinal"]] = as.call(list(as.name("list"), substitute(model)))
+      modOut$call$longitudinal = as.call(list(as.name("list"), substitute(model)))
     } else {
-      arguments[["longitudinal"]] = argumentsIn[["longitudinal"]]
+      modOut$call$longitudinal = argumentsIn[["longitudinal"]]
     }
   }
   
