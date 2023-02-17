@@ -1,6 +1,4 @@
-<img src="vignettes/lcmm.png" align="left" width=130 style="margin-right: 30px;"/> \
-
-# Latent Class Mixed Models with R 
+# <img src="vignettes/lcmm.png" align="right" width=130 style="margin-right: 0px;vertical-align:middle"/> <span style="font-size:38px"> Extended Mixed Models Using Latent Classes and Latent Processes </span>
 
 &nbsp;
 

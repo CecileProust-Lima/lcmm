@@ -21,7 +21,7 @@ remotes::install_github("CecileProust-Lima/lcmm")
 ## Documentation
 
 
-The complete documentation is available on the lcmm website <https://CecileProust-Lima.github.io/lcmm>, along with vignettes for each of the main estimating function of the package.
+The complete documentation is available on the lcmm website <https://CecileProust-Lima.github.io/lcmm/>, along with vignettes for each of the main estimating function of the package.
 
 A detailed companion paper is also available in Journal of Statistical
 Software :

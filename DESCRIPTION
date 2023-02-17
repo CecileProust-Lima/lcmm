@@ -12,6 +12,7 @@ License: GPL (>= 2.0)
 Depends: R (>= 3.5.0), survival (>= 2.37-2), parallel, mvtnorm, randtoolbox, marqLevAlg (> 2.0)
 Imports: nlme
 Suggests: knitr,rmarkdown,lattice,NormPsy
+URL: https://CecileProust-Lima.github.io/lcmm
 BugReports: https://github.com/CecileProust-Lima/lcmm/issues
 LazyLoad: yes
 LazyData: true

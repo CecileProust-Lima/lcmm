@@ -2,7 +2,7 @@ template:
   bootstrap: 5
   bootswatch: sandstone
   bslib:
-    pkgdown-nav-height: 80px
+    pkgdown-nav-height: 60px
 
 navbar:
   type: light
