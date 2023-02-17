@@ -371,15 +371,17 @@ We can assess the fit of the model by comparing the predictions to the observati
 ```{r, include=T, fig.height=4, fig.width=7, fig.align = "center"}
 # overall
 plot(mj4b, which = "fit", var.time = "age65", marg = F, break.times = 10, bty = "l", 
-     ylab = "normMMSE", xlab = "Age in decades from 65 years",shades=T)
+     ylab = "normMMSE", xlab = "Age in decades from 65 years",shades=TRUE)
+```
+```{r, include=T, fig.height=4, fig.width=9, fig.align = "center"}
 # by covariate profile
 par(mfrow=c(1,2))
 plot(mj4b, which = "fit", var.time = "age65", marg = F, break.times = 10, bty = "l", 
      ylab = "normMMSE", xlab = "Age in decades from 65 years",subset = dem == 1,
-     main="diagnosed as demented",shades=T)
+     main="diagnosed as demented",shades=TRUE)
 plot(mj4b, which = "fit", var.time = "age65", marg = F, break.times = 10, bty = "l", 
      ylab = "normMMSE", xlab = "Age in decades from 65 years",subset = dem == 0,
-     main="non diagnosed as demented",shades=T)
+     main="non diagnosed as demented",shades=TRUE)
 ```
 
 The residuals of the longitudinal part:
@@ -411,7 +413,7 @@ plot(mj4b, which = "survival", lwd = 2, legend.loc = F, bty = "l",
      xlab = "age in years", ylab = "dementia-free probability")
 ```
 
-```{r, include=T, fig.height=4, fig.width=7, fig.align = "center"}
+```{r, include=T, fig.height=4, fig.width=9, fig.align = "center"}
 # computation of the cumulative incidence for a specific profile of covariates
 cuminc0 <- cuminc(mj4b,time = seq(65,95,by=1))
 cuminc1 <- cuminc(mj4b,time = seq(65,95,by=1),CEP=1,male=1)
@@ -466,7 +468,7 @@ epoce4 <- epoce(mj4b, pred.times = landmark, var.time = "age65",fun.time =
 ```
 
 
-```{r, include=T,message=F, fig.height=4, fig.width=7, fig.align = "center"}
+```{r, include=T,message=F, fig.height=4, fig.width=8, fig.align = "center"}
 # computation of the differences in EPOCE
 diff23 <- Diffepoce(epoce2, epoce3)
 diff34 <- Diffepoce(epoce3, epoce4)

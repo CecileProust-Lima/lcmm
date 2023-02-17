@@ -95,20 +95,6 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
       partialH=FALSE,verbose=TRUE,nproc=1,clustertype=NULL)
 ``` 
 
-# Package installation
-
-If the package lcmm is not installed, install it:
-
-```{r,eval=FALSE}
-install.packages("lcmm")
-```
-
-Each time you will open a R session, you will first have to load the lcmm library:
-
-```{r,results='hide',message=FALSE,warning=FALSE}
-library(lcmm)
-```
-
 # Dataset example
 
 ## paquid subsample
