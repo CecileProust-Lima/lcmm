@@ -7,7 +7,7 @@ Authors@R: c(person("Cecile", "Proust-Lima", role=c("aut", "cre"), email="cecile
              person("Viviane", "Philipps", role="aut"),
 	     person("Amadou", "Diakite", role="ctb"),
 	     person("Benoit", "Liquet", role="ctb"))
-Description: Estimation of various extensions of the mixed models including latent class mixed models, joint latent latent class mixed models, mixed models for curvilinear outcomes, mixed models for multivariate longitudinal outcomes using a maximum likelihood estimation method (Proust-Lima, Philipps, Liquet (2017) <doi:10.18637/jss.v078.i02>).
+Description: Estimation of various extensions of the mixed models including latent class mixed models, joint latent class mixed models, mixed models for curvilinear outcomes, mixed models for multivariate longitudinal outcomes using a maximum likelihood estimation method (Proust-Lima, Philipps, Liquet (2017) <doi:10.18637/jss.v078.i02>).
 License: GPL (>= 2.0)
 Depends: R (>= 3.5.0), survival (>= 2.37-2), parallel, mvtnorm, randtoolbox, marqLevAlg (> 2.0)
 Imports: nlme
