@@ -285,13 +285,19 @@ externVar = function(model,
     }
   }
   
-  #NVCin
-  if(funIn %in% c("multlcmm", "mpjlcmm")){
-    NVCin = model$N[6]
+  #nVCIn
+  if(funIn == "mpjlcmm"){
+    nVCIn = model$N[6]
+    iVCIn = sum(model$N[1:5]) + 1:nVCIn
   } else if(funIn == "Jointlcmm"){
-    NVCin = model$N[5]
+    nVCIn = model$N[5]
+    iVCIn = sum(model$N[1:4]) + 1:nVCIn
+  } else if(funIn == "multlcmm"){
+    nVCIn = model$N[4]
+    iVCIn = sum(model$N[1:3]) + 1:nVCIn
   } else {
-    NVCin = model$N[3]
+    nVCIn = model$N[3]
+    iVCIn = sum(model$N[1:2]) + 1:nVCIn
   }
   
   
@@ -428,6 +434,16 @@ externVar = function(model,
       iKeepOut = 1:nIn
       iKeepIn = iKeepOut
       iEst = nIn+1:nEst
+      
+      #Id of varcov estimates
+      if(inherits(strMod, "multlcmm")){
+        nVCStr = strMod$N[4]
+        iVCStr = sum(strMod$N[1:3]) + 1:nVCStr
+      } else {
+        nVCStr = strMod$N[3]
+        iVCStr = sum(strMod$N[1:2]) + 1:nVCStr
+      }
+      iVCOut = length(iKeepIn) + iVCStr - nMB
       
       #Liste des arguments
       #on fixe nos parametres
@@ -566,13 +582,12 @@ externVar = function(model,
     est = model$best
     
     #cholesky not varcov
-    whereRand = substr(names(est), 1, 7) == "varcov "
     if(funIn %in% c("mpjlcmm", "Jointlcmm") | !all(as.logical(model$idiag))){
-      est[whereRand] = model$cholesky #Warning : quickest way to do this, but maybe not the best/safest
+      est[iVCIn] = model$cholesky #Warning : quickest way to do this, but maybe not the best/safest
     } else {
-      cholMatrix = matrix(NA, sum(whereRand), sum(whereRand))
+      cholMatrix = matrix(NA, nVCIn, nVCIn)
       cholMatrix[upper.tri(cholMatrix, diag = T)] = model$cholesky
-      est[substr(names(est), 1, 7) == "varcov "] = diag(cholMatrix)
+      est[iVCIn] = diag(cholMatrix)
     }
     
     Vin = matrix(0, length(est), length(est))
@@ -585,16 +600,15 @@ externVar = function(model,
     coefss = rmvnorm(M, est, Vin)
     coefss = as.data.frame(coefss)
     colnames(coefss) = names(model$best)[iKeepIn]
-    whereRand = whereRand[iKeepIn]
     #we just need to build back varcov into the coefs instead of cholesky matrix
-    coefss = apply(coefss, 1, function(coefs, model, data, whereRand){
+    coefss = apply(coefss, 1, function(coefs, model, data, iVCIn){
       if(funIn == "mpjlcmm"){
         varcovMods = longitudinal
       } else {
         varcovMods = list(model)
       }
       
-      chols = coefs[whereRand]
+      chols = coefs[iVCIn]
       model$cholesky = chols
       
       varcov = c()
@@ -621,10 +635,10 @@ externVar = function(model,
         
         countChol = countChol + nChol
       }
-      coefs[whereRand] = varcov
+      coefs[iVCIn] = varcov
       
       return(coefs)
-    }, model = model, data = data, whereRand = whereRand)
+    }, model = model, data = data, iVCIn = iVCIn)
 
     if(nproc > 1)
     {
@@ -637,25 +651,23 @@ externVar = function(model,
         clusterEvalQ(cl, require(pack, character.only = T))
       }
       
-      modOuts <- parApply(cl, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, NVCin){
+      modOuts <- parApply(cl, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, nVCIn, iVCOut){
         arguments[["B"]][iKeepOut] = coefs
         
         #Model Estimation
         modOut = do.call(funOut, c(arguments))
         
         #cholesky not varcov as output in best
-        whereRand = substr(names(modOut$best), 1, 7) == "varcov "
-        whereRand[-iEst] = FALSE
         if(class(modOut) == "mpjlcmm" | !all(modOut$idiag)){
-          modOut$best[whereRand] = modOut$cholesky[-(1:NVCin)] #Warning : quickest way to do this, but maybe not the best/safest
+          modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)] #Warning : quickest way to do this, but maybe not the best/safest
         } else {
-          cholMatrix = matrix(NA, sum(whereRand), sum(whereRand))
-          cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:NVCin)]
-          modOut$best[whereRand] = diag(cholMatrix)
+          cholMatrix = matrix(NA, length(iVCOut), length(iVCOut))
+          cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:nVCIn)]
+          modOut$best[iVCOut] = diag(cholMatrix)
         }
         
         return(modOut)
-      }, arguments = arguments, iKeepOut = iKeepOut, funOut = funOut, iEst = iEst, NVCin = NVCin)
+      }, arguments = arguments, iKeepOut = iKeepOut, funOut = funOut, iEst = iEst, nVCIn = nVCIn, iVCOut = iVCOut)
       parallel::stopCluster(cl)
       
       #format output
@@ -688,14 +700,12 @@ externVar = function(model,
         modOut = do.call(funOut, c(arguments))
         
         #cholesky not varcov as output in best
-        whereRand = substr(names(modOut$best), 1, 7) == "varcov "
-        whereRand[-iEst] = FALSE
         if(class(modOut) == "mpjlcmm" | !all(modOut$idiag)){
-          modOut$best[whereRand] = modOut$cholesky[-(1:NVCin)] #Warning : quickest way to do this, but maybe not the best/safest
+          modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)] #Warning : quickest way to do this, but maybe not the best/safest
         } else {
-          cholMatrix = matrix(NA, sum(whereRand), sum(whereRand))
-          cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:NVCin)]
-          modOut$best[whereRand] = diag(cholMatrix)
+          cholMatrix = matrix(NA, length(iVCOut), length(iVCOut))
+          cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:nVCIn)]
+          modOut$best[iVCOut] = diag(cholMatrix)
         }
         
         #output V and betas
@@ -735,17 +745,15 @@ externVar = function(model,
     modOut$Mconv = Mconv
     
     #replace chol for varcov in best
-    whereRand = substr(names(modOut$best), 1, 7) == "varcov "
-    whereRand[-iEst] = FALSE
-    modOut$cholesky[-(1:NVCin)] = modOut$best[whereRand]
+    modOut$cholesky[-(1:nVCIn)] = modOut$best[iVCOut]
     if(idiag){
-      modOut$best[whereRand] = modOut$cholesky[-(1:NVCin)]^2
+      modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]^2
     } else {
-      NVC = sqrt(2*(length(modOut$cholesky)-NVCin)+1/4)-1/2
+      NVC = sqrt(2*(length(modOut$cholesky)-nVCIn)+1/4)-1/2
       cholMatrix = matrix(0, NVC, NVC)
-      cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$best[whereRand]
+      cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$best[iVCOut]
       vc = t(cholMatrix)%*%cholMatrix
-      modOut$best[whereRand] = vc[upper.tri(vc, diag = T)]
+      modOut$best[iVCOut] = vc[upper.tri(vc, diag = T)]
     }
   }
   
