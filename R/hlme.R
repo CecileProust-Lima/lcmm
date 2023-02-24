@@ -281,7 +281,7 @@
 #' 
 #' 
 hlme <-
-    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=TRUE,returndata=FALSE){
+    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,error=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=TRUE,returndata=FALSE){
 
         ptm<-proc.time()
         if(verbose==TRUE) cat("Be patient, hlme is running ... \n")
@@ -347,9 +347,28 @@ hlme <-
             }  
 ### fin test argument cor 
 
+        library("stringr")
+        if(!is.null(match.call()$error)){if(!str_detect(as.character(match.call()$error)[1],"factor"))stop(paste("You need to specify the argument of error using the function factor"))}
+        if(length(as.character(match.call()$error))!=2 & !is.null(match.call()$error)){stop(paste("You need to write factor and after un parenthesis the name of the variable"))}
+        if(!is.null(match.call()$error)){
+          var_error<-as.character(match.call()$error)[2]
+          if(!(var_error %in% colnames(data))){
+            stop(paste("The argument of error must be in data"))
+            }else{
+              name_var_error<-var_error
+              var_error<-data[,which(colnames(data)==var_error)]
+              var_error<-as.matrix(var_error)
+          # we need to have var_error=j for the jieme marqueur 
+              colnames(var_error)<-name_var_error
+              findindex<-function(y){ 
+                index<-(y==unique(var_error[,name_var_error])) 
+                return(grep("TRUE",index))}
+              var_error[,name_var_error]<-apply(var_error,MARGIN = 1,FUN=findindex)
+            }
+        }
 
-
-### ad 2/04/2012
+        
+        ### ad 2/04/2012
         X0.names2 <- c("intercept")
 ### ad 
         int.fixed <- 0
@@ -413,6 +432,18 @@ hlme <-
                 na.cor <- attr(m,"na.action") 	
             }
         else { na.cor <- NULL }
+                                      #error AB need to be verified
+        if(!is.null(match.call()$error))
+          { 
+                m <- match.call()[c(1,match(c("data","subset","na.action"),names(match.call()),0))]
+                m$formula <- as.formula(paste(colnames(var_error),1,sep="~"))
+                m$na.action <- na.action
+                m[[1]] <- as.name("model.frame")
+                m <- eval(m,sys.parent())    
+                na.error <- attr(m,"na.action") 	
+        }
+        else { na.error <- NULL }
+       
 
 ### names of covariate in intial fit     (sans les interactions)
         X0.names2 <- unique(c(X0.names2,colnames(get_all_vars(formula(terms(fixed)),data=data))[-1]))
@@ -425,8 +456,8 @@ hlme <-
 
 
 
-        ## Table sans donnees manquante: newdata
-	na.action <- unique(c(na.fixed,na.mixture,na.random,na.classmb,na.cor))
+        ## Table sans donnees manquante: newdata AB
+	na.action <- unique(c(na.fixed,na.mixture,na.random,na.classmb,na.cor,na.error))
         ## dans na.action, on a les indices des NA dans le subset de data
 
                                         #prendre le subset :
@@ -447,6 +478,10 @@ hlme <-
             newdata <- newdata[-na.action,]
 	}
 
+                                    # AB remplacer dans new data var_error par sa nouvelle valeur 
+  if(!is.null(match.call()$error)){
+    newdata[,colnames(var_error)]<-var_error
+  }
         attributes(newdata)$terms <- NULL
 
         ## Construction de nouvelles var explicatives sur la nouvelle table
@@ -510,8 +545,8 @@ hlme <-
         else{
             inddepvar.classmb <- inddepvar.classmb.nom <- "intercept"
             id.X_classmb <- 0
-	}	
-        
+        }	
+
         
                                         #7/05/2012
 ##############   COVARIATES       ##########################
@@ -525,7 +560,12 @@ hlme <-
         if(ncor0>0) 
             { if(!(cor.var.time %in% var.exp)) 
                   {var.exp <- c(var.exp, cor.var.time)} #si la varaible de temps dans cor n'est dan sles variables expl, on l'ajoute
-          }             
+        }
+        #AB
+        if(!is.null(match.call()$error))
+          { if(!(colnames(var_error) %in% var.exp))
+            {var.exp<-c(var.exp,colnames(var_error))} # if the variable of error is not in descriptives variables we add it
+        }
         
                                         #if(!(all(nom.mixture %in% nom.fixed))) stop("The covariates in mixture should be also included in the argument fixed")
                                         # controler si les variables de mixture sont toutes dans fixed : 
@@ -630,13 +670,24 @@ hlme <-
                     {
                         X0 <- cbind(X0, newdata[,cor.var.time])
                         colnames(X0) <- c(oldnames, cor.var.time)
+                        oldnames <- colnames(X0)
                     }
-            }  
+        }  
+        
+        #AB 
+        if(!is.null(match.call()$error)) 
+        { 
+            X0 <- cbind(X0, newdata[,colnames(var_error)])
+            colnames(X0) <- c(oldnames, colnames(var_error))
+          
+        }  
 
                                         #colnames(X0) <- var.exp # a remettre si on enleve les z.fixed etc
 
-                                        #X0 <- X0[,-which(colnames(X0)=="intercept")]
+  
+                                            #X0 <- X0[,-which(colnames(X0)=="intercept")]
 ### ad
+        
 
         if((any(is.na(X0))==TRUE)|(any(is.na(Y0))==TRUE))stop("The data should not contain any missing value")
                                         # 
@@ -659,7 +710,6 @@ hlme <-
             PRIOR[(is.na(PRIOR))] <- 0
         }
 ####
-
         ng0 <- ng
         idiag0 <- as.integer(idiag)
         nwg0 <- as.integer(nwg)
@@ -668,6 +718,14 @@ hlme <-
         idprob0 <- rep(0,nvar.exp)
         idg0 <- rep(0,nvar.exp)
         
+        #AB
+       iderr0<-rep(0,nvar.exp)
+        if(is.null(match.call()$error)){
+          nerr0 <- 1
+          }else{
+            nerr0<-length(unique(var_error[,colnames(var_error)]))
+            iderr0[length(iderr0)]<-1
+            } 
         z.X0 <- strsplit(nom.X0,split=":",fixed=TRUE)
         z.X0 <- lapply(z.X0,sort)
 
@@ -794,8 +852,9 @@ hlme <-
             if(ncor0==1)
                 {b1[NEF+NVC+1] <- 1 }
             if(ncor0==2)
-                {b1[(NEF+NVC+1):(NEF+NVC+ncor0)] <- c(0,1) }
-            b1[NEF+NVC+ncor0+1] <- 1
+            {b1[(NEF+NVC+1):(NEF+NVC+ncor0)] <- c(0,1) }
+            #AB, replaced b1[NEF+NVC+ncor0+1] <- 1 by : 
+            b1[(NEF+NVC+ncor0+1):(NEF+NVC+ncor0+nerr0)] <- 1
             NPM <- length(b1)
             NW <- 0
             V <- rep(0,NPM*(NPM+1)/2) 
@@ -815,8 +874,9 @@ hlme <-
             if(ncor0==1)
                 {b[NEF+NVC+NW+1] <- 1 }
             if(ncor0==2)
-                {b[(NPROB+NEF+NVC+NW+1):(NPROB+NEF+NVC+NW+ncor0)] <- c(0,1) }
-            NPM <- NPROB+NEF+NVC+NW+ncor0+1
+            {b[(NPROB+NEF+NVC+NW+1):(NPROB+NEF+NVC+NW+ncor0)] <- c(0,1) }
+            #AB,replaced NPM <- NPROB+NEF+NVC+NW+ncor0+1 by 
+            NPM <- NPROB+NEF+NVC+NW+ncor0+nerr0
             V <- rep(0,NPM*(NPM+1)/2)
         }
 
@@ -840,7 +900,8 @@ hlme <-
                 idg2 <- rep(0,nv0) 
                 idg2[idg0!=0] <- 1
                 NEF2<-sum(idg2==1)
-                NPM2<-NEF2+NVC+ncor0+1
+                #AB, replaced  NPM2<-NEF2+NVC+ncor0+1 by 
+                NPM2<-NEF2+NVC+ncor0+nerr0
                 nwg2<-0
                 ng2<-1
                 ppi2<- rep(0,ns0)
@@ -854,6 +915,9 @@ hlme <-
                 V2 <- rep(0,NPM2*(NPM2+1)/2)
                 best <- rep(0,NPM2)
                 
+                
+                #AB, added as.integer(iderr0) and as.integer(nerr0)
+                # AB, replace C_hetmixlin by 
                 init <- .Fortran(C_hetmixlin,
                                  as.double(Y0),
                                  as.double(X0),
@@ -862,6 +926,7 @@ hlme <-
                                  as.integer(idea2),
                                  as.integer(idg2),
                                  as.integer(idcor0),
+                                 as.integer(iderr0),
                                  as.integer(ns0),
                                  as.integer(ng2),
                                  as.integer(nv0),
@@ -871,6 +936,7 @@ hlme <-
                                  as.integer(idiag0),
                                  as.integer(nwg2),
                                  as.integer(ncor0),
+                                 as.integer(nerr0),
                                  npm=as.integer(NPM2),
                                  best=as.double(b1),
                                  V=as.double(V2),
@@ -889,6 +955,7 @@ hlme <-
                                  as.double(convG2),
                                  as.integer(maxiter2),
                                  as.integer(fix0))
+              
 
                 k <- NPROB
                 l <- 0
@@ -909,8 +976,10 @@ hlme <-
                     }
                 }
                 b[(NPROB+NEF+1):(NPROB+NEF+NVC)] <- init$best[(NEF2+1):(NEF2+NVC)]
-                if (ncor0>0) {b[(NPROB+NEF+NVC+NW+1):(NPROB+NEF+NVC+NW+ncor0)] <- init$best[(NPM2-ncor0):(NPM2-1)]}
-                b[NPROB+NEF+NVC+NW+ncor0+1] <- init$best[NPM2]
+                #AB, replaced if (ncor0>0) {b[(NPROB+NEF+NVC+NW+1):(NPROB+NEF+NVC+NW+ncor0)] <- init$best[(NPM2-ncor0):(NPM2-1)]} by 
+                if (ncor0>0) {b[(NPROB+NEF+NVC+NW+1):(NPROB+NEF+NVC+NW+ncor0)] <- init$best[(NPM2-ncor0-nerr0+1):(NPM2-nerr0)]}
+                # AB replaced b[NPROB+NEF+NVC+NW+ncor0+1] <- init$best[NPM2] by 
+                b[(NPROB+NEF+NVC+NW+ncor0+1):(NPROB+NEF+NVC+NW+ncor0+nerr0)] <- init$best[(NPM2-nerr0+1):NPM2]
             } 
             if(ng0==1 ){
                 b <- b1
@@ -931,7 +1000,8 @@ hlme <-
                         if(ng>1 & B$ng==1)
                             {
                                 NEF2 <- sum(idg0!=0)
-                                NPM2 <- NEF2+NVC+ncor0+1
+                                #AB replaced NPM2 <- NEF2+NVC+ncor0+1 by 
+                                NPM2 <- NEF2+NVC+ncor0+nerr0
                                 if(length(B$best)!=NPM2) stop("B is not correct")
 
 
@@ -970,9 +1040,11 @@ hlme <-
                                                     {
                                                         b[(NPROB+NEF+1):(NPROB+NEF+NVC)] <- B$cholesky
                                                     }
-                                            }
-                                        if (ncor0>0) {b[(NPROB+NEF+NVC+NW+1):(NPROB+NEF+NVC+NW+ncor0)] <- B$best[(NPM2-ncor0):(NPM2-1)]}
-                                        b[NPROB+NEF+NVC+NW+ncor0+1] <- B$best[NPM2]
+                                        }
+                                        # AB replaced if (ncor0>0) {b[(NPROB+NEF+NVC+NW+1):(NPROB+NEF+NVC+NW+ncor0)] <- B$best[(NPM2-ncor0):(NPM2-1)]}
+                                        # b[NPROB+NEF+NVC+NW+ncor0+1] <- B$best[NPM2] by 
+                                        if (ncor0>0) {b[(NPROB+NEF+NVC+NW+1):(NPROB+NEF+NVC+NW+ncor0)] <- B$best[(NPM2-ncor0-nerr0+1):(NPM2-nerr0)]}
+                                        b[(NPROB+NEF+NVC+NW+ncor0+1):(NPROB+NEF+NVC+NW+ncor0+nerr0)] <- B$best[(NPM2-nerr0+1):NPM2]
                                     }
                                 else
                                     {
@@ -1031,8 +1103,8 @@ hlme <-
                                             {
                                                 bb[NEF+NVC+1:ncor0] <- B$best[(NPM2-ncor0):(NPM2-1)]
                                             }
-                                
-                                        bb[NEF+NVC+ncor0+1] <- B$best[NPM2]
+                                        # AB replaced bb[NEF+NVC+ncor0+1] <- B$best[NPM2] by 
+                                        bb[(NEF+NVC+ncor0+1):(NEF+NVC+ncor0+nerr0)] <- B$best[(NPM2-nerr0+1):NPM2]
                                                             
                                         up <- vbb[upper.tri(vbb,diag=TRUE)]
                                         vbb <- t(vbb)
@@ -1052,7 +1124,8 @@ hlme <-
                 
         ## faire wRandom et b0Random
         NEF2 <- sum(idg0!=0)
-        NPM2 <- NEF2+NVC+ncor0+1
+        #AB replaced NPM2 <- NEF2+NVC+ncor0+1 by 
+        NPM2 <- NEF2+NVC+ncor0+nerr0
 
         wRandom <- rep(0,NPM)
         b0Random <- rep(0,ng-1) # nprob 
@@ -1088,7 +1161,8 @@ hlme <-
         }
         
         if (ncor0>0) {wRandom[NPROB+NEF+NVC+NW+1:ncor0] <- NEF2+NVC+1:ncor0}
-        wRandom[NPM] <- NPM2
+        # AB replaced wRandom[NPM] <- NPM2 by 
+        wRandom[NPROB+NEF+NVC+NW+ncor0+1:nerr0] <- NEF2+NVC+ncor0+1:nerr0
         ## wRandom et b0Random ok.
         
         ##------------------------------------------
@@ -1117,6 +1191,8 @@ hlme <-
         if(NW!=0)names(b)[(NPROB+NEF+NVC+1):(NPROB+NEF+NVC+NW)] <- paste("varprop class",c(1:(ng0-1)))
         names(b)[NPM] <- "stderr"
         if(ncor0!=0) {names(b)[(NPROB+NEF+NVC+NW+1):(NPROB+NEF+NVC+NW+ncor0)] <- paste("cor",1:ncor0,sep="") }
+        #AB added
+        names(b)[(NPROB+NEF+NVC+NW+ncor0+1):(NPROB+NEF+NVC+NW+ncor0+nerr0)] <- paste("error",1:nerr0,sep="")
 
         N <- NULL
         N[1] <- NPROB
@@ -1124,6 +1200,8 @@ hlme <-
         N[3] <- NVC
         N[4] <- NW
         N[5] <- ncor0
+        #AB added
+        N[6]<-nerr0
 
         idiag <- as.integer(idiag0)
         idea <- as.integer(idea0)
@@ -1131,7 +1209,8 @@ hlme <-
 
 
 ################ Sortie ###########################
-
+        #AB added as.integer(iderr0) and as.integer(nerr0)
+       
         out <- .Fortran(C_hetmixlin,
                         as.double(Y0),
                         as.double(X0),
@@ -1140,6 +1219,7 @@ hlme <-
                         as.integer(idea0),
                         as.integer(idg0),
                         as.integer(idcor0),
+                        as.integer(iderr0),
                         as.integer(ns0),
                         as.integer(ng0),
                         as.integer(nv0),
@@ -1149,6 +1229,7 @@ hlme <-
                         as.integer(idiag0),
                         as.integer(nwg0),
                         as.integer(ncor0),
+                        as.integer(nerr0),
                         as.integer(NPM),
                         best=as.double(b),
                         V=as.double(V),
@@ -1173,6 +1254,7 @@ hlme <-
         {
             mr <- NPM-length(posfix)
             Vr <- matrix(0,mr,mr)
+            #AB need to check
             Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
             Vr <- t(Vr)
             Vr[upper.tri(Vr,diag=TRUE)] <- out$V[1:(mr*(mr+1)/2)]
@@ -1255,7 +1337,8 @@ hlme <-
 ### ad 2/04/2012
         if (!("intercept" %in% nom.X0)) X0.names2 <- X0.names2[-1]
 ### ad
-        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random)
+        #AB added iderr0=iderr0
+        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,iderr0=iderr0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random)
         class(res) <-c("hlme") 
         cost<-proc.time()-ptm
         if(verbose==TRUE) cat("The program took", round(cost[3],2), "seconds \n")

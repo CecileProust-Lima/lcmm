@@ -14,6 +14,7 @@ hlme(
   idiag = FALSE,
   nwg = FALSE,
   cor = NULL,
+  error = NULL,
   data,
   B,
   convB = 1e-04,

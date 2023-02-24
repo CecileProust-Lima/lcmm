@@ -71,13 +71,13 @@
 
 
       module commun
-
+!AB add nerr0 and iderr0
       implicit none
-      integer,save ::ns,ng,nv,idiag,ncssg,nvc,nea,ncg,nwg,ncor
+      integer,save ::ns,ng,nv,idiag,ncssg,nvc,nea,ncg,nwg,ncor,nerr
       integer,save ::nprob,nvarprob,maxmes,nobs,npmtot
       double precision,dimension(:),allocatable,save::Y
       double precision,dimension(:,:),allocatable,save ::X
-      integer,dimension(:),allocatable,save ::idea,idg,idprob,idcor
+      integer,dimension(:),allocatable,save ::idea,idg,idprob,idcor,iderr
       integer,dimension(:),allocatable,save :: nmes,prior
       integer,dimension(:),allocatable,save::fix
       double precision,dimension(:),allocatable,save::bfix
@@ -90,8 +90,9 @@
 
 !================ SUBROUTINES ================================
 
-      subroutine hetmixlin(Y0,X0,Prior0, idprob0,idea0,idg0,idcor0  &
-          ,ns0,ng0,nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0   &
+      !AB add iderr0,and nerr0
+      subroutine hetmixlin(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,iderr0  &
+          ,ns0,ng0,nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0,nerr0   &
           ,npmtot0,btot,vopt,vrais,ni,istop,gconv,ppi0,resid_m0,resid_ss0 &
           ,pred_m_g0,pred_ss_g0,pred_RE,convB,convL,convG,maxiter0,fix0)
 
@@ -102,11 +103,12 @@
       IMPLICIT NONE
 
 
-        !D claration des variables en entree
+      !D claration des variables en entree
+      !AB add iderr0 and nerr0 and put them at nv0 instead of ns0 for idcor too
       integer,intent(in):: nv0,maxiter0,nea0
-      integer, intent(in) :: ns0, ng0, nobs0, idiag0, nwg0, npmtot0,ncor0
-      integer, dimension(nv0), intent(in) :: idea0,idg0,idprob0
-      integer, dimension(ns0), intent(in) :: nmes0,Prior0,idcor0
+      integer, intent(in) :: ns0, ng0, nobs0, idiag0, nwg0, npmtot0,ncor0,nerr0
+      integer, dimension(nv0), intent(in) :: idea0,idg0,idprob0,idcor0,iderr0
+      integer, dimension(ns0), intent(in) :: nmes0,Prior0
       double precision, dimension(nobs0), intent(in) :: Y0
       double precision, dimension(nobs0*nv0), intent(in) :: X0
       double precision, intent(in) :: convB, convL, convG
@@ -155,9 +157,9 @@
       maxiter=maxiter0
 
       ! pas de H restreint pr hlme
-         
+        !AB add idr 
       allocate(Y(ns0*maxmes),idprob(nv0),X(ns0*maxmes,nv0)    &
-     ,idea(nv0),idg(nv0),nmes(ns0),prior(ns0),idcor(nv0))
+     ,idea(nv0),idg(nv0),nmes(ns0),prior(ns0),idcor(nv0),iderr(nv0))
 
 
 
@@ -179,8 +181,9 @@
       else
          nwg=ng-1
       end if
-          ncor=ncor0
-
+      ncor=ncor0
+      !AB add nerr=nerr0
+      nerr=nerr0   
       idiag=idiag0
       prior=0
       nmes=0
@@ -189,14 +192,18 @@
       idprob=0
       idea=0
       idg=0
-          idcor=0
+      idcor=0
+      !AB add idr=0
+      iderr=0
       nmestot=0
       ktemp=0
       do k=1,nv
          idprob(k)=idprob0(k)
          idea(k)=idea0(k)
          idg(k)=idg0(k)
-             idcor(k) = idcor0(k)
+         idcor(k) = idcor0(k)
+         !AB add
+         iderr(k)=iderr0(k)
          jtemp=0
          it=0
          DO i=1,ns
@@ -265,7 +272,8 @@
       end if
 
       nef=nprob+ncssg+ncg*ng
-      npmtot=nef+nvc+nwg+ncor+1
+      !AB replaced 
+      npmtot=nef+nvc+nwg+ncor+nerr
 
       if (idiag.eq.1) then
          DO j=1,nvc
@@ -324,6 +332,8 @@
          ca=0.d0
          cb=0.d0
          dd=0.d0
+         !AB Optimisation faite ici, nous nous souhaitons une seule iteration, soit ier=1
+
 
          call marq98(b,npm,ni,V,vrais,ier,istop,ca,cb,dd,funcpa)
 
@@ -405,9 +415,10 @@
 
       deallocate(pbH)
 
- 1589 continue
-
-      deallocate(Y,X,idprob,idea,idg,nmes,prior,idcor)
+1589  continue
+      
+      !AB add at the delocate idr
+      deallocate(Y,X,idprob,idea,idg,nmes,prior,idcor,iderr)
       deallocate(fix,bfix)
 
       return
@@ -441,7 +452,9 @@
       double precision :: vrais,eps,det
       double precision ::thi,thj,temp
       double precision ::Y4,expo
+      !AB add error that will contain for a subject i the variable var_error of i at all times, need to be an int as ncor 
       double precision,dimension(maxmes) :: mu,Y1,Y2,Y3,tcor
+      integer,dimension(maxmes) :: error
       double precision,dimension(ng) :: pi
 
       b1=0.d0
@@ -526,14 +539,38 @@
                  end do
               end if
            end do
-         end if
+        end if
+        !AB added for subject i the value of error
+
+        error=1
+        if(iderr(nv)==1) then
+           do j=1,nmes(i)
+              error(j) = int(X(it+j,nv))
+           end do
+        end if
+        
+        
+
+        ! AB replaced : 
+        ! do j1=1,nmes(i)
+           ! do j2=1,nmes(i)
+              ! if (j1.eq.j2) Corr(j1,j2) = b1(npmtot)*b1(npmtot)
+               !if (ncor.eq.1) then 
+                !  Corr(j1,j2) = Corr(j1,j2)+b1(npmtot-1)*b1(npmtot-1)*min(tcor(j1),tcor(j2))
+               !else if (ncor.eq.2) then
+                !  Corr(j1,j2) = Corr(j1,j2)+b1(npmtot-1)*b1(npmtot-1)*exp(-b1(npmtot-2)*abs(tcor(j1)-tcor(j2)))
+               !end if
+           ! end do
+        !end do
+        ! by :
+        
          do j1=1,nmes(i)
             do j2=1,nmes(i)
-               if (j1.eq.j2) Corr(j1,j2) = b1(npmtot)*b1(npmtot)
+               if (j1.eq.j2) Corr(j1,j2) = b1(nef+nvc+nwg+ncor+error(j1))*b1(nef+nvc+nwg+ncor+error(j1))
                if (ncor.eq.1) then 
-                  Corr(j1,j2) = Corr(j1,j2)+b1(npmtot-1)*b1(npmtot-1)*min(tcor(j1),tcor(j2))
+                  Corr(j1,j2) = Corr(j1,j2)+b1(nef+nvc+nwg+ncor)*b1(nef+nvc+nwg+ncor)*min(tcor(j1),tcor(j2))
                else if (ncor.eq.2) then
-                  Corr(j1,j2) = Corr(j1,j2)+b1(npmtot-1)*b1(npmtot-1)*exp(-b1(npmtot-2)*abs(tcor(j1)-tcor(j2)))
+                  Corr(j1,j2) = Corr(j1,j2)+b1(nef+nvc+nwg+2)*b1(nef+nvc+nwg+2)*exp(-b1(nef+nvc+nwg+1)*abs(tcor(j1)-tcor(j2)))
                end if
             end do
          end do        
@@ -813,6 +850,7 @@
       double precision,dimension(ng) ::fi,pi
       double precision,dimension(ns,ng) ::PPI
       double precision,dimension(maxmes) :: mu,Y1,Y2,Y3,tcor
+      integer,dimension(maxmes) :: error
 
 
 
@@ -895,18 +933,43 @@
                  end do
               end if
            end do
-         end if
+        end if
+
+        !AB added for subject i the value of error
+        
+        error=1
+        if(iderr(nv)==1) then
+           do j=1,nmes(i)
+              error(j) = int(X(it+j,nv))
+           end do
+        end if
+        
+       
+        ! AB replaced : 
+       ! do j1=1,nmes(i)
+           ! do j2=1,nmes(i)
+            !   if (j1.eq.j2) Corr(j1,j2) = b1(npm)*b1(npm)
+             !  if (ncor.eq.1) then 
+              !    Corr(j1,j2) = Corr(j1,j2)+b1(npm-1)*b1(npm-1)*min(tcor(j1),tcor(j2))
+             !  else if (ncor.eq.2) then
+              !    Corr(j1,j2) = Corr(j1,j2)+b1(npm-1)*b1(npm-1)*exp(-b1(npm-2)*abs(tcor(j1)-tcor(j2)))
+              ! end if
+           ! end do
+        ! end do               
+        ! by :
+        
          do j1=1,nmes(i)
             do j2=1,nmes(i)
-               if (j1.eq.j2) Corr(j1,j2) = b1(npm)*b1(npm)
+               if (j1.eq.j2) Corr(j1,j2) = b1(nef+nvc+nwg+ncor+error(j1))*b1(nef+nvc+nwg+ncor+error(j1))
                if (ncor.eq.1) then 
-                  Corr(j1,j2) = Corr(j1,j2)+b1(npm-1)*b1(npm-1)*min(tcor(j1),tcor(j2))
+                  Corr(j1,j2) = Corr(j1,j2)+b1(nef+nvc+nwg+ncor)*b1(nef+nvc+nwg+ncor)*min(tcor(j1),tcor(j2))
                else if (ncor.eq.2) then
-                  Corr(j1,j2) = Corr(j1,j2)+b1(npm-1)*b1(npm-1)*exp(-b1(npm-2)*abs(tcor(j1)-tcor(j2)))
+                  Corr(j1,j2) = Corr(j1,j2)+b1(nef+nvc+nwg+2)*b1(nef+nvc+nwg+2)*exp(-b1(nef+nvc+nwg+1)*abs(tcor(j1)-tcor(j2)))
                end if
             end do
-         end do  
-                 
+         end do
+         
+        
 
 ! creation de P=Zi*Ut et V=P*P' que si non spec aux classes
 
@@ -1120,6 +1183,7 @@
       double precision ::temp
       double precision,dimension(nea,maxmes)::Valea
       double precision,dimension(maxmes) :: mu,Y1,Y2,pred1,err1,tcor
+      integer, dimension(maxmes) :: error
       double precision,dimension(ng) :: pi
       double precision,dimension(nobs)::resid_m &
        ,pred_m,resid_ss,pred_ss
@@ -1208,17 +1272,49 @@
                  end do
               end if
            end do
-         end if
+        end if
+
+
+
+
+        !AB added for subject i the value of error
+        
+        error=1
+        if(iderr(nv)==1) then
+           do j=1,nmes(i)
+              error(j) = int(X(nmes_cur+j,nv))
+           end do
+        end if
+        
+
+        ! AB replaced : 
+        
+        ! do j1=1,nmes(i)
+         !   do j2=1,nmes(i)
+          !     if (j1.eq.j2) sigmaE(j1,j2) = b1(npm)*b1(npm)
+           !    if (ncor.eq.1) then 
+            !      Corr(j1,j2) = Corr(j1,j2)+b1(npm-1)*b1(npm-1)*min(tcor(j1),tcor(j2))
+             !  else if (ncor.eq.2) then
+              !    Corr(j1,j2) = Corr(j1,j2)+b1(npm-1)*b1(npm-1)*exp(-b1(npm-2)*abs(tcor(j1)-tcor(j2)))
+             !  end if
+           ! end do
+        !  end do
+        !by : 
+        
          do j1=1,nmes(i)
             do j2=1,nmes(i)
-               if (j1.eq.j2) sigmaE(j1,j2) = b1(npm)*b1(npm)
+               if (j1.eq.j2) sigmaE(j1,j2) = b1(nef+nvc+nwg+ncor+error(j1))*b1(nef+nvc+nwg+ncor+error(j1))
                if (ncor.eq.1) then 
-                  Corr(j1,j2) = Corr(j1,j2)+b1(npm-1)*b1(npm-1)*min(tcor(j1),tcor(j2))
+                  Corr(j1,j2) = Corr(j1,j2)+b1(nef+nvc+nwg+ncor)*b1(nef+nvc+nwg+ncor)*min(tcor(j1),tcor(j2))
                else if (ncor.eq.2) then
-                  Corr(j1,j2) = Corr(j1,j2)+b1(npm-1)*b1(npm-1)*exp(-b1(npm-2)*abs(tcor(j1)-tcor(j2)))
+                  Corr(j1,j2) = Corr(j1,j2)+b1(nef+nvc+nwg+2)*b1(nef+nvc+nwg+2)*exp(-b1(nef+nvc+nwg+1)*abs(tcor(j1)-tcor(j2)))
                end if
             end do
-         end do  
+         end do
+
+
+
+
 
 !     creation de Y1
 

@@ -4,7 +4,7 @@
 #include "lcmm.h"
 
 static R_FortranMethodDef FortRout[] = {
-  {"hetmixlin", (DL_FUNC) &F77_SUB(hetmixlin), 34},
+  {"hetmixlin", (DL_FUNC) &F77_SUB(hetmixlin), 36},
   {"hetmixcont", (DL_FUNC) &F77_SUB(hetmixcont), 47},
   {"hetmixord", (DL_FUNC) &F77_SUB(hetmixord), 39},
   {"hetmixcontmult", (DL_FUNC) &F77_SUB(hetmixcontmult), 54},
@@ -16,6 +16,7 @@ static R_FortranMethodDef FortRout[] = {
   {"postprob2", (DL_FUNC) &F77_SUB(postprob2), 40},
   {"calculustransfo", (DL_FUNC) &F77_SUB(calculustransfo), 16},
   {"mpjhet", (DL_FUNC) &F77_SUB(mpjhet), 64},
+  {"loglikhlmevarhetero", (DL_FUNC) &F77_SUB(loglikhlmevarhetero), 24},
   {NULL, NULL, 0}
 };
 
