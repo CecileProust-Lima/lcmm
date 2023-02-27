@@ -100,8 +100,7 @@ update.mpjlcmm <- function(object,...)
         m$conv <- object$conv
 
         ##predictions
-        if(inherits(m,"multlcmm")) m$pred[,1:ncol(object$pred)] <- object$pred[which(object$pred[,2] %in% m$Ynames),]
-        else m$pred[,1:(ncol(object$pred)-1)] <- object$pred[which(object$pred[,2]==object$Names$Yname[k]),-2]
+        if(inherits(m,"multlcmm")) m$pred <- object$pred[which(object$pred[,2] %in% m$Ynames),] else m$pred <- object$pred[which(object$pred[,2]==object$Names$Yname[k]),-2]
 
         m$pprob <- object$pprob
         m$pprobY <- object$pprobY
