@@ -435,6 +435,9 @@ externVar = function(model,
       iKeepIn = iKeepOut
       iEst = nIn+1:nEst
       
+      #input VC, only for keep betaa
+      iVCKeep = iVCIn
+      
       #Id of varcov estimates
       if(inherits(strMod, "multlcmm")){
         nVCStr = strMod$N[4]
@@ -472,10 +475,12 @@ externVar = function(model,
       
       #changement de ma fonction en mpjlcmm (pour avec la variance)
       if(funIn != "mpjlcmm"){
+        argumentsMpj = list()
         argumentsMpj[["longitudinal"]] = list(model)
         argumentsMpj[["maxiter"]] = 0
         argumentsMpj[["ng"]] = ng
         argumentsMpj[["subject"]] = subject
+        argumentsMpj[["data"]] = argumentsIn[["data"]]
         if (!is.null(model$call$classmb)){
           argumentsMpj[["classmb"]] = model$call$classmb
         }
@@ -507,6 +512,12 @@ externVar = function(model,
       iKeepIn = (nInMB+1):nIn
       iEst = 1:nEst
       
+      #input VC, only for keep betas
+      iVCKeep = iVCIn-nInMB
+      
+      #Id of varcov estimates (none)
+      iVCOut = c()
+      
       #On recree tous nos arguments
       if(is.null(argumentsIn[["longitudinal"]])){
         arguments[["longitudinal"]] = list(model)
@@ -526,12 +537,19 @@ externVar = function(model,
       #on fixe nos parametres
       arguments[["posfix"]] = unique(c(posfix, iKeepOut))
       
-      #### weird... Input model has been changed because we need output model to be changed
-      if(funIn != "mpjlcmm"){
+      #### weird... "Input" model has been changed because we need it to build output model
+      #To explain : "hessienne" function needs mpjlcmm model. So i need mpj for paramBoot
+      #And we need to create our longitudinal (and logicall) now before changinng "input" moded.
+      #I really hate that hessian is only for mpj......
+      if(funIn != "mpjlcmm" & varest == "calc"){
+        longitudinalOut = as.call(list(as.name("list"), substitute(model)))
+        
         modelOld = model
         model = modelMpj
         model$V = modelOld$V
       }
+      
+      
       
     }
   }
@@ -583,7 +601,7 @@ externVar = function(model,
     
     #cholesky not varcov
     if(funIn %in% c("mpjlcmm", "Jointlcmm") | !all(as.logical(model$idiag))){
-      est[iVCIn] = model$cholesky #Warning : quickest way to do this, but maybe not the best/safest
+      est[iVCIn] = model$cholesky
     } else {
       cholMatrix = matrix(NA, nVCIn, nVCIn)
       cholMatrix[upper.tri(cholMatrix, diag = T)] = model$cholesky
@@ -601,14 +619,14 @@ externVar = function(model,
     coefss = as.data.frame(coefss)
     colnames(coefss) = names(model$best)[iKeepIn]
     #we just need to build back varcov into the coefs instead of cholesky matrix
-    coefss = apply(coefss, 1, function(coefs, model, data, iVCIn){
+    coefss = apply(coefss, 1, function(coefs, model, data, iVCKeep){
       if(funIn == "mpjlcmm"){
         varcovMods = longitudinal
       } else {
         varcovMods = list(model)
       }
       
-      chols = coefs[iVCIn]
+      chols = coefs[iVCKeep]
       model$cholesky = chols
       
       varcov = c()
@@ -635,10 +653,10 @@ externVar = function(model,
         
         countChol = countChol + nChol
       }
-      coefs[iVCIn] = varcov
+      coefs[iVCKeep] = varcov
       
       return(coefs)
-    }, model = model, data = data, iVCIn = iVCIn)
+    }, model = model, data = data, iVCKeep = iVCKeep)
 
     if(nproc > 1)
     {
@@ -653,13 +671,14 @@ externVar = function(model,
       
       modOuts <- parApply(cl, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, nVCIn, iVCOut){
         arguments[["B"]][iKeepOut] = coefs
+        arguments[["nproc"]] = 1
         
         #Model Estimation
         modOut = do.call(funOut, c(arguments))
         
         #cholesky not varcov as output in best
         if(class(modOut) == "mpjlcmm" | !all(modOut$idiag)){
-          modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)] #Warning : quickest way to do this, but maybe not the best/safest
+          modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]
         } else {
           cholMatrix = matrix(NA, length(iVCOut), length(iVCOut))
           cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:nVCIn)]
@@ -701,7 +720,7 @@ externVar = function(model,
         
         #cholesky not varcov as output in best
         if(class(modOut) == "mpjlcmm" | !all(modOut$idiag)){
-          modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)] #Warning : quickest way to do this, but maybe not the best/safest
+          modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]
         } else {
           cholMatrix = matrix(NA, length(iVCOut), length(iVCOut))
           cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:nVCIn)]
@@ -775,7 +794,11 @@ externVar = function(model,
   }
   if(!missing(classmb)){
     if(is.null(argumentsIn[["longitudinal"]])){
-      modOut$call$longitudinal = as.call(list(as.name("list"), substitute(model)))
+      if(varest == "calc"){           #Because of hessienne mpj....
+        modOut$call$longitudinal = longitudinalOut 
+      } else {
+        modOut$call$longitudinal = as.call(list(as.name("list"), substitute(model)))
+      }
     } else {
       modOut$call$longitudinal = argumentsIn[["longitudinal"]]
     }
