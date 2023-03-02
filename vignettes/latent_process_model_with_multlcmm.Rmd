@@ -46,9 +46,7 @@ where:
 - $u_i$ are the random effects (i.e., individual effects); they are distributed according to a zero-mean multivariate normal distribution with covariance matrix $B$;
 - $(w_i(t))$ is a Gaussian process that might be added in the model to relax the intra-subject correlation structure.
 
-This structural model for $\Lambda(t)$ according to time and covariates is exactly the same as in the univariate case (see 
-https://cran.r-project.org/package=lcmm/vignettes/latent_process_model_with_lcmm.html
-). 
+This structural model for $\Lambda(t)$ according to time and covariates is exactly the same as in the [univariate case](latent_process_model_with_lcmm.html). 
 
 Now, instead of defining one equation of observation, we define K equations of observation for the K different markers with $Y_{ijk}$ the observation for subject $i$, marker $k$ and occasion $j$. As in the univariate case, several types of markers can be handled by defining a marker-specific link function $H_{k}$. The marker-specific equation of observation also includes potentially some contrasts $\gamma_k$ on covariates and a marker and subject specific random intercept so that:</p> 
 
@@ -72,7 +70,7 @@ The link functions are the same as in the univariate case (in lcmm). For continu
 
 For binary and ordinal outcomes, $H_k$ links each level of the variable with an interval of values for the latent process plus measurement errors. This corresponds to the (cumulative) probit model.
 
-We describe below a case with continuous link functions. For ordinal markers, see vignette https://cran.r-project.org/package=lcmm/vignettes/latent_process_model_with_multlcmm_IRT.html
+We describe below a case with continuous link functions. For ordinal markers, see [vignette](latent_process_model_with_multlcmm_IRT.html).
 
 
 ## Identifiability
@@ -193,7 +191,7 @@ Models involving Beta transformations and splines transformations seem to fit a 
 
 The transformations can be plotted and compared between models:
           
-```{r testprint2,message=FALSE, fig.height=3, fig.width=5, fig.align = "center"}
+```{r testprint2,message=FALSE, fig.height=4, fig.width=7, fig.align = "center"}
 par(mfrow=c(1,1))
 col <- rainbow(4)
 plot(mult_splines2, which = "linkfunction", col = c(col[2],col[3],col[4]), lwd =1,lty=4)
@@ -221,7 +219,7 @@ Confidence intervals of the link functions can be obtained by the Monte Carlo me
 
 &nbsp;                         
      
-```{r,message=FALSE, fig.height=3, fig.width=5, fig.align = "center"}
+```{r,message=FALSE, fig.height=4, fig.width=7, fig.align = "center"}
 col <- rainbow(5)
 CIlink <- predictlink(mult_betaspl)
 plot(CIlink, col = c(col[2],col[3],col[4]), lwd = 2, shades = TRUE)
@@ -306,12 +304,10 @@ plot(mult_betaspl, which="fit", var.time="time", bty="l", xlab="time since entry
 
 ## heterogeneous profiles of trajectories
 
-The latent process mixed model for multivariate markers extends to the heterogeneous case with latent classes. The same strategy as explained with hlme (see https://cran.r-project.org/package=lcmm/vignettes/latent_class_model_with_hlme.html
-) can be used.  
+The latent process mixed model for multivariate markers extends to the heterogeneous case with latent classes. The same strategy as explained with [hlme](latent_class_model_with_hlme.html) can be used.  
 
 
 ## joint analysis of a time to event
 
-The latent process mixed model for multivariate markers extends to the case of a joint model. This is done in Jointlcmm when one latent process is involved
-(see https://cran.r-project.org/package=lcmm/vignettes/joint_latent_class_model_with_Jointlcmm.html) or mpjlcmm when multivariate latent processes are considered (vignette to come)
+The latent process mixed model for multivariate markers extends to the case of a joint model. This is done in [Jointlcmm when one latent process is involved](joint_latent_class_model_with_Jointlcmm.html) or mpjlcmm when [multivariate latent processes are considered](multivariate_latent_class_model_with_mpjlcmm.html).
 

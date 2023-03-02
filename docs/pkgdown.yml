@@ -1,0 +1,15 @@
+pandoc: 2.3.1
+pkgdown: 2.0.7.9000
+pkgdown_sha: c354aa7e5ea1f9936692494c28c89e5bdd31fc68
+articles:
+  joint_latent_class_model_with_Jointlcmm: joint_latent_class_model_with_Jointlcmm.html
+  latent_class_model_with_hlme: latent_class_model_with_hlme.html
+  latent_process_model_with_lcmm: latent_process_model_with_lcmm.html
+  latent_process_model_with_multlcmm: latent_process_model_with_multlcmm.html
+  latent_process_model_with_multlcmm_IRT: latent_process_model_with_multlcmm_IRT.html
+  lcmm: lcmm.html
+  multivariate_latent_class_model_with_mpjlcmm: multivariate_latent_class_model_with_mpjlcmm.html
+  pre_normalizing: pre_normalizing.html
+  usual_problems: usual_problems.html
+last_built: 2023-02-17T15:54Z
+

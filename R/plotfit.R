@@ -109,7 +109,8 @@
 
                     if(length(indpred)==0) stop("Argument outcome is not correct")
                     
-                    pred0 <- x$pred[indpred,c(1,7,7+1:ng),drop=FALSE]           
+                    pred0 <- x$pred[indpred,c(1,7,7+1:ng),drop=FALSE]
+                    times <- times[indpred]
                 }
 
             ppi <- x$pprob[,c(1,2+1:ng),drop=FALSE] #ID,prob1...ng
@@ -166,7 +167,8 @@
 
                     if(length(indpred)==0) stop("Argument outcome is not correct")
             
-                    pred <- x$pred[indpred,c(1,7,7+ng+1:ng),drop=FALSE]           
+                    pred <- x$pred[indpred,c(1,7,7+ng+1:ng),drop=FALSE]
+                    times <- times[indpred]
                 }   
             
             ppi <- x$pprob[,c(1,2+1:ng),drop=FALSE] #ID,prob1...ng

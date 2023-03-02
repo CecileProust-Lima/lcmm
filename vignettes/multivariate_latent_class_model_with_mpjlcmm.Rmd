@@ -254,7 +254,7 @@ summarytable(mm1, mm2_a, mm2_b, mm2_c, mm3_a, mm3_b, mm3_c, mm4_a, mm4_b, mm4_c,
 
 We keep the best model for each number of latent classes and we plot some statistical criteria used to select the optimal number of classes :
 
-```{r,comment='', fig.width=7, fig.height=4}
+```{r,comment='', fig.width=8, fig.height=3}
 summaryplot(mm1, mm2_b, mm3_b, mm4_c, mm5_c)
 ```
 
@@ -333,7 +333,7 @@ pred_CESD <- predictY(mCESD2_biv, data.frame(age=seq(65,95,length.out=50)), var.
 
 &nbsp;
 
-```{r,comment='', fig.height=4, fig.width=7}
+```{r,comment='', fig.height=4, fig.width=8}
 par(mfrow=c(1,2))
 plot(pred_MMSE, lwd=3, ylab="MMSE", main="Predicted trajectories for MMSE", legend.loc="bottomleft")
 plot(pred_CESD, lwd=3, ylab="CESD", main="Predicted trajectories for CESD", legend=NULL)

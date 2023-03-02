@@ -291,6 +291,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         Xnames <- vector("list",K)
         nomsX <- unique(unlist(sapply(longitudinal,function(x) setdiff(x$Xnames2,"intercept"))))
         longicall <- vector("list",K)
+        timeobs <- NULL
         
         for(k in 1:K)
             {
@@ -345,7 +346,11 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                             else
                             {
                                 if(modk$linktype[yk]==0) link[yk] <- "linear"
-                                if(modk$linktype[yk]==1) link[yk] <- "beta"
+                                if(modk$linktype[yk]==1)
+                                {
+                                    link[yk] <- "beta"
+                                    range <- c(range, modk$linknodes[c(1,2), yk])
+                                }
                             }
                         }
                         z$link <- link
@@ -380,6 +385,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     Xnames[[k]] <- mod$Xnames
                     ny[k] <- 1
                 }
+
 
                 ## donnees km
                 for(m in 1:ny[k])
@@ -448,9 +454,28 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
 
                                 dataY <- rbind(dataY,datam)
                             }
+                                                                
+                        ## save var.time
+                        if(!is.null(mod$var.time))
+                        {
+                            if(longclass[k]=="multlcmm")
+                            {
+                                timeobs <- c(timeobs,mod$pred[which(mod$pred[,2]==Ynames[[k]][m]),ncol(mod$pred)])
+                            }
+                            else
+                            {
+                                timeobs <- c(timeobs,mod$pred[,ncol(mod$pred)])
+                            }
+                        }
+                        else
+                        {
+                            timeobs <- c(timeobs, rep(NA, nrow(datam)))
+                        }
                     }
                 
             }
+
+        dataY <- data.frame(dataY, var.time.timeobs=as.numeric(timeobs))
 
 
         if(is.null(survival))
@@ -674,7 +699,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     colnames(newdata) <- unique(c(nom.subject,varSurvClas,nom.prior))
                 }
             }
-
+ 
 
         ## prendre les sujets dans dataY et dans newdata
         selectid <- intersect(unique(dataY[,subject]),unique(newdata[,nom.subject]))
@@ -706,6 +731,9 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 
         ## Y0
         Y0 <- dataY$measureY
+
+        ## var.time
+        timeobs <- dataY$var.time.timeobs[order(dataY[,nom.subject])]
 
         ## X0 pour longitudinal
         nomxk <- vector("list",K)
@@ -2345,11 +2373,22 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 pred_ss <- rep(NA,nobs0)
             } 
 
-        pred <- data.frame(IND,nomyy,pred_m,out$resid_m,pred_ss,out$resid_ss,out$Yobs,pred_m_g,pred_ss_g)
-
         temp <- paste("pred_m",1:ng,sep="")
         temp1 <- paste("pred_ss",1:ng,sep="")
-        colnames(pred) <- c(nom.subject,"Yname","pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1)
+        if(!all(is.na(timeobs)))
+        {
+            pred <- data.frame(IND,nomyy,pred_m,out$resid_m,pred_ss,out$resid_ss,out$Yobs,pred_m_g,pred_ss_g,timeobs)
+            colnames(pred) <- c(nom.subject,"Yname","pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1,"var.time")
+            var.time <- "var.time"
+        }
+        else
+        {
+            pred <- data.frame(IND,nomyy,pred_m,out$resid_m,pred_ss,out$resid_ss,out$Yobs,pred_m_g,pred_ss_g)
+            colnames(pred) <- c(nom.subject,"Yname","pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1)
+            var.time <- NULL
+        }
+
+
 
         ## risques
         if(nbevt>0)
@@ -2459,7 +2498,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                    contrainte=contrainte, levels=levels, longicall=longicall,
                    AIC=2*(length(out$best)-length(posfix)-out$loglik),
                    BIC=(length(out$best)-length(posfix))*log(ns)-2*out$loglik,
-                   runtime=cost[3])
+                   runtime=cost[3], var.time=var.time)
 
         class(res) <- "mpjlcmm"
 
