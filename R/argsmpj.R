@@ -73,6 +73,7 @@ argsmpj <- function(longitudinal,subject,classmb,ng,survival,
   Xnames <- vector("list",K)
   nomsX <- unique(unlist(sapply(longitudinal,function(x) setdiff(x$Xnames2,"intercept"))))
   longicall <- vector("list",K)
+  timeobs <- NULL
   
   for(k in 1:K)
   {
@@ -114,6 +115,10 @@ argsmpj <- function(longitudinal,subject,classmb,ng,survival,
           {
             if(modk$linktype[yk]==0) link[yk] <- "linear"
             if(modk$linktype[yk]==1) link[yk] <- "beta"
+            {
+              link[yk] <- "beta"
+              range <- c(range, modk$linknodes[c(1,2), yk])
+            }
           }
         }
         z$link <- link
@@ -216,10 +221,28 @@ argsmpj <- function(longitudinal,subject,classmb,ng,survival,
         
         dataY <- rbind(dataY,datam)
       }
+      
+      ## save var.time
+      if(!is.null(mod$var.time))
+      {
+        if(longclass[k]=="multlcmm")
+        {
+          timeobs <- c(timeobs,mod$pred[which(mod$pred[,2]==Ynames[[k]][m]),ncol(mod$pred)])
+        }
+        else
+        {
+          timeobs <- c(timeobs,mod$pred[,ncol(mod$pred)])
+        }
+      }
+      else
+      {
+        timeobs <- c(timeobs, rep(NA, nrow(datam)))
+      }
     }
     
   }
   
+  dataY <- data.frame(dataY, var.time.timeobs=as.numeric(timeobs))
   
   if(is.null(survival))
   {
@@ -474,6 +497,9 @@ argsmpj <- function(longitudinal,subject,classmb,ng,survival,
   
   ## Y0
   Y0 <- dataY$measureY
+  
+  ## var.time
+  timeobs <- dataY$var.time.timeobs[order(dataY[,nom.subject])]
   
   ## X0 pour longitudinal
   nomxk <- vector("list",K)

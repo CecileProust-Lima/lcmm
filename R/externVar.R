@@ -84,6 +84,10 @@
 #' @param posfix Optional vector specifying the indices in vector B of the
 #' parameters that should not be estimated. Default to NULL, all external parameters are
 #' estimated.
+#' @param partialH optional logical for Piecewise and Splines baseline risk functions and
+#' Splines link functions only. Indicates whether the parameters of the baseline risk or
+#' link functions can be dropped from the Hessian matrix to define convergence criteria
+#' (can solve non convergence due to estimates at the boundary of the parameter space - usually 0).
 #' @param verbose logical indicating whether information about computation should be
 #' reported. Default to FALSE.
 #' @param nproc the number cores for parallel computation. Default to 1 (sequential mode).
@@ -227,6 +231,7 @@ externVar = function(model,
                      convG = 0.0001,
                      maxiter = 100,
                      posfix,
+                     partialH = FALSE,
                      verbose = FALSE,
                      nproc = 1){
   
@@ -317,6 +322,7 @@ externVar = function(model,
     arguments[["convB"]] = convB
     arguments[["convL"]] = convL
     arguments[["convG"]] = convG
+    arguments[["partialH"]] = partialH
     #survival
     arguments[["survival"]] =  argumentsIn[["survival"]]
     arguments[["hazard"]] =  argumentsIn[["hazard"]]
@@ -411,7 +417,6 @@ externVar = function(model,
       argumentsStrMod[["classmb"]] = ~1
       argumentsStrMod[["ng"]] = ng
       argumentsStrMod[["nwg"]] = nwg
-      argumentsStrMod[["maxiter"]] = 0
       argumentsStrMod[["B"]] = as.name("strMod")
       
       strMod = do.call(argfunctionStrMod, c(argumentsStrMod))
