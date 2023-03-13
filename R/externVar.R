@@ -749,6 +749,12 @@ externVar = function(model,
       stop("No parametric boostrap iteration could converge.")
     }
     
+    #Residual Error : need to be all the same sign
+    #[would need to be changed if inside function B names were to be changed, stable if output other than mpj is allowed for Xext]
+    Kin = length(model$longicall)
+    Kout = length(modOut$longicall)
+    modOut$best[names(modOut$best) == "stderr"][(Kin+1):(Kin+Kout)] = abs(modOut$best[names(modOut$best) == "stderr"][(Kin+1):(Kin+Kout)])
+    
     #compute variance
     bests = bests[,conv %in% c(1,3)]
     mb = apply(bests, 1, mean, na.rm = T)
