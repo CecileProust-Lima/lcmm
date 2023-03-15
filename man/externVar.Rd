@@ -19,7 +19,7 @@ externVar(
   data,
   longitudinal,
   method,
-  varest = "paramBoot",
+  varest = "calc",
   M = 200,
   B,
   convB = 1e-04,
@@ -27,6 +27,7 @@ externVar(
   convG = 1e-04,
   maxiter = 100,
   posfix,
+  partialH = FALSE,
   verbose = FALSE,
   nproc = 1
 )
@@ -91,7 +92,7 @@ only joint likelihood two stage estimation "twoStageJoint" implemented at the mo
 \item{varest}{character string indicating the method used to account for step one
 variability when computing the variance estimation.
 either "none", "paramBoot" or "calc" ("calc" is implemented for "twoStageJoint"
-method only) Defaults to \code{"paramBoot"}}
+method only) Defaults to \code{"calc"} for "twoStageJoint" method}
 
 \item{M}{integer number of parametrical boostrap iterations when varest is "paramBoot".
 Default to 200.}
@@ -117,6 +118,11 @@ iterative algorithm. Defaults to 100}
 parameters that should not be estimated. Default to NULL, all external parameters are
 estimated.}
 
+\item{partialH}{optional logical for Piecewise and Splines baseline risk functions and
+Splines link functions only. Indicates whether the parameters of the baseline risk or
+link functions can be dropped from the Hessian matrix to define convergence criteria
+(can solve non convergence due to estimates at the boundary of the parameter space - usually 0).}
+
 \item{verbose}{logical indicating whether information about computation should be
 reported. Default to FALSE.}
 
@@ -125,132 +131,113 @@ reported. Default to FALSE.}
 \description{
 This function allows to model external variables in relationship with previously modeled
 latent class structures, either external outcomes or external class predictors.
-The joint likelihood, for both external class predictors and external outcome
-of the class. It returns a model object frome one of the lcmm package model classes.
+It returns a model object frome one of the lcmm package model classes.
 }
 \details{
 A. DATA STRUCTURE
 
 The \code{data} argument must follow specific structure for individual variables,
-aka variables with a unique constant value for each subject. For an individual variable
-given as external outcome, data value must be present only once per subject.
+i.e. variables with a unique constant value for each subject. For an individual variable
+given as external outcome, data value must be present only once per subject,
+independently of any time variable used in the original latent class.
 For an individual variable given as external class predictor,
-data values must be present for each
+data values must be given for every row of every individual (as usual)
 
 B. VARIANCE ESTIMATION
 
 Not taking into account first stage variance with specifing \code{"none"} may lead to
 underestimation of the final variance, even though it is much quicker.
-With big models it is recommended used variance estimation method \code{"none"} first before using
-method \code{"paramBoot"} with parameter \code{"B"} being given the resulting estimates values
+Method \code{"calc"} is recommended because it is generally faster.
+In the event of very high number of parameters in initial latent class model, but low
+number of parameters for an external outcome, method \code{"paramBoot"} can be used,
+with parameter \code{"B"} being given the resulting estimates values using \code{"none"}.
 }
 \examples{
 
 \dontrun{
-# Example with hlme input model
-mMMSE1_1 <- hlme(MMSE~age65+I(age65^2)+CEP,
+paquid$age65 <- (paquid$age-65)/10
+
+#############################################################################
+###                             EXAMPLE 1 :                               ###
+### relationship between latent classes and external longitudinal outcome ###
+#############################################################################
+
+## define and estimate the latent class model
+
+mMMSE1_Y <- hlme(MMSE~age65+I(age65^2)+CEP,
                  random=~age65+I(age65^2),
                  subject="ID",
                  data=paquid)
-mMMSE2_1 <- hlme(MMSE~age65+I(age65^2)+CEP,
+mMMSE2_Y <- hlme(MMSE~age65+I(age65^2)+CEP,
                  random=~age65+I(age65^2),
                  subject="ID",
                  data=paquid,
                  ng=2,
                  mixture=~age65+I(age65^2),
-                 B=random(mMMSE1_1))
+                 B=random(mMMSE1_Y))
 
-modPlusCESDnone = externVar(mMMSE2_1,
-                            fixed = CESD~age65+I(age65^2)+male,
-                            random = ~age65+I(age65^2),
-                            mixture = ~age65+I(age65^2),
-                            subject="ID",
-                            data=paquid,
-                            verbose = T,
-                            varest = "none",
-                            method = "twoStageJoint",
-                            B = c(7.8, 6.5, -0.3, 6, 0.8, -0.5, -2.5, 74, -64, 106, 16, -29, 9, 5.4))
+## define and estimate the relationship with the external variable
 
-modPlusCESDboot = externVar(mMMSE2_1,
-                            fixed = CESD~age65+I(age65^2)+male,
-                            random = ~age65+I(age65^2),
-                            mixture = ~age65+I(age65^2),
-                            subject="ID",
-                            data=paquid,
-                            verbose = T,
-                            varest = "paramBoot",
-                            M = 10,
-                            method = "twoStageJoint",
-                            B = c(7.8, 6.5, -0.3, 6, 0.8, -0.5, -2.5, 74, -64, 106, 16, -29, 9, 5.4))
 
-modPlusCESDcalc = externVar(mMMSE2_1,
-                            fixed = CESD~age65+I(age65^2)+male,
-                            random = ~age65+I(age65^2),
-                            mixture = ~age65+I(age65^2),
-                            subject="ID",
-                            data=paquid,
-                            verbose = T,
-                            varest = "calc",
-                            method = "twoStageJoint",
-                            B = c(7.8, 6.5, -0.3, 6, 0.8, -0.5, -2.5, 74, -64, 106, 16, -29, 9, 5.4))
-                            
-summary(modPlusCESDnone)
-summary(modPlusCESDboot)
-summary(modPlusCESDcalc)
 
-# Example with Jointlcmm input model
-m1 <- Jointlcmm(fixed= Ydep1~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
-random=~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
-subject='ID',
-survival = Surv(Tevent,Event)~ X1+X2,
-hazard="Weibull",
-hazardtype="Specific",
-ng=1,
-data=data_lcmm)
-m2 <- Jointlcmm(fixed= Ydep1~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
-                mixture=~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
-                random=~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
-                subject='ID',
-                survival = Surv(Tevent,Event)~X1+mixture(X2),
-                hazard=c("Weibull", "Weibull"),
-                hazardtype=c("Specific", "Specific"),
-                ng=2,
-                data=data_lcmm,
-                B=m1)
+modYextnone = externVar(mMMSE2_Y,
+                        fixed = CESD~age65+I(age65^2)+male,
+                        random = ~age65+I(age65^2),
+                        mixture = ~age65+I(age65^2),
+                        subject="ID",
+                        data=paquid,
+                        varest = "none",
+                        method = "twoStageJoint",
+                        B = c(7.8, 6.5, -0.3, 6, 0.8, -0.5, -2.5, 74, -64, 106, 16, -29, 9, 5.4))
+summary(modYextnone)
 
-m2plusY2none = externVar(m2,
-                         method = "twoStageJoint",
-                         fixed = Ydep2~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
-                         random = ~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
-                         mixture=~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
-                         subject='ID',
-                         idiag = TRUE,
-                         varest = "none",
-                         data=data_lcmm)
-m2plusY2boot = externVar(m2,
-                         method = "twoStageJoint",
-                         fixed = Ydep2~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
-                         random = ~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
-                         mixture=~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
-                         subject='ID',
-                         idiag = TRUE,
-                         varest = "paramBoot",
-                         M = 10,
-                         data=data_lcmm,
-                         B = m2plusY2none$best[-m2plusY2none$call$posfix])
-m2plusY2calc = externVar(m2,
-                         method = "twoStageJoint",
-                         fixed = Ydep2~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
-                         random = ~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
-                         mixture=~ns(Time, knots = c(1), Boundary.knots = c(0.2, 2.1)),
-                         subject='ID',
-                         idiag = TRUE,
-                         varest = "calc",
-                         data=data_lcmm,
-                         B = m2plusY2none$best[-m2plusY2none$call$posfix])
-summary(m2plusY2none)
-summary(m2plusY2boot)
-summary(m2plusY2calc)
+modYextcalc = externVar(mMMSE2_Y,
+                        fixed = CESD~age65+I(age65^2)+male,
+                        random = ~age65+I(age65^2),
+                        mixture = ~age65+I(age65^2),
+                        subject="ID",
+                        data=paquid,
+                        method = "twoStageJoint",
+                        B = modYextnone$best[-(1:15)])
+summary(modYextcalc)
+
+#############################################################################
+###                             EXAMPLE 2 :                               ###
+###   relationship between latent classes and external class predictor    ###
+#############################################################################
+
+## define and estimate the latent class model
+
+mMMSE1_X <- hlme(MMSE~age65+I(age65^2),
+                 random=~age65+I(age65^2),
+                 subject="ID",
+                 data=paquid)
+mMMSE2_X <- hlme(MMSE~age65+I(age65^2),
+                 random=~age65+I(age65^2),
+                 subject="ID",
+                 data=paquid,
+                 ng=2,
+                 mixture=~age65+I(age65^2),
+                 B=random(mMMSE1_X))
+
+
+## define and estimate the relationship with the external variable
+
+modXextnone = externVar(mMMSE2_X,
+                        classmb = ~CEP,
+                        subject = "ID",
+                        data = paquid,
+                        method = "twoStageJoint",
+                        varest = "none")
+summary(modXextnone)
+
+modXextcalc = externVar(mMMSE2_X,
+                        classmb = ~CEP,
+                        subject = "ID",
+                        data = paquid,
+                        method = "twoStageJoint",
+                        B = modXextnone$best[1:2])
+summary(modXextcalc)
 }
 
 
