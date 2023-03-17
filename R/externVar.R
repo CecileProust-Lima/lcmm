@@ -1,8 +1,17 @@
-#' Estimation of external variable latent class models
+#' Estimation of secondary regression models after the estimation of a primary latent class model
 #' 
-#' This function allows to model external variables in relationship with previously modeled
-#' latent class structures, either external outcomes or external class predictors.
-#' It returns a model object frome one of the lcmm package model classes.
+#' This function fits regression models to relate a latent class structure (stemmed 
+#' from a latent class model estimated within \code{lcmm} package) with either an external
+#'  outcome or external class predictors. 
+#'  Two inference techniques are implemented to account for the classification error: 
+#'  
+#'  - a 2-stage estimation of the joint likelihood of the original latent class model 
+#'  and the secondary/ external regression;
+#'  
+#'  - a regression between the posterior latent class assignment and the external variable 
+#'  which internally corrects for the assignment misclassification. 
+#'  
+#' It returns an object from one of the \code{lcmm} package classes.
 #' 
 #' A. DATA STRUCTURE
 #' 
@@ -16,77 +25,86 @@
 #' B. VARIANCE ESTIMATION
 #' 
 #' Not taking into account first stage variance with specifing \code{"none"} may lead to
-#' underestimation of the final variance, even though it is much quicker.
-#' Method \code{"calc"} is recommended because it is generally faster.
-#' In the event of very high number of parameters in initial latent class model, but low
-#' number of parameters for an external outcome, method \code{"paramBoot"} can be used,
-#' with parameter \code{"B"} being given the resulting estimates values using \code{"none"}.
+#' underestimation of the final variance. When possible, Method \code{"Hessian"} 
+#' which relies on the combination of Hessians from the primary and secondary
+#' model is recommended. However, it may become numerically intensive in the event 
+#' of very high number of parameters in the primary latent class model. As an 
+#' alternative, especially in situations with a complex primary model but rather 
+#' parcimonious secondary model, method \code{"paramBoot"} which implements a 
+#' parametric bootstrap can be used.
 #' 
-#' 
-#' @param model original latent class structure model from which external variables
-#' must be modeled.
-#' @param fixed two sided linear formula object for specifying the
-#' fixed-effects on external outcome variable.
+#' @param model an object inheriting from class \code{lcmm}, 
+#' \code{Jointlcmm}, \code{multlcmm} or \code{mpjlcmm} giving the primary latent
+#'  class model.
+#' @param fixed optional two sided linear formula object for specifying the
+#' fixed-effects in the secondary model with an external outcome variable.
 #' The response outcome is on the left of \code{~} and the covariates are separated
 #' by \code{+} on the right of the \code{~}. By default, an intercept is included.
-#' @param mixture one-sided formula object for the class-specific fixed effects
+#' @param mixture optional one-sided formula object for the class-specific fixed effects
 #' in the model for the external outcome. Among the list of covariates included in fixed,
 #' the covariates with class-specific regression parameters are entered in
 #' mixture separated by \code{+}. By default, an intercept is included.
 #' If no intercept, \code{-1} should be the first term included.
-#' @param random an optional one sided linear formula object for specifying the
-#' random-effects on external outcome. By default, no random effect is included.
+#' @param random optional one-sided linear formula object for specifying the
+#' random-effects on external outcome in the secondary model, if appropriate. 
+#' By default, no random effect is included.
 #' @param subject name of the covariate representing the grouping structure.
-#' Even without random effect. By default, the funciton will try to retrieve it
-#' from input model
-#' @param classmb optional one-sided formula describing the covariates in the
-#' class-membership multinomial logistic model. These are external covariates or
-#' external class predictors in this function.
-#' @param varest character string indicating the method used to account for step one
-#' variability when computing the variance estimation.
-#' either "none", "paramBoot" or "calc" ("calc" is implemented for "twoStageJoint"
-#' method only) Defaults to \code{"calc"} for "twoStageJoint" method
-#' @param M integer number of parametrical boostrap iterations when varest is "paramBoot".
+#' Even in the absence of a hierarchical structure. By default, the function will try to retrieve it
+#' from \code{model} argument.
+#' @param classmb optional one-sided formula specifying the external predictors of 
+#' latent class membership to be modelled in the secondary class-membership multinomial 
+#' logistic model. Covariates are separated by \code{+} on the right of the \code{~}. 
+#' By default, an intercept is included. 
+#' @param varest optional character indicating the method to be used to compute the variance of 
+#' the regression estimates. "none" does not account for the uncertainty in the original latent 
+#' class model, \code{"paramBoot"} computes the total variance using a parametric bootstrap technique, 
+#' \code{"Hessian"} computes the total Hessian of the joint likelihood (implemented for \code{"twoStageJoint"}
+#' method only). Default to \code{"Hessian"} for \code{"twoStageJoint"} method
+#' @param M option integer indicating the number of draws for the parametric boostrap when \code{varest="paramBoot"}.
 #' Default to 200.
-#' @param idiag optional logical for the structure of the variance-covariance
-#' matrix of the random-effects. If \code{FALSE}, a non structured matrix of
+#' @param idiag if appropriate, optional logical for the structure of the variance-covariance
+#' matrix of the random-effects in the secondary model. 
+#' If \code{FALSE}, a non structured matrix of
 #' variance-covariance is considered (by default). If \code{TRUE} a diagonal
 #' matrix of variance-covariance is considered.
-#' @param nwg optional logical indicating if the variance-covariance of the
-#' random-effects is class-specific. If \code{FALSE} the variance-covariance
+#' @param nwg if appropriate, optional logical indicating if the variance-covariance of the
+#' random-effects in the secondary model is class-specific. If \code{FALSE} the variance-covariance
 #' matrix is common over latent classes (by default). If \code{TRUE} a
 #' class-specific proportional parameter multiplies the variance-covariance
 #' matrix in each class (the proportional parameter in the last latent class
 #' equals 1 to ensure identifiability).
-#' @param link link optional family of link functions to estimate for the external outcome.
-#' Defaults to NULL, corresponding to hlme function
+#' @param link optional family of parameterized link functions for the external outcome if appropriate.
+#' Defaults to NULL, corresponding to continuous Gaussian distribution (hlme function).
+#' @param intnodes optional vector of interior nodes. This argument is only
+#' required for a I-splines link function with nodes entered manually.
 #' @param epsY optional definite positive real used to rescale the marker in (0,1)
 #' when the beta link function is used. By default, epsY=0.5.
 #' @param data Data frame containing the variables named in
 #' \code{fixed}, \code{mixture}, \code{random}, \code{classmb} and \code{subject},
-#' for both the current function arguments and the input models arguments
+#' for both the current function arguments and the input model arguments
 #' Check \code{details} to get information on the data structure, especially with
-#' individual external outcomes
-#' @param method character string representing the method to be used :
-#' only joint likelihood two stage estimation "twoStageJoint" implemented at the moment
-#' @param B optional but recommanded specification for the initial values for the
-#' parameters. Two options are allowed: (1) a vector of initial values is entered.
-#' (2) nothing is specified. A preliminary analysis involving the
-#' estimation of a standard model is performed to choose initial values.
+#' external outcomes.
+#' @param method character indicating the inference technique to be used:
+#' only "twoStageJoint" for 2-stage estimation from the joint likelihood 
+#' is implemented at the moment.
+#' @param B optional vector of initial parameter values for the secondary model. 
+#' If external outcome, the vector has the same structure as a latent class model
+#' estimated in the other functions of \code{lcmm} package for the same type of 
+#' outcome. If external class predictors (of size p), the vector is of length 
+#' (ng-1)*(1+p). If \code{B=NULL} (by default), internal initial values are selected. 
 #' @param convB optional threshold for the convergence criterion based on the
 #' parameter stability. By default, convB=0.0001.
 #' @param convL optional threshold for the convergence criterion based on the
 #' log-likelihood stability. By default, convL=0.0001.
 #' @param convG optional threshold for the convergence criterion based on the
 #' derivatives. By default, convG=0.0001.
-#' @param longitudinal optional list of longitudinal models of type hlme,
-#' lcmm or multlcmm used to build mpjlcmm input model for "twoStageJoint" method.
-#' By default, the function will try to retrieve it from the input model
-#' @param maxiter optional maximum number of iterations for the Marquardt
-#' iterative algorithm. Defaults to 100
-#' @param posfix Optional vector specifying the indices in vector B of the
-#' parameters that should not be estimated. Default to NULL, all external parameters are
-#' estimated.
+#' @param longitudinal only for \code{mpjlcmm} models and "twoStageJoint" method:
+#'  optional list of the longitudinal submodels in the primary latent class model. 
+#' @param maxiter optional maximum number of iterations for the secondary model estimation using 
+#' Marquardt iterative algorithm. Defaults to 100
+#' @param posfix optional vector specifying indices in parameter vector B the 
+#' secondary model that should not be estimated. Default to NULL, all the 
+#' parameters of the secondary regression are estimated. 
 #' @param partialH optional logical for Piecewise and Splines baseline risk functions and
 #' Splines link functions only. Indicates whether the parameters of the baseline risk or
 #' link functions can be dropped from the Hessian matrix to define convergence criteria
@@ -99,90 +117,98 @@
 #' @examples
 #' 
 #' \dontrun{
-#' paquid$age65 <- (paquid$age-65)/10
-#' 
-#' #############################################################################
-#' ###                             EXAMPLE 1 :                               ###
-#' ### relationship between latent classes and external longitudinal outcome ###
-#' #############################################################################
-#' 
-#' ## define and estimate the latent class model
-#' 
-#' mMMSE1_Y <- hlme(MMSE~age65+I(age65^2)+CEP,
-#'                  random=~age65+I(age65^2),
-#'                  subject="ID",
-#'                  data=paquid)
-#' mMMSE2_Y <- hlme(MMSE~age65+I(age65^2)+CEP,
-#'                  random=~age65+I(age65^2),
-#'                  subject="ID",
-#'                  data=paquid,
-#'                  ng=2,
-#'                  mixture=~age65+I(age65^2),
-#'                  B=random(mMMSE1_Y))
-#' 
-#' ## define and estimate the relationship with the external variable
 #' 
 #' 
+#' ###### Estimation of the primary latent class model                   ######
 #' 
-#' modYextnone = externVar(mMMSE2_Y,
-#'                         fixed = CESD~age65+I(age65^2)+male,
-#'                         random = ~age65+I(age65^2),
-#'                         mixture = ~age65+I(age65^2),
-#'                         subject="ID",
-#'                         data=paquid,
-#'                         varest = "none",
-#'                         method = "twoStageJoint",
-#'                         B = c(7.8, 6.5, -0.3, 6, 0.8, -0.5, -2.5, 74, -64, 106, 16, -29, 9, 5.4))
-#' summary(modYextnone)
+#' set.seed(1234)
+#' PrimMod <- hlme(Ydep1~Time,random=~Time,subject='ID',ng=1,data=data_lcmm)
+#' PrimMod2 <- hlme(Ydep1~Time,mixture=~Time,random=~Time,subject='ID',
+#'                  ng=2,data=data_lcmm,B=random(PrimMod))
 #' 
-#' modYextcalc = externVar(mMMSE2_Y,
-#'                         fixed = CESD~age65+I(age65^2)+male,
-#'                         random = ~age65+I(age65^2),
-#'                         mixture = ~age65+I(age65^2),
-#'                         subject="ID",
-#'                         data=paquid,
-#'                         method = "twoStageJoint",
-#'                         B = modYextnone$best[-(1:15)])
-#' summary(modYextcalc)
+#' ###### Example 1: Relationship between a latent class structure and         #
+#' #                   external class predictors                          ######
+#'                   
+#' # estimation of the secondary multinomial logistic model with total variance
+#' # computed with the Hessian
 #' 
-#' #############################################################################
-#' ###                             EXAMPLE 2 :                               ###
-#' ###   relationship between latent classes and external class predictor    ###
-#' #############################################################################
+#' XextHess <- externVar(PrimMod2,
+#'                       classmb = ~X1 + X2 + X3 + X4, 
+#'                       subject = "ID",
+#'                       data = data_lcmm,
+#'                       method = "twoStageJoint") 
+#' summary(XextHess)
 #' 
-#' ## define and estimate the latent class model
+#' # estimation of a secondary multinomial logistic model with total variance
+#' # computed with parametric Bootstrap (much longer). When using the bootstrap 
+#' # estimator, we recommend running first the analysis with option varest = "none" 
+#' # which is faster but which underestimates the variance. And then use these values
+#' # as initial values when running the model with varest = "paramBoot" to obtain 
+#' # a valid variance of the parameters. 
 #' 
-#' mMMSE1_X <- hlme(MMSE~age65+I(age65^2),
-#'                  random=~age65+I(age65^2),
-#'                  subject="ID",
-#'                  data=paquid)
-#' mMMSE2_X <- hlme(MMSE~age65+I(age65^2),
-#'                  random=~age65+I(age65^2),
-#'                  subject="ID",
-#'                  data=paquid,
-#'                  ng=2,
-#'                  mixture=~age65+I(age65^2),
-#'                  B=random(mMMSE1_X))
+#' XextNone <- externVar(PrimMod2,
+#'                       classmb = ~X1 + X2 + X3 + X4, 
+#'                       subject = "ID",
+#'                       data = data_lcmm,
+#'                       varest = "none",
+#'                       method = "twoStageJoint") 
 #' 
+#' XextBoot <- externVar(PrimMod2,
+#'                       classmb = ~X1 + X2 + X3 + X4, 
+#'                       subject = "ID",
+#'                       data = data_lcmm,
+#'                       varest = "paramBoot",
+#'                       method = "twoStageJoint",
+#'                       B = XextNone$best[1:5]) 
+#' summary(XextBoot)
 #' 
-#' ## define and estimate the relationship with the external variable
+#'  
+#' ###### Example 2: Relationship between a latent class structure and         #
+#' #                external outcome (repeatedly measured over time)     ######
+#'                   
+#' # estimation of the secondary linear mixed model with total variance
+#' # computed with the Hessian
 #' 
-#' modXextnone = externVar(mMMSE2_X,
-#'                         classmb = ~CEP,
-#'                         subject = "ID",
-#'                         data = paquid,
-#'                         method = "twoStageJoint",
-#'                         varest = "none")
-#' summary(modXextnone)
+#' YextHess = externVar(PrimMod2,   #primary model
+#'                      fixed = Ydep2 ~ Time*X1,  #secondary model
+#'                      random = ~Time, #secondary model
+#'                      mixture = ~Time,  #secondary model
+#'                      subject="ID",
+#'                      data=data_lcmm,
+#'                      method = "twoStageJoint")
+#'                      
 #' 
-#' modXextcalc = externVar(mMMSE2_X,
-#'                         classmb = ~CEP,
-#'                         subject = "ID",
-#'                         data = paquid,
-#'                         method = "twoStageJoint",
-#'                         B = modXextnone$best[1:2])
-#' summary(modXextcalc)
+#' # estimation of a secondary linear mixed model with total variance
+#' # computed with parametric Bootstrap (much longer). When using the bootstrap 
+#' # estimator, we recommend running first the analysis with option varest = "none" 
+#' # which is faster but which underestimates the variance. And then use these values
+#' # as initial values when running the model with varest = "paramBoot" to obtain 
+#' # a valid variance of the parameters. 
+#' 
+#' YextNone = externVar(PrimMod2,   #primary model
+#'                      fixed = Ydep2 ~ Time*X1,  #secondary model
+#'                      random = ~Time, #secondary model
+#'                      mixture = ~Time,  #secondary model
+#'                      subject="ID",
+#'                      data=data_lcmm,
+#'                      varest = "none",
+#'                      method = "twoStageJoint")
+#' 
+#' YextBoot = externVar(PrimMod2,   #primary model
+#'                      fixed = Ydep2 ~ Time*X1,  #secondary model
+#'                      random = ~Time, #secondary model
+#'                      mixture = ~Time,  #secondary model
+#'                      subject="ID",
+#'                      data=data_lcmm,
+#'                      method = "twoStageJoint",
+#'                      B = YextNone$best[-(1:9)],
+#'                      varest= "paramBoot")
+#' 
+#' summary(YextBoot) 
+#' 
 #' }
+#'
+#'
 #'
 #' 
 #' @export
@@ -205,7 +231,7 @@ externVar = function(model,
                      data,
                      longitudinal,
                      method,
-                     varest = "calc",
+                     varest = "Hessian",
                      M = 200,
                      B,
                      convB = 0.0001,
@@ -226,7 +252,7 @@ externVar = function(model,
   if(!missing(fixed) & !missing(classmb)) stop("Either external outcome in fixed or external class predictor in classmb must be given")
   if(missing(method) | !method %in% c("twoStageJoint")) stop('Method must be either "twoStageJoint"')
   if(model$ng == 1) stop("Input model does not have latent class structure (ng=1)")
-  if(!varest %in% c("none", "paramBoot", "calc")) stop('Variance estimation method "varest" must be either "none", "paramBoot" or "calc"')
+  if(!varest %in% c("none", "paramBoot", "Hessian")) stop('Variance estimation method "varest" must be either "none", "paramBoot" or "Hessian"')
   if(!is.null(link) & missing(fixed)) stop("The argument link is not to be used with external class predictor")
   
 
@@ -528,7 +554,7 @@ externVar = function(model,
       #To explain : "hessienne" function needs mpjlcmm model. So i need mpj for paramBoot
       #And we need to create our longitudinal (and logicall) now before changinng "input" moded.
       #I really hate that hessian is only for mpj......
-      if(funIn != "mpjlcmm" & varest == "calc"){
+      if(funIn != "mpjlcmm" & varest == "Hessian"){
         longitudinalOut = as.call(list(as.name("list"), substitute(model)))
         
         modelOld = model
@@ -548,7 +574,7 @@ externVar = function(model,
     modOut = do.call(funOut, c(arguments))
   }
   
-  if(varest == "calc"){
+  if(varest == "Hessian"){
     if(verbose){cat("Variance estimation...\n\n")}
     nb11 = length(model$best)
     V11 = matrix(0, nb11, nb11)
@@ -787,7 +813,7 @@ externVar = function(model,
   }
   if(!missing(classmb)){
     if(is.null(argumentsIn[["longitudinal"]])){
-      if(varest == "calc"){           #Because of hessienne mpj....
+      if(varest == "Hessian"){           #Because of hessienne mpj....
         modOut$call$longitudinal = longitudinalOut 
       } else {
         modOut$call$longitudinal = as.call(list(as.name("list"), substitute(model)))
@@ -797,7 +823,7 @@ externVar = function(model,
     }
   }
   
-  #On remet longicall comme considéré dans l'environnement présent, pas dans celui de mpjlcmm
+  #On remet longicall comme considere dans environnement present, pas dans celui de mpjlcmm
   if(inherits(modOut, "mpjlcmm")){
     longicall = vector("list", modOut$K)
     for(k in 1:modOut$K){
