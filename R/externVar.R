@@ -98,8 +98,8 @@
 #' log-likelihood stability. By default, convL=0.0001.
 #' @param convG optional threshold for the convergence criterion based on the
 #' derivatives. By default, convG=0.0001.
-#' @param longitudinal only for \code{mpjlcmm} models and "twoStageJoint" method:
-#'  optional list of the longitudinal submodels in the primary latent class model. 
+#' @param longitudinal only with \code{mpjlcmm} primary models and "twoStageJoint" method:
+#' mandatory list containing the longitudinal submodels used in the primary latent class model. 
 #' @param maxiter optional maximum number of iterations for the secondary model estimation using 
 #' Marquardt iterative algorithm. Defaults to 100
 #' @param posfix optional vector specifying indices in parameter vector B the 
@@ -254,7 +254,6 @@ externVar = function(model,
   if(model$ng == 1) stop("Input model does not have latent class structure (ng=1)")
   if(!varest %in% c("none", "paramBoot", "Hessian")) stop('Variance estimation method "varest" must be either "none", "paramBoot" or "Hessian"')
   if(!is.null(link) & missing(fixed)) stop("The argument link is not to be used with external class predictor")
-  
 
   if(missing(posfix)) posfix = c()
   
@@ -278,15 +277,9 @@ externVar = function(model,
   
   #Get longitudinal
   if(funIn == "mpjlcmm"){
-    if(missing(longitudinal)){
-      if(class(try(eval(as.call(model$call$longitudinal)))) == "try-error"){
-        stop("longitudinal not found in environment, please specify longitudinal argument with a list of longitudinal models used to build mpjlcmm input model")
-      }
-      longCall = model$call$longitudinal
-      longitudinal = eval(longCall)
-    } else if (!missing(longitudinal)) {
-      longCall = substitute(longitudinal)
-    }
+    if(missing(longitudinal)) stop("The argument longitudinal is mandatory with a mpjlcmm input model")
+    
+    longCall = substitute(longitudinal)
     
     K = length(longitudinal)
     for(k in 1:K){

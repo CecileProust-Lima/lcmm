@@ -89,8 +89,8 @@ for both the current function arguments and the input model arguments
 Check \code{details} to get information on the data structure, especially with
 external outcomes.}
 
-\item{longitudinal}{only for \code{mpjlcmm} models and "twoStageJoint" method:
-optional list of the longitudinal submodels in the primary latent class model.}
+\item{longitudinal}{only with \code{mpjlcmm} primary models and "twoStageJoint" method:
+mandatory list containing the longitudinal submodels used in the primary latent class model.}
 
 \item{method}{character indicating the inference technique to be used:
 only "twoStageJoint" for 2-stage estimation from the joint likelihood 
