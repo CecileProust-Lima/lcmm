@@ -5,7 +5,7 @@
 #'  outcome or external class predictors. 
 #'  Two inference techniques are implemented to account for the classification error: 
 #'  
-#'  - a 2-stage estimation of the joint likelihood of the original latent class model 
+#'  - a 2-stage estimation of the joint likelihood of the primary latent class model 
 #'  and the secondary/ external regression;
 #'  
 #'  - a regression between the posterior latent class assignment and the external variable 
@@ -18,7 +18,7 @@
 #' The \code{data} argument must follow specific structure for individual variables,
 #' i.e. variables with a unique constant value for each subject. For an individual variable
 #' given as external outcome, data value must be present only once per subject,
-#' independently of any time variable used in the original latent class.
+#' independently of any time variable used in the primary latent class.
 #' For an individual variable given as external class predictor,
 #' data values must be given for every row of every individual (as usual)
 #' 
@@ -56,7 +56,7 @@
 #' logistic model. Covariates are separated by \code{+} on the right of the \code{~}. 
 #' By default, an intercept is included. 
 #' @param varest optional character indicating the method to be used to compute the variance of 
-#' the regression estimates. "none" does not account for the uncertainty in the original latent 
+#' the regression estimates. \code{"none"} does not account for the uncertainty in the primary latent 
 #' class model, \code{"paramBoot"} computes the total variance using a parametric bootstrap technique, 
 #' \code{"Hessian"} computes the total Hessian of the joint likelihood (implemented for \code{"twoStageJoint"}
 #' method only). Default to \code{"Hessian"} for \code{"twoStageJoint"} method
@@ -81,7 +81,7 @@
 #' when the beta link function is used. By default, epsY=0.5.
 #' @param data Data frame containing the variables named in
 #' \code{fixed}, \code{mixture}, \code{random}, \code{classmb} and \code{subject},
-#' for both the current function arguments and the input model arguments
+#' for both the current function arguments and the primary model arguments
 #' Check \code{details} to get information on the data structure, especially with
 #' external outcomes.
 #' @param method character indicating the inference technique to be used:
@@ -246,12 +246,12 @@ externVar = function(model,
   ptm <- proc.time()
   
   if(missing(model)) stop("model argument must be given")
-  if(!class(model) %in% c("hlme", "lcmm", "multlcmm", "Jointlcmm", "mpjlcmm")) stop('input models class must be either "hlme", "lcmm", "multlcmm", "Jointlcmm" or "mpjlcmm"')
-  if(model$conv == 2) warning("input model did not fully converge")
+  if(!inherits(model, c("hlme", "lcmm", "multlcmm", "Jointlcmm", "mpjlcmm"))) stop('primary model class must be either "hlme", "lcmm", "multlcmm", "Jointlcmm" or "mpjlcmm"')
+  if(model$conv == 2) warning("primary model did not fully converge")
   if(missing(fixed) & missing(classmb)) stop("Either external outcome in fixed or external class predictor in classmb must be given")
   if(!missing(fixed) & !missing(classmb)) stop("Either external outcome in fixed or external class predictor in classmb must be given")
   if(missing(method) | !method %in% c("twoStageJoint")) stop('Method must be either "twoStageJoint"')
-  if(model$ng == 1) stop("Input model does not have latent class structure (ng=1)")
+  if(model$ng == 1) stop("Primary model does not have latent class structure (ng=1)")
   if(!varest %in% c("none", "paramBoot", "Hessian")) stop('Variance estimation method "varest" must be either "none", "paramBoot" or "Hessian"')
   if(!is.null(link) & missing(fixed)) stop("The argument link is not to be used with external class predictor")
 
@@ -259,7 +259,7 @@ externVar = function(model,
   
   cl = match.call()
   
-  #Informations about input model
+  #Informations about primary model
   argumentsIn = as.list(model$call)
   funIn = as.character(argumentsIn[[1]])
   argumentsIn[[1]] = NULL
@@ -271,21 +271,21 @@ externVar = function(model,
     if (model$call$subject %in% colnames(data)){
       subject = model$call$subject
     } else {
-      stop("The argument subject must be specified if different from the subject argument used in the input model")
+      stop("The argument subject must be specified if different from the subject argument used in the primary model")
     }
   } 
   
   #Get longitudinal
   if(funIn == "mpjlcmm"){
-    if(missing(longitudinal)) stop("The argument longitudinal is mandatory with a mpjlcmm input model")
+    if(missing(longitudinal)) stop("The argument longitudinal is mandatory with a mpjlcmm primary model")
     
     longCall = substitute(longitudinal)
     
     K = length(longitudinal)
     for(k in 1:K){
-      cl = as.list(longitudinal[[k]]$call)
-      cl[["computeDiscrete"]] = FALSE
-      longitudinal[[k]]$call = as.call(cl)
+      cl_long = as.list(longitudinal[[k]]$call)
+      cl_long[["computeDiscrete"]] = FALSE
+      longitudinal[[k]]$call = as.call(cl_long)
       
       assign(as.character(longCall[[k+1]]), longitudinal[[k]])
     }
@@ -300,12 +300,19 @@ externVar = function(model,
     iVCIn = sum(model$N[1:4]) + 1:nVCIn
   } else if(funIn == "multlcmm"){
     nVCIn = model$N[4]
-    iVCIn = sum(model$N[1:3]) + 1:nVCIn
+    iVCIn = sum(model$N[3]) + 1:nVCIn
   } else {
     nVCIn = model$N[3]
     iVCIn = sum(model$N[1:2]) + 1:nVCIn
   }
   
+  #pprob with new data
+  argumentsInEdit = argumentsIn
+  argumentsInEdit[["data"]] = data
+  argumentsInEdit[["maxiter"]] = 0
+  argumentsInEdit[["B"]] = model$best
+  modelEdit = do.call(funIn, argumentsInEdit)
+  pprob = modelEdit$pprob
   
   #Change general model arguments
   if(method == "twoStageJoint"){
@@ -346,10 +353,6 @@ externVar = function(model,
       if(!inherits(fixed,"formula")) stop("The argument fixed must be a formula")
       if(!inherits(mixture,"formula")) stop("The argument mixture must be a formula")
       if(!inherits(random,"formula")) stop("The argument random must be a formula")
-      
-      if(!class(model) %in% c("hlme", "lcmm", "multlcmm", "Jointlcmm", "mpjlcmm")){
-        stop('The input model is not a supported class for the "twoStageJoint" method')
-      }
       
       if(length(fixed[[2]]) != 1){
         argfunctionStrMod = "multlcmm"
@@ -447,7 +450,7 @@ externVar = function(model,
       #Id of varcov estimates
       if(inherits(strMod, "multlcmm")){
         nVCStr = strMod$N[4]
-        iVCStr = sum(strMod$N[1:3]) + 1:nVCStr
+        iVCStr = sum(strMod$N[3]) + 1:nVCStr
       } else {
         nVCStr = strMod$N[3]
         iVCStr = sum(strMod$N[1:2]) + 1:nVCStr
@@ -482,7 +485,7 @@ externVar = function(model,
       #changement de ma fonction en mpjlcmm (pour avec la variance)
       if(funIn != "mpjlcmm"){
         argumentsMpj = list()
-        argumentsMpj[["longitudinal"]] = list(model)
+        argumentsMpj[["longitudinal"]] = as.call(list(as.name("list"), substitute(model)))
         argumentsMpj[["maxiter"]] = 0
         argumentsMpj[["ng"]] = ng
         argumentsMpj[["subject"]] = subject
@@ -503,7 +506,7 @@ externVar = function(model,
         oldclassmb = formula(arguments[["classmb"]])
       }
       
-      #nInMB : number of MB parameters in input model
+      #nInMB : number of MB parameters in primary model
       nInMB = ncol(model.matrix(oldclassmb, data))*(ng-1)
       
       #nEst : number of MB parameters in output model
@@ -666,16 +669,16 @@ externVar = function(model,
 
     if(nproc > 1)
     {
-      cl <- parallel::makeCluster(nproc)
+      clust <- parallel::makeCluster(nproc)
       
       #load all loaded packages
       packages = loadedNamespaces()
       for(pack in packages){
-        clusterExport(cl, "pack", environment())
-        clusterEvalQ(cl, require(pack, character.only = T))
+        clusterExport(clust, "pack", environment())
+        clusterEvalQ(clust, require(pack, character.only = T))
       }
       
-      modOuts <- parApply(cl, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, nVCIn, iVCOut){
+      modOuts <- parApply(clust, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, nVCIn, iVCOut){
         arguments[["B"]][iKeepOut] = coefs
         arguments[["nproc"]] = 1
         
@@ -683,7 +686,7 @@ externVar = function(model,
         modOut = do.call(funOut, c(arguments))
         
         #cholesky not varcov as output in best
-        if(class(modOut) == "mpjlcmm" | !all(modOut$idiag)){
+        if(inherits(modOut, "mpjlcmm") | !all(modOut$idiag)){
           modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]
         } else {
           cholMatrix = matrix(NA, length(iVCOut), length(iVCOut))
@@ -693,7 +696,7 @@ externVar = function(model,
         
         return(modOut)
       }, arguments = arguments, iKeepOut = iKeepOut, funOut = funOut, iEst = iEst, nVCIn = nVCIn, iVCOut = iVCOut)
-      parallel::stopCluster(cl)
+      parallel::stopCluster(clust)
       
       #format output
       bests = as.data.frame(matrix(NA, nrow = nEst, ncol = M))
@@ -725,7 +728,7 @@ externVar = function(model,
         modOut = do.call(funOut, c(arguments))
         
         #cholesky not varcov as output in best
-        if(class(modOut) == "mpjlcmm" | !all(modOut$idiag)){
+        if(inherits(modOut, "mpjlcmm") | !all(modOut$idiag)){
           modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]
         } else {
           cholMatrix = matrix(NA, length(iVCOut), length(iVCOut))
@@ -786,6 +789,14 @@ externVar = function(model,
       vc = t(cholMatrix)%*%cholMatrix
       modOut$best[iVCOut] = vc[upper.tri(vc, diag = T)]
     }
+    
+    #Compute loglikelihood
+    z = modOut$call
+    z$posfix = NULL
+    z$B = x$best
+    z[[1]] = as.name("argsmpj")
+    argsloglik = eval(z)
+    modOut$loglik = do.call("loglikmpjlcmm", argsloglik)
   }
   
   if(method == "twoStageJoint" & !missing(fixed)) modOut$strMod = strMod
@@ -795,26 +806,26 @@ externVar = function(model,
   
   #Il ne faut que les noms de variables dans le call sorti
   #Selon si c'est Yext ou Xext
-  if(!missing(fixed)){
-    if(funIn == "mpjlcmm"){
-      modOut$call$longitudinal = as.call(c(as.list(longCall), as.name("strMod")))
-    } else if(funIn == "Jointlcmm"){
-      modOut$call$longitudinal = as.call(list(as.name("list"), as.name("modNoSurv"), as.name("strMod")))
-    } else {
-      modOut$call$longitudinal = as.call(list(as.name("list"), substitute(model), as.name("strMod")))
-    }
-  }
-  if(!missing(classmb)){
-    if(is.null(argumentsIn[["longitudinal"]])){
-      if(varest == "Hessian"){           #Because of hessienne mpj....
-        modOut$call$longitudinal = longitudinalOut 
-      } else {
-        modOut$call$longitudinal = as.call(list(as.name("list"), substitute(model)))
-      }
-    } else {
-      modOut$call$longitudinal = argumentsIn[["longitudinal"]]
-    }
-  }
+  # if(!missing(fixed)){
+  #   if(funIn == "mpjlcmm"){
+  #     modOut$call$longitudinal = as.call(c(as.list(longCall), as.name("strMod")))
+  #   } else if(funIn == "Jointlcmm"){
+  #     modOut$call$longitudinal = as.call(list(as.name("list"), as.name("modNoSurv"), as.name("strMod")))
+  #   } else {
+  #     modOut$call$longitudinal = as.call(list(as.name("list"), substitute(model), as.name("strMod")))
+  #   }
+  # }
+  # if(!missing(classmb)){
+  #   if(is.null(argumentsIn[["longitudinal"]])){
+  #     if(varest == "Hessian"){           #Because of hessienne mpj....
+  #       modOut$call$longitudinal = longitudinalOut 
+  #     } else {
+  #       modOut$call$longitudinal = as.call(list(as.name("list"), substitute(model)))
+  #     }
+  #   } else {
+  #     modOut$call$longitudinal = argumentsIn[["longitudinal"]]
+  #   }
+  # }
   
   #On remet longicall comme considere dans environnement present, pas dans celui de mpjlcmm
   if(inherits(modOut, "mpjlcmm")){
@@ -826,8 +837,65 @@ externVar = function(model,
   }
   
   cost = proc.time()-ptm
+  
+  #Object Class Creation and transformation from mpjlcmm
+  if(!missing(fixed)){
+    #Get info
+    gconv = modOut$gconv
+    conv = modOut$conv
+    niter = modOut$niter
+    
+    #With exclusively longitudinal external outcome
+    modUpdate = update(modOut)
+    modOut = modUpdate[[length(modUpdate)]]
+    
+    modOut$gconv = gconv
+    modOut$conv = conv
+    modOut$niter = niter
+    modOut$pprob = pprob
+    if(inherits(modOut, "multlcmm")) modOut$N[3] = modOut$N[3]-modOut$N[1]
+    modOut$N[1] = 0
+    modOut$call = cl
+    modOut$varest = varest
+    modOut$runtime = cost[3]
+    
+    V = matrix(NA, length(modOut$best), length(modOut$best))
+    V[upper.tri(V, diag = T)] = modOut$V
+    V[lower.tri(V, diag = F)] = t(V)[lower.tri(t(V), diag = F)]
+    V = V[-c(1:(modOut$ng-1)), -c(1:(modOut$ng-1))]
+    V = V[upper.tri(V, diag = T)]
+    
+    modOut$V = V
+    modOut$best = modOut$best[-c(1:(modOut$ng-1))]
+    
+    class(modOut) = c(class(modOut), "externVar")
+  }
+  if(!missing(classmb)){
+    V = matrix(NA, nOut, nOut)
+    V[upper.tri(V, diag = T)] = modOut$V
+    V[lower.tri(V, diag = F)] = t(V)[lower.tri(t(V), diag = F)]
+    V = V[iEst, iEst]
+    V = V[upper.tri(V, diag = T)]
+    
+    best = modOut$best[iEst]
+    
+    #Select output
+    N = modOut$N[1]
+    Names = modOut$Names[c("Xnsnames", "ID")]
+    levels = modOut$levels[c("levelsclassmb")]
+    
+    modOut = list(ng = modOut$ng, ns = modOut$ns, idprob = modOut$idprob, nv2 = modOut$nv2,
+                  loglik = modOut$loglik, best = best, V = V, gconv = modOut$gconv,
+                  conv = modOut$conv, call = cl, niter = modOut$niter, N = N,
+                  pprob = modOut$pprob, Names = Names, na.action = modOut$na.action,
+                  AIC = 2*(length(best)-length(posfix)-modOut$loglik),
+                  BIC = (length(best)-length(posfix))*log(modOut$ns)-2*modOut$loglik,
+                  varest = varest, runtime = cost[3])
+    
+    class(modOut) = c("externX", "externVar")
+  }
+  
   if(verbose){cat(paste("The externVar program took", round(cost[3],2), "seconds\n"))}
-  modOut$runtime = cost[3]
   
   return(modOut)
   

@@ -5,8 +5,17 @@ summary.multlcmm <- function(object,...)
     x <- object
     if (!inherits(x, "multlcmm")) stop("use only with \"multlcmm\" objects")
 
-    cat("General latent class mixed model", "\n")
+    if(inherits(x, "externVar")){
+      cat("Secondary linear mixed model", "\n")
+    } else {
+      cat("General latent class mixed model", "\n")
+    }
     cat("     fitted by maximum likelihood method", "\n")
+    if(inherits(x, "externVar")){
+      if(x$varest == "none") cat("     primary model variance not accounted for", "\n")
+      if(x$varest == "Hessian") cat("     primary model variance accounted for through the hessian of the joint likelihood", "\n")
+      if(x$varest == "paramBoot") cat("     primary model variance accounted for through parametric boostrap", "\n")
+    }
 
     cl <- x$call
     cl$B <- NULL
