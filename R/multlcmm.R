@@ -412,6 +412,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     if(!inherits(random,"formula")) stop("The argument random must be a formula")
     if(!inherits(classmb,"formula")) stop("The argument classmb must be a formula")
     if(missing(data)){ stop("The argument data should be specified and defined as a data.frame")}
+    data <- as.data.frame(data)
     if(nrow(data)==0) stop("Data should not be empty")
     if(missing(subject)){ stop("The argument subject must be specified")}
     if(!is.numeric(data[[subject]])) stop("The argument subject must be numeric")
