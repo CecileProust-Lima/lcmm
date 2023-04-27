@@ -223,6 +223,13 @@ externVar = function(model,
                      random,
                      subject,
                      classmb,
+                     survival,
+                     hazard = "Weibull",
+                     hazardtype = "Specific",
+                     hazardnodes = NULL,
+                     TimeDepVar = NULL,
+                     nsim = 100,
+                     logscale = FALSE,
                      idiag = FALSE,
                      nwg = FALSE,
                      link = NULL,
@@ -248,13 +255,13 @@ externVar = function(model,
   if(missing(model)) stop("model argument must be given")
   if(!inherits(model, c("hlme", "lcmm", "multlcmm", "Jointlcmm", "mpjlcmm"))) stop('primary model class must be either "hlme", "lcmm", "multlcmm", "Jointlcmm" or "mpjlcmm"')
   if(model$conv == 2) warning("primary model did not fully converge")
-  if(missing(fixed) & missing(classmb)) stop("Either external outcome in fixed or external class predictor in classmb must be given")
-  if(!missing(fixed) & !missing(classmb)) stop("Either external outcome in fixed or external class predictor in classmb must be given")
+  if(sum(c(!missing(fixed), !missing(classmb), !missing(survival))) != 1) stop("One and only one in survival, fixed or classmb must be given")
   if(missing(method) | !method %in% c("twoStageJoint")) stop('Method must be either "twoStageJoint"')
   if(model$ng == 1) stop("Primary model does not have latent class structure (ng=1)")
   if(!varest %in% c("none", "paramBoot", "Hessian")) stop('Variance estimation method "varest" must be either "none", "paramBoot" or "Hessian"')
   if(!is.null(link) & missing(fixed)) stop("The argument link is not to be used with external class predictor")
 
+  
   if(missing(posfix)) posfix = c()
   
   cl = match.call()
@@ -265,6 +272,15 @@ externVar = function(model,
   argumentsIn[[1]] = NULL
   ng = model$ng
   nIn = length(model$best)
+  
+  if(is.null(argumentsIn[["classmb"]])){
+    oldclassmb = ~ 1
+  } else {
+    oldclassmb = formula(argumentsIn[["classmb"]])
+  }
+  
+  #number of MB parameters in primary model
+  nInMB = ncol(model.matrix(oldclassmb, data))*(ng-1)
   
   #Get subject
   if(missing(subject)){
@@ -311,6 +327,7 @@ externVar = function(model,
   argumentsInEdit[["data"]] = data
   argumentsInEdit[["maxiter"]] = 0
   argumentsInEdit[["B"]] = model$best
+  argumentsInEdit[["verbose"]] = FALSE
   modelEdit = do.call(funIn, argumentsInEdit)
   pprob = modelEdit$pprob
   
@@ -331,7 +348,7 @@ externVar = function(model,
     arguments[["convL"]] = convL
     arguments[["convG"]] = convG
     arguments[["partialH"]] = partialH
-    #survival
+    #primary survival
     arguments[["survival"]] =  argumentsIn[["survival"]]
     arguments[["hazard"]] =  argumentsIn[["hazard"]]
     arguments[["hazardtype"]] =  argumentsIn[["hazardtype"]]
@@ -340,12 +357,232 @@ externVar = function(model,
     arguments[["TimeDepVar"]] =  argumentsIn[["TimeDepVar"]]
     arguments[["logscale"]] =  argumentsIn[["logscale"]]
     
-    #Yextern
+    #Yextern survival
+    if(!missing(survival)){
+      funOut = "mpjlcmm"
+      
+      #manage inputs
+      if(!is.null(argumentsIn[["survival"]])) stop('secondary survival model is not supported with "twoStageJoint" method if primary model already includes survival')
+      
+      #Informations about secondary outcome model
+      ##number of survival parameters to estimate
+      ###number of events
+      surv <- cl$survival[[2]]
+      if(length(surv)==3) #censure droite sans troncature gauche
+      {
+        idtrunc <- 0 
+        nom.Tevent <- as.character(surv[2])
+        nom.Event <- as.character(surv[3])
+        nom.Tentry <- NULL #si pas de troncature, Tentry=0
+        noms.surv <-  c(nom.Tevent,nom.Event) 
+      }
+      
+      if(length(surv)==4) #censure droite et troncature
+      {
+        idtrunc <- 1 
+        nom.Tentry <- as.character(surv[2])
+        nom.Tevent <- as.character(surv[3])
+        nom.Event <- as.character(surv[4])
+        noms.surv <-  c(nom.Tentry,nom.Tevent,nom.Event)
+      }  
+      
+      Tevent <- getElement(object=data,name=nom.Tevent)
+      Event <- getElement(object=data,name=nom.Event)  
+      nbevt <- length(attr(do.call("Surv",list(time=Tevent,event=Event,type="mstate")),"states")) 
+      if(nbevt<1) nbevt <- 1
+      
+      ###get number of parameters for baseline functions
+      hazard <- rep(hazard,length.out=nbevt)
+      hazardtype <- rep(hazardtype,length.out=nbevt)
+      if(any(hazard %in% c("splines","Splines")))
+      {
+        hazard[which(hazard %in% c("splines","Splines"))] <- "5-quant-splines" 
+      }
+      if(any(hazard %in% c("piecewise","Piecewise")))
+      {
+        hazard[which(hazard %in% c("piecewise","Piecewise"))] <- "5-quant-piecewise" 
+      }
+      
+      hazWhat = hazard
+      #when not weibull, keep only the last word of hazard
+      hazWhat[hazard != 'Weibull'] = sapply(strsplit(hazard[hazard != 'Weibull'], "-"), `[`, 3)
+      hazN = rep(2, nbevt)
+      hazN[hazard != 'Weibull'] = sapply(strsplit(hazard[hazard != 'Weibull'], "-"), `[`, 1)
+      hazN = as.integer(hazN)
+      hazN = hazN +
+        (hazWhat == "Weibull")*0 +
+        (hazWhat == "piecewise")*(-1) +
+        (hazWhat == "splines")*(2)
+      hazN = hazN *
+        (hazardtype == "Specific")*ng
+      
+      #we extract the number of base function parameter with constraints (ie, not PH parameters)
+      nSurvConstraint = hazN
+      
+      hazN = hazN  +
+        (hazardtype == "PH")*(ng-1)
+      
+      #we now have all base functions parameters :
+      nEstY = sum(hazN)
+      
+      ###get number of parameters for survival covariates
+      form.surv <- cl$survival[3]
+      
+      noms.form.surv <- all.vars(attr(terms(formula(paste("~",form.surv))),"variables"))
+      if(length(noms.form.surv)==0)
+      {
+        form.cause <- ~-1
+        form.causek <- vector("list",nbevt)
+        for(k in 1:nbevt) form.causek[[k]] <- ~-1
+        form.mixture <- ~-1
+        form.commun <- ~-1
+        asurv <- terms(~-1)
+      }
+      else
+      {
+        ##creer la formula pour cause
+        form1 <- gsub("mixture","",form.surv)
+        form1 <- formula(paste("~",form1))
+        asurv1 <- terms(form1,specials="cause")  
+        ind.cause <- attr(asurv1,"specials")$cause
+        if(length(ind.cause))
+        {
+          form.cause <- paste(labels(asurv1)[ind.cause],collapse="+")
+          form.cause <- gsub("cause","",form.cause)
+          form.cause <- formula(paste("~",form.cause))
+        }
+        else
+        {
+          form.cause <- ~-1 
+        }
+        
+        ## formules pour causek
+        form.causek <- vector("list",nbevt)
+        for(k in 1:nbevt)
+        {
+          formk <- gsub("mixture","",form.surv)
+          for(kk in 1:nbevt)
+          {
+            if(kk != k) formk <- gsub(paste("cause",kk,sep=""),"",formk)
+          }
+          
+          asurvk <- terms(formula(paste("~",formk)),specials=paste("cause",k,sep=""))
+          ind.causek <- attr(asurvk,"specials")$cause
+          
+          if(length(ind.causek))
+          {
+            formcausek <- paste(labels(asurvk)[ind.causek],collapse="+")
+            formcausek <- gsub(paste("cause",k,sep=""),"",formcausek)
+            formcausek <- formula(paste("~",formcausek))
+            form.causek[[k]] <- formcausek
+          }
+          else
+          {
+            form.causek[[k]] <- ~-1
+          }
+        }
+        
+        
+        
+        ##creer la formule pour mixture
+        form2 <- form.surv
+        for( k in 1:nbevt)
+        {
+          form2 <- gsub(paste("cause",k,sep=""),"",form2)
+        }
+        form2 <- gsub("cause","",form2)
+        form2 <- formula(paste("~",form2))         
+        asurv2 <- terms(form2,specials="mixture") 
+        ind.mixture <- attr(asurv2,"specials")$mixture
+        if(length(ind.mixture))
+        {
+          form.mixture <- paste(labels(asurv2)[ind.mixture],collapse="+")
+          form.mixture <- gsub("mixture","",form.mixture)
+          form.mixture <- formula(paste("~",form.mixture))
+        }
+        else
+        {
+          form.mixture <- ~-1 
+        }  
+        
+        ## creer la formule pour ni cause ni mixture
+        asurv <- terms(formula(paste("~",form.surv)),specials=c("cause","mixture",paste("cause",1:nbevt,sep="")))
+        ind.commun <- setdiff(1:length(labels(asurv)),unlist(attr(asurv,"specials")))
+        if(length(ind.commun))
+        {
+          form.commun <- paste(labels(asurv)[ind.commun],collapse="+")
+          form.commun <- gsub("mixture","",form.commun) #si X1*mixture(X2), alors X1:mixture(X2) dans form.commun
+          form.commun <- gsub("cause","",form.commun)   # si X1:cause(X2)
+          form.commun <- formula(paste("~",form.commun))  
+          ##NB: si mixture(X1)*cause(X2), X1:X2 en commun
+        }
+        else
+        {
+          form.commun <- ~-1 
+        }
+      }
+      
+      #I extract number of variable in each formula (through model.matrix) excluding intercept
+      ncols = sapply(c(form.commun, form.cause, form.mixture, form.causek), function(x, data){
+        mm = model.matrix(x, data)
+        mm = mm[,-1]
+        return(ncol(mm))
+      }, data = data)
+      
+      #I also need how many parameters each kind of covariate makes
+      nparam = c(1, nbevt, ng, nbevt*ng)
+      
+      #we now have all the survival covariates parameters :
+      nEstX = sum(ncols*nparam)
+      
+      nEst = nEstY + nEstX
+      
+      #nOut : nuber of total final parameters
+      nOut = nIn + nEst
+      
+      #index
+      iKeepOut = c(1:nInMB, nInMB+nEst+1:(nIn-nInMB))
+      iKeepIn = 1:nIn
+      iEst = nInMB+1:nEst
+      
+      #input VC, only for keep betaa (iKeepIn)
+      iVCKeep = iVCIn
+      
+      #Id of varcov estimates
+      iVCOut = c()
+      
+      #list of arguments
+      arguments[["survival"]] =  survival
+      arguments[["hazard"]] =  hazard
+      arguments[["hazardtype"]] =  hazardtype
+      arguments[["hazardnodes"]] =  hazardnodes
+      arguments[["TimeDepVar"]] =  TimeDepVar
+      arguments[["logscale"]] =  logscale
+      arguments[["posfix"]] = unique(c(iKeepOut, posfix))
+      #what is in longitudinal ?
+      if(funIn == "mpjlcmm"){
+        arguments[["longitudinal"]] = longitudinal
+      } else {
+        arguments[["longitudinal"]] = list(model)
+      }
+      #initial values
+      if(missing(B)){
+        arguments[["B"]][iEst] = rep(1, nEst)
+      } else {
+        arguments[["B"]][iEst] = B
+      }
+    }
+    
+    
+    
+    
+    
+    #Yextern longitudinal
     if(!missing(fixed)){
       
       funOut = "mpjlcmm"
       
-      #Erreurs
+      #Manage inputs
       
       if(missing(mixture)) mixture = ~1
       if(missing(random)) random = ~-1
@@ -362,7 +599,7 @@ externVar = function(model,
         argfunctionStrMod = "lcmm"
       }
       
-      #Jointlcmm needs transformation into lcmm to be put into longitudinal.
+      #Primary Jointlcmm needs transformation into lcmm to be put into longitudinal.
       if(funIn == "Jointlcmm"){
         
         if(is.null(argumentsIn[["link"]])){
@@ -400,6 +637,7 @@ externVar = function(model,
         modNoSurv = do.call(argfunJoint, argumentsJoint)
       }
       
+      #let's create structure for secondary model
       argumentsStrMod = list()
       argumentsStrMod[["fixed"]] = fixed
       argumentsStrMod[["random"]] = random
@@ -428,9 +666,9 @@ externVar = function(model,
       #Let's change strMod's saved call
       strMod$call$data = substitute(data)
       
-      #Now join the initial and the external outcome models
+      ## Now join the primary and secondary model
       
-      #Informations about external outcome model
+      #Informations about secondary outcome model
       #number of classmb parameters to remove
       nMB = ng-1
       #number of remaining parameters to estimate
@@ -444,7 +682,7 @@ externVar = function(model,
       iKeepIn = iKeepOut
       iEst = nIn+1:nEst
       
-      #input VC, only for keep betaa
+      #input VC, only for keep betaa (iKeepIn)
       iVCKeep = iVCIn
       
       #Id of varcov estimates
@@ -455,7 +693,7 @@ externVar = function(model,
         nVCStr = strMod$N[3]
         iVCStr = sum(strMod$N[1:2]) + 1:nVCStr
       }
-      iVCOut = length(iKeepIn) + iVCStr - nMB
+      iVCOut = nIn + iVCStr - nMB
       
       #Liste des arguments
       #on fixe nos parametres
@@ -477,6 +715,9 @@ externVar = function(model,
         arguments[["B"]][iEst] = B
       }
     }
+    
+    
+    
     #X extern
     if(!missing(classmb)){
       
@@ -500,15 +741,6 @@ externVar = function(model,
       
       funOut = "mpjlcmm"
       
-      if(is.null(arguments[["classmb"]])){
-        oldclassmb = ~ 1
-      } else {
-        oldclassmb = formula(arguments[["classmb"]])
-      }
-      
-      #nInMB : number of MB parameters in primary model
-      nInMB = ncol(model.matrix(oldclassmb, data))*(ng-1)
-      
       #nEst : number of MB parameters in output model
       nEst1G = ncol(model.matrix(classmb, data))
       nEst = nEst1G*(ng-1)
@@ -521,7 +753,7 @@ externVar = function(model,
       iKeepIn = (nInMB+1):nIn
       iEst = 1:nEst
       
-      #input VC, only for keep betas
+      #input VC, only for keep betas (iKeepIn)
       iVCKeep = iVCIn-nInMB
       
       #Id of varcov estimates (none)
@@ -678,7 +910,8 @@ externVar = function(model,
         clusterEvalQ(clust, require(pack, character.only = T))
       }
       
-      modOuts <- parApply(clust, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, nVCIn, iVCOut){
+      survivalMissing = missing(survival)
+      modOuts <- parApply(clust, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, nVCIn, iVCOut, survivalMissing){
         arguments[["B"]][iKeepOut] = coefs
         arguments[["nproc"]] = 1
         
@@ -694,8 +927,28 @@ externVar = function(model,
           modOut$best[iVCOut] = diag(cholMatrix)
         }
         
+        #Residual Error : need to be the same sign across bootstrap iterations
+        #[would need to be changed if inside function B names were to be changed, stable if output other than mpj is allowed for Xext]
+        browser()
+        countParamBeforeResVar = sum(modOut$N[1:3])
+        sumny = 0
+        for(k in modOut$K){
+          countParamBeforeResVar = countParamBeforeResVar+modOut$npmK[k]
+          #the case with "multlcmm" is ignored as, as of writing this code, it is not implemented as a secondary model
+          #it would need to be implemented with more specific parameter count
+          sumny = sumny+modOut$ny[k]
+          if(modOut$contrainte[k] == 0 | (modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 0))
+            modOut$best[countParamBeforeResVar] = abs(modOut$best[countParamBeforeResVar])
+        }
+        
+        #Survival Base Function : need to be the same sign across bootstrap iterations
+        if(!survivalMissing){
+          iSurvConstraint = 1:nSurvConstraint+modOut$N[1]
+          modOut$best[iSurvConstraint] = abs(modOut$best[iSurvConstraint])
+        }
+        
         return(modOut)
-      }, arguments = arguments, iKeepOut = iKeepOut, funOut = funOut, iEst = iEst, nVCIn = nVCIn, iVCOut = iVCOut)
+      }, arguments = arguments, iKeepOut = iKeepOut, funOut = funOut, iEst = iEst, nVCIn = nVCIn, iVCOut = iVCOut, survivalMissing = survivalMissing)
       parallel::stopCluster(clust)
       
       #format output
@@ -736,6 +989,25 @@ externVar = function(model,
           modOut$best[iVCOut] = diag(cholMatrix)
         }
         
+        #Residual Error : need to be the same sign across bootstrap iterations
+        #[would need to be changed if inside function B names were to be changed, stable if output other than mpj is allowed for Xext]
+        countParamBeforeResVar = sum(modOut$N[1:3])
+        sumny = 0
+        for(k in modOut$K){
+          countParamBeforeResVar = countParamBeforeResVar+modOut$npmK[k]
+          #the case with "multlcmm" is ignored as, as of writing this code, it is not implemented as a secondary model
+          #it would need to be implemented with more specific parameter count
+          sumny = sumny+modOut$ny[k]
+          if(modOut$contrainte[k] == 0 | (modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 0))
+            modOut$best[countParamBeforeResVar] = abs(modOut$best[countParamBeforeResVar])
+        }
+        
+        #Survival Base Function : need to be the same sign across bootstrap iterations
+        if(!missing(survival)){
+          iSurvConstraint = 1:nSurvConstraint+modOut$N[1]
+          modOut$best[iSurvConstraint] = abs(modOut$best[iSurvConstraint])
+        }
+        
         #output V and betas
         bests[,i] = modOut$best[iEst]
         
@@ -749,15 +1021,9 @@ externVar = function(model,
     }
     
     Mconv = sum(conv %in% c(1,3))
-    if(Mconv == 0){
+    if(Mconv <= 1){
       stop("No parametric boostrap iteration could converge.")
     }
-    
-    #Residual Error : need to be all the same sign
-    #[would need to be changed if inside function B names were to be changed, stable if output other than mpj is allowed for Xext]
-    Kin = length(model$longicall)
-    Kout = length(modOut$longicall)
-    modOut$best[names(modOut$best) == "stderr"][(Kin+1):(Kin+Kout)] = abs(modOut$best[names(modOut$best) == "stderr"][(Kin+1):(Kin+Kout)])
     
     #compute variance
     bests = bests[,conv %in% c(1,3)]
@@ -793,7 +1059,7 @@ externVar = function(model,
     #Compute loglikelihood
     z = modOut$call
     z$posfix = NULL
-    z$B = x$best
+    z$B = z$best
     z[[1]] = as.name("argsmpj")
     argsloglik = eval(z)
     modOut$loglik = do.call("loglikmpjlcmm", argsloglik)
@@ -839,6 +1105,32 @@ externVar = function(model,
   cost = proc.time()-ptm
   
   #Object Class Creation and transformation from mpjlcmm
+  if(!missing(survival)){
+    best = modOut$best[iEst]
+    V = VarCov(modOut)
+    V = V[iEst, iEst]
+    V = V[upper.tri(V, diag = T)]
+    
+    #select output
+    N = modOut$N[c(2:3, 11+modOut$K+modOut$nbevt)]
+    Nprm = modOut$Nprm[2:(2+modOut$nbevt)]
+    Names = modOut$Names[c("Xnsnames", "ID", "Tnames", "TimeDepVar.name")]
+    Names[["Xnsnames"]] = Names[["Xnsnames"]][as.logical(modOut$idspecif)]
+    levels = modOut$levels[c("levelsdata", "levelssurv")]
+    
+    modOut = list(nbevt = modOut$nbevt, ng = modOut$ng, ns = modOut$ns, idcom = modOut$idcom,
+                  idspecif = modOut$idspecif, idtdv = modOut$idtdv, loglik = modOut$loglik,
+                  best = best, V = V, gconv = modOut$gconv, conv = modOut$conv, call = cl,
+                  niter = modOut$niter, N = N, Nprm = Nprm, Names = Names, logspecif = modOut$logspecif,
+                  predSurv = modOut$predSurv, typrisq = modOut$typrisq, hazardtype = modOut$hazardtype,
+                  hazardnodes = modOut$hazardnodes, nz = modOut$nz, scoretest = modOut$scoretest,
+                  na.action = modOut$na.action, levels = levels, 
+                  AIC = 2*(length(best)-length(posfix)-modOut$loglik),
+                  BIC = (length(best)-length(posfix))*log(modOut$ns)-2*modOut$loglik,
+                  varest = varest, runtime = cost[3])
+    
+    class(modOut) = c("externSurv", "externVar")
+  }
   if(!missing(fixed)){
     #Get info
     gconv = modOut$gconv
@@ -882,7 +1174,7 @@ externVar = function(model,
     #Select output
     N = modOut$N[1]
     Names = modOut$Names[c("Xnsnames", "ID")]
-    levels = modOut$levels[c("levelsclassmb")]
+    levels = modOut$levels[c("levelsdata", "levelsclassmb")]
     
     modOut = list(ng = modOut$ng, ns = modOut$ns, idprob = modOut$idprob, nv2 = modOut$nv2,
                   loglik = modOut$loglik, best = best, V = V, gconv = modOut$gconv,

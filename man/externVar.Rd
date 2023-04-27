@@ -11,6 +11,13 @@ externVar(
   random,
   subject,
   classmb,
+  survival,
+  hazard = "Weibull",
+  hazardtype = "Specific",
+  hazardnodes = NULL,
+  TimeDepVar = NULL,
+  nsim = 100,
+  logscale = FALSE,
   idiag = FALSE,
   nwg = FALSE,
   link = NULL,
@@ -85,7 +92,7 @@ when the beta link function is used. By default, epsY=0.5.}
 
 \item{data}{Data frame containing the variables named in
 \code{fixed}, \code{mixture}, \code{random}, \code{classmb} and \code{subject},
-for both the current function arguments and the input model arguments
+for both the current function arguments and the primary model arguments
 Check \code{details} to get information on the data structure, especially with
 external outcomes.}
 
@@ -97,7 +104,7 @@ only "twoStageJoint" for 2-stage estimation from the joint likelihood
 is implemented at the moment.}
 
 \item{varest}{optional character indicating the method to be used to compute the variance of 
-the regression estimates. "none" does not account for the uncertainty in the original latent 
+the regression estimates. \code{"none"} does not account for the uncertainty in the primary latent 
 class model, \code{"paramBoot"} computes the total variance using a parametric bootstrap technique, 
 \code{"Hessian"} computes the total Hessian of the joint likelihood (implemented for \code{"twoStageJoint"}
 method only). Default to \code{"Hessian"} for \code{"twoStageJoint"} method}
@@ -143,7 +150,7 @@ from a latent class model estimated within \code{lcmm} package) with either an e
  outcome or external class predictors. 
  Two inference techniques are implemented to account for the classification error: 
  
- - a 2-stage estimation of the joint likelihood of the original latent class model 
+ - a 2-stage estimation of the joint likelihood of the primary latent class model 
  and the secondary/ external regression;
  
  - a regression between the posterior latent class assignment and the external variable 
@@ -157,7 +164,7 @@ A. DATA STRUCTURE
 The \code{data} argument must follow specific structure for individual variables,
 i.e. variables with a unique constant value for each subject. For an individual variable
 given as external outcome, data value must be present only once per subject,
-independently of any time variable used in the original latent class.
+independently of any time variable used in the primary latent class.
 For an individual variable given as external class predictor,
 data values must be given for every row of every individual (as usual)
 
