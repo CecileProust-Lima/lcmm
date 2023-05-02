@@ -159,7 +159,7 @@
 #'                       data = data_lcmm,
 #'                       varest = "paramBoot",
 #'                       method = "twoStageJoint",
-#'                       B = XextNone$best[1:5]) 
+#'                       B = XextNone$best) 
 #' summary(XextBoot)
 #' 
 #'  
@@ -201,7 +201,7 @@
 #'                      subject="ID",
 #'                      data=data_lcmm,
 #'                      method = "twoStageJoint",
-#'                      B = YextNone$best[-(1:9)],
+#'                      B = YextNone$best,
 #'                      varest= "paramBoot")
 #' 
 #' summary(YextBoot) 
@@ -928,17 +928,27 @@ externVar = function(model,
         }
         
         #Residual Error : need to be the same sign across bootstrap iterations
-        #[would need to be changed if inside function B names were to be changed, stable if output other than mpj is allowed for Xext]
         browser()
-        countParamBeforeResVar = sum(modOut$N[1:3])
+        countParamBeforeErrLink = sum(modOut$N[1:3])
         sumny = 0
-        for(k in modOut$K){
-          countParamBeforeResVar = countParamBeforeResVar+modOut$npmK[k]
-          #the case with "multlcmm" is ignored as, as of writing this code, it is not implemented as a secondary model
-          #it would need to be implemented with more specific parameter count
-          sumny = sumny+modOut$ny[k]
+        for(k in 1:modOut$K){
+          
+          for(y in 1:modOut$ny[k]){
+            sumny = sumny+1
+            
+            if(modOut$contrainte[k] == 2){
+              countParamYBeforeErr = sum(modOut$Nprm[3+1:5*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
+              modOut$best[countParamYBeforeErr:(countParamYBeforeErr+modOut$Nprm[3+6*modOut$ny[k]-modOut$ny[k]+y])]
+              
+              if(modOut$linktype[sumny] == 0)
+                countParamYBeforeErrLink = sum(modOut$Nprm[3+1:8*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
+                modOut$best[countParamYBeforeErrLink]
+            }
+          }
+          
+          countParamBeforeErrLink = countParamBeforeErrLink+modOut$npmK[k]
           if(modOut$contrainte[k] == 0 | (modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 0))
-            modOut$best[countParamBeforeResVar] = abs(modOut$best[countParamBeforeResVar])
+            modOut$best[countParamBeforeErrLink] = abs(modOut$best[countParamBeforeErrLink])
         }
         
         #Survival Base Function : need to be the same sign across bootstrap iterations
@@ -955,8 +965,9 @@ externVar = function(model,
       bests = as.data.frame(matrix(NA, nrow = nEst, ncol = M))
       Vs = list()
       conv = c()
+      
+      modOut = modOuts[[M]]
       for (i in 1:M){
-        modOut = modOuts[[i]]
         #output V and betas
         bests[,i] = modOut$best[iEst]
         
@@ -978,7 +989,7 @@ externVar = function(model,
         arguments[["B"]][iKeepOut] = coefss[,i]
         
         #Model Estimation
-        modOut = do.call(funOut, c(arguments))
+        captured_log = capture.output({modOut = do.call(funOut, c(arguments))})
         
         #cholesky not varcov as output in best
         if(inherits(modOut, "mpjlcmm") | !all(modOut$idiag)){
@@ -990,16 +1001,27 @@ externVar = function(model,
         }
         
         #Residual Error : need to be the same sign across bootstrap iterations
-        #[would need to be changed if inside function B names were to be changed, stable if output other than mpj is allowed for Xext]
-        countParamBeforeResVar = sum(modOut$N[1:3])
+        browser()
+        countParamBeforeErrLink = sum(modOut$N[1:3])
         sumny = 0
-        for(k in modOut$K){
-          countParamBeforeResVar = countParamBeforeResVar+modOut$npmK[k]
-          #the case with "multlcmm" is ignored as, as of writing this code, it is not implemented as a secondary model
-          #it would need to be implemented with more specific parameter count
-          sumny = sumny+modOut$ny[k]
+        for(k in 1:modOut$K){
+          
+          for(y in 1:modOut$ny[k]){
+            sumny = sumny+1
+            
+            if(modOut$contrainte[k] == 2){
+              countParamYBeforeErr = sum(modOut$Nprm[3+1:5*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
+              modOut$best[countParamYBeforeErr:(countParamYBeforeErr+modOut$Nprm[3+6*modOut$ny[k]-modOut$ny[k]+y])]
+              
+              if(modOut$linktype[sumny] == 0)
+                countParamYBeforeErrLink = sum(modOut$Nprm[3+1:8*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
+              modOut$best[countParamYBeforeErrLink]
+            }
+          }
+          
+          countParamBeforeErrLink = countParamBeforeErrLink+modOut$npmK[k]
           if(modOut$contrainte[k] == 0 | (modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 0))
-            modOut$best[countParamBeforeResVar] = abs(modOut$best[countParamBeforeResVar])
+            modOut$best[countParamBeforeErrLink] = abs(modOut$best[countParamBeforeErrLink])
         }
         
         #Survival Base Function : need to be the same sign across bootstrap iterations
@@ -1056,13 +1078,16 @@ externVar = function(model,
       modOut$best[iVCOut] = vc[upper.tri(vc, diag = T)]
     }
     
-    #Compute loglikelihood
+    #Computations on final model
     z = modOut$call
     z$posfix = NULL
-    z$B = z$best
-    z[[1]] = as.name("argsmpj")
-    argsloglik = eval(z)
-    modOut$loglik = do.call("loglikmpjlcmm", argsloglik)
+    z$B = modOut$best
+    z$maxiter = 0
+    z$verbose = FALSE
+    modelEdit = eval(z)
+    modOut$pprob = modelEdit$pprob
+    modOut$predSurv = modelEdit$predSurv
+    modOut$loglik = modelEdit$loglik
   }
   
   if(method == "twoStageJoint" & !missing(fixed)) modOut$strMod = strMod
@@ -1121,10 +1146,10 @@ externVar = function(model,
     modOut = list(nbevt = modOut$nbevt, ng = modOut$ng, ns = modOut$ns, idcom = modOut$idcom,
                   idspecif = modOut$idspecif, idtdv = modOut$idtdv, loglik = modOut$loglik,
                   best = best, V = V, gconv = modOut$gconv, conv = modOut$conv, call = cl,
-                  niter = modOut$niter, N = N, Nprm = Nprm, Names = Names, logspecif = modOut$logspecif,
-                  predSurv = modOut$predSurv, typrisq = modOut$typrisq, hazardtype = modOut$hazardtype,
-                  hazardnodes = modOut$hazardnodes, nz = modOut$nz, scoretest = modOut$scoretest,
-                  na.action = modOut$na.action, levels = levels, 
+                  niter = modOut$niter, N = N, Nprm = Nprm, pprob = pprob, Names = Names,
+                  logspecif = modOut$logspecif, predSurv = modOut$predSurv, typrisq = modOut$typrisq,
+                  hazardtype = modOut$hazardtype, hazardnodes = modOut$hazardnodes, nz = modOut$nz,
+                  scoretest = modOut$scoretest, na.action = modOut$na.action, levels = levels, 
                   AIC = 2*(length(best)-length(posfix)-modOut$loglik),
                   BIC = (length(best)-length(posfix))*log(modOut$ns)-2*modOut$loglik,
                   varest = varest, runtime = cost[3])

@@ -27,8 +27,10 @@
 
 xclass <- function(m1,m2)
 {
-    if(!(class(m1) %in% c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("Please use this function only with hlme, lcmm, multlcmm, Jointlcmm or mpjlcmm models")
-    if(!(class(m2) %in% c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("Please use this function only with hlme, lcmm, multlcmm, Jointlcmm or mpjlcmm models")
-
+    #if(!(class(m1) %in% c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("Please use this function only with hlme, lcmm, multlcmm, Jointlcmm or mpjlcmm models")
+    #if(!(class(m2) %in% c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("Please use this function only with hlme, lcmm, multlcmm, Jointlcmm or mpjlcmm models")
+    if(!inherits(m1, c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm", "externX", "externSurv"))) stop("Please use this function only with hlme, lcmm, multlcmm, Jointlcmm, mpjlcmm, externX or externSurv models")
+    if(!inherits(m2, c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm", "externX", "externSurv"))) stop("Please use this function only with hlme, lcmm, multlcmm, Jointlcmm, mpjlcmm, externX or externSurv models")
+    
     table(m1$pprob[,2],m2$pprob[,2])
 }

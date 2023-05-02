@@ -7,6 +7,8 @@
 \alias{plot.multlcmm}
 \alias{plot.Jointlcmm}
 \alias{plot.mpjlcmm}
+\alias{plot.externSurv}
+\alias{plot.externX}
 \title{Plot of a fitted model}
 \usage{
 \method{plot}{hlme}(x, which = "residuals", var.time, break.times, marg, subset, shades, ...)
@@ -38,6 +40,10 @@
 )
 
 \method{plot}{mpjlcmm}(x, which, event, ...)
+
+\method{plot}{externSurv}(x, which = "hazard", event, ...)
+
+\method{plot}{externX}(x, which = "postprob", event, ...)
 }
 \arguments{
 \item{x}{an object inheriting from classes \code{hlme}, \code{lcmm},

@@ -1,7 +1,8 @@
 .plotfit <-function(x,var.time,break.times=NULL,marg=TRUE,legend.loc="bottomleft",legend,outcome=1,subset=NULL,shades=FALSE,...)
 {
     if(missing(x)) stop("Argument x should be specified")
-    if(!(class(x) %in% c("hlme","lcmm","Jointlcmm","multlcmm"))) stop("Use with hlme, lcmm, multlcmm or Jointlcmm only")
+    if(!inherits(x, c("hlme","lcmm","Jointlcmm","multlcmm"))) stop("Use with hlme, lcmm, multlcmm or Jointlcmm only")
+    #if(!(class(x) %in% c("hlme","lcmm","Jointlcmm","multlcmm"))) stop("Use with hlme, lcmm, multlcmm or Jointlcmm only")
     if(missing(var.time)) stop("Argument var.time should be specified")
     if(any(x$linktype==3)) stop("This function is not available for thresholds mixed models")
     
@@ -27,7 +28,8 @@
         }
 
     
-    if(class(x) %in% c("hlme","lcmm","Jointlcmm"))
+    #if(class(x) %in% c("hlme","lcmm","Jointlcmm"))
+    if(inherits(x, c("hlme","lcmm","Jointlcmm")))
         {
             if(length(x$na.action)) data <- data[-x$na.action,]  
         }
@@ -98,7 +100,8 @@
 
     if(marg==TRUE)
         {
-            if(class(x) %in% c("hlme","lcmm","Jointlcmm"))
+            #if(class(x) %in% c("hlme","lcmm","Jointlcmm"))
+            if(inherits(x, c("hlme","lcmm","Jointlcmm")))
                 {
                     pred0 <- x$pred[,c(1,6,6+1:ng),drop=FALSE] #ID,obs,pred_m1...ng
                 }
@@ -156,7 +159,8 @@
     if(marg==FALSE)
         {
             
-            if(class(x) %in% c("hlme","lcmm","Jointlcmm"))
+            #if(class(x) %in% c("hlme","lcmm","Jointlcmm"))
+            if(inherits(x, c("hlme","lcmm","Jointlcmm")))
                 {
                     pred <- x$pred[,c(1,6,6+ng+1:ng),drop=FALSE] #ID,obs,pred_ss1...ng
                 }
