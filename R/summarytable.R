@@ -37,7 +37,7 @@
 summarytable <- function(m1, ..., which=c("G","loglik","npm","BIC","%class"), display=TRUE)
     {
         if(missing(m1)) stop("At least one model should be specified")
-        if(!inherits(m1,c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("Use with 'hlme', 'lcmm' , 'multlcmm', 'Jointlcmm' or 'mpjlcmm' objects only")
+        if(!inherits(m1,c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm", "externX", "externSurv"))) stop("Use with 'hlme', 'lcmm' , 'multlcmm', 'Jointlcmm', 'mpjlcmm', 'externX' or 'externSurv' objects only")
         if(any(!(which %in% c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "scoretest","ICL", "ICL1", "ICL2","%class")))) stop(paste("which should contain elements among",paste(c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy", "scoretest", "ICL", "ICL1", "ICL2", "%class"),collapse=", ")))
 
         dots <- list(...)

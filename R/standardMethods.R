@@ -72,6 +72,16 @@ coef.Jointlcmm <- function(object,...)
 coef.mpjlcmm <- function(object,...)
     {
         estimates.mpjlcmm(object)
+}
+#' @export
+coef.externX <- function(object,...)
+    {
+        estimates.externX(object)
+    }
+#' @export
+coef.externSurv <- function(object,...)
+    {
+        estimates.externSurv(object)
     }
 
 
@@ -98,6 +108,16 @@ vcov.Jointlcmm <- function(object,...)
     }
 #' @export
 vcov.mpjlcmm <- function(object,...)
+    {
+        VarCov(object)
+}
+#' @export
+vcov.externX <- function(object,...)
+    {
+        VarCov(object)
+    }
+#' @export
+vcov.externSurv <- function(object,...)
     {
         VarCov(object)
     }

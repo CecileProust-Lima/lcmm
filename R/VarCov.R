@@ -18,7 +18,7 @@
 VarCov <- function(x)
 {
  if(missing(x)) stop("The argument x should be specified")
- if (!inherits(x, c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("use only with hlme, lcmm, multlcmm, Jointlcmm or mpjlcmm objects")
+ if (!inherits(x, c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm","externX","externSurv"))) stop("use only with hlme, lcmm, multlcmm, Jointlcmm, mpjlcmm, externX or externSurv objects")
 
  if(x$conv %in% c(1,2,3))
  {

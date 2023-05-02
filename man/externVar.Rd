@@ -224,7 +224,7 @@ XextBoot <- externVar(PrimMod2,
                       data = data_lcmm,
                       varest = "paramBoot",
                       method = "twoStageJoint",
-                      B = XextNone$best[1:5]) 
+                      B = XextNone$best) 
 summary(XextBoot)
 
  
@@ -266,7 +266,7 @@ YextBoot = externVar(PrimMod2,   #primary model
                      subject="ID",
                      data=data_lcmm,
                      method = "twoStageJoint",
-                     B = YextNone$best[-(1:9)],
+                     B = YextNone$best,
                      varest= "paramBoot")
 
 summary(YextBoot) 
