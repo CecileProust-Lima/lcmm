@@ -49,6 +49,7 @@
       integer,dimension(:),allocatable,save ::idea,idg,idprob,idcor
       integer,dimension(:),allocatable,save::idcom,idspecif,idtdv
       integer,dimension(:),allocatable,save :: nmes,prior
+      double precision,dimension(:,:),allocatable,save ::pprior
       double precision,save :: minY,maxY,epsY
       double precision,dimension(:),allocatable,save::zitr
       double precision,dimension(:),allocatable,save::mm,mm1,mm2,im,im1,im2
@@ -547,38 +548,43 @@
                pi=0.d0
                pi(prior(i))=1.d0
             else
-
-
-               ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
-               Xprob=0.d0
-               !Xprob(1)=1
-               l=0
-               do k=1,nv
-                  if (idprob(k).eq.1) then
-                     l=l+1
-                     Xprob(l)=X(nmes_curr+1,k)
-                  end if
-               end do
-               pi=0.d0
-               temp=0.d0
-               Do g=1,ng-1
-                  bprob=0.d0
-                  do k=1,nvarprob
-                     bprob(k)=b1((k-1)*(ng-1)+g)
-                  end do
-
-                  temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
-
-                  pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
-               end do
-
-               pi(ng)=1/(1+temp)
-
-               do g=1,ng-1
-                  pi(g)=pi(g)*pi(ng)
-               end do
-
-            end if
+                pi=1.d0   
+                if(nprob.gt.0) then
+                   ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
+                   Xprob=0.d0
+                   !Xprob(1)=1
+                   l=0
+                   do k=1,nv
+                      if (idprob(k).eq.1) then
+                         l=l+1
+                         Xprob(l)=X(nmes_curr+1,k)
+                      end if
+                   end do
+                   pi=0.d0
+                   temp=0.d0
+                   Do g=1,ng-1
+                      bprob=0.d0
+                      do k=1,nvarprob
+                         bprob(k)=b1((k-1)*(ng-1)+g)
+                      end do
+                      
+                      temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
+                      
+                      pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
+                   end do
+                   
+                   pi(ng)=1/(1+temp)
+                   
+                   do g=1,ng-1
+                      pi(g)=pi(g)*pi(ng)
+                   end do
+                end if
+                
+                do g=1,ng
+                   pi(g) = pi(g)*pprior(i,g)
+                end do
+                
+             end if
 
 
 ! creation des vecteurs de variables explicatives
@@ -1600,34 +1606,42 @@
             pi=0.d0
             pi(prior(i))=1.d0
          else
-            ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
-            Xprob=0.d0
-            l=0
-            do k=1,nv
-               if (idprob(k).eq.1) then
-                  l=l+1
-                  Xprob(l)=X(it+1,k)
-               end if
-            end do
-            pi=0.d0
-            temp=0.d0
-            Do g=1,ng-1
-               bprob=0.d0
-               do k=1,nvarprob
-                  bprob(k)=b1((k-1)*(ng-1)+g)
+            pi=1.d0   
+            if(nprob.gt.0) then
+               ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
+               Xprob=0.d0
+               l=0
+               do k=1,nv
+                  if (idprob(k).eq.1) then
+                     l=l+1
+                     Xprob(l)=X(it+1,k)
+                  end if
+               end do
+               pi=0.d0
+               temp=0.d0
+               Do g=1,ng-1
+                  bprob=0.d0
+                  do k=1,nvarprob
+                     bprob(k)=b1((k-1)*(ng-1)+g)
+                  end do
+                  
+                  temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
+                  
+                  pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
+                  
                end do
                
-               temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
+               pi(ng)=1/(1+temp)
                
-               pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
-               
-            end do
-
-            pi(ng)=1/(1+temp)
+               do g=1,ng-1
+                  pi(g)=pi(g)*pi(ng)
+               end do
+            end if
             
-            do g=1,ng-1
-               pi(g)=pi(g)*pi(ng)
+            do g=1,ng
+               pi(g) = pi(g)*pprior(i,g)
             end do
+            
          end if
          ! pig ok
 
@@ -2685,30 +2699,38 @@
                    pi=0.d0
                pi(prior(i))=1.d0
             else
-               Xprob=0.d0
-               !Xprob(1)=1.d0
-               l=0
-               do k=1,nv
-                  if (idprob(k).eq.1) then
-                     l=l+1
-                     Xprob(l)=X(it+1,k)
-                  end if
-               end do
-!     write(*,*)'l apres Xprob',l,(Xprob(j),j=1,10)
-               pi=0.d0
-               temp=0.d0
-               Do g=1,ng-1
-                  bprob=0.d0
-                  do k=1,nvarprob
-                     bprob(k)=b1((k-1)*(ng-1)+g)
+               pi=1.d0   
+               if(nprob.gt.0) then
+                  Xprob=0.d0
+                  !Xprob(1)=1.d0
+                  l=0
+                  do k=1,nv
+                     if (idprob(k).eq.1) then
+                        l=l+1
+                        Xprob(l)=X(it+1,k)
+                     end if
                   end do
-                  temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
-                  pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
+                  !     write(*,*)'l apres Xprob',l,(Xprob(j),j=1,10)
+                  pi=0.d0
+                  temp=0.d0
+                  Do g=1,ng-1
+                     bprob=0.d0
+                     do k=1,nvarprob
+                        bprob(k)=b1((k-1)*(ng-1)+g)
+                     end do
+                     temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
+                     pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
+                  end do
+                  pi(ng)=1.d0/(1.d0+temp)
+                  do g=1,ng-1
+                     pi(g)=pi(g)*pi(ng)
+                  end do
+               end if
+               
+               do g=1,ng
+                  pi(g) = pi(g)*pprior(i,g)
                end do
-               pi(ng)=1.d0/(1.d0+temp)
-               do g=1,ng-1
-                  pi(g)=pi(g)*pi(ng)
-               end do
+               
             end if
 
 !     creation des vecteurs de variables explicatives
@@ -3229,38 +3251,45 @@
            else
               pi=1.d0
               if(ng.gt.1) then
-
-                 ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
-                 Xprob=0.d0
-                 !Xprob(1)=1
-                 l=0
-                 do k=1,nv
-                    if (idprob(k).eq.1) then
-                       l=l+1
-                       Xprob(l)=X(nmes_curr+1,k)
-                    end if
-                 end do
-                 pi=0.d0
-                 temp=0.d0
-                 Do g=1,ng-1
-                    bprob=0.d0
-                    do k=1,nvarprob
-                       bprob(k)=b1((k-1)*(ng-1)+g)
+                 pi=1.d0   
+                 if(nprob.gt.0) then
+                    ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
+                    Xprob=0.d0
+                    !Xprob(1)=1
+                    l=0
+                    do k=1,nv
+                       if (idprob(k).eq.1) then
+                          l=l+1
+                          Xprob(l)=X(nmes_curr+1,k)
+                       end if
                     end do
-
-                    temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
-
-                    pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
-                    !write(*,*)"pi(g)",pi(g)
+                    pi=0.d0
+                    temp=0.d0
+                    Do g=1,ng-1
+                       bprob=0.d0
+                       do k=1,nvarprob
+                          bprob(k)=b1((k-1)*(ng-1)+g)
+                       end do
+                       
+                       temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
+                       
+                       pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
+                       !write(*,*)"pi(g)",pi(g)
+                    end do
+                    
+                    pi(ng)=1/(1+temp)
+                    
+                    do g=1,ng-1
+                       pi(g)=pi(g)*pi(ng)
+                    end do
+                 end if
+                 
+                 do g=1,ng
+                    pi(g) = pi(g)*pprior(i,g)
                  end do
-
-                 pi(ng)=1/(1+temp)
-
-                 do g=1,ng-1
-                    pi(g)=pi(g)*pi(ng)
-                 end do
+                
               end if
-
+              
            end if
 
            ! creation des vecteurs de variables explicatives
@@ -3599,7 +3628,7 @@
 
 
       
-  subroutine loglikjointlcmm(Y0,X0,Prior0,Tentr0,Tevt0,Devt0,ind_survint0 &
+  subroutine loglikjointlcmm(Y0,X0,Prior0,pprior0,Tentr0,Tevt0,Devt0,ind_survint0 &
        ,idprob0,idea0,idg0,idcor0,idcom0,idspecif0,idtdv0,idlink0 &
        ,epsY0,nbzitr0,zitr0,uniqueY0,nvalSPL0,indiceY0 &
        ,typrisq0,risqcom0,nz0,zi0 &
@@ -3622,6 +3651,7 @@
       double precision,dimension(nobs0*nv0),intent(in)::X0
       double precision, dimension(ns0),intent(in)::Tentr0,Tevt0
       integer, dimension(ns0),intent(in)::ind_survint0,nmes0,Devt0,prior0
+      double precision, dimension(ns0*ng0), intent(in) :: pprior0
       integer,dimension(nv0),intent(in)::idprob0,idea0,idg0,idcor0 
       integer,intent(in)::idlink0,nbzitr0,nvalSPL0,nbevt0
       integer, dimension(nv0),intent(in)::idcom0,idtdv0
@@ -3732,7 +3762,7 @@
 
       allocate(Y(nobs0),idprob(nv0),X(nobs0,nv0) &
       ,idea(nv0),idg(nv0),idcor(nv0),nmes(ns0),prior(ns0) &
-      ,idcom(nv0),idspecif(nv0*nbevt0),idtdv(nv0))
+      ,idcom(nv0),idspecif(nv0*nbevt0),idtdv(nv0),pprior(ns0,ng0))
 
       !  alloc pour partie survie
 
@@ -3791,7 +3821,8 @@
          nwg=ng-1
       end if
       idiag=idiag0
-
+      prior=0
+      pprior=0.d0
       nmes=nmes0
       Y=0.d0
       X=0.d0
@@ -3829,6 +3860,10 @@
                ktemp=ktemp+1
                it=it+1
                X(it,k)=X0(ktemp)
+            end do
+            
+            do g=1,ng                 
+               pprior(i,g)=pprior0((i-1)*ng+g)
             end do
          end do
       end do
@@ -4184,7 +4219,7 @@
  1236 continue
 
       deallocate(Y,X,idprob,idea,idg,idcor,nmes,Tsurv0,Tsurv,Tsurvint &
-     ,ind_survint,zi,devt,prior,zitr,mm,mm1,mm2,im,im1,im2 &
+     ,ind_survint,zi,devt,prior,pprior,zitr,mm,mm1,mm2,im,im1,im2 &
      ,indiceY,uniqueY,risqcom,typrisq,nz,nprisq,nrisq,idcom,idspecif,idtdv &
      ,nxevtspec,nevtparx,nxcurr)
 

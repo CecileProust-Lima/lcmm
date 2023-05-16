@@ -54,6 +54,7 @@ module communo
   double precision,dimension(:,:),allocatable,save ::X
   integer,dimension(:),allocatable,save ::idea,idg,idprob,ide
   integer,dimension(:),allocatable,save :: nmes,prior
+  double precision,dimension(:,:),allocatable,save ::pprior
   integer,save :: minY,maxY
   integer,dimension(:),allocatable,save::fix
   double precision,dimension(:),allocatable,save::bfix
@@ -257,37 +258,43 @@ double precision function funcpao(b,npm,id,thi,jd,thj)
            pi=0.d0
            pi(prior(i))=1.d0
         else
-
-           ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
-           Xprob=0.d0
-           Xprob(1)=1
-           l=0
-           do k=1,nv
-              if (idprob(k).eq.1) then
-                 l=l+1
-                 Xprob(1+l)=X(it+1,k)
-              end if
-           end do
-           pi=0.d0
-           temp=0.d0
-           Do g=1,ng-1
-              bprob=0.d0
-              do k=1,nvarprob
-                 bprob(k)=b1((k-1)*(ng-1)+g)
+           pi=1.d0
+           if(nprob.gt.0) then
+              ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
+              Xprob=0.d0
+              !Xprob(1)=1
+              l=0
+              do k=1,nv
+                 if (idprob(k).eq.1) then
+                    l=l+1
+                    Xprob(l)=X(it+1,k)
+                 end if
               end do
+              pi=0.d0
+              temp=0.d0
+              Do g=1,ng-1
+                 bprob=0.d0
+                 do k=1,nvarprob
+                    bprob(k)=b1((k-1)*(ng-1)+g)
+                 end do
 
-              temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
-
-              pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
-
+                 temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
+                 
+                 pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
+                 
+              end do
+              
+              pi(ng)=1/(1+temp)
+              
+              do g=1,ng-1
+                 pi(g)=pi(g)*pi(ng)
+              end do
+           end if
+           
+           do g=1,ng
+              pi(g) = pi(g)*pprior(i,g)
            end do
-
-           pi(ng)=1/(1+temp)
-
-           do g=1,ng-1
-              pi(g)=pi(g)*pi(ng)
-           end do
-
+           
         end if
 
         ! creation des vecteurs de variables explicatives
@@ -610,37 +617,43 @@ double precision function funcpio(b,npm,id,thi,jd,thj,i)
         pi=0.d0
         pi(prior(i))=1.d0
      else
-
-        ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
-        Xprob=0.d0
-        Xprob(1)=1
-        l=0
-        do k=1,nv
-           if (idprob(k).eq.1) then
-              l=l+1
-              Xprob(1+l)=X(nmescur+1,k)
-           end if
-        end do
-        pi=0.d0
-        temp=0.d0
-        Do g=1,ng-1
-           bprob=0.d0
-           do k=1,nvarprob
-              bprob(k)=b1((k-1)*(ng-1)+g)
+        pi=1.d0
+        if(nprob.gt.0) then
+           ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
+           Xprob=0.d0
+           !Xprob(1)=1
+           l=0
+           do k=1,nv
+              if (idprob(k).eq.1) then
+                 l=l+1
+                 Xprob(l)=X(nmescur+1,k)
+              end if
            end do
+           pi=0.d0
+           temp=0.d0
+           Do g=1,ng-1
+              bprob=0.d0
+              do k=1,nvarprob
+                 bprob(k)=b1((k-1)*(ng-1)+g)
+              end do
+              
+              temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
+              
+              pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
+              
+           end do
+           
+           pi(ng)=1/(1+temp)
+           
+           do g=1,ng-1
+              pi(g)=pi(g)*pi(ng)
+           end do
+        end if
 
-           temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
-
-           pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
-
+        do g=1,ng
+           pi(g) = pi(g)*pprior(i,g)
         end do
-
-        pi(ng)=1/(1+temp)
-
-        do g=1,ng-1
-           pi(g)=pi(g)*pi(ng)
-        end do
-
+        
      end if
 
      ! creation des vecteurs de variables explicatives
@@ -1086,38 +1099,44 @@ subroutine postprobo(b,npm,PPI)
         pi=0.d0
         pi(prior(i))=1.d0
      else
-
-        ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
-        Xprob=0.d0
-        Xprob(1)=1
-        l=0
-        do k=1,nv
-           if (idprob(k).eq.1) then
-              l=l+1
-              Xprob(1+l)=X(it+1,k)
-           end if
-        end do
-
-        pi=0.d0
-        temp=0.d0
-        Do g=1,ng-1
-           bprob=0.d0
-           do k=1,nvarprob
-              bprob(k)=b1((k-1)*(ng-1)+g)
+        pi=1.d0
+        if(nprob.gt.0) then
+           ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
+           Xprob=0.d0
+           !Xprob(1)=1
+           l=0
+           do k=1,nv
+              if (idprob(k).eq.1) then
+                 l=l+1
+                 Xprob(l)=X(it+1,k)
+              end if
            end do
+           
+           pi=0.d0
+           temp=0.d0
+           Do g=1,ng-1
+              bprob=0.d0
+              do k=1,nvarprob
+                 bprob(k)=b1((k-1)*(ng-1)+g)
+              end do
+              
+              temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
+              
+              pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
+              
+           end do
+           
+           pi(ng)=1/(1+temp)
+           
+           do g=1,ng-1
+              pi(g)=pi(g)*pi(ng)
+           end do
+        end if
 
-           temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
-
-           pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
-
+        do g=1,ng
+           pi(g) = pi(g)*pprior(i,g)
         end do
-
-        pi(ng)=1/(1+temp)
-
-        do g=1,ng-1
-           pi(g)=pi(g)*pi(ng)
-        end do
-
+        
      end if
 
 
@@ -1383,7 +1402,7 @@ end subroutine computUACVo
 
 
 
-subroutine logliklcmmord(Y0,X0,Prior0,idprob0,idea0,idg0,ns0,ng0,nv0,nobs0, &
+subroutine logliklcmmord(Y0,X0,Prior0,pprior0,idprob0,idea0,idg0,ns0,ng0,nv0,nobs0, &
      nea0,nmes0,idiag0,nwg0,npm0,b0,ppi0,resid_m, &
      resid_ss,pred_m_g,pred_ss_g,pred_RE, &
      minY0,maxY0,ide0,marker,transfY,UACV,rlindiv,V,fix0,nfix0,bfix0,estim0,loglik)
@@ -1401,6 +1420,7 @@ subroutine logliklcmmord(Y0,X0,Prior0,idprob0,idea0,idg0,ns0,ng0,nv0,nobs0, &
   integer, intent(in)::ns0,ng0,nobs0,idiag0,nwg0,npm0,nea0
   integer, dimension(nv0),intent(in)::idea0,idg0,idprob0
   integer, dimension(ns0),intent(in)::nmes0,prior0
+  double precision, dimension(ns0*ng0), intent(in) :: pprior0
   double precision,dimension(nobs0),intent(in)::Y0
   double precision,dimension(nobs0*nv0),intent(in)::X0
   integer,dimension(npm0+nfix0),intent(in)::fix0
@@ -1461,7 +1481,7 @@ subroutine logliklcmmord(Y0,X0,Prior0,idprob0,idea0,idg0,ns0,ng0,nv0,nobs0, &
   maxY=maxY0
 
   allocate(Y(nobs0),idprob(nv0),X(nobs0,nv0) &
-       ,idea(nv0),idg(nv0),nmes(ns0),prior(ns0),ide(maxY-minY))
+       ,idea(nv0),idg(nv0),nmes(ns0),prior(ns0),pprior(ns0,ng0),ide(maxY-minY))
 
   ! enrigstrement pour les modules
   ns=ns0
@@ -1475,7 +1495,8 @@ subroutine logliklcmmord(Y0,X0,Prior0,idprob0,idea0,idg0,ns0,ng0,nv0,nobs0, &
   end if
 
   idiag=idiag0
-
+  prior=0
+  pprior=0.d0
   nmes=0
   Y=0.d0
   X=0.d0
@@ -1507,6 +1528,10 @@ subroutine logliklcmmord(Y0,X0,Prior0,idprob0,idea0,idg0,ns0,ng0,nv0,nobs0, &
            it=it+1
            X(it,k)=X0(ktemp)
         end do
+        
+        do g=1,ng                 
+           pprior(i,g)=pprior0((i-1)*ng+g)
+        end do
      end do
   end do
 
@@ -1528,7 +1553,7 @@ subroutine logliklcmmord(Y0,X0,Prior0,idprob0,idea0,idg0,ns0,ng0,nv0,nobs0, &
   nea=0
   ncg=0
   ncssg=0
-  nprob=ng-1
+  nprob=0 !ng-1
   nvarprob=min(ng-1,1)
   do k=1,nv
      if (idg(k).eq.1) then
@@ -1640,7 +1665,7 @@ subroutine logliklcmmord(Y0,X0,Prior0,idprob0,idea0,idg0,ns0,ng0,nv0,nobs0, &
 
 1589 continue
 
-  deallocate(Y,X,idprob,idea,idg,nmes,prior,ide)
+  deallocate(Y,X,idprob,idea,idg,nmes,prior,pprior,ide)
   deallocate(fix,bfix)
 
   return

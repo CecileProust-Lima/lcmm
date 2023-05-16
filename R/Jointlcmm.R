@@ -255,6 +255,9 @@
 #' values in 0,1,...,ng. Value O indicates no prior for the subject while a
 #' value in 1,...,ng indicates that the subject belongs to the corresponding
 #' latent class.
+#' @param pprior optional vector specifying the names of the covariates containing the
+#' prior probabilities to belong to each latent class. These probabilities should be
+#' between 0 and 1 and should sum up to 1 for each subject. 
 #' @param logscale optional boolean indicating whether an exponential
 #' (logscale=TRUE) or a square (logscale=FALSE -by default) transformation is
 #' used to ensure positivity of parameters in the baseline risk functions. See
@@ -451,7 +454,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                       hazardnodes=NULL,hazardrange=NULL,TimeDepVar=NULL,
                       link=NULL,intnodes=NULL,epsY=0.5,range=NULL,
                       cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,
-                      nsim=100,prior=NULL,logscale=FALSE,subset=NULL,na.action=1,
+                      nsim=100,prior=NULL,pprior=NULL,logscale=FALSE,subset=NULL,na.action=1,
                       posfix=NULL,partialH=FALSE,verbose=FALSE,returndata=FALSE,
                       var.time=NULL,nproc=1,clustertype=NULL)
     {
@@ -492,6 +495,17 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
             {
                 nom.prior <- as.character(prior)
                 if(!isTRUE(nom.prior %in% colnames(data))) stop(paste("Data should contain variable",nom.prior))
+            }
+
+        nom.pprior <- NULL
+        if(!is.null(pprior))
+            {
+                if(ng==1) stop("pprior is only useful if ng>1")
+                if(!is.character(pprior)) stop("pprior should be a character vector")
+                if(length(pprior) != ng) stop("pprior should be of length ng")
+                
+                nom.pprior <- as.character(pprior)
+                if(!all(nom.pprior %in% colnames(data))) stop(paste("Data should contain variable",paste(nom.pprior, collapse=" ")))
             }
         
         nom.timedepvar <- NULL
@@ -708,7 +722,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         ttesLesVar <- setdiff(ttesLesVar,nomY)
         
 ###subset de data avec les variables utilisees
-        newdata <- data[,unique(c(nom.subject,nomY,noms.surv,ttesLesVar,nom.prior,nom.timedepvar)),drop=FALSE]
+        newdata <- data[,unique(c(nom.subject,nomY,noms.surv,ttesLesVar,nom.prior,nom.pprior,nom.timedepvar)),drop=FALSE]
 
         ## remplacer les NA de prior par 0  
         if(!is.null(nom.prior))
@@ -717,6 +731,12 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                 newdata[which(is.na(prior)),nom.prior] <- 0
                 prior[which(is.na(prior))] <- 0
             }
+        
+        ##pprior : proba d'appartenance a chaque classe
+        if(!is.null(pprior))
+        {
+            pprior <- newdata[,nom.pprior]
+        }
 
         ## remplacer les NA de TimeDepVar par Tevent
         Tint <- Tevent
@@ -757,6 +777,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                 Event <- Event[-linesNA]
                 Tint <- Tint[-linesNA]
                 prior <- prior[-linesNA]
+                pprior <- pprior[-linesNA,]
             }
 
 
@@ -1000,16 +1021,18 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         IND <- newdata[,nom.subject]
         #IDnum <- as.numeric(IND)
         if(is.null(nom.prior)) prior <- rep(0,length(Y0))  
+        if(is.null(nom.pprior)) pprior <- matrix(1,length(Y0),ng)  
         if(!length(indiceY0)) indiceY0 <- rep(0,length(Y0))  
-        matYX <- cbind(IND,timeobs,prior,Y0,indiceY0,Tentry,Tevent,Event,Tint,X0)
+        matYX <- cbind(IND,timeobs,prior,pprior,Y0,indiceY0,Tentry,Tevent,Event,Tint,X0)
         matYXord <- matYX[order(IND),]
-        Y0 <- as.numeric(matYXord[,4])
-        X0 <- apply(matYXord[,-c(1:9),drop=FALSE],2,as.numeric)
+        Y0 <- as.numeric(matYXord[,4+ng])
+        X0 <- apply(matYXord[,-c(1:(9+ng)),drop=FALSE],2,as.numeric)
         #IDnum <- matYXord[,1]
         IND <- matYXord[,1]
-        indiceY0 <- as.numeric(matYXord[,5])
+        indiceY0 <- as.numeric(matYXord[,5+ng])
         prior0 <- as.numeric(unique(matYXord[,c(1,3)])[,2])
         if(length(prior0)!=length(unique(IND))) stop("Please check 'prior' argument. Subjects can not have multiple assigned classes.")
+        pprior0 <- t(matYXord[!duplicated(matYXord[,1]), 3+1:ng, drop=FALSE])       
         timeobs <- matYXord[,2]
 
         ## nombre de sujets
@@ -1020,12 +1043,13 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                                         #if(nrow(data.surv) != ns0) stop("Subjects cannot have several times to event.")
         
         nmes <- as.vector(table(IND))
-        data.surv <- sweep(matYXord[cumsum(nmes),c(6,7,8,9), drop=FALSE], MARGIN=1, STATS=0, FUN=function(x,y){as.numeric(x)+y})
+        ##data.surv <- sweep(matYXord[cumsum(nmes),ng+c(6,7,8,9), drop=FALSE], MARGIN=1, STATS=0, FUN=function(x,y){as.numeric(x)+y})
+        data.surv <- matYXord[cumsum(nmes),ng+c(6,7,8,9), drop=FALSE]
         
-        tsurv0 <- data.surv[,1] 
-        tsurv <- data.surv[,2]
-        devt <- data.surv[,3]
-        tsurvint <- data.surv[,4]
+        tsurv0 <- as.numeric(data.surv[,1])
+        tsurv <- as.numeric(data.surv[,2])
+        devt <- as.numeric(data.surv[,3])
+        tsurvint <- as.numeric(data.surv[,4])
         ind_survint <- (tsurvint<tsurv) + 0 
 
 
@@ -1839,7 +1863,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                                         bb <- rmvnorm(n=1,mean=bb,sigma = vbb) #bb + Chol %*% rnorm(length(bb))
 
                                         
-                                        b[1:nprob] <- 0
+                                        if(nprob>0) b[1:nprob] <- 0
 
                                         avt <- 0
                                         for(ke in 1:nbevt)
@@ -1972,7 +1996,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         nom.X0[which(nom.X0=="(Intercept)")] <- "intercept"
         
         ##prm classmb   
-        if(ng0>=2)
+        if(ng0>=2 & nprob>0)
             {
                 nom <- rep(nom.X0[idprob0==1],each=ng0-1)
                 nom1 <- paste(nom," class",c(1:(ng0-1)),sep="")
@@ -2161,7 +2185,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
 
 
         ##prm fixed   
-        if(ng0==1)
+        if(ng0==1 & nef>0)
             {
                 if(idlink!=-1)
                     {
@@ -2240,7 +2264,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
 
         if(maxiter==0)
         {
-            vrais <- loglikJointlcmm(b,Y0,X0,prior0,tsurv0,tsurv,devt,ind_survint,
+            vrais <- loglikJointlcmm(b,Y0,X0,prior0,pprior0,tsurv0,tsurv,devt,ind_survint,
                                      idprob0,idea0,idg0,idcor0,idcom,idspecif,idtdv,
                                      idlink,epsY,nbzitr,zitr0,uniqueY0,nvalSPL0,
                                      indiceY0,typrisq,risqcom,nz,zi,ns0,ng0,nv0,
@@ -2266,7 +2290,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                        digits=8,print.info=verbose,blinding=FALSE,
                        multipleTry=25,file="",
                        nproc=nproc,maxiter=maxiter,minimize=FALSE,
-                       Y0=Y0,X0=X0,prior0=prior0,tentr0=tsurv0,tevt0=tsurv,devt0=devt,
+                       Y0=Y0,X0=X0,prior0=prior0,pprior0=pprior0,tentr0=tsurv0,tevt0=tsurv,devt0=devt,
                        ind_survint0=ind_survint,idprob0=idprob0,idea0=idea0,idg0=idg0,
                        idcor0=idcor0,idcom0=idcom,idspecif0=idspecif,idtdv0=idtdv,
                        idlink0=idlink,epsY0=epsY,nbzitr0=nbzitr,zitr0=zitr0,
@@ -2312,6 +2336,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                              as.double(Y0),
                              as.double(X0),
                              as.integer(prior0),
+                             as.double(pprior0),
                              as.double(tsurv0),
                              as.double(tsurv),
                              as.integer(devt),
