@@ -243,6 +243,9 @@
 #' membership. The covariate should be an integer with values in 0,1,...,ng.
 #' When there is no prior, the value should be 0. When there is a prior for the
 #' subject, the value should be the number of the latent class (in 1,...,ng).
+#' @param pprior optional vector specifying the names of the covariates containing the
+#' prior probabilities to belong to each latent class. These probabilities should be
+#' between 0 and 1 and should sum up to 1 for each subject. 
 #' @param range optional vector indicating the range of the outcome (that is
 #' the minimum and maximum). By default, the range is defined according to the
 #' minimum and maximum observed values of the outcome. The option should be
@@ -439,7 +442,7 @@
 #' 
 #' 
 #' 
-lcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=FALSE,returndata=FALSE,var.time=NULL,nproc=1,clustertype=NULL,computeDiscrete=NULL)
+lcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,pprior=NULL,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=FALSE,returndata=FALSE,var.time=NULL,nproc=1,clustertype=NULL,computeDiscrete=NULL)
 {
 
 mm <- match.call()
@@ -771,13 +774,13 @@ if(!(idlink0 %in% c(1,2)) & isTRUE(partialH)) stop("No partial Hessian can be de
 link <- as.character(link)
 ### appel des differents modeles selon la valeur de l'argument link
 result <- switch(link
-,"linear"=.Contlcmm(fixed=fixed,mixture=mixture,random=random,subject=subject,classmb=classmb,ng=ng,idiag=idiag,nwg=nwg,cor=cor.char,data=data,B=B,convB=convB,convL=convL,convG=convG,prior=prior,maxiter=maxiter,epsY=epsY,idlink0=idlink0,ntrtot0=ntrtot0,nbzitr0=nbzitr0,zitr=zitr,nsim=nsim,call=mm,Ydiscrete,subset=subset,na.action,posfix=posfix,partialH=partialH,verbose=verbose,returndata=returndata,var.time=var.time,nproc=nproc,clustertype=clustertype)
+,"linear"=.Contlcmm(fixed=fixed,mixture=mixture,random=random,subject=subject,classmb=classmb,ng=ng,idiag=idiag,nwg=nwg,cor=cor.char,data=data,B=B,convB=convB,convL=convL,convG=convG,prior=prior,pprior=pprior,maxiter=maxiter,epsY=epsY,idlink0=idlink0,ntrtot0=ntrtot0,nbzitr0=nbzitr0,zitr=zitr,nsim=nsim,call=mm,Ydiscrete,subset=subset,na.action,posfix=posfix,partialH=partialH,verbose=verbose,returndata=returndata,var.time=var.time,nproc=nproc,clustertype=clustertype)
 
-,"beta"=.Contlcmm(fixed=fixed,mixture=mixture,random=random,subject=subject,classmb=classmb,ng=ng,idiag=idiag,nwg=nwg,cor=cor.char,data=data,B=B,convB=convB,convL=convL,convG=convG,prior=prior,maxiter=maxiter,epsY=epsY,idlink0=idlink0,ntrtot0=ntrtot0,nbzitr0=nbzitr0,zitr=zitr,nsim=nsim,call=mm,Ydiscrete,subset=subset,na.action,posfix=posfix,partialH=partialH,verbose=verbose,returndata=returndata,var.time=var.time,nproc=nproc,clustertype=clustertype)
+,"beta"=.Contlcmm(fixed=fixed,mixture=mixture,random=random,subject=subject,classmb=classmb,ng=ng,idiag=idiag,nwg=nwg,cor=cor.char,data=data,B=B,convB=convB,convL=convL,convG=convG,prior=prior,pprior=pprior,maxiter=maxiter,epsY=epsY,idlink0=idlink0,ntrtot0=ntrtot0,nbzitr0=nbzitr0,zitr=zitr,nsim=nsim,call=mm,Ydiscrete,subset=subset,na.action,posfix=posfix,partialH=partialH,verbose=verbose,returndata=returndata,var.time=var.time,nproc=nproc,clustertype=clustertype)
 
-,"splines"=.Contlcmm(fixed=fixed,mixture=mixture,random=random,subject=subject,classmb=classmb,ng=ng,idiag=idiag,nwg=nwg,cor=cor.char,data=data,B=B,convB=convB,convL=convL,convG=convG,prior=prior,maxiter=maxiter,epsY=epsY,idlink0=idlink0,ntrtot0=ntrtot0,nbzitr0=nbzitr0,zitr=zitr,nsim=nsim,call=mm,Ydiscrete,subset=subset,na.action,posfix=posfix,partialH=partialH,verbose=verbose,returndata=returndata,var.time=var.time,nproc=nproc,clustertype=clustertype)
+,"splines"=.Contlcmm(fixed=fixed,mixture=mixture,random=random,subject=subject,classmb=classmb,ng=ng,idiag=idiag,nwg=nwg,cor=cor.char,data=data,B=B,convB=convB,convL=convL,convG=convG,prior=prior,pprior=pprior,maxiter=maxiter,epsY=epsY,idlink0=idlink0,ntrtot0=ntrtot0,nbzitr0=nbzitr0,zitr=zitr,nsim=nsim,call=mm,Ydiscrete,subset=subset,na.action,posfix=posfix,partialH=partialH,verbose=verbose,returndata=returndata,var.time=var.time,nproc=nproc,clustertype=clustertype)
                  
-,"thresholds"=.Ordlcmm(fixed=fixed,mixture=mixture,random=random,subject=subject,classmb=classmb,ng=ng,idiag=idiag,nwg=nwg,data=data,B=B,convB=convB,convL=convL,convG=convG,prior=prior,maxiter=maxiter,zitr=zitr,ide=ide0,call=mm,Ydiscrete,subset=subset,na.action=na.action,posfix=posfix,partialH=partialH,verbose=verbose,returndata=returndata,var.time=var.time,nproc=nproc,clustertype=clustertype))
+,"thresholds"=.Ordlcmm(fixed=fixed,mixture=mixture,random=random,subject=subject,classmb=classmb,ng=ng,idiag=idiag,nwg=nwg,data=data,B=B,convB=convB,convL=convL,convG=convG,prior=prior,pprior=pprior,maxiter=maxiter,zitr=zitr,ide=ide0,call=mm,Ydiscrete,subset=subset,na.action=na.action,posfix=posfix,partialH=partialH,verbose=verbose,returndata=returndata,var.time=var.time,nproc=nproc,clustertype=clustertype))
   
 return(result)
 }

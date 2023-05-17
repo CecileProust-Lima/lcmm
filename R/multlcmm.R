@@ -229,6 +229,9 @@
 #' membership. The covariate should be an integer with values in 0,1,...,ng.
 #' When there is no prior, the value should be 0. When there is a prior for the
 #' subject, the value should be the number of the latent class (in 1,...,ng).
+#' @param pprior optional vector specifying the names of the covariates containing the
+#' prior probabilities to belong to each latent class. These probabilities should be
+#' between 0 and 1 and should sum up to 1 for each subject. 
 #' @param range optional vector indicating the range of the outcomes (that is
 #' the minimum and maximum). By default, the range is defined according to the
 #' minimum and maximum observed values of the outcome. The option should be
@@ -382,7 +385,7 @@
 #' 
 #' @export
 #' 
-multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,randomY=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=FALSE,returndata=FALSE,methInteg="QMC",nMC=NULL,var.time=NULL,nproc=1,clustertype=NULL)
+multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,randomY=FALSE,link="linear",intnodes=NULL,epsY=0.5,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,maxiter=100,nsim=100,prior,pprior=NULL,range=NULL,subset=NULL,na.action=1,posfix=NULL,partialH=FALSE,verbose=FALSE,returndata=FALSE,methInteg="QMC",nMC=NULL,var.time=NULL,nproc=1,clustertype=NULL)
 {
     ptm<-proc.time()
 
@@ -390,9 +393,18 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 
     nom.subject <- as.character(subject)
 
-#### INCLUSION PRIOR
+#### INCLUSION PRIOR / pprior
     nom.prior <- NULL
     if(!missing(prior)) nom.prior <- as.character(prior)
+
+    nom.pprior <- NULL
+    if(!is.null(pprior))
+    {
+        if(ng==1) stop("pprior is only useful if ng>1")
+        if(!is.character(pprior)) stop("pprior should be a character vector")
+        if(length(pprior) != ng) stop("pprior should be of length ng")
+        nom.pprior <- as.character(pprior)
+    }
 ####
 
     if(!missing(mixture) & ng==1) stop("No mixture can be specified with ng=1")
@@ -412,6 +424,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     if(!inherits(random,"formula")) stop("The argument random must be a formula")
     if(!inherits(classmb,"formula")) stop("The argument classmb must be a formula")
     if(missing(data)){ stop("The argument data should be specified and defined as a data.frame")}
+    data <- as.data.frame(data)
     if(nrow(data)==0) stop("Data should not be empty")
     if(missing(subject)){ stop("The argument subject must be specified")}
     if(!is.numeric(data[[subject]])) stop("The argument subject must be numeric")
@@ -479,11 +492,11 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     acontr <- terms(contr)
     
     ##tjrs intercept dans classmb
-    if(attr(aclassmb,"intercept")==0 & ng>1)
-        {
-            attr(aclassmb,"intercept") <- 1
-            cat("The formula in classmb should always include an intercept. An intercept has been added.")
-        }
+    ## if(attr(aclassmb,"intercept")==0 & ng>1)
+    ##     {
+    ##         attr(aclassmb,"intercept") <- 1
+    ##         cat("The formula in classmb should always include an intercept. An intercept has been added.")
+    ##     }
 
 ###liste des outcomes
     nomsY <- as.character(attr(afixed,"variables")[2])
@@ -528,24 +541,27 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     
 ###subset de data avec les variables utilisees
     
-    newdata <- data[,c(nom.subject,nomsY,ttesLesVar,nom.prior)]
+    newdata <- data[,c(nom.subject,nomsY,ttesLesVar,nom.prior,nom.pprior)]
     if(!is.null(nom.prior))
         {
             prior <- newdata[,nom.prior]
             newdata[which(is.na(prior)),nom.prior] <- 0
         }
 
+   
+    
 ###un data frame par outcome et creation Y0
     dataY <- paste("data",nomsY,sep=".")
     Y0 <- NULL
     IND <- NULL
     outcome <- NULL
     prior <- NULL
+    pprior <- NULL
     data0 <- NULL
     nayk <- vector("list",ny0)
     for (k in 1:ny0)
         {
-            dtemp <- newdata[,c(nom.subject,nomsY[k],ttesLesVar,nom.prior)]
+            dtemp <- newdata[,c(nom.subject,nomsY[k],ttesLesVar,nom.prior,nom.pprior)]
             ##enlever les NA
             linesNA <- apply(dtemp,2,function(v) which(is.na(v)))
             linesNA <- unique(unlist(linesNA))
@@ -557,11 +573,19 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
             IND <- c(IND, dtemp[,nom.subject])
             outcome <- c(outcome,rep(nomsY[k],nrow(dtemp)))
             if(!is.null(nom.prior)) prior <- c(prior, dtemp[,nom.prior])
+            if(!is.null(nom.pprior)) pprior <- rbind(pprior, dtemp[,nom.pprior])
             data0 <- rbind(data0, dtemp[,setdiff(colnames(dtemp),nomsY[k]),drop=FALSE])   #dataset sans NA avec les covariables utilisees; obs ordonnees par outcome
         }
 
 ###prior=0 si pas specifie
     if(is.null(prior)) prior <- rep(0,length(Y0))
+
+    ##pprior1 si pas specifie
+    if(is.null(pprior))
+    {
+        pprior <- matrix(1, length(Y0), ng)            
+    }
+
 
 ###creation de X0 (ttes les var + interactions)
 
@@ -858,16 +882,17 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 
 ###ordonner les mesures par individu
     #IDnum <- as.numeric(IND)
-    matYX <- cbind(IND,timeobs,prior,Y0,indiceY0,outcome,X0)
+    matYX <- cbind(IND,timeobs,prior,pprior,Y0,indiceY0,outcome,X0)
     matYXord <- matYX[order(IND),]
-    Y0 <- as.numeric(matYXord[,4])
-    X0 <- apply(matYXord[,-c(1,2,3,4,5,6),drop=FALSE],2,as.numeric)
+    Y0 <- as.numeric(matYXord[,4+ng])
+    X0 <- apply(matYXord[,-c(1:(6+ng)),drop=FALSE],2,as.numeric)
                                         #X0 <- as.matrix(X0)  a remettre si X0 <- as.data.frame(X0) remis l.211
     IND <- matYXord[,1]
-    outcome <- matYXord[,6]
-    indiceY0 <- as.numeric(matYXord[,5])
+    outcome <- matYXord[,6+ng]
+    indiceY0 <- as.numeric(matYXord[,5+ng])
     prior0 <- as.numeric(unique(matYXord[,c(1,3)])[,2])
     if(length(prior0)!=length(unique(IND))) stop("Please check 'prior' argument. Subjects can not have multiple assigned classes.")
+    pprior0 <- t(matYXord[!duplicated(matYXord[,1]), 3+1:ng, drop=FALSE])
     timeobs <- matYXord[,2]
         
 
@@ -1208,7 +1233,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                                             }
 
                                         ## les prm de classmb et nwg sont toujours initalises a 0 et 1
-                                        b[1:nprob] <- 0
+                                        if(nprob>0) b[1:nprob] <- 0
                                         if(nw>0) b[nef+nvc+1:nw] <- 1
 
                                         ## if(nvc>0)
@@ -1277,7 +1302,8 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     NPM2 <- nef2+ nvc+ncor0+nalea0+ny0+sum(ntrtot0)
     
     wRandom <- rep(0,NPM)
-    b0Random <- rep(0,ng-1)
+    b0Random <- NULL
+    if(nprob>0) b0Random <- rep(0,ng-1)
     
     l <- 0
     t <- 0
@@ -1341,7 +1367,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 
     nom.X0 <- colnames(X0)
     nom.X0[nom.X0=="(Intercept)"] <- "intercept"
-    if(ng0>=2)
+    if(ng0>=2 & nprob>0)
         {
             nom <-rep(nom.X0[idprob0==1],each=ng0-1)
             nom1 <- paste(nom," class",c(1:(ng0-1)),sep="")
@@ -1349,7 +1375,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
         }
 
 
-    if(ng0==1) names(b)[1:(nef-ncontr)] <- nom.X0[-1][idg0[-1]!=0]
+    if(ng0==1 & (nef-ncontr)>0) names(b)[1:(nef-ncontr)] <- nom.X0[-1][idg0[-1]!=0]
     if(ng0>1){
  	nom1<- NULL
  	for (i in 1:nv0) {
@@ -1440,7 +1466,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 
     if(maxiter==0)
     {
-        vrais <- loglikmultlcmm(b,Y0,X0,prior0,idprob0,idea0,idg0,idcor0,idcontr0,
+        vrais <- loglikmultlcmm(b,Y0,X0,prior0,pprior0,idprob0,idea0,idg0,idcor0,idcontr0,
                                 ny0,ns0,ng0,nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0,
                                 nalea0,NPM,epsY,idlink0,nbzitr0,zitr,uniqueY0,
                                 indiceY0,nvalSPLORD0,fix0,nfix,bfix,methInteg,nMC,
@@ -1462,7 +1488,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                    digits=8,print.info=verbose,blinding=FALSE,
                    multipleTry=25,file="",
                    nproc=nproc,maxiter=maxiter,minimize=FALSE,
-                   Y0=Y0,X0=X0,prior0=prior0,idprob0=idprob0,idea0=idea0,idg0=idg0,
+                   Y0=Y0,X0=X0,prior0=prior0,pprior0=pprior0,idprob0=idprob0,idea0=idea0,idg0=idg0,
                    idcor0=idcor0,idcontr0=idcontr0,ny0=ny0,ns0=ns0,ng0=ng0,nv0=nv0,
                    nobs0=nobs0,nea0=nea0,nmes0=nmes0,idiag0=idiag0,nwg0=nwg0,
                    ncor0=ncor0,nalea0=nalea0,npm0=NPM,epsY0=epsY,idlink0=idlink0,
@@ -1502,6 +1528,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                          as.double(Y0),
                          as.double(X0),
                          as.integer(prior0),
+                         as.double(prior0),
                          as.integer(idprob0),
                          as.integer(idea0),
                          as.integer(idg0),

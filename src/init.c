@@ -11,11 +11,11 @@ static R_FortranMethodDef FortRout[] = {
   {"postprob2", (DL_FUNC) &F77_SUB(postprob2), 40},
   {"calculustransfo", (DL_FUNC) &F77_SUB(calculustransfo), 16},
   {"iteminfo", (DL_FUNC) &F77_SUB(iteminfo), 15},
-  {"loglikmultlcmm", (DL_FUNC) &F77_SUB(loglikmultlcmm), 53},
-  {"loglikjointlcmm", (DL_FUNC) &F77_SUB(loglikjointlcmm), 60},
+  {"loglikmultlcmm", (DL_FUNC) &F77_SUB(loglikmultlcmm), 54},
+  {"loglikjointlcmm", (DL_FUNC) &F77_SUB(loglikjointlcmm), 61},
   {"loglikmpjlcmm", (DL_FUNC) &F77_SUB(loglikmpjlcmm), 62},
-  {"logliklcmmcont", (DL_FUNC) &F77_SUB(logliklcmmcont), 42},
-  {"logliklcmmord", (DL_FUNC) &F77_SUB(logliklcmmord), 35},
+  {"logliklcmmcont", (DL_FUNC) &F77_SUB(logliklcmmcont), 43},
+  {"logliklcmmord", (DL_FUNC) &F77_SUB(logliklcmmord), 36},
   {"loglikhlme", (DL_FUNC) &F77_SUB(loglikhlme), 31},
   {NULL, NULL, 0}
 };

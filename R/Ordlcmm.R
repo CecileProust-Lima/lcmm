@@ -1,6 +1,6 @@
 ###################### derniere mise a jour : 2012/03/16 ############"
 .Ordlcmm <-
-    function(fixed,mixture,random,subject,classmb,ng,idiag,nwg,data,B,convB,convL,convG,prior,maxiter,zitr,ide,call,Ydiscrete,subset=subset,na.action,posfix,partialH,verbose,returndata,var.time,nproc,clustertype)
+    function(fixed,mixture,random,subject,classmb,ng,idiag,nwg,data,B,convB,convL,convG,prior,pprior=NULL,maxiter,zitr,ide,call,Ydiscrete,subset=subset,na.action,posfix,partialH,verbose,returndata,var.time,nproc,clustertype)
 {
     
     ptm<-proc.time()
@@ -17,7 +17,8 @@
     if(!missing(classmb) & ng==1) stop("No classmb can be specified with ng=1")
     if(missing(random)) random <- ~-1
     if(missing(fixed)) stop("The argument Fixed must be specified in any model")
-    if(missing(classmb)) classmb <- ~-1
+    if(missing(classmb) & ng==1) classmb <- ~-1
+    if(missing(classmb) & ng>1) classmb <- ~1
     if(missing(mixture)) mixture <- ~-1
     if(ng==1&nwg==TRUE) stop ("The argument nwg should be FALSE for ng=1")
 
@@ -259,6 +260,21 @@
     }
 ####
 
+        ##pprior : proba d'appartenance a chaque classe
+        if(is.null(pprior))
+        {
+            pprior0 <- matrix(1, length(IND), ng)            
+        }
+        else
+        {
+            if(ng==1) stop("pprior is only useful if ng>1")
+            if(!is.character(pprior)) stop("pprior should be a character vector")
+            if(length(pprior) != ng) stop("pprior should be of length ng")
+            if(!all(pprior %in% colnames(newdata))) stop("pprior variables should be included in data")
+
+            pprior0 <- newdata[,pprior]
+        }
+    
     ng0 <- ng
     idiag0 <- as.integer(idiag)
     nwg0 <- as.integer(nwg)
@@ -278,13 +294,13 @@
             if((z.X0[i] %in% z.fixed) & (z.X0[i] %in% z.mixture)) idg0[i] <- 2     
         }
 
-    if((int.fixed+int.random)>0) idprob0[1] <- 0
+    #if((int.fixed+int.random)>0) idprob0[1] <- 0
 
     ## on ordonne les donnees suivant la variable IND
-    matYX <- cbind(IND,PRIOR,Y0,X0)
+    matYX <- cbind(IND,PRIOR,pprior0,Y0,X0)
     matYXord <- matYX[sort.list(matYX[,1]),]
-    Y0 <- as.numeric(matYXord[,3] )
-    X0 <- apply(matYXord[,-c(1,2,3),drop=FALSE],2,as.numeric)
+    Y0 <- as.numeric(matYXord[,3+ng] )
+    X0 <- apply(matYXord[,-c(1:(3+ng)),drop=FALSE],2,as.numeric)
     #IDnum <- matYXord[,1]
     IND <- matYXord[,1]
 
@@ -312,6 +328,18 @@
     if (!(all(prior0  %in% seqnG))) stop ("The argument prior should contain integers between 0 and ng")
 #####
 
+    ## pprior de dim ns
+    if(!is.null(pprior))
+    {
+        pprior0 <- matYX[cumsum(nmes0),2+1:ng, drop=FALSE]
+        if(any(is.na(pprior0))) stop("pprior contains missing values")
+    }
+    else
+    {
+        pprior0 <- matrix(1, ns0, ng0)
+    }
+    pprior0 <- t(pprior0)       
+    
 
     loglik <- as.double(0)
     rlindiv <- rep(0,ns0)
@@ -378,7 +406,7 @@
 
 #####cas 2 : ng>=2
     if(ng0>1){
-        NPROB <- (sum(idprob0==1)+1)*(ng0-1)
+        NPROB <- (sum(idprob0==1))*(ng0-1)
         NEF <- sum(idg0==1)+(sum(idg0==2))*ng0-1
         NVC <- 0
         if(idiag0==1&nea0>0) NVC <- sum(idea0==1)
@@ -618,7 +646,7 @@
                                             b[c((NPROB+1):(NPROB+NEF+NVC),(NPROB+NEF+NVC+NW+1):NPM)] <- rmvnorm(n=1,mean=bb,sigma = vbb) #bb + Chol %*% rnorm(length(bb))
                                         }
 
-                                    b[1:NPROB] <- 0
+                                    if(NPROB>0) b[1:NPROB] <- 0
                                     if(NW>0) b[NPROB+NEF+NVC+1:NW] <- 1
                                                                        
                                 }
@@ -633,8 +661,8 @@
 
             
 
-    if(ng0>=2){
-        nom <-rep(c("intercept",nom.X0[idprob0!=0]),each=ng0-1)
+    if(ng0>=2 & NPROB>0){
+        nom <-rep(nom.X0[idprob0!=0],each=ng0-1)
         nom1 <- paste(nom," class",c(1:(ng0-1)),sep="")
         names(b)[1:NPROB]<-nom1
     }
@@ -709,7 +737,7 @@
     
     if(maxiter==0)
     {
-        vrais <- logliklcmm(b,Y0,X0,prior0,idprob0,idea0,idg0,idcor0,
+        vrais <- logliklcmm(b,Y0,X0,prior0,pprior0,idprob0,idea0,idg0,idcor0,
                             ns0,ng0,nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0,
                             NPM,epsY0,idlink0,nbzitr0,zitr0,minY,maxY,ide,
                             fix0,nfix,bfix)
@@ -730,7 +758,7 @@
                    digits=8,print.info=verbose,blinding=FALSE,
                    multipleTry=25,file="",
                    nproc=nproc,maxiter=maxiter,minimize=FALSE,
-                   Y0=Y0,X0=X0,prior0=prior0,idprob0=idprob0,idea0=idea0,
+                   Y0=Y0,X0=X0,prior0=prior0,pprior0=pprior0,idprob0=idprob0,idea0=idea0,
                    idg0=idg0,idcor0=idcor0,ns0=ns0,ng0=ng0,nv0=nv0,nobs=nobs0,
                    nea0=nea0,nmes0=nmes0,idiag=idiag0,nwg0=nwg0,ncor0=ncor0,
                    npm0=NPM,epsY0=epsY0,idlink0=idlink0,nbzitr0=nbzitr0,zitr0=zitr0,
@@ -768,6 +796,7 @@
                          as.double(Y0),
                          as.double(X0),
                          as.integer(prior0),
+                         as.double(pprior0),
                          as.integer(idprob0),
                          as.integer(idea0),
                          as.integer(idg0),

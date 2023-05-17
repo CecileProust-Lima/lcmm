@@ -95,7 +95,7 @@ loglikhlme <- function(b,Y0,X0,prior0,pprior0,idprob0,idea0,idg0,idcor0,
 
 #'@rdname loglik
 #'@export
-logliklcmm <- function(b,Y0,X0,prior0,idprob0,idea0,idg0,idcor0,ns0,ng0,nv0,nobs0,
+logliklcmm <- function(b,Y0,X0,prior0,pprior0,idprob0,idea0,idg0,idcor0,ns0,ng0,nv0,nobs0,
                        nea0,nmes0,idiag0,nwg0,ncor0,npm0,epsY0,idlink0,nbzitr0,zitr0,
                        minY0,maxY0,ide0,fix0,nfix0,bfix0)
 {
@@ -118,7 +118,7 @@ logliklcmm <- function(b,Y0,X0,prior0,idprob0,idea0,idg0,idcor0,ns0,ng0,nv0,nobs
     {
         marker <- rep(0,2*(maxY0-minY0+1))
         transfY <- rep(0,2*(maxY0-minY0+1))
-        ll <- .Fortran(C_logliklcmmord,as.double(Y0),as.double(X0),as.integer(prior0),as.integer(idprob0),as.integer(idea0),as.integer(idg0),as.integer(ns0),as.integer(ng0),as.integer(nv0),as.integer(nobs0),as.integer(nea0),as.integer(nmes0),as.integer(idiag0),as.integer(nwg0),as.integer(npm0),as.double(b),as.double(ppi0),as.double(resid_m),as.double(resid_ss),as.double(pred_m_g),as.double(pred_ss_g),as.double(predRE),as.integer(minY0),as.integer(maxY0),as.integer(ide0),as.double(marker),as.double(transfY),as.double(UACV),as.double(rlindiv),as.double(v),as.integer(fix0),as.integer(nfix0),as.double(bfix0),as.integer(estim0),loglik=as.double(res))$loglik
+        ll <- .Fortran(C_logliklcmmord,as.double(Y0),as.double(X0),as.integer(prior0),as.double(pprior0),as.integer(idprob0),as.integer(idea0),as.integer(idg0),as.integer(ns0),as.integer(ng0),as.integer(nv0),as.integer(nobs0),as.integer(nea0),as.integer(nmes0),as.integer(idiag0),as.integer(nwg0),as.integer(npm0),as.double(b),as.double(ppi0),as.double(resid_m),as.double(resid_ss),as.double(pred_m_g),as.double(pred_ss_g),as.double(predRE),as.integer(minY0),as.integer(maxY0),as.integer(ide0),as.double(marker),as.double(transfY),as.double(UACV),as.double(rlindiv),as.double(v),as.integer(fix0),as.integer(nfix0),as.double(bfix0),as.integer(estim0),loglik=as.double(res))$loglik
     }
     else
     {
@@ -126,7 +126,7 @@ logliklcmm <- function(b,Y0,X0,prior0,idprob0,idea0,idg0,idcor0,ns0,ng0,nv0,nobs
         marker <- rep(0,nsim0)
         transfY <- rep(0,nsim0)
         
-        ll <- .Fortran(C_logliklcmmcont,as.double(Y0),as.double(X0),as.integer(prior0),as.integer(idprob0),as.integer(idea0),as.integer(idg0),as.integer(idcor0),as.integer(ns0),as.integer(ng0),as.integer(nv0),as.integer(nobs0),as.integer(nea0),as.integer(nmes0),as.integer(idiag0),as.integer(nwg0),as.integer(ncor0),as.integer(npm0),as.double(b),as.double(ppi0),as.double(resid_m),as.double(resid_ss),as.double(pred_m_g),as.double(pred_ss_g),as.double(predRE),as.double(epsY0),as.integer(idlink0),as.integer(nbzitr0),as.double(zitr0),as.double(marker),as.double(transfY),as.integer(nsim0),as.double(Yobs),as.integer(Ydiscret),as.double(vraisdiscret),as.double(UACV),as.double(rlindiv),as.double(v),as.integer(fix0),as.integer(nfix0),as.double(bfix0),as.integer(estim0),loglik=as.double(res))$loglik
+        ll <- .Fortran(C_logliklcmmcont,as.double(Y0),as.double(X0),as.integer(prior0),as.double(pprior0),as.integer(idprob0),as.integer(idea0),as.integer(idg0),as.integer(idcor0),as.integer(ns0),as.integer(ng0),as.integer(nv0),as.integer(nobs0),as.integer(nea0),as.integer(nmes0),as.integer(idiag0),as.integer(nwg0),as.integer(ncor0),as.integer(npm0),as.double(b),as.double(ppi0),as.double(resid_m),as.double(resid_ss),as.double(pred_m_g),as.double(pred_ss_g),as.double(predRE),as.double(epsY0),as.integer(idlink0),as.integer(nbzitr0),as.double(zitr0),as.double(marker),as.double(transfY),as.integer(nsim0),as.double(Yobs),as.integer(Ydiscret),as.double(vraisdiscret),as.double(UACV),as.double(rlindiv),as.double(v),as.integer(fix0),as.integer(nfix0),as.double(bfix0),as.integer(estim0),loglik=as.double(res))$loglik
     }
 
     return(ll)
@@ -137,12 +137,10 @@ logliklcmm <- function(b,Y0,X0,prior0,idprob0,idea0,idg0,idcor0,ns0,ng0,nv0,nobs
 
 #'@rdname loglik
 #'@export
-loglikmultlcmm <- function(b,Y0,X0,prior0,idprob0,idea0,idg0,idcor0,idcontr0,ny0,ns0,ng0,
+loglikmultlcmm <- function(b,Y0,X0,prior0,pprior0,idprob0,idea0,idg0,idcor0,idcontr0,ny0,ns0,ng0,
                            nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0,nalea0,npm0,
-                           #ppi0,resid_m,resid_ss,pred_m_g,pred_ss_g,pred_RE,pred_RE_Y,
                            epsY0,idlink0,nbzitr0,zitr0,uniqueY0,indiceY0,nvalSPLORD0,
-                           #marker,transfY,nsim0,Yobs,Ydiscret,vraisdiscret,UACV,rlindiv,
-                           fix0,nfix0,bfix0,methInteg0,nMC0,dimMC0,seqMC0,chol0)#,estim0)
+                           fix0,nfix0,bfix0,methInteg0,nMC0,dimMC0,seqMC0,chol0)
 {
     res <- 0
     ppi0 <- rep(0,ns0*ng0)
@@ -161,14 +159,14 @@ loglikmultlcmm <- function(b,Y0,X0,prior0,idprob0,idea0,idg0,idcor0,idcontr0,ny0
     UACV <- 0
     rlindiv <- rep(0,ns0)
     estim0 <- 1
-    .Fortran(C_loglikmultlcmm,as.double(Y0),as.double(X0),as.integer(prior0),as.integer(idprob0),as.integer(idea0),as.integer(idg0),as.integer(idcor0),as.integer(idcontr0),as.integer(ny0),as.integer(ns0),as.integer(ng0),as.integer(nv0),as.integer(nobs0),as.integer(nea0),as.integer(nmes0),as.integer(idiag0),as.integer(nwg0),as.integer(ncor0),as.integer(nalea0),as.integer(npm0),as.double(b),as.double(ppi0),as.double(resid_m),as.double(resid_ss),as.double(pred_m_g),as.double(pred_ss_g),as.double(predRE),as.double(predRE_Y),as.double(epsY0),as.integer(idlink0),as.integer(nbzitr0),as.double(zitr0),as.double(uniqueY0),as.integer(indiceY0),as.integer(nvalSPLORD0),as.double(marker),as.double(transfY),as.integer(nsim0),as.double(Yobs),as.integer(Ydiscret),as.double(vraisdiscret),as.double(UACV),as.double(rlindiv),as.integer(fix0),as.integer(nfix0),as.double(bfix0),as.integer(methInteg0),as.integer(nMC0),as.integer(dimMC0),as.double(seqMC0),as.integer(chol0),as.integer(estim0),loglik=as.double(res))$loglik
+    .Fortran(C_loglikmultlcmm,as.double(Y0),as.double(X0),as.integer(prior0),as.double(pprior0),as.integer(idprob0),as.integer(idea0),as.integer(idg0),as.integer(idcor0),as.integer(idcontr0),as.integer(ny0),as.integer(ns0),as.integer(ng0),as.integer(nv0),as.integer(nobs0),as.integer(nea0),as.integer(nmes0),as.integer(idiag0),as.integer(nwg0),as.integer(ncor0),as.integer(nalea0),as.integer(npm0),as.double(b),as.double(ppi0),as.double(resid_m),as.double(resid_ss),as.double(pred_m_g),as.double(pred_ss_g),as.double(predRE),as.double(predRE_Y),as.double(epsY0),as.integer(idlink0),as.integer(nbzitr0),as.double(zitr0),as.double(uniqueY0),as.integer(indiceY0),as.integer(nvalSPLORD0),as.double(marker),as.double(transfY),as.integer(nsim0),as.double(Yobs),as.integer(Ydiscret),as.double(vraisdiscret),as.double(UACV),as.double(rlindiv),as.integer(fix0),as.integer(nfix0),as.double(bfix0),as.integer(methInteg0),as.integer(nMC0),as.integer(dimMC0),as.double(seqMC0),as.integer(chol0),as.integer(estim0),loglik=as.double(res))$loglik
 }
 
 
 
 #' @rdname loglik
 #' @export
-loglikJointlcmm <- function(b,Y0,X0,prior0,tentr0,tevt0,devt0,ind_survint0,idprob0,idea0,idg0,idcor0,idcom0,idspecif0,idtdv0,idlink0,epsY0,nbzitr0,zitr0,uniqueY0,nvalSPL0,indiceY0,typrisq0,risqcom0,nz0,zi0,ns0,ng0,nv0,nobs0,nmes0,nbevt0,nea0,nwg0,ncor0,idiag0,idtrunc0,logspecif0,npm0,fix0,nfix0,bfix0)
+loglikJointlcmm <- function(b,Y0,X0,prior0,pprior0,tentr0,tevt0,devt0,ind_survint0,idprob0,idea0,idg0,idcor0,idcom0,idspecif0,idtdv0,idlink0,epsY0,nbzitr0,zitr0,uniqueY0,nvalSPL0,indiceY0,typrisq0,risqcom0,nz0,zi0,ns0,ng0,nv0,nobs0,nmes0,nbevt0,nea0,nwg0,ncor0,idiag0,idtrunc0,logspecif0,npm0,fix0,nfix0,bfix0)
 {
     res <- 0
     ppi0 <- rep(0,ns0*ng0)
@@ -192,6 +190,7 @@ loglikJointlcmm <- function(b,Y0,X0,prior0,tentr0,tevt0,devt0,ind_survint0,idpro
              as.double(Y0),
              as.double(X0),
              as.integer(prior0),
+             as.double(pprior0),
              as.double(tentr0),
              as.double(tevt0),
              as.integer(devt0),
