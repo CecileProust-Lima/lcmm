@@ -409,7 +409,7 @@ plot.externX <- function(x,which="postprob",event,...)
   if(missing(x)) stop("The model should be specified")
   if(!inherits(x,"externX")) stop("Use with 'externX' objects only")
   
-  if(!(which %in% c("postprob"))) stop(paste("Argument 'which' should be one of:",paste(c("residuals","postprob","link","linkfunction","fit","hazard","baselinerisk","survival"),collapse=" ")))
+  if(!(which %in% c("postprob"))) stop(paste("Argument 'which' should be one of:",paste(c("postprob"),collapse=" ")))
   
   if(which=="postprob") .plotpostprob(x,...)
   

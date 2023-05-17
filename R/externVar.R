@@ -256,7 +256,7 @@ externVar = function(model,
   if(!inherits(model, c("hlme", "lcmm", "multlcmm", "Jointlcmm", "mpjlcmm"))) stop('primary model class must be either "hlme", "lcmm", "multlcmm", "Jointlcmm" or "mpjlcmm"')
   if(model$conv == 2) warning("primary model did not fully converge")
   if(sum(c(!missing(fixed), !missing(classmb), !missing(survival))) != 1) stop("One and only one in survival, fixed or classmb must be given")
-  if(missing(method) | !method %in% c("twoStageJoint")) stop('Method must be either "twoStageJoint"')
+  if(missing(method) | !method %in% c("twoStageJoint", "condProbaCorr")) stop('Method must be either "twoStageJoint" or "condProbaCorr"')
   if(model$ng == 1) stop("Primary model does not have latent class structure (ng=1)")
   if(!varest %in% c("none", "paramBoot", "Hessian")) stop('Variance estimation method "varest" must be either "none", "paramBoot" or "Hessian"')
   if(!is.null(link) & missing(fixed)) stop("The argument link is not to be used with external class predictor")
@@ -278,6 +278,7 @@ externVar = function(model,
   } else {
     oldclassmb = formula(argumentsIn[["classmb"]])
   }
+  if(!missing(classmb) & oldclassmb != ~1) stop("Primary model already has class predictor")
   
   #number of MB parameters in primary model
   nInMB = ncol(model.matrix(oldclassmb, data))*(ng-1)
@@ -331,12 +332,58 @@ externVar = function(model,
   modelEdit = do.call(funIn, argumentsInEdit)
   pprob = modelEdit$pprob
   
+  
+  arguments = list()
+  
+  if(!missing(fixed)){
+    #Manage inputs
+    
+    if(missing(mixture)) mixture = ~1
+    if(missing(random)) random = ~-1
+    
+    if(!inherits(fixed,"formula")) stop("The argument fixed must be a formula")
+    if(!inherits(mixture,"formula")) stop("The argument mixture must be a formula")
+    if(!inherits(random,"formula")) stop("The argument random must be a formula")
+    
+    if(length(fixed[[2]]) != 1){
+      argfunctionStrMod = "multlcmm"
+    } else if(is.null(link)){
+      argfunctionStrMod = "hlme"
+    } else {
+      argfunctionStrMod = "lcmm"
+    }
+    
+    #let's create structure for secondary model
+    argumentsStrMod = list()
+    argumentsStrMod[["fixed"]] = fixed
+    argumentsStrMod[["random"]] = random
+    argumentsStrMod[["subject"]] = subject
+    argumentsStrMod[["ng"]] = 1
+    argumentsStrMod[["idiag"]] = idiag
+    if(argfunctionStrMod %in% c("lcmm", "multlcmm", "Jointlcmm")){
+      argumentsStrMod[["link"]] = link
+      argumentsStrMod[["intnodes"]] = intnodes
+      argumentsStrMod[["epsY"]] = epsY
+    }
+    argumentsStrMod[["data"]] = data
+    argumentsStrMod[["maxiter"]] = 0
+    argumentsStrMod[["verbose"]] = FALSE
+    
+    strMod = do.call(argfunctionStrMod, c(argumentsStrMod))
+    
+    argumentsStrMod[["mixture"]] = mixture
+    argumentsStrMod[["classmb"]] = ~1
+    argumentsStrMod[["ng"]] = ng
+    argumentsStrMod[["nwg"]] = nwg
+    argumentsStrMod[["B"]] = as.name("strMod")
+    
+    strMod = do.call(argfunctionStrMod, c(argumentsStrMod))
+  }
+  
   #Change general model arguments
   if(method == "twoStageJoint"){
     
-    #Arguments communs
-    arguments = list()
-    
+    #Common argument in twoStageJoint
     arguments[["data"]] = data
     arguments[["ng"]] = ng
     arguments[["subject"]] = subject
@@ -526,7 +573,8 @@ externVar = function(model,
       ncols = sapply(c(form.commun, form.cause, form.mixture, form.causek), function(x, data){
         mm = model.matrix(x, data)
         mm = mm[,-1]
-        return(ncol(mm))
+        if(is.null(ncol(mm))) {return(1)}
+        else {return(ncol(mm))}
       }, data = data)
       
       #I also need how many parameters each kind of covariate makes
@@ -582,22 +630,8 @@ externVar = function(model,
       
       funOut = "mpjlcmm"
       
-      #Manage inputs
-      
-      if(missing(mixture)) mixture = ~1
-      if(missing(random)) random = ~-1
-      
-      if(!inherits(fixed,"formula")) stop("The argument fixed must be a formula")
-      if(!inherits(mixture,"formula")) stop("The argument mixture must be a formula")
-      if(!inherits(random,"formula")) stop("The argument random must be a formula")
-      
-      if(length(fixed[[2]]) != 1){
-        argfunctionStrMod = "multlcmm"
-      } else if(is.null(link)){
-        argfunctionStrMod = "hlme"
-      } else {
-        argfunctionStrMod = "lcmm"
-      }
+      #Let's change strMod's saved call
+      strMod$call$data = substitute(data)
       
       #Primary Jointlcmm needs transformation into lcmm to be put into longitudinal.
       if(funIn == "Jointlcmm"){
@@ -636,35 +670,6 @@ externVar = function(model,
         
         modNoSurv = do.call(argfunJoint, argumentsJoint)
       }
-      
-      #let's create structure for secondary model
-      argumentsStrMod = list()
-      argumentsStrMod[["fixed"]] = fixed
-      argumentsStrMod[["random"]] = random
-      argumentsStrMod[["subject"]] = subject
-      argumentsStrMod[["ng"]] = 1
-      argumentsStrMod[["idiag"]] = idiag
-      if(argfunctionStrMod %in% c("lcmm", "multlcmm", "Jointlcmm")){
-        argumentsStrMod[["link"]] = link
-        argumentsStrMod[["intnodes"]] = intnodes
-        argumentsStrMod[["epsY"]] = epsY
-      }
-      argumentsStrMod[["data"]] = data
-      argumentsStrMod[["maxiter"]] = 0
-      argumentsStrMod[["verbose"]] = FALSE
-      
-      strMod = do.call(argfunctionStrMod, c(argumentsStrMod))
-      
-      argumentsStrMod[["mixture"]] = mixture
-      argumentsStrMod[["classmb"]] = ~1
-      argumentsStrMod[["ng"]] = ng
-      argumentsStrMod[["nwg"]] = nwg
-      argumentsStrMod[["B"]] = as.name("strMod")
-      
-      strMod = do.call(argfunctionStrMod, c(argumentsStrMod))
-      
-      #Let's change strMod's saved call
-      strMod$call$data = substitute(data)
       
       ## Now join the primary and secondary model
       
@@ -731,9 +736,7 @@ externVar = function(model,
         argumentsMpj[["ng"]] = ng
         argumentsMpj[["subject"]] = subject
         argumentsMpj[["data"]] = argumentsIn[["data"]]
-        if (!is.null(model$call$classmb)){
-          argumentsMpj[["classmb"]] = model$call$classmb
-        }
+        argumentsMpj[["classmb"]] = oldclassmb
         
         modelMpj = do.call("mpjlcmm", argumentsMpj)
         modelMpj$V = model$V
@@ -781,7 +784,6 @@ externVar = function(model,
       #### weird... "Input" model has been changed because we need it to build output model
       #To explain : "hessienne" function needs mpjlcmm model. So i need mpj for paramBoot
       #And we need to create our longitudinal (and logicall) now before changinng "input" moded.
-      #I really hate that hessian is only for mpj......
       if(funIn != "mpjlcmm" & varest == "Hessian"){
         longitudinalOut = as.call(list(as.name("list"), substitute(model)))
         
@@ -795,6 +797,275 @@ externVar = function(model,
     }
   }
   
+  if(method == "condProbaCorr"){
+    
+    if(!missing(classmb)){
+      #we need it all in a function in order to be able to use parametric bootstrap later
+      
+      #nEst : number of MB parameters in output model
+      nEst1G = ncol(model.matrix(classmb, data))
+      nEst = nEst1G*(ng-1)
+      iEst = 1:nEst
+      
+      iKeepIn = 1:nIn
+      iKeepOut = 1:nIn+nEst
+      
+      nOut = nEst
+      
+      #Id of varcov estimates to keep in bootstrap
+      iVCKeep = iVCIn
+      #Id of varcov estimates (none)
+      iVCOut = c()
+      
+      condProbaCorr = function(data,
+                               ng,
+                               B,
+                               iKeepIn,
+                               iEst,
+                               argumentsIn,
+                               funIn,
+                               nproc,
+                               maxiter,
+                               verbose){
+        argumentsInEdit = argumentsIn
+        argumentsInEdit[["B"]] = B[iKeepOut]
+        argumentsInEdit[["maxiter"]] = 0
+        argumentsInEdit[["verbose"]] = F
+        argumentsInEdit[["nproc"]] = nproc
+        model = do.call(funIn, argumentsInEdit)
+        
+        B = B[iEst]
+        
+        #First : let's compute P(\tilde C|C) (\tilde C : A)
+        pAlY = sapply(1:ng, function(g){
+          return(as.numeric(predictClass(model, data)[,2] == g))
+        })
+        pClY = as.matrix(predictClass(model, data)[,3:(2+ng)])
+        if(any(is.nan(pClY))) stop("NaN in posterior classification probability")
+        
+        betas = c(model$best[1:(ng-1)], 0)
+        pC = sapply(betas, function(b, betas){
+          exp(b)/sum(exp(betas))
+        }, betas=betas)
+        
+        pAlC = t(pClY)%*%pAlY/(model$ns*pC)
+        
+        if(det(pAlC) == 0 | is.na(det(pAlC))) stop("Computed error matrix is singular. One class might be empty")
+        
+        
+        #Then : let's add the classification to the dataset for each individual
+        indivProb = pAlY%*%t(pAlC)
+        indivProb = cbind(predictClass(model, data)[,1], indivProb)
+        colnames(indivProb) = c(subject, paste0("class", 1:ng))
+        data = merge(data, indivProb, by = subject)
+        
+        for(id in unique(data[[subject]])){
+          if(length(data[[subject]] > 1)) data = data[-which(data[[subject]] == id)[-1],]
+        }
+        
+        #negative log likelihood function
+        nLL = function(beta, y, X) {
+          beta = matrix(ncol = ncol(y)-1, byrow = T, beta)
+          denom <- apply(exp(X%*%beta),1,sum) + 1
+          num_mat <- y*cbind(exp(X%*%beta), 1)
+          num <- apply(num_mat,1,sum)
+          vrais <- sum(log(num/denom))
+          return(-vrais)
+        }
+        
+        #frame
+        argmf = list(
+          formula = classmb,
+          data = data
+        )
+        mf = do.call(model.frame, argmf)
+        ns = nrow(mf)
+        
+        y = data[, paste0("class", 1:ng)]
+        y = as.matrix(y)
+        nBy = ncol(y)-1
+        
+        X = model.matrix(classmb, data)
+        nEst = ncol(X)*nBy
+        
+        opt = marqLevAlg(b=B, fn=nLL, y=y, X=X, print.info = verbose, nproc = nproc, maxiter = maxiter)
+
+        namesX = c("intercept", colnames(X)[colnames(X) != "(Intercept)"])
+        names(opt$b) = c(sapply(namesX, FUN = function(i){
+          return(paste0(i, " ", colnames(y)[-ng]))
+        }))
+        Names = list(Xnsnames = namesX,
+                     ID = subject)
+        
+        N = c(nEst)
+        
+        res = list(best = opt$b,
+                   V = opt$v,
+                   conv = opt$istop,
+                   loglik = -opt$fn.value,
+                   ns = length(unique(data[[subject]])),
+                   ng = ng,
+                   idprob = rep(1, ncol(X)),
+                   nv2 = ncol(X),
+                   gconv = c(opt$ca, opt$cb, opt$rdm),
+                   pprob = NULL,
+                   Names = Names,
+                   N = N)
+        
+        return(res)
+      }
+      
+      #Finally : we need to build the model arguments
+      arguments[["data"]] = data
+      arguments[["ng"]] = ng
+      arguments[["iKeepIn"]] = iKeepIn
+      arguments[["iEst"]] = iEst
+      arguments[["argumentsIn"]] = argumentsIn
+      arguments[["funIn"]] = funIn
+      arguments[["nproc"]] = nproc
+      arguments[["maxiter"]] = maxiter
+      arguments[["verbose"]] = verbose
+      
+      #on ajoute des valeurs de base pour nos nouveaux estimateurs
+      arguments[["B"]] = rep(0, nIn+nOut)
+      #initial values
+      if(!missing(B)){
+        arguments[["B"]][iEst] = B
+      }
+      
+      funOut = "condProbaCorr"
+      
+      
+      
+    }
+    if(!missing(fixed)){
+      ## we need it all in a function in order to be able to use parametric bootstrap later on
+      
+      #number of classmb parameters to remove
+      nMB = ng-1
+      #number of remaining parameters to estimate
+      nStr = length(strMod$best)
+      nEst = nStr - nMB
+      iEst = 1:nEst
+      
+      iKeepIn = 1:nIn
+      iKeepOut = 1:nIn+nEst
+      
+      nOut = nEst
+      
+      #Id of varcov estimates to keep in bootstrap
+      iVCKeep = iVCIn
+      #Id of varcov estimates
+      if(inherits(strMod, "multlcmm")){
+        nVCStr = strMod$N[4]
+        iVCStr = sum(strMod$N[3]) + 1:nVCStr
+      } else {
+        nVCStr = strMod$N[3]
+        iVCStr = sum(strMod$N[1:2]) + 1:nVCStr
+      }
+      iVCOut = nIn + iVCStr - nMB
+      
+      
+      condProbaCorr = function(model,
+                               data,
+                               fixed,
+                               random,
+                               subject,
+                               mixture,
+                               ng,
+                               B,
+                               link,
+                               iEst,
+                               maxiter,
+                               verbose,
+                               nproc,
+                               convB,
+                               convL,
+                               convG){
+        #First : let's compute P(C|\tilde C) (\tilde C : A)
+        pAlY = sapply(1:ng, function(g){
+          return(as.numeric(predictClass(model, data)[,2] == g))
+        })
+        pClY = as.matrix(predictClass(model, data)[,3:(2+ng)])
+        if(any(is.nan(pClY))) stop("NaN in posterior classification probability")
+        
+        pA = apply(pAlY, 2, mean)
+        pClA = t(pAlY)%*%pClY/(model$ns*pA)
+        
+        if(det(pClA) == 0 | is.na(det(pClA))) stop("Computed error matrix is singular. One class might be empty")
+        
+        #Then : let's add it to dataset for each individual
+        indivProb = pAlY%*%pClA
+        indivProb = cbind(predictClass(model, data)[,1], indivProb)
+        colnames(indivProb)[1] = subject
+        data = merge(data, indivProb, by = subject)
+        
+        if(length(fixed[[2]]) != 1){
+          funOut = "multlcmm"
+          arguments[["link"]] = link
+        } else if(missing(link)){
+          funOut = "hlme"
+          arguments[["link"]] = NULL
+        } else {
+          funOut = "lcmm"
+          arguments[["link"]] = link
+        }
+        
+        #Finally : we need to build the model for ppriors !
+        arguments = list()
+        arguments[["data"]] = data
+        arguments[["fixed"]] = fixed
+        arguments[["random"]] = random
+        arguments[["subject"]] = subject
+        arguments[["mixture"]] = mixture
+        arguments[["classmb"]] = ~-1
+        arguments[["ng"]] = ng
+        arguments[["pprior"]] = c("prob1", "prob2")
+        #technical options
+        arguments[["maxiter"]] = maxiter
+        arguments[["verbose"]] = verbose
+        arguments[["nproc"]] = nproc
+        arguments[["convB"]] = convB
+        arguments[["convL"]] = convL
+        arguments[["convG"]] = convG
+        
+        arguments[["B"]] = B[iEst]
+        
+        return(do.call(funOut, arguments))
+      }
+      
+      #we need to build the model
+      arguments[["data"]] = data
+      arguments[["model"]] = model
+      arguments[["fixed"]] = fixed
+      arguments[["random"]] = random
+      arguments[["subject"]] = subject
+      arguments[["mixture"]] = mixture
+      arguments[["ng"]] = ng
+      arguments[["link"]] = link
+      arguments[["iEst"]] = iEst
+      #technical options
+      arguments[["maxiter"]] = maxiter
+      arguments[["verbose"]] = verbose
+      arguments[["nproc"]] = nproc
+      arguments[["convB"]] = convB
+      arguments[["convL"]] = convL
+      arguments[["convG"]] = convG
+      
+      
+      #on ajoute des valeurs de base pour nos nouveaux estimateurs
+      arguments[["B"]] = rep(0, nIn+nOut)
+      #initial values
+      if(missing(B)){
+        arguments[["B"]][iEst] = strMod$best[(nMB+1):nStr]
+      } else {
+        arguments[["B"]][iEst] = B
+      }
+      
+      funOut = "condProbaCorr"
+    }
+  }
+  
   if(varest != "paramBoot"){
     arguments[["B"]][iKeepOut] = model$best[iKeepIn]
     if(verbose){cat("Model estimation...\n\n")}
@@ -803,6 +1074,8 @@ externVar = function(model,
   }
   
   if(varest == "Hessian"){
+    if(method != "twoStageJoint") stop("Hessian variance estimation method only avaliable for 'twoStageJoint' method")
+    
     if(verbose){cat("Variance estimation...\n\n")}
     nb11 = length(model$best)
     V11 = matrix(0, nb11, nb11)
@@ -911,43 +1184,46 @@ externVar = function(model,
       }
       
       survivalMissing = missing(survival)
-      modOuts <- parApply(clust, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, nVCIn, iVCOut, survivalMissing){
+      fixedMissing = missing(fixed)
+      modOuts <- parApply(clust, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, nVCIn, iVCOut, survivalMissing, fixedMissing){
         arguments[["B"]][iKeepOut] = coefs
         arguments[["nproc"]] = 1
         
         #Model Estimation
         modOut = do.call(funOut, c(arguments))
         
-        #cholesky not varcov as output in best
-        if(inherits(modOut, "mpjlcmm") | !all(modOut$idiag)){
-          modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]
-        } else {
-          cholMatrix = matrix(NA, length(iVCOut), length(iVCOut))
-          cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:nVCIn)]
-          modOut$best[iVCOut] = diag(cholMatrix)
-        }
-        
-        #Residual Error : need to be the same sign across bootstrap iterations
-        countParamBeforeErrLink = sum(modOut$N[1:3])
-        sumny = 0
-        for(k in 1:modOut$K){
-          
-          for(y in 1:modOut$ny[k]){
-            sumny = sumny+1
-            
-            if(modOut$contrainte[k] == 2){
-              countParamYBeforeErr = sum(modOut$Nprm[3+1:5*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
-              modOut$best[countParamYBeforeErr:(countParamYBeforeErr+modOut$Nprm[3+6*modOut$ny[k]-modOut$ny[k]+y])]
-              
-              if(modOut$linktype[sumny] == 0)
-                countParamYBeforeErrLink = sum(modOut$Nprm[3+1:8*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
-                modOut$best[countParamYBeforeErrLink]
-            }
+        if(!fixedMissing){
+          #cholesky not varcov as output in best
+          if(inherits(modOut, "mpjlcmm") | !all(modOut$idiag)){
+            modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]
+          } else {
+            cholMatrix = matrix(NA, length(iVCOut), length(iVCOut))
+            cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:nVCIn)]
+            modOut$best[iVCOut] = diag(cholMatrix)
           }
           
-          countParamBeforeErrLink = countParamBeforeErrLink+modOut$npmK[k]
-          if(modOut$contrainte[k] == 0 | (modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 0))
-            modOut$best[countParamBeforeErrLink] = abs(modOut$best[countParamBeforeErrLink])
+          #Residual Error : need to be the same sign across bootstrap iterations
+          countParamBeforeErrLink = sum(modOut$N[1:3])
+          sumny = 0
+          for(k in 1:modOut$K){
+            
+            for(y in 1:modOut$ny[k]){
+              sumny = sumny+1
+              
+              if(modOut$contrainte[k] == 2){
+                countParamYBeforeErr = sum(modOut$Nprm[3+1:5*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
+                modOut$best[countParamYBeforeErr:(countParamYBeforeErr+modOut$Nprm[3+6*modOut$ny[k]-modOut$ny[k]+y])]
+                
+                if(modOut$linktype[sumny] == 0)
+                  countParamYBeforeErrLink = sum(modOut$Nprm[3+1:8*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
+                modOut$best[countParamYBeforeErrLink]
+              }
+            }
+            
+            countParamBeforeErrLink = countParamBeforeErrLink+modOut$npmK[k]
+            if(modOut$contrainte[k] == 0 | (modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 0))
+              modOut$best[countParamBeforeErrLink] = abs(modOut$best[countParamBeforeErrLink])
+          }
         }
         
         #Survival Base Function : need to be the same sign across bootstrap iterations
@@ -957,7 +1233,7 @@ externVar = function(model,
         }
         
         return(modOut)
-      }, arguments = arguments, iKeepOut = iKeepOut, funOut = funOut, iEst = iEst, nVCIn = nVCIn, iVCOut = iVCOut, survivalMissing = survivalMissing)
+      }, arguments = arguments, iKeepOut = iKeepOut, funOut = funOut, iEst = iEst, nVCIn = nVCIn, iVCOut = iVCOut, survivalMissing = survivalMissing, fixedMissing = fixedMissing)
       parallel::stopCluster(clust)
       
       #format output
@@ -990,36 +1266,38 @@ externVar = function(model,
         #Model Estimation
         captured_log = capture.output({modOut = do.call(funOut, c(arguments))})
         
-        #cholesky not varcov as output in best
-        if(inherits(modOut, "mpjlcmm") | !all(modOut$idiag)){
-          modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]
-        } else {
-          cholMatrix = matrix(NA, length(iVCOut), length(iVCOut))
-          cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:nVCIn)]
-          modOut$best[iVCOut] = diag(cholMatrix)
-        }
-        
-        #Residual Error : need to be the same sign across bootstrap iterations
-        countParamBeforeErrLink = sum(modOut$N[1:3])
-        sumny = 0
-        for(k in 1:modOut$K){
-          
-          for(y in 1:modOut$ny[k]){
-            sumny = sumny+1
-            
-            if(modOut$contrainte[k] == 2){
-              countParamYBeforeErr = sum(modOut$Nprm[3+1:5*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
-              modOut$best[countParamYBeforeErr:(countParamYBeforeErr+modOut$Nprm[3+6*modOut$ny[k]-modOut$ny[k]+y])]
-              
-              if(modOut$linktype[sumny] == 0)
-                countParamYBeforeErrLink = sum(modOut$Nprm[3+1:8*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
-              modOut$best[countParamYBeforeErrLink]
-            }
+        if(!missing(fixed)){
+          #cholesky not varcov as output in best
+          if(inherits(modOut, "mpjlcmm") | !all(modOut$idiag)){
+            modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]
+          } else {
+            cholMatrix = matrix(NA, length(iVCOut), length(iVCOut))
+            cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:nVCIn)]
+            modOut$best[iVCOut] = diag(cholMatrix)
           }
           
-          countParamBeforeErrLink = countParamBeforeErrLink+modOut$npmK[k]
-          if(modOut$contrainte[k] == 0 | (modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 0))
-            modOut$best[countParamBeforeErrLink] = abs(modOut$best[countParamBeforeErrLink])
+          #Residual Error : need to be the same sign across bootstrap iterations
+          countParamBeforeErrLink = sum(modOut$N[1:3])
+          sumny = 0
+          for(k in 1:modOut$K){
+            
+            for(y in 1:modOut$ny[k]){
+              sumny = sumny+1
+              
+              if(modOut$contrainte[k] == 2){
+                countParamYBeforeErr = sum(modOut$Nprm[3+1:5*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
+                modOut$best[countParamYBeforeErr:(countParamYBeforeErr+modOut$Nprm[3+6*modOut$ny[k]-modOut$ny[k]+y])]
+                
+                if(modOut$linktype[sumny] == 0)
+                  countParamYBeforeErrLink = sum(modOut$Nprm[3+1:8*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
+                modOut$best[countParamYBeforeErrLink]
+              }
+            }
+            
+            countParamBeforeErrLink = countParamBeforeErrLink+modOut$npmK[k]
+            if(modOut$contrainte[k] == 0 | (modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 0))
+              modOut$best[countParamBeforeErrLink] = abs(modOut$best[countParamBeforeErrLink])
+          }
         }
         
         #Survival Base Function : need to be the same sign across bootstrap iterations
@@ -1065,15 +1343,17 @@ externVar = function(model,
     modOut$Mconv = Mconv
     
     #replace chol for varcov in best
-    modOut$cholesky[-(1:nVCIn)] = modOut$best[iVCOut]
-    if(idiag){
-      modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]^2
-    } else {
-      NVC = sqrt(2*(length(modOut$cholesky)-nVCIn)+1/4)-1/2
-      cholMatrix = matrix(0, NVC, NVC)
-      cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$best[iVCOut]
-      vc = t(cholMatrix)%*%cholMatrix
-      modOut$best[iVCOut] = vc[upper.tri(vc, diag = T)]
+    if(!missing(fixed)){
+      modOut$cholesky[-(1:nVCIn)] = modOut$best[iVCOut]
+      if(idiag){
+        modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]^2
+      } else {
+        NVC = sqrt(2*(length(modOut$cholesky)-nVCIn)+1/4)-1/2
+        cholMatrix = matrix(0, NVC, NVC)
+        cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$best[iVCOut]
+        vc = t(cholMatrix)%*%cholMatrix
+        modOut$best[iVCOut] = vc[upper.tri(vc, diag = T)]
+      }
     }
     
     #Computations on final model
@@ -1083,13 +1363,13 @@ externVar = function(model,
     z$maxiter = 0
     z$verbose = FALSE
     modelEdit = eval(z)
-    modOut$pprob = modelEdit$pprob
-    modOut$predSurv = modelEdit$predSurv
+    if(method == "twoStageJoint") modOut$pprob = modelEdit$pprob
+    if(!missing(survival)) modOut$predSurv = modelEdit$predSurv
     modOut$loglik = modelEdit$loglik
   }
   
-  if(method == "twoStageJoint" & !missing(fixed)) modOut$strMod = strMod
-  if(method == "twoStageJoint" & !missing(fixed) & funIn == "Jointlcmm") modOut$modNoSurv = modNoSurv
+  #if(method == "twoStageJoint" & !missing(fixed)) modOut$strMod = strMod
+  #if(method == "twoStageJoint" & !missing(fixed) & funIn == "Jointlcmm") modOut$modNoSurv = modNoSurv
   
   modOut$call$data = substitute(data)
   
@@ -1155,35 +1435,49 @@ externVar = function(model,
     class(modOut) = c("externSurv", "externVar")
   }
   if(!missing(fixed)){
-    #Get info
-    gconv = modOut$gconv
-    conv = modOut$conv
-    niter = modOut$niter
-    
-    #With exclusively longitudinal external outcome
-    modUpdate = update(modOut)
-    modOut = modUpdate[[length(modUpdate)]]
-    
-    modOut$gconv = gconv
-    modOut$conv = conv
-    modOut$niter = niter
-    modOut$pprob = pprob
-    if(inherits(modOut, "multlcmm")) modOut$N[3] = modOut$N[3]-modOut$N[1]
-    modOut$N[1] = 0
-    modOut$call = cl
-    modOut$varest = varest
-    modOut$runtime = cost[3]
-    
-    V = matrix(NA, length(modOut$best), length(modOut$best))
-    V[upper.tri(V, diag = T)] = modOut$V
-    V[lower.tri(V, diag = F)] = t(V)[lower.tri(t(V), diag = F)]
-    V = V[-c(1:(modOut$ng-1)), -c(1:(modOut$ng-1))]
-    V = V[upper.tri(V, diag = T)]
-    
-    modOut$V = V
-    modOut$best = modOut$best[-c(1:(modOut$ng-1))]
-    
-    class(modOut) = c(class(modOut), "externVar")
+    if(method == "twoStageJoint"){
+      
+      #Get info
+      gconv = modOut$gconv
+      conv = modOut$conv
+      niter = modOut$niter
+      
+      #With exclusively longitudinal external outcome
+      modUpdate = update(modOut)
+      modOut = modUpdate[[length(modUpdate)]]
+      
+      modOut$gconv = gconv
+      modOut$conv = conv
+      modOut$niter = niter
+      modOut$pprob = pprob
+      if(inherits(modOut, "multlcmm")) modOut$N[3] = modOut$N[3]-modOut$N[1]
+      modOut$N[1] = 0
+      modOut$call = cl
+      modOut$varest = varest
+      modOut$runtime = cost[3]
+      
+      V = matrix(NA, length(modOut$best), length(modOut$best))
+      V[upper.tri(V, diag = T)] = modOut$V
+      V[lower.tri(V, diag = F)] = t(V)[lower.tri(t(V), diag = F)]
+      V = V[-c(1:(modOut$ng-1)), -c(1:(modOut$ng-1))]
+      V = V[upper.tri(V, diag = T)]
+      
+      modOut$V = V
+      modOut$best = modOut$best[-c(1:nMB)]
+      
+      class(modOut) = c(class(modOut), "externVar")
+    }
+    if(method == "condProbaCorr"){
+      
+      #Get info
+      modOut$pprob = pprob
+      if(inherits(modOut, "multlcmm")) modOut$N[3] = modOut$N[3]-modOut$N[1]
+      modOut$call = cl
+      modOut$varest = varest
+      modOut$runtime = cost[3]
+      
+      class(modOut) = c(class(modOut), "externVar")
+    }
   }
   if(!missing(classmb)){
     V = matrix(NA, nOut, nOut)
@@ -1205,7 +1499,7 @@ externVar = function(model,
                   pprob = modOut$pprob, Names = Names, na.action = modOut$na.action,
                   AIC = 2*(length(best)-length(posfix)-modOut$loglik),
                   BIC = (length(best)-length(posfix))*log(modOut$ns)-2*modOut$loglik,
-                  varest = varest, runtime = cost[3])
+                  varest = varest, method = method, runtime = cost[3])
     
     class(modOut) = c("externX", "externVar")
   }
