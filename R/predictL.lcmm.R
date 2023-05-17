@@ -290,20 +290,26 @@ if(!is.null(na.action)){
 	}	
 ## random
 	if(!is.null(x$call$random)){
-		X_random <- model.matrix(formula(paste("~",call_random,sep="")),data=newdata1random)	
+            X_random <- model.matrix(formula(paste("~",call_random,sep="")),data=newdata1random)
+            id.X_random <- 0
+            if(ncol(X_random)>0){
 		if(colnames(X_random)[1]=="(Intercept)"){
 			colnames(X_random)[1] <- "intercept"
 			int.random <- 1
 		}
 		id.X_random <- 1
+            }
 	}else{
 		id.X_random <- 0
 	}	
 ## classmb
 	if(!is.null(x$call$classmb)){ 
-		X_classmb <- model.matrix(formula(paste("~",call_classmb,sep="")),data=newdata1classmb)
+            X_classmb <- model.matrix(formula(paste("~",call_classmb,sep="")),data=newdata1classmb)
+            id.X_classmb <- 0
+            if(ncol(X_classmb)>0) {
 		colnames(X_classmb)[1] <- "intercept"
 		id.X_classmb <- 1
+            }
 	}else{
 		id.X_classmb <- 0
 	}
