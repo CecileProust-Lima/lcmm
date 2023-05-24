@@ -761,7 +761,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         nodes <- NULL
         nbzitr <- rep(0,sum(ny))
         ntr <- rep(0,sum(ny))
-        zitr <- vector("list", sumny))
+        zitr <- vector("list", sum(ny))
         levelsFRM <- vector("list",K)
         for(k in 1:K)
             {   
