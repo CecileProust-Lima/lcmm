@@ -473,16 +473,19 @@ if (!is.null(cor.char))
 
 ## gestion de B=random(mod)
 
+    tryB <- try(as.numeric(B), silent=TRUE)
+    if(inherits(tryB, "try-error"))
+    {
         if(length(mm$B)==2)
             {
-                if(!inherits(eval(mm$B[[2]]),"lcmm")) stop("The model specified in B should be of class lcmm")
+                if(!inherits(eval(mm$B[[2]], parent.env(environment())),"lcmm")) stop("The model specified in B should be of class lcmm")
                 if(as.character(mm$B[1])!="random") stop("Please use random() to specify random initial values")
-                B <- eval(mm$B[[2]])   
+                B <- eval(mm$B[[2]], parent.env(environment()))   
                 B$Brandom <- TRUE
                 if(B$conv != 1) stop("Model in argument B did not converge properly")
                 #if(length(posfix)) stop("Argument posfix is not compatible with random intial values")
             }
-
+    }
 
 
 
