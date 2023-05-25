@@ -315,7 +315,7 @@ subroutine cvpl(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0 &
   nea=0
   ncg=0
   ncssg=0
-  nprob=ng-1
+  nprob=0 !ng-1
   nvarprob=min(ng-1,1)
   do k=1,nv
      if (idg(k).eq.1) then

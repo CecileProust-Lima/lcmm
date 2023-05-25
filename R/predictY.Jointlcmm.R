@@ -804,10 +804,10 @@ call_survival <- formula(paste("~",call_survival,sep=""))
                     if(x$N[7]>0) b1 <- c(b1,best[sum(x$N[1:6])+1:x$N[7]])
 
                     idprob1 <- x$idprob
-                    idprob1[1] <- 0
+                    ##idprob1[1] <- 0
                     npm1 <- length(b1)
 
-                    
+
                     if(!isTRUE(draws))
                         {
                             out <- .Fortran(C_predictcont,
