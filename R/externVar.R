@@ -585,6 +585,46 @@ externVar = function(model,
     arguments[["TimeDepVar"]] =  argumentsIn[["TimeDepVar"]]
     arguments[["logscale"]] =  argumentsIn[["logscale"]]
     
+    
+    #Primary Jointlcmm needs transformation into lcmm to be put into longitudinal.
+    if(funIn == "Jointlcmm"){
+      
+      if(is.null(argumentsIn[["link"]])){
+        argfunJoint = "hlme"
+      } else {
+        argfunJoint = "lcmm"
+      }
+      
+      argumentsJoint = argumentsIn
+      argumentsJoint[["survival"]] = NULL
+      argumentsJoint[["hazard"]] = NULL
+      argumentsJoint[["hazardtype"]] = NULL
+      argumentsJoint[["hazardnodes"]] = NULL
+      argumentsJoint[["hazardrange"]] = NULL
+      argumentsJoint[["TimeDepVar"]] = NULL
+      argumentsJoint[["logscale"]] = NULL
+      
+      argumentsJoint[["maxiter"]] = 0
+      argumentsJoint[["mixture"]] = NULL
+      argumentsJoint[["classmb"]] = NULL
+      argumentsJoint[["ng"]] = 1
+      argumentsJoint[["nwg"]] = FALSE
+      argumentsJoint[["B"]] = NULL
+      argumentsJoint[["verbose"]] = FALSE
+      argumentsJoint[["data"]] = data
+      
+      modNoSurv = do.call(argfunJoint, argumentsJoint)
+      
+      argumentsJoint[["mixture"]] = argumentsIn[["mixture"]]
+      argumentsJoint[["classmb"]]= ~1
+      argumentsJoint[["ng"]] = argumentsIn[["ng"]]
+      argumentsJoint[["nwg"]] = argumentsIn[["nwg"]]
+      argumentsJoint[["B"]] = modNoSurv
+      
+      modNoSurv = do.call(argfunJoint, argumentsJoint)
+    }
+    
+    
     #Yextern survival
     if(!missing(survival)){
       funOut = "mpjlcmm"
@@ -632,44 +672,6 @@ externVar = function(model,
       
       #Let's change strMod's saved call
       strMod$call$data = substitute(data)
-      
-      #Primary Jointlcmm needs transformation into lcmm to be put into longitudinal.
-      if(funIn == "Jointlcmm"){
-        
-        if(is.null(argumentsIn[["link"]])){
-          argfunJoint = "hlme"
-        } else {
-          argfunJoint = "lcmm"
-        }
-        
-        argumentsJoint = argumentsIn
-        argumentsJoint[["survival"]] = NULL
-        argumentsJoint[["hazard"]] = NULL
-        argumentsJoint[["hazardtype"]] = NULL
-        argumentsJoint[["hazardnodes"]] = NULL
-        argumentsJoint[["hazardrange"]] = NULL
-        argumentsJoint[["TimeDepVar"]] = NULL
-        argumentsJoint[["logscale"]] = NULL
-        
-        argumentsJoint[["maxiter"]] = 0
-        argumentsJoint[["mixture"]] = NULL
-        argumentsJoint[["classmb"]] = NULL
-        argumentsJoint[["ng"]] = 1
-        argumentsJoint[["nwg"]] = FALSE
-        argumentsJoint[["B"]] = NULL
-        argumentsJoint[["verbose"]] = FALSE
-        argumentsJoint[["data"]] = data
-        
-        modNoSurv = do.call(argfunJoint, argumentsJoint)
-        
-        argumentsJoint[["mixture"]] = argumentsIn[["mixture"]]
-        argumentsJoint[["classmb"]]= ~1
-        argumentsJoint[["ng"]] = argumentsIn[["ng"]]
-        argumentsJoint[["nwg"]] = argumentsIn[["nwg"]]
-        argumentsJoint[["B"]] = modNoSurv
-        
-        modNoSurv = do.call(argfunJoint, argumentsJoint)
-      }
       
       ## Now join the primary and secondary model
       
@@ -729,7 +731,11 @@ externVar = function(model,
       #changement de ma fonction en mpjlcmm (pour avec la variance)
       if(funIn != "mpjlcmm"){
         argumentsMpj = list()
-        argumentsMpj[["longitudinal"]] = as.call(list(as.name("list"), substitute(model)))
+        if(funIn == "Jointlcmm"){
+          argumentsMpj[["longitudinal"]] = as.call(list(as.name("list"), modNoSurv))
+        } else {
+          argumentsMpj[["longitudinal"]] = as.call(list(as.name("list"), substitute(model)))
+        }
         argumentsMpj[["maxiter"]] = 0
         argumentsMpj[["ng"]] = ng
         argumentsMpj[["subject"]] = subject
@@ -761,10 +767,12 @@ externVar = function(model,
       iVCOut = c()
       
       #On recree tous nos arguments
-      if(is.null(argumentsIn[["longitudinal"]])){
-        arguments[["longitudinal"]] = list(model)
-      } else {
+      if(funIn == "mpjlcmm"){
         arguments[["longitudinal"]] = longitudinal
+      } else if(funIn == "Jointlcmm"){
+        arguments[["longitudinal"]] = list(modNoSurv)
+      } else {
+        arguments[["longitudinal"]] = list(model)
       }
       arguments[["classmb"]] = classmb
       #on ajoute des valeurs de base pour nos nouveaux estimateurs
