@@ -897,7 +897,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         zzitr <- matrix(0, max(sapply(zitr, length)), sum(ny))
         for(k in 1:K)
         {
-            if(nbzitr[k]>0) zzitr[,k] <- zitr[[k]]
+            if(nbzitr[k]>0) zzitr[1:nbzitr[k],k] <- zitr[[k]]
         }
         zitr <- zzitr
 
