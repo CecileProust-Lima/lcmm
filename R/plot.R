@@ -386,7 +386,7 @@ plot.externSurv <- function(x,which="hazard",event,...)
   if(missing(x)) stop("The model should be specified")
   if(!inherits(x,"externSurv")) stop("Use with 'externSurv' objects only")
   
-  if(!(which %in% c("postprob","hazard","baselinerisk","survival"))) stop(paste("Argument 'which' should be one of:",paste(c("residuals","postprob","link","linkfunction","fit","hazard","baselinerisk","survival"),collapse=" ")))
+  if(!(which %in% c("postprob","hazard","baselinerisk","survival"))) stop(paste("Argument 'which' should be one of:",paste(c("postprob","hazard","baselinerisk","survival"),collapse=" ")))
   
   if(which=="postprob") .plotpostprob(x,...)
   
