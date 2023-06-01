@@ -993,17 +993,21 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     
 ## gestion de B=random(mod)
 
-        Brandom <- FALSE
+    Brandom <- FALSE
+    tryB <- try(as.numeric(B), silent=TRUE)
+    if(inherits(tryB, "try-error"))
+    {
         if(length(cl$B)==2)
             {
-                if(!inherits(eval(cl$B[[2]]),"multlcmm")) stop("The model specified in B should be of class multlcmm")
+                if(!inherits(eval(cl$B[[2]], parent.env(environment())),"multlcmm")) stop("The model specified in B should be of class multlcmm")
                 if(as.character(cl$B[1])!="random") stop("Please use random() to specify random initial values")
                 
                 Brandom <- TRUE
-                B <- eval(cl$B[[2]])
+                B <- eval(cl$B[[2]], parent.env(environment()))
                 if(B$conv != 1) stop("Model in argument B did not converge properly")
                 #if(length(posfix)) stop("Argument posfix is not compatible with random intial values")
             }
+    }
     
 ###valeurs initiales
     if(!(missing(B)))

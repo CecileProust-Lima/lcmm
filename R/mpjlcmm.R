@@ -761,7 +761,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         nodes <- NULL
         nbzitr <- rep(0,sum(ny))
         ntr <- rep(0,sum(ny))
-        zitr <- matrix(0,nrow=0,ncol=0)
+        zitr <- vector("list", sum(ny))
         levelsFRM <- vector("list",K)
         for(k in 1:K)
             {   
@@ -869,16 +869,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     nbtmp[which(mod$linktype==2)] <- mod$nbnodes
                     nbzitr[sum(ny[1:k])-ny[k]+1:ny[k]] <- nbtmp
                     nodes <- c(nodes,as.vector(mod$linknodes))
-                    if(nrow(zitr)<max(nbtmp))
-                    {
-                        zitr <- rbind(zitr,matrix(0,nrow=max(nbtmp)-nrow(zitr),ncol=ncol(zitr)))
-                        zitr <- cbind(zitr,mod$linknodes)
-                    }
-                    else
-                    {
-                        ztmp <- rbind(mod$linknodes,matrix(0,nrow=nrow(zitr)-max(nbtmp),ncol=ncol(mod$linknodes)))
-                        zitr <- cbind(zitr,ztmp)
-                    }
+                    zitr[[k]] <- mod$linknodes
                     epsY[sum(ny[1:k])-ny[k]+1:ny[k]] <- mod$epsY
                     mspl <- 0
                     for (m in 1:ny[k])
@@ -896,20 +887,19 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 {
                     nbzitr[k] <- length(mod$linknodes)
                     nodes <- c(nodes,as.vector(mod$linknodes))
-                    if(nrow(zitr)<nbzitr[k])
-                    {
-                        zitr <- rbind(zitr,matrix(0,nrow=nbzitr[k]-nrow(zitr),ncol=ncol(zitr)))
-                        zitr <- cbind(zitr,mod$linknodes)
-                    }
-                    else
-                    {
-                        ztmp <- c(mod$linknodes,rep(0,nrow(zitr)-nbzitr[k]))
-                        zitr <- cbind(zitr,ztmp)
-                    }
+                    zitr[[k]] <- mod$linknodes
                     epsY[k] <- mod$epsY
                     ntr[k] <- ifelse(idlink[k]==0,2,nbzitr[k]+2)
                 }
             }
+
+        ## zitr en matrice
+        zzitr <- matrix(0, max(sapply(zitr, length)), sum(ny))
+        for(k in 1:K)
+        {
+            if(nbzitr[k]>0) zzitr[,k] <- zitr[[k]]
+        }
+        zitr <- zzitr
 
         ## refaire les idg etc pour tenir compte de toutes les var
         colnames(X0)[which(colnames(X0)=="(Intercept)")] <- "intercept"
@@ -1552,11 +1542,11 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             if(inherits(B,"try-error"))
             {
                 if(length(cl$B)==1) stop(B)
-                if(!inherits(eval(cl$B[[2]]),"mpjlcmm")) stop("The model specified in B should be of class mpjlcmm")
+                if(!inherits(eval(cl$B[[2]], parent.env(environment())),"mpjlcmm")) stop("The model specified in B should be of class mpjlcmm")
                 if(as.character(cl$B[1])!="random") stop("Please use random() to specify random initial values")
                 
                 Brandom <- TRUE
-                B <- eval(cl$B[[2]])
+                B <- eval(cl$B[[2]], parent.env(environment()))
                 if(B$conv != 1) stop("Model in argument B did not converge properly")   
                 #if(length(posfix)) stop("Argument posfix is not compatible with random intial values")
             }

@@ -169,7 +169,7 @@ epoce <- function(model,pred.times,var.time,fun.time=identity,newdata=NULL,subse
 
 ### specification recup de args
     idprob0 <- model$idprob
-    idprob0[1] <- 0
+    ##idprob0[1] <- 0
     idea0 <- model$idea
     idg0 <- model$idg
     idcor0 <- model$idcor
