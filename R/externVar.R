@@ -256,7 +256,7 @@ externVar = function(model,
   if(!inherits(model, c("hlme", "lcmm", "multlcmm", "Jointlcmm", "mpjlcmm"))) stop('primary model class must be either "hlme", "lcmm", "multlcmm", "Jointlcmm" or "mpjlcmm"')
   if(model$conv == 2) warning("primary model did not fully converge")
   if(sum(c(!missing(fixed), !missing(classmb), !missing(survival))) != 1) stop("One and only one in survival, fixed or classmb must be given")
-  if(missing(method) | !method %in% c("twoStageJoint", "condProbaCorr")) stop('Method must be either "twoStageJoint" or "condProbaCorr"')
+  if(missing(method) | !method %in% c("twoStageJoint", "conditional")) stop('Method must be either "twoStageJoint" or "conditional"')
   if(model$ng == 1) stop("Primary model does not have latent class structure (ng=1)")
   if(!varest %in% c("none", "paramBoot", "Hessian")) stop('Variance estimation method "varest" must be either "none", "paramBoot" or "Hessian"')
   if(!is.null(link) & missing(fixed)) stop("The argument link is not to be used with external class predictor")
@@ -803,7 +803,7 @@ externVar = function(model,
     }
   }
   
-  if(method == "condProbaCorr"){
+  if(method == "conditional"){
     
     #Yextern survival
     if(!missing(survival)){
@@ -821,7 +821,7 @@ externVar = function(model,
       iVCKeep = iVCIn
       iVCOut = c()
       
-      condProbaCorr = function(model,
+      conditional = function(model,
                                data,
                                survival,
                                hazard,
@@ -922,7 +922,7 @@ externVar = function(model,
       }
       arguments[["B"]][iEst] = B
       
-      funOut = "condProbaCorr"
+      funOut = "conditional"
     }
     
     #Yextern longitudinal
@@ -954,7 +954,7 @@ externVar = function(model,
       iVCOut = nIn + iVCStr - nMB
       
       
-      condProbaCorr = function(model,
+      conditional = function(model,
                                data,
                                fixed,
                                random,
@@ -1053,7 +1053,7 @@ externVar = function(model,
         arguments[["B"]][iEst] = B
       }
       
-      funOut = "condProbaCorr"
+      funOut = "conditional"
     }
     
     #Xextern
@@ -1075,7 +1075,7 @@ externVar = function(model,
       #Id of varcov estimates (none)
       iVCOut = c()
       
-      condProbaCorr = function(data,
+      conditional = function(data,
                                ng,
                                B,
                                iKeepIn,
@@ -1192,7 +1192,7 @@ externVar = function(model,
         arguments[["B"]][iEst] = B
       }
       
-      funOut = "condProbaCorr"
+      funOut = "conditional"
       
       
       
@@ -1567,7 +1567,7 @@ externVar = function(model,
                     BIC = (length(best)-length(posfix))*log(modOut$ns)-2*modOut$loglik,
                     varest = varest, runtime = cost[3])
     }
-    if(method == "condProbaCorr"){
+    if(method == "conditional"){
       best = modOut$best[iEst]
       V = matrix(NA, nOut, nOut)
       V[upper.tri(V, diag = T)] = modOut$V
@@ -1630,7 +1630,7 @@ externVar = function(model,
       
       class(modOut) = c(class(modOut), "externVar")
     }
-    if(method == "condProbaCorr"){
+    if(method == "conditional"){
       
       #Get info
       modOut$pprob = pprob
