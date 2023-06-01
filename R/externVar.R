@@ -1614,6 +1614,7 @@ externVar = function(model,
       modOut$pprob = pprob
       if(inherits(modOut, "multlcmm")) modOut$N[3] = modOut$N[3]-modOut$N[1]
       modOut$N[1] = 0
+      modOut$idprob0 = rep(0, length(modOut$idprob0))
       modOut$call = cl
       modOut$varest = varest
       modOut$runtime = cost[3]
