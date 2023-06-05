@@ -742,6 +742,13 @@ externVar = function(model,
         argumentsMpj[["data"]] = argumentsIn[["data"]]
         argumentsMpj[["classmb"]] = oldclassmb
         
+        argumentsMpj[["survival"]] = argumentsIn[["survival"]]
+        argumentsMpj[["hazard"]] = argumentsIn[["hazard"]]
+        argumentsMpj[["hazardtype"]] = argumentsIn[["hazardtype"]]
+        argumentsMpj[["hazardnodes"]] = argumentsIn[["hazardnodes"]]
+        argumentsMpj[["TimeDepVar"]] = argumentsIn[["TimeDepVar"]]
+        argumentsMpj[["logscale"]] = argumentsIn[["logscale"]]
+        
         modelMpj = do.call("mpjlcmm", argumentsMpj)
         modelMpj$V = model$V
       }
