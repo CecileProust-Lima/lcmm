@@ -728,31 +728,6 @@ externVar = function(model,
       
       if(!inherits(classmb,"formula")) stop("The argument classmb must be a formula")
       
-      #changement de ma fonction en mpjlcmm (pour avec la variance)
-      if(funIn != "mpjlcmm"){
-        argumentsMpj = list()
-        if(funIn == "Jointlcmm"){
-          argumentsMpj[["longitudinal"]] = as.call(list(as.name("list"), modNoSurv))
-        } else {
-          argumentsMpj[["longitudinal"]] = as.call(list(as.name("list"), substitute(model)))
-        }
-        argumentsMpj[["maxiter"]] = 0
-        argumentsMpj[["ng"]] = ng
-        argumentsMpj[["subject"]] = subject
-        argumentsMpj[["data"]] = argumentsIn[["data"]]
-        argumentsMpj[["classmb"]] = oldclassmb
-        
-        argumentsMpj[["survival"]] = argumentsIn[["survival"]]
-        argumentsMpj[["hazard"]] = argumentsIn[["hazard"]]
-        argumentsMpj[["hazardtype"]] = argumentsIn[["hazardtype"]]
-        argumentsMpj[["hazardnodes"]] = argumentsIn[["hazardnodes"]]
-        argumentsMpj[["TimeDepVar"]] = argumentsIn[["TimeDepVar"]]
-        argumentsMpj[["logscale"]] = argumentsIn[["logscale"]]
-        
-        modelMpj = do.call("mpjlcmm", argumentsMpj)
-        modelMpj$V = model$V
-      }
-      
       funOut = "mpjlcmm"
       
       #nEst : number of MB parameters in output model
@@ -794,16 +769,40 @@ externVar = function(model,
       #on fixe nos parametres
       arguments[["posfix"]] = unique(c(posfix, iKeepOut))
       
-      #### weird... "Input" model has been changed because we need it to build output model
-      #To explain : "hessienne" function needs mpjlcmm model. So i need mpj for paramBoot
-      #And we need to create our longitudinal (and logicall) now before changinng "input" moded.
-      if(funIn != "mpjlcmm" & varest == "Hessian"){
-        longitudinalOut = as.call(list(as.name("list"), substitute(model)))
-        
-        modelOld = model
-        model = modelMpj
-        model$V = modelOld$V
-      }
+      # #### weird... "Input" model has been changed because we need it to build output model
+      # #To explain : "hessienne" function needs mpjlcmm model. So i need mpj for paramBoot
+      # #And we need to create our longitudinal (and logicall) now before changinng "input" moded.
+      # if(funIn != "mpjlcmm" & varest == "Hessian"){
+      #   
+      #   argumentsMpj = list()
+      #   if(funIn == "Jointlcmm"){
+      #     argumentsMpj[["longitudinal"]] = as.call(list(as.name("list"), modNoSurv))
+      #   } else {
+      #     argumentsMpj[["longitudinal"]] = as.call(list(as.name("list"), substitute(model)))
+      #   }
+      #   argumentsMpj[["maxiter"]] = 0
+      #   argumentsMpj[["B"]] = model$best
+      #   argumentsMpj[["ng"]] = ng
+      #   argumentsMpj[["subject"]] = subject
+      #   argumentsMpj[["data"]] = argumentsIn[["data"]]
+      #   argumentsMpj[["classmb"]] = oldclassmb
+      #   
+      #   argumentsMpj[["survival"]] = argumentsIn[["survival"]]
+      #   argumentsMpj[["hazard"]] = argumentsIn[["hazard"]]
+      #   argumentsMpj[["hazardtype"]] = argumentsIn[["hazardtype"]]
+      #   argumentsMpj[["hazardnodes"]] = argumentsIn[["hazardnodes"]]
+      #   argumentsMpj[["TimeDepVar"]] = argumentsIn[["TimeDepVar"]]
+      #   argumentsMpj[["logscale"]] = argumentsIn[["logscale"]]
+      #   
+      #   modelMpj = do.call("mpjlcmm", argumentsMpj)
+      #   modelMpj$V = model$V
+      #   
+      #   longitudinalOut = as.call(list(as.name("list"), substitute(model)))
+      #   
+      #   modelOld = model
+      #   model = modelMpj
+      #   model$V = modelOld$V
+      # }
       
       
       
