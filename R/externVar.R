@@ -1250,16 +1250,7 @@ externVar = function(model,
   #Get Bootstrap Models
   if(varest == "paramBoot"){
     if(verbose){cat("Bootstrap estimation...\n\n")}
-    est = model$best
-    
-    #cholesky not varcov
-    if(funIn %in% c("mpjlcmm", "Jointlcmm") | !all(as.logical(model$idiag))){
-      est[iVCIn] = model$cholesky
-    } else {
-      cholMatrix = matrix(NA, nVCIn, nVCIn)
-      cholMatrix[upper.tri(cholMatrix, diag = T)] = model$cholesky
-      est[iVCIn] = diag(cholMatrix)
-    }
+    est = estimates(model)
     
     Vin = matrix(0, length(est), length(est))
     Vin[upper.tri(Vin, diag = T)] = model$V
@@ -1407,13 +1398,7 @@ externVar = function(model,
         
         if(!missing(fixed)){
           #cholesky not varcov as output in best
-          if(inherits(modOut, "mpjlcmm") | !all(modOut$idiag)){
-            modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]
-          } else {
-            cholMatrix = matrix(NA, length(iVCOut), length(iVCOut))
-            cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:nVCIn)]
-            modOut$best[iVCOut] = diag(cholMatrix)
-          }
+          modOut$best = estimates(modOut)
           
           #Residual Error : need to be the same sign across bootstrap iterations
           countParamBeforeErrLink = sum(modOut$N[1:3])
@@ -1574,6 +1559,14 @@ externVar = function(model,
                     varest = varest, runtime = cost[3])
     }
     if(method == "conditional"){
+      data$dummyY = 1
+      subLoglik = hlme(dummyY~1,
+                       data = data,
+                       subject = subject,
+                       maxiter = 0,
+                       B = c(1, 0.000001))$loglik
+      loglik = modOut$loglik - subLoglik
+      
       best = modOut$best[iEst]
       V = matrix(NA, nOut, nOut)
       V[upper.tri(V, diag = T)] = modOut$V
@@ -1588,14 +1581,14 @@ externVar = function(model,
       
       
       modOut = list(nbevt = 1, ng = modOut$ng, ns = modOut$ns, idcom = modOut$idcom,
-                    idspecif = modOut$idspecif, idtdv = modOut$idtdv, loglik = modOut$loglik,
+                    idspecif = modOut$idspecif, idtdv = modOut$idtdv, loglik = loglik,
                     best = best, V = V, gconv = modOut$gconv, conv = modOut$conv, call = cl,
                     niter = modOut$niter, N = N, Nprm = Nprm, pprob = pprob, Names = Names,
                     logspecif = modOut$logspecif, predSurv = modOut$predSurv, typrisq = modOut$hazard[[1]],
                     hazardtype = modOut$hazard[[2]], hazardnodes = modOut$hazard[[3]], nz = modOut$hazard[[4]],
                     scoretest = modOut$scoretest, na.action = modOut$na.action, levels = levels,
-                    AIC = 2*(length(best)-length(posfix)-modOut$loglik),
-                    BIC = (length(best)-length(posfix))*log(modOut$ns)-2*modOut$loglik,
+                    AIC = 2*(length(best)-length(posfix)-loglik),
+                    BIC = (length(best)-length(posfix))*log(modOut$ns)-2*loglik,
                     varest = varest, runtime = cost[3])
     }
     
@@ -1637,7 +1630,6 @@ externVar = function(model,
       class(modOut) = c(class(modOut), "externVar")
     }
     if(method == "conditional"){
-      
       #Get info
       modOut$pprob = pprob
       if(inherits(modOut, "multlcmm")) modOut$N[3] = modOut$N[3]-modOut$N[1]
