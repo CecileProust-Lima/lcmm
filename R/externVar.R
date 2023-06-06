@@ -1332,27 +1332,29 @@ externVar = function(model,
             modOut$best[iVCOut] = diag(cholMatrix)
           }
           
-          #Residual Error : need to be the same sign across bootstrap iterations
-          countParamBeforeErrLink = sum(modOut$N[1:3])
-          sumny = 0
-          for(k in 1:modOut$K){
-            
-            for(y in 1:modOut$ny[k]){
-              sumny = sumny+1
+          if(inherits(modOut, "mpjlcmm")){
+            #Residual Error : need to be the same sign across bootstrap iterations
+            countParamBeforeErrLink = sum(modOut$N[1:3])
+            sumny = 0
+            for(k in 1:modOut$K){
               
-              if(modOut$contrainte[k] == 2){
-                countParamYBeforeErr = sum(modOut$Nprm[3+1:5*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
-                modOut$best[countParamYBeforeErr:(countParamYBeforeErr+modOut$Nprm[3+6*modOut$ny[k]-modOut$ny[k]+y])]
+              for(y in 1:modOut$ny[k]){
+                sumny = sumny+1
                 
-                if(modOut$linktype[sumny] == 0)
-                  countParamYBeforeErrLink = sum(modOut$Nprm[3+1:8*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
-                modOut$best[countParamYBeforeErrLink]
+                if(modOut$contrainte[k] == 2){
+                  countParamYBeforeErr = sum(modOut$Nprm[3+1:5*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
+                  modOut$best[countParamYBeforeErr:(countParamYBeforeErr+modOut$Nprm[3+6*modOut$ny[k]-modOut$ny[k]+y])]
+                  
+                  if(modOut$linktype[sumny] == 0)
+                    countParamYBeforeErrLink = sum(modOut$Nprm[3+1:8*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
+                  modOut$best[countParamYBeforeErrLink]
+                }
               }
+              
+              countParamBeforeErrLink = countParamBeforeErrLink+modOut$npmK[k]
+              if(modOut$contrainte[k] == 0 | (modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 0))
+                modOut$best[countParamBeforeErrLink] = abs(modOut$best[countParamBeforeErrLink])
             }
-            
-            countParamBeforeErrLink = countParamBeforeErrLink+modOut$npmK[k]
-            if(modOut$contrainte[k] == 0 | (modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 0))
-              modOut$best[countParamBeforeErrLink] = abs(modOut$best[countParamBeforeErrLink])
           }
         }
         
@@ -1400,27 +1402,29 @@ externVar = function(model,
           #cholesky not varcov as output in best
           modOut$best = estimates(modOut)
           
-          #Residual Error : need to be the same sign across bootstrap iterations
-          countParamBeforeErrLink = sum(modOut$N[1:3])
-          sumny = 0
-          for(k in 1:modOut$K){
-            
-            for(y in 1:modOut$ny[k]){
-              sumny = sumny+1
+          if(inherits(modOut, "mpjlcmm")){
+            #Residual Error : need to be the same sign across bootstrap iterations
+            countParamBeforeErrLink = sum(modOut$N[1:3])
+            sumny = 0
+            for(k in 1:modOut$K){
               
-              if(modOut$contrainte[k] == 2){
-                countParamYBeforeErr = sum(modOut$Nprm[3+1:5*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
-                modOut$best[countParamYBeforeErr:(countParamYBeforeErr+modOut$Nprm[3+6*modOut$ny[k]-modOut$ny[k]+y])]
+              for(y in 1:modOut$ny[k]){
+                sumny = sumny+1
                 
-                if(modOut$linktype[sumny] == 0)
-                  countParamYBeforeErrLink = sum(modOut$Nprm[3+1:8*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
-                modOut$best[countParamYBeforeErrLink]
+                if(modOut$contrainte[k] == 2){
+                  countParamYBeforeErr = sum(modOut$Nprm[3+1:5*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
+                  modOut$best[countParamYBeforeErr:(countParamYBeforeErr+modOut$Nprm[3+6*modOut$ny[k]-modOut$ny[k]+y])]
+                  
+                  if(modOut$linktype[sumny] == 0)
+                    countParamYBeforeErrLink = sum(modOut$Nprm[3+1:8*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
+                  modOut$best[countParamYBeforeErrLink]
+                }
               }
+              
+              countParamBeforeErrLink = countParamBeforeErrLink+modOut$npmK[k]
+              if(modOut$contrainte[k] == 0 | (modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 0))
+                modOut$best[countParamBeforeErrLink] = abs(modOut$best[countParamBeforeErrLink])
             }
-            
-            countParamBeforeErrLink = countParamBeforeErrLink+modOut$npmK[k]
-            if(modOut$contrainte[k] == 0 | (modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 0))
-              modOut$best[countParamBeforeErrLink] = abs(modOut$best[countParamBeforeErrLink])
           }
         }
         
