@@ -826,6 +826,7 @@ externVar = function(model,
       #Id of varcov estimates to keep in bootstrap
       iVCKeep = iVCIn
       iVCOut = c()
+      nVCIn = 0
       
       conditional = function(model,
                                data,
@@ -957,7 +958,9 @@ externVar = function(model,
         nVCStr = strMod$N[3]
         iVCStr = sum(strMod$N[1:2]) + 1:nVCStr
       }
-      iVCOut = nIn + iVCStr - nMB
+      iVCOut = iVCStr - nMB
+      
+      nVCIn = 0
       
       
       conditional = function(model,
@@ -976,6 +979,15 @@ externVar = function(model,
                                convB,
                                convL,
                                convG){
+        argumentsInEdit = argumentsIn
+        argumentsInEdit[["B"]] = B[iKeepOut]
+        argumentsInEdit[["maxiter"]] = 0
+        argumentsInEdit[["verbose"]] = F
+        argumentsInEdit[["nproc"]] = nproc
+        model = do.call(funIn, argumentsInEdit)
+        
+        B = B[iEst]
+        
         #First : let's compute P(C|\tilde C) (\tilde C : A)
         pAlY = sapply(1:ng, function(g){
           return(as.numeric(predictClass(model, data)[,2] == g))
@@ -1024,7 +1036,7 @@ externVar = function(model,
         arguments[["convL"]] = convL
         arguments[["convG"]] = convG
         
-        arguments[["B"]] = B[iEst]
+        arguments[["B"]] = B
         
         res = do.call(funOut, arguments)
         res$call = match.call()
@@ -1080,6 +1092,7 @@ externVar = function(model,
       iVCKeep = iVCIn
       #Id of varcov estimates (none)
       iVCOut = c()
+      nVCIn = 0
       
       conditional = function(data,
                                ng,
@@ -1315,7 +1328,7 @@ externVar = function(model,
       
       survivalMissing = missing(survival)
       fixedMissing = missing(fixed)
-      modOuts <- parApply(clust, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, nVCIn, iVCOut, survivalMissing, fixedMissing){
+      modOuts <- parApply(clust, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, survivalMissing, fixedMissing){
         arguments[["B"]][iKeepOut] = coefs
         arguments[["nproc"]] = 1
         
@@ -1359,7 +1372,7 @@ externVar = function(model,
         }
         
         return(modOut)
-      }, arguments = arguments, iKeepOut = iKeepOut, funOut = funOut, iEst = iEst, nVCIn = nVCIn, iVCOut = iVCOut, survivalMissing = survivalMissing, fixedMissing = fixedMissing)
+      }, arguments = arguments, iKeepOut = iKeepOut, funOut = funOut, iEst = iEst, survivalMissing = survivalMissing, fixedMissing = fixedMissing)
       parallel::stopCluster(clust)
       
       #format output
@@ -1466,9 +1479,9 @@ externVar = function(model,
     
     #replace chol for varcov in best
     if(!missing(fixed)){
-      modOut$cholesky[-(1:nVCIn)] = modOut$best[iVCOut]
+      modOut$cholesky[-(1:nVCIn)*(nVCIn != 0)] = modOut$best[iVCOut]
       if(idiag){
-        modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]^2
+        modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)*(nVCIn != 0)]^2
       } else {
         NVC = sqrt(2*(length(modOut$cholesky)-nVCIn)+1/4)-1/2
         cholMatrix = matrix(0, NVC, NVC)
@@ -1488,6 +1501,7 @@ externVar = function(model,
     if(method == "twoStageJoint") modOut$pprob = modelEdit$pprob
     if(!missing(survival)) modOut$predSurv = modelEdit$predSurv
     modOut$loglik = modelEdit$loglik
+    if(method == "conditional") modOut$best = modOut$best[iEst]
   }
   
   #if(method == "twoStageJoint" & !missing(fixed)) modOut$strMod = strMod
