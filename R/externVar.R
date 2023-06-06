@@ -1324,13 +1324,7 @@ externVar = function(model,
         
         if(!fixedMissing){
           #cholesky not varcov as output in best
-          if(inherits(modOut, "mpjlcmm") | !all(modOut$idiag)){
-            modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]
-          } else {
-            cholMatrix = matrix(NA, length(iVCOut), length(iVCOut))
-            cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$cholesky[-(1:nVCIn)]
-            modOut$best[iVCOut] = diag(cholMatrix)
-          }
+          modOut$best = estimates(modOut)
           
           if(inherits(modOut, "mpjlcmm")){
             #Residual Error : need to be the same sign across bootstrap iterations
