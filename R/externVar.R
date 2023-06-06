@@ -819,7 +819,7 @@ externVar = function(model,
       iEst = 1:nEst
       
       iKeepIn = 1:nIn
-      iKeepOut = 1:nIn+nEst
+      iKeepOut = 1:nIn+nEst+2
       
       nOut = nEst+2
       
@@ -847,6 +847,15 @@ externVar = function(model,
                                convB,
                                convL,
                                convG){
+        argumentsInEdit = argumentsIn
+        argumentsInEdit[["B"]] = B[iKeepOut]
+        argumentsInEdit[["maxiter"]] = 0
+        argumentsInEdit[["verbose"]] = F
+        argumentsInEdit[["nproc"]] = nproc
+        model = do.call(funIn, argumentsInEdit)
+        
+        B = B[iEst]
+        
         #First : let's compute P(C|\tilde C) (\tilde C : A)
         pAlY = sapply(1:ng, function(g){
           return(as.numeric(predictClass(model, data)[,2] == g))
@@ -922,12 +931,11 @@ externVar = function(model,
       arguments[["convG"]] = convG
       
       #on ajoute des valeurs de base pour nos nouveaux estimateurs
-      arguments[["B"]] = rep(1, nIn+nOut)
+      arguments[["B"]] = rep(0.1, nIn+nOut)
       #initial values
-      if(missing(B)){
-        B = rep(0.1, nEst)
+      if(!missing(B)){
+        arguments[["B"]][iEst] = B
       }
-      arguments[["B"]][iEst] = B
       
       funOut = "conditional"
     }
