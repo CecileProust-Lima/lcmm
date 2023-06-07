@@ -1028,6 +1028,13 @@ externVar = function(model,
           arguments[["link"]] = link
         }
         
+        #With some kind of input model, prob does not have the same name
+        if(!"prob1" %in% colnames(data)){
+          for(i in 1:ng){
+            data[[paste0("prob", i)]] = data[[paste0("probYT", i)]]
+          }
+        }
+        
         arguments[["data"]] = data
         arguments[["fixed"]] = fixed
         arguments[["random"]] = random
@@ -1443,7 +1450,7 @@ externVar = function(model,
           }
         }
         
-        #Survival Base Function : need to be the same sign across bootstrap iterations
+        #Survival Base Function constraint : need to be the same sign across bootstrap iterations
         if(!missing(survival)){
           iSurvConstraint = 1:nSurvConstraint+modOut$N[1]
           modOut$best[iSurvConstraint] = abs(modOut$best[iSurvConstraint])
