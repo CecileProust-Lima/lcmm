@@ -869,7 +869,6 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     nbtmp[which(mod$linktype==2)] <- mod$nbnodes
                     nbzitr[sum(ny[1:k])-ny[k]+1:ny[k]] <- nbtmp
                     nodes <- c(nodes,as.vector(mod$linknodes))
-                    zitr[[k]] <- mod$linknodes
                     epsY[sum(ny[1:k])-ny[k]+1:ny[k]] <- mod$epsY
                     mspl <- 0
                     for (m in 1:ny[k])
@@ -881,13 +880,14 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                             mspl <- mspl +1
                             ntr[sum(ny[1:k])-ny[k]+m] <- mod$nbnodes[mspl]+2
                         }
+                        zitr[[sum(ny[1:k])-ny[k]+m]] <- mod$linknodes[1:mod$nbnodes[m],m]
                     }
                 }
                 if(contrainte[k]==1)
                 {
                     nbzitr[k] <- length(mod$linknodes)
                     nodes <- c(nodes,as.vector(mod$linknodes))
-                    zitr[[k]] <- mod$linknodes
+                    zitr[[sum(ny[1:k])-ny[k]+m]] <- mod$linknodes
                     epsY[k] <- mod$epsY
                     ntr[k] <- ifelse(idlink[k]==0,2,nbzitr[k]+2)
                 }
@@ -897,7 +897,11 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         zzitr <- matrix(0, max(sapply(zitr, length)), sum(ny))
         for(k in 1:K)
         {
-            if(nbzitr[k]>0) zzitr[1:nbzitr[k],k] <- zitr[[k]]
+            for(m in 1:ny[k])
+            {
+                km <- sum(ny[1:k])-ny[k]+m
+                if(nbzitr[km]>0) zzitr[1:nbzitr[km],km] <- zitr[[km]]
+            }
         }
         zitr <- zzitr
 
