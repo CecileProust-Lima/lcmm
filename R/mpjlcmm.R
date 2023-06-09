@@ -841,6 +841,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                 nv[k] <- ncol(xk)-2 # enlever process et outcome
                 idg <- c(idg,mod$idg)
                 idea <- c(idea,mod$idea)
+                if(is.null(mod$idcontr)) mod$idcontr <- rep(0, length(mod$idg))
                 idcontr <- c(idcontr,mod$idcontr)
                 idcor <- c(idcor,mod$idcor)
 
@@ -879,17 +880,21 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                         {
                             mspl <- mspl +1
                             ntr[sum(ny[1:k])-ny[k]+m] <- mod$nbnodes[mspl]+2
+                            zitr[[sum(ny[1:k])-ny[k]+m]] <- mod$linknodes[1:mod$nbnodes[mspl],m]
                         }
-                        zitr[[sum(ny[1:k])-ny[k]+m]] <- mod$linknodes[1:mod$nbnodes[m],m]
+                        else
+                        {
+                            zitr[[sum(ny[1:k])-ny[k]+m]] <- mod$linknodes[1:2,m]
+                        }
                     }
                 }
                 if(contrainte[k]==1)
                 {
-                    nbzitr[k] <- length(mod$linknodes)
+                    nbzitr[sum(ny[1:k])-ny[k]+1] <- length(mod$linknodes)
                     nodes <- c(nodes,as.vector(mod$linknodes))
-                    zitr[[sum(ny[1:k])-ny[k]+m]] <- mod$linknodes
-                    epsY[k] <- mod$epsY
-                    ntr[k] <- ifelse(idlink[k]==0,2,nbzitr[k]+2)
+                    zitr[[sum(ny[1:k])-ny[k]+1]] <- mod$linknodes
+                    epsY[sum(ny[1:k])-ny[k]+1] <- mod$epsY
+                    ntr[sum(ny[1:k])-ny[k]+1] <- ifelse(idlink[k]==0,2,nbzitr[k]+2)
                 }
             }
 
