@@ -1083,6 +1083,7 @@ externVar = function(model,
       if(missing(B)){
         arguments[["B"]][iEst] = strMod$best[(nMB+1):nStr]
       } else {
+        if(length(B) != length(iEst)) stop("B should be of length ", length(iEst))
         arguments[["B"]][iEst] = B
       }
       
@@ -1307,20 +1308,23 @@ externVar = function(model,
         ncolRandMod = ncol(model.matrix(formula(varcovMod$call$random), data))
         
         if(varcovMod$idiag){
-          nChol = ncolRandMod
+          nChol = ncolRandMod-as.integer(funIn == "multlcmm")
           
           vc = chols[1:nChol+countChol]
           
           varcov = c(varcov, (vc^2))
         } else {
-          nChol = ncolRandMod*(ncolRandMod+1)/2
+          nChol = ncolRandMod*(ncolRandMod+1)/2-as.integer(funIn == "multlcmm")
           
           #cholMatrix
           cholMatrix = matrix(0, ncolRandMod, ncolRandMod)
-          cholMatrix[upper.tri(cholMatrix, diag = T)] = chols[1:nChol+countChol]
+          cholsToMatrix = chols[1:nChol+countChol]
+          if(funIn == "multlcmm") cholsToMatrix = c(1, cholsToMatrix)
+          cholMatrix[upper.tri(cholMatrix, diag = T)] = cholsToMatrix
           
           vc = t(cholMatrix)%*%cholMatrix
           varcov = c(varcov, vc[upper.tri(vc, diag = T)])
+          if(funIn == "multlcmm") varcov = varcov[-1]
         }
         
         countChol = countChol + nChol
