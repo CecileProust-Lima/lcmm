@@ -661,6 +661,7 @@ externVar = function(model,
       if(missing(B)){
         arguments[["B"]][iEst] = rep(1, nEst)
       } else {
+        if(length(B) != length(iEst)) stop("B should be of length ", length(iEst))
         arguments[["B"]][iEst] = B
       }
     }
@@ -719,6 +720,7 @@ externVar = function(model,
       if(missing(B)){
         arguments[["B"]][iEst] = strMod$best[(nMB+1):nStr]
       } else {
+        if(length(B) != length(iEst)) stop("B should be of length ", length(iEst))
         arguments[["B"]][iEst] = B
       }
     }
@@ -763,6 +765,7 @@ externVar = function(model,
       if(missing(B)){
         arguments[["B"]][1:ng-1] = model$best[1:ng-1]
       } else {
+        if(length(B) != length(iEst)) stop("B should be of length ", length(iEst))
         arguments[["B"]][iEst] = B
       }
       
@@ -934,6 +937,7 @@ externVar = function(model,
       arguments[["B"]] = rep(0.1, nIn+nOut)
       #initial values
       if(!missing(B)){
+        if(length(B) != length(iEst)) stop("B should be of length ", length(iEst))
         arguments[["B"]][iEst] = B
       }
       
@@ -1224,6 +1228,7 @@ externVar = function(model,
       arguments[["B"]] = rep(0, nIn+nOut)
       #initial values
       if(!missing(B)){
+        if(length(B) != length(iEst)) stop("B should be of length ", length(iEst))
         arguments[["B"]][iEst] = B
       }
       
