@@ -120,7 +120,6 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
   vrais_mpj_i=0.d0
   !print*,"vrais pour i=",i
 
-  
   b1=0.d0
   eps=1.D-20
   l=0
@@ -138,7 +137,6 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
      end if
   end do
 
-  
   if (nbevt.gt.0) then
      ! calcul de brisq et risq, surv et surv0 pour chaque evt et tous les g
      risq=0.d0
@@ -346,7 +344,6 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
      tmp = tmp + nef(k)+ncontr(k)+nvc(k)+nw(k)+ncor(k)+nerr(k)+nalea(k)+sumntr
      sumparK = sumparK + nmesparK(i,k)
   end do
-  
   
 !  print*,"transfo ok"
   
@@ -1170,13 +1167,12 @@ double precision function vrais_mpj_i(b,npm,id,thi,jd,thj,i)
      if(idtrunc.eq.1) then 
         vrais_mpj_i = vrais_mpj_i - log(retard)
      end if
-     
     ! print*,"apres idtrunc"
   end if
 
   
 654 continue
- ! print*,"fin vrais i"
+
   return
   
 end function vrais_mpj_i
@@ -1205,9 +1201,9 @@ double precision function vrais_mpj(b,m,id,thi,jd,thj)
      !print*,vrais_mpj_i(b,m,id,thi,jd,thj,i) 
      temp=vrais_mpj_i(b,m,id,thi,jd,thj,i)  
      !call dblepr("vrais=",-1,temp,1) 
-     !write(*,*)"vrais= ",temp        
+     !if(i.eq.1)write(*,*)"vrais= ",temp        
      vrais_mpj = vrais_mpj + temp
-     !print*,"vrais_mpj=",vrais_mpj
+     !print*,"i=",i," vrais_mpj=",vrais_mpj
      !if (temp.ne.-1.d9 .or. temp/temp.ne.1) then 
      if (abs(temp+1.d9).lt.1.d-6 .or. temp.ne.temp) then 
         !write(*,*)"i=",i,"vrais= ",temp," id=",id," jd=",jd
@@ -3755,7 +3751,6 @@ subroutine loglikmpjlcmm(K0,ny0,nbevt0,ng0,ns0,Y0,nobs0,X0,nv0,Xns0,nv20, &
      end if
   end do
 
-
   allocate(Y(nobs0),X(nobs0,sum(nv0(:))),Xns(ns0,nv20),prior(ns0),  &
        idea(sum(nv0(:))),idg(sum(nv0(:))),idcontr(sum(nv0(:))),&
        idcor(sum(nv0(:))), nmes(ns0,nytot),&
@@ -3768,6 +3763,7 @@ subroutine loglikmpjlcmm(K0,ny0,nbevt0,ng0,ns0,Y0,nobs0,X0,nv0,Xns0,nv20, &
   nv2=nv20
   nobs=nobs0
   nbevt=nbevt0
+  idtrunc=idtrunc0
 
   nmes=nmes0
   Y=0.d0
@@ -4324,7 +4320,6 @@ subroutine loglikmpjlcmm(K0,ny0,nbevt0,ng0,ns0,Y0,nobs0,X0,nv0,Xns0,nv20, &
 
   deallocate(Y,X,Xns,idprob,idea,idg,idcontr,idcor,nmes,prior,zitr,mm,mm1,mm2,im,im1,&
        im2,indiceY,uniqueY,idcom,idspecif,idtdv)
-
 
   if(nbevt.gt.0) then
      deallocate(Tsurv0,Tsurv,Tsurvint,ind_survint,zi,devt,risqcom,typrisq, &
