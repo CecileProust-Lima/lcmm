@@ -1532,7 +1532,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                          as.double(Y0),
                          as.double(X0),
                          as.integer(prior0),
-                         as.double(prior0),
+                         as.double(pprior0),
                          as.integer(idprob0),
                          as.integer(idea0),
                          as.integer(idg0),
