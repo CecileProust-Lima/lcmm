@@ -1509,11 +1509,16 @@ externVar = function(model,
       if(idiag){
         modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)*(nVCIn != 0)]^2
       } else {
-        NVC = sqrt(2*(length(modOut$cholesky)-nVCIn)+1/4)-1/2
+        isMult = as.integer(modOut$contrainte[modOut$K] == 2)
+        NVC = sqrt(2*(length(modOut$cholesky)+isMult-nVCIn)+1/4)-1/2
         cholMatrix = matrix(0, NVC, NVC)
-        cholMatrix[upper.tri(cholMatrix, diag = T)] = modOut$best[iVCOut]
+        chols = modOut$best[iVCOut]
+        if(modOut$contrainte[modOut$K] == 2) chols = c(1, chols)
+        cholMatrix[upper.tri(cholMatrix, diag = T)] = chols
         vc = t(cholMatrix)%*%cholMatrix
-        modOut$best[iVCOut] = vc[upper.tri(vc, diag = T)]
+        vc = vc[upper.tri(vc, diag = T)]
+        if(modOut$contrainte[modOut$K] == 2) vc = vc[-1]
+        modOut$best[iVCOut] = vc
       }
     }
     
