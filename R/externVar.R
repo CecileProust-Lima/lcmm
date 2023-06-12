@@ -1510,7 +1510,9 @@ externVar = function(model,
     if(!missing(fixed)){
       modOut$cholesky[-(1:nVCIn)*(nVCIn != 0)] = modOut$best[iVCOut]
       if(idiag){
-        modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)*(nVCIn != 0)]^2
+        modOut$best[iVCOut] = ifelse(nVCIn == 0,
+                                     modOut$cholesky^2,
+                                     modOut$cholesky[-(1:nVCIn)]^2)
       } else {
         isMult = as.integer(modOut$contrainte[modOut$K] == 2)
         NVC = sqrt(2*(length(modOut$cholesky)+isMult-nVCIn)+1/4)-1/2
