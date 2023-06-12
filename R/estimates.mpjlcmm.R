@@ -34,16 +34,8 @@ estimates.mpjlcmm <- function(x,cholesky=TRUE)
             {
                 if(nvc[k]>0)
                 {
-                    if(contrainte[k]==2)
-                    {
-                        res[tmp + nef[k]+ncontr[k]+1:nvc[k]] <- ch[jch + 1+1:nvc[k]]
-                        jch <- jch + 1 + nvc[k]
-                    }
-                    else
-                    {
-                        res[tmp + nef[k]+ncontr[k]+1:nvc[k]] <- ch[jch + 1:nvc[k]]
-                        jch <- jch + nvc[k]
-                    }
+                    res[tmp + nef[k]+ncontr[k]+1:nvc[k]] <- ch[jch + 1:nvc[k]]
+                    jch <- jch + nvc[k]
                 }
                 
                 tmp <- tmp + nef[k] + ncontr[k] + nvc[k] + nw[k] + ncor[k] + nerr[k] + nalea[k] + sum(ntr[sumny+1:ny[k]])
