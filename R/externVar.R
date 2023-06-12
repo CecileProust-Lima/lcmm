@@ -1509,20 +1509,43 @@ externVar = function(model,
     #replace chol for varcov in best
     if(!missing(fixed)){
       modOut$cholesky[-(1:nVCIn)*(nVCIn != 0)] = modOut$best[iVCOut]
-      if(idiag){
-        modOut$best[iVCOut] = ifelse(nVCIn == 0,
-                                     modOut$cholesky^2,
-                                     modOut$cholesky[-(1:nVCIn)]^2)
-      } else {
+      if(idiag & inherits(modOut, "mpjlcmm")){ #idiag but not multlcmm because diff $chol structure
+        if(nVCIn == 0){
+          modOut$best[iVCOut] = modOut$cholesky^2
+        } else {
+          modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]^2
+        }
+      } else if(inherits(modOut, "mpjlcmm")) { #only mpj (twoStage), because $contrainte is used to get multlcmm
         isMult = as.integer(modOut$contrainte[modOut$K] == 2)
         NVC = sqrt(2*(length(modOut$cholesky)+isMult-nVCIn)+1/4)-1/2
         cholMatrix = matrix(0, NVC, NVC)
         chols = modOut$best[iVCOut]
-        if(modOut$contrainte[modOut$K] == 2) chols = c(1, chols)
+        if(modOut$contrainte[modOut$K] == 2) chols = c(1, chols) #mpjlcmm & mult : no 1 in $chol
         cholMatrix[upper.tri(cholMatrix, diag = T)] = chols
         vc = t(cholMatrix)%*%cholMatrix
         vc = vc[upper.tri(vc, diag = T)]
         if(modOut$contrainte[modOut$K] == 2) vc = vc[-1]
+        modOut$best[iVCOut] = vc
+      } else { #for conditional, but mult can be idiag. Because $chol structure is full for mult even with idiag
+        NVC = sqrt(2*(length(modOut$cholesky)-nVCIn)+1/4)-1/2
+        cholMatrix = matrix(0, NVC, NVC)
+        chols = modOut$best[iVCOut]
+        if(inherits(modOut, "multlcmm")) chols = c(1, chols)
+        if(idiag){
+          chols_idiag = c()
+          for(i in 1:NVC){
+            chols_idiag = c(chols_idiag, rep(0, i-1), chols[i])
+          }
+          chols = chols_idiag
+        }
+        cholMatrix[upper.tri(cholMatrix, diag = T)] = chols
+        vc = t(cholMatrix)%*%cholMatrix
+        if(idiag){
+          vc = diag(vc)
+        } else {
+          vc = vc[upper.tri(vc, diag = T)]
+        }
+        if(inherits(modOut, "multlcmm")) vc = vc[-1]
         modOut$best[iVCOut] = vc
       }
     }
