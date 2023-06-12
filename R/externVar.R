@@ -559,6 +559,8 @@ externVar = function(model,
     argumentsStrMod[["B"]] = as.name("strMod")
     
     strMod = do.call(argfunctionStrMod, c(argumentsStrMod))
+    
+    strMod$best[1:ng+(ng-1)] = mean(strMod$best[1:ng+(ng-1)])
   }
   
   #Change general model arguments
