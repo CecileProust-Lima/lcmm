@@ -260,7 +260,7 @@ externVar = function(model,
   if(model$ng == 1) stop("Primary model does not have latent class structure (ng=1)")
   if(!varest %in% c("none", "paramBoot", "Hessian")) stop('Variance estimation method "varest" must be either "none", "paramBoot" or "Hessian"')
   if(!is.null(link) & missing(fixed)) stop("The argument link is not to be used with external class predictor")
-
+  
   
   if(missing(posfix)) posfix = c()
   
@@ -834,24 +834,24 @@ externVar = function(model,
       nVCIn = 0
       
       conditional = function(model,
-                               data,
-                               survival,
-                               hazard,
-                               hazardtype,
-                               hazardnodes = NULL,
-                               TimeDepVar = NULL,
-                               logscale,
-                               subject,
-                               ng,
-                               B,
-                               link,
-                               iEst,
-                               maxiter,
-                               verbose,
-                               nproc,
-                               convB,
-                               convL,
-                               convG){
+                             data,
+                             survival,
+                             hazard,
+                             hazardtype,
+                             hazardnodes = NULL,
+                             TimeDepVar = NULL,
+                             logscale,
+                             subject,
+                             ng,
+                             B,
+                             link,
+                             iEst,
+                             maxiter,
+                             verbose,
+                             nproc,
+                             convB,
+                             convL,
+                             convG){
         argumentsInEdit = argumentsIn
         argumentsInEdit[["B"]] = B[iKeepOut]
         argumentsInEdit[["maxiter"]] = 0
@@ -978,21 +978,22 @@ externVar = function(model,
       
       
       conditional = function(model,
-                               data,
-                               fixed,
-                               random,
-                               subject,
-                               mixture,
-                               ng,
-                               B,
-                               link,
-                               iEst,
-                               maxiter,
-                               verbose,
-                               nproc,
-                               convB,
-                               convL,
-                               convG){
+                             data,
+                             fixed,
+                             random,
+                             idiag,
+                             subject,
+                             mixture,
+                             ng,
+                             B,
+                             link,
+                             iEst,
+                             maxiter,
+                             verbose,
+                             nproc,
+                             convB,
+                             convL,
+                             convG){
         argumentsInEdit = argumentsIn
         argumentsInEdit[["B"]] = B[iKeepOut]
         argumentsInEdit[["maxiter"]] = 0
@@ -1044,6 +1045,7 @@ externVar = function(model,
         arguments[["data"]] = data
         arguments[["fixed"]] = fixed
         arguments[["random"]] = random
+        arguments[["idiag"]] = idiag
         arguments[["subject"]] = subject
         arguments[["mixture"]] = mixture
         arguments[["classmb"]] = ~-1
@@ -1069,6 +1071,7 @@ externVar = function(model,
       arguments[["model"]] = model
       arguments[["fixed"]] = fixed
       arguments[["random"]] = random
+      arguments[["idiag"]] = idiag
       arguments[["subject"]] = subject
       arguments[["mixture"]] = mixture
       arguments[["ng"]] = ng
@@ -1117,15 +1120,15 @@ externVar = function(model,
       nVCIn = 0
       
       conditional = function(data,
-                               ng,
-                               B,
-                               iKeepIn,
-                               iEst,
-                               argumentsIn,
-                               funIn,
-                               nproc,
-                               maxiter,
-                               verbose){
+                             ng,
+                             B,
+                             iKeepIn,
+                             iEst,
+                             argumentsIn,
+                             funIn,
+                             nproc,
+                             maxiter,
+                             verbose){
         argumentsInEdit = argumentsIn
         argumentsInEdit[["B"]] = B[iKeepOut]
         argumentsInEdit[["maxiter"]] = 0
@@ -1188,7 +1191,7 @@ externVar = function(model,
         nEst = ncol(X)*nBy
         
         opt = marqLevAlg(b=B, fn=nLL, y=y, X=X, print.info = verbose, nproc = nproc, maxiter = maxiter)
-
+        
         namesX = c("intercept", colnames(X)[colnames(X) != "(Intercept)"])
         names(opt$b) = c(sapply(namesX, FUN = function(i){
           return(paste0(i, " ", colnames(y)[-ng]))
@@ -1340,7 +1343,7 @@ externVar = function(model,
       
       return(coefs)
     }, model = model, data = data, iVCKeep = iVCKeep)
-
+    
     if(nproc > 1)
     {
       clust <- parallel::makeCluster(nproc)
