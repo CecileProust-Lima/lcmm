@@ -1434,7 +1434,11 @@ externVar = function(model,
         arguments[["B"]][iKeepOut] = coefss[,i]
         
         #Model Estimation
-        captured_log = capture.output({modOut = do.call(funOut, c(arguments))})
+        if(verbose){
+          modOut = do.call(funOut, c(arguments))
+        } else {
+          captured_log = capture.output({modOut = do.call(funOut, c(arguments))})
+        }
         
         if(!missing(fixed)){
           #cholesky not varcov as output in best
