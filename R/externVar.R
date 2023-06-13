@@ -238,7 +238,7 @@ externVar = function(model,
                      data,
                      longitudinal,
                      method,
-                     varest = "Hessian",
+                     varest,
                      M = 200,
                      B,
                      convB = 0.0001,
@@ -263,6 +263,8 @@ externVar = function(model,
   
   
   if(missing(posfix)) posfix = c()
+  if(method == "twoStageJoint" & missing(varest)) varest = "Hessian"
+  if(method == "conditional" & missing(varest)) varest = "paramBoot"
   
   cl = match.call()
   
