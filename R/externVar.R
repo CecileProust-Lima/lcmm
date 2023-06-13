@@ -258,13 +258,13 @@ externVar = function(model,
   if(sum(c(!missing(fixed), !missing(classmb), !missing(survival))) != 1) stop("One and only one in survival, fixed or classmb must be given")
   if(missing(method) | !method %in% c("twoStageJoint", "conditional")) stop('Method must be either "twoStageJoint" or "conditional"')
   if(model$ng == 1) stop("Primary model does not have latent class structure (ng=1)")
+  if(method == "twoStageJoint" & missing(varest)) varest = "Hessian"
+  if(method == "conditional" & missing(varest)) varest = "paramBoot"
   if(!varest %in% c("none", "paramBoot", "Hessian")) stop('Variance estimation method "varest" must be either "none", "paramBoot" or "Hessian"')
   if(!is.null(link) & missing(fixed)) stop("The argument link is not to be used with external class predictor")
   
   
   if(missing(posfix)) posfix = c()
-  if(method == "twoStageJoint" & missing(varest)) varest = "Hessian"
-  if(method == "conditional" & missing(varest)) varest = "paramBoot"
   
   cl = match.call()
   
