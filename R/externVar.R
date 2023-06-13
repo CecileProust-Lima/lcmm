@@ -1164,7 +1164,7 @@ externVar = function(model,
         data = merge(data, indivProb, by = subject)
         
         for(id in unique(data[[subject]])){
-          if(length(data[[subject]] > 1)) data = data[-which(data[[subject]] == id)[-1],]
+          if(sum(data[[subject]] == id) > 1) data = data[-which(data[[subject]] == id)[-1],]
         }
         
         #negative log likelihood function
