@@ -1634,6 +1634,10 @@ externVar = function(model,
                     AIC = 2*(length(best)-length(posfix)-modOut$loglik),
                     BIC = (length(best)-length(posfix))*log(modOut$ns)-2*modOut$loglik,
                     varest = varest, runtime = cost[3])
+      if(varest == "paramBoot"){
+        modOut$Mconv = round(Mconv/M*100, 1)
+        modOut$conv = as.integer(modOut$Mconv > 90)
+      }
     }
     if(method == "conditional"){
       data$dummyY = 1
@@ -1667,6 +1671,10 @@ externVar = function(model,
                     AIC = 2*(length(best)-length(posfix)-loglik),
                     BIC = (length(best)-length(posfix))*log(modOut$ns)-2*loglik,
                     varest = varest, runtime = cost[3])
+      if(varest == "paramBoot"){
+        modOut$Mconv = round(Mconv/M*100, 1)
+        modOut$conv = as.integer(modOut$Mconv > 90)
+      }
     }
     
     class(modOut) = c("externSurv", "externVar")
@@ -1703,6 +1711,10 @@ externVar = function(model,
       
       modOut$V = V
       modOut$best = modOut$best[-c(1:nMB)]
+      if(varest == "paramBoot"){
+        modOut$Mconv = round(Mconv/M*100, 1)
+        modOut$conv = as.integer(modOut$Mconv > 90)
+      }
       
       class(modOut) = c(class(modOut), "externVar")
     }
@@ -1713,6 +1725,10 @@ externVar = function(model,
       modOut$call = cl
       modOut$varest = varest
       modOut$runtime = cost[3]
+      if(varest == "paramBoot"){
+        modOut$Mconv = round(Mconv/M*100, 1)
+        modOut$conv = as.integer(modOut$Mconv > 90)
+      }
       
       class(modOut) = c(class(modOut), "externVar")
     }
@@ -1738,6 +1754,10 @@ externVar = function(model,
                   AIC = 2*(length(best)-length(posfix)-modOut$loglik),
                   BIC = (length(best)-length(posfix))*log(modOut$ns)-2*modOut$loglik,
                   varest = varest, method = method, runtime = cost[3])
+    if(varest == "paramBoot"){
+      modOut$Mconv = round(Mconv/M*100, 1)
+      modOut$conv = as.integer(modOut$Mconv > 90)
+    }
     
     class(modOut) = c("externX", "externVar")
   }
