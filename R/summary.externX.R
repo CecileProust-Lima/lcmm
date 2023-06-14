@@ -6,9 +6,6 @@ summary.externX = function(object, ...){
   
   cat("Secondary multinomial model for external class predictor", "\n")
   cat("     fitted by maximum likelihood method", "\n")
-  if(x$varest == "none") cat("     primary model variance not accounted for", "\n")
-  if(x$varest == "Hessian") cat("     primary model variance accounted for through the hessian of the joint likelihood", "\n")
-  if(x$varest == "paramBoot") cat("     primary model variance accounted for through parametric boostrap", "\n")
   
   cl <- x$call
   cl$B <- NULL
@@ -150,7 +147,7 @@ summary.externX = function(object, ...){
       if(any(c(1:nprob) %in% posfix)) maxch[1] <- maxch[1]-1
       dimnames(tmp) <- list(names(coef)[1:nprob],
                             c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
-                              paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""),
+                              paste(paste(rep(" ",max(maxch[2]-4,0)),collapse=""),"Se**",sep=""),
                               paste(paste(rep(" ",max(maxch[3]-4,0)),collapse=""),"Wald",sep=""),
                               paste(paste(rep(" ",max(maxch[4]-7,0)),collapse=""),"p-value",sep="")))
       
@@ -163,8 +160,11 @@ summary.externX = function(object, ...){
     
     if(length(posfix))
     {
-      cat(" *  coefficient fixed by the user \n \n")
+      cat(" *  coefficient fixed by the user \n")
     }
+    if(x$varest == "none") cat(" ** total variance estimated witout correction for primary model uncertainty", "\n \n")
+    if(x$varest == "Hessian") cat(" ** total variance estimated through the Hessian of the joint likelihood", "\n \n")
+    if(x$varest == "paramBoot") cat(" ** total variance estimated through parametric bootstrap", "\n \n")
     
     return(invisible(tTable))
   }
