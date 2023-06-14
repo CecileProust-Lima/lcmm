@@ -23,7 +23,6 @@ summary.externSurv <- function(object,...){
   cat("Statistical Model:", "\n")
   cat(paste("     Dataset:", x$call$data),"\n")
   cat(paste("     Number of subjects:", x$ns),"\n")
-  cat(paste("     Number of longitudinal models:", x$K),"\n")
   cat(paste("     Number of latent classes:", x$ng), "\n")
   cat(paste("     Number of parameters:", length(x$best))," \n")
   if(length(posfix)) cat(paste("     Number of estimated parameters:", length(x$best)-length(posfix))," \n")
