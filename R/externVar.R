@@ -232,9 +232,13 @@ externVar = function(model,
                      logscale = FALSE,
                      idiag = FALSE,
                      nwg = FALSE,
+                     randomY = NULL,
                      link = NULL,
-                     intnodes=NULL,
-                     epsY = 0.5,
+                     intnodes = NULL,
+                     epsY = NULL,
+                     cor = NULL,
+                     nsim = NULL,
+                     range = NULL,
                      data,
                      longitudinal,
                      method,
@@ -546,11 +550,15 @@ externVar = function(model,
     argumentsStrMod[["subject"]] = subject
     argumentsStrMod[["ng"]] = 1
     argumentsStrMod[["idiag"]] = idiag
+    argumentsStrMod[["randomY"]] = randomY
     if(argfunctionStrMod %in% c("lcmm", "multlcmm", "Jointlcmm")){
       argumentsStrMod[["link"]] = link
       argumentsStrMod[["intnodes"]] = intnodes
-      argumentsStrMod[["epsY"]] = epsY
     }
+    argumentsStrMod[["epsY"]] = epsY
+    argumentsStrMod[["cor"]] = substitute(cor)
+    argumentsStrMod[["nsim"]] = nsim
+    argumentsStrMod[["range"]] = range
     argumentsStrMod[["data"]] = data
     argumentsStrMod[["maxiter"]] = 0
     argumentsStrMod[["verbose"]] = FALSE
@@ -1009,11 +1017,18 @@ externVar = function(model,
                              fixed,
                              random,
                              idiag,
+                             nwg,
+                             randomY = NULL,
+                             link,
+                             intnodes = NULL,
+                             epsY = NULL,
+                             cor = NULL,
+                             nsim = NULL,
+                             range = NULL,
                              subject,
                              mixture,
                              ng,
                              B,
-                             link,
                              iEst,
                              maxiter,
                              verbose,
@@ -1059,12 +1074,14 @@ externVar = function(model,
         if(length(fixed[[2]]) != 1){
           funOut = "multlcmm"
           arguments[["link"]] = link
+          arguments[["intnodes"]] = intnodes
         } else if(missing(link)){
           funOut = "hlme"
           arguments[["link"]] = NULL
         } else {
           funOut = "lcmm"
           arguments[["link"]] = link
+          arguments[["intnodes"]] = intnodes
         }
         
         #With some type of input model, prob does not have the same name
@@ -1078,6 +1095,12 @@ externVar = function(model,
         arguments[["fixed"]] = fixed
         arguments[["random"]] = random
         arguments[["idiag"]] = idiag
+        arguments[["nwg"]] = nwg
+        arguments[["randomY"]] = randomY
+        arguments[["epsY"]] = epsY
+        arguments[["cor"]] = substitute(cor)
+        arguments[["nsim"]] = nsim
+        arguments[["range"]] = range
         arguments[["subject"]] = subject
         arguments[["mixture"]] = mixture
         arguments[["classmb"]] = ~-1
@@ -1104,10 +1127,17 @@ externVar = function(model,
       arguments[["fixed"]] = fixed
       arguments[["random"]] = random
       arguments[["idiag"]] = idiag
+      arguments[["nwg"]] = nwg
+      arguments[["randomY"]] = randomY
+      arguments[["link"]] = link
+      arguments[["intnodes"]] = intnodes
+      arguments[["epsY"]] = epsY
+      arguments[["cor"]] = substitute(cor)
+      arguments[["nsim"]] = nsim
+      arguments[["range"]] = range
       arguments[["subject"]] = subject
       arguments[["mixture"]] = mixture
       arguments[["ng"]] = ng
-      arguments[["link"]] = link
       arguments[["iEst"]] = iEst
       #technical options
       arguments[["maxiter"]] = maxiter
@@ -1156,7 +1186,8 @@ externVar = function(model,
       #We need what is inside of longitudinal to still exist in the worker
       argumentsIn[["longitudinal"]] = eval(argumentsIn[["longitudinal"]])
       
-      conditional = function(data,
+      conditional = function(classmb,
+                             data,
                              ng,
                              B,
                              iKeepIn,
@@ -1259,6 +1290,7 @@ externVar = function(model,
       }
       
       #Finally : we need to build the model arguments
+      arguments[["classmb"]] = classmb
       arguments[["data"]] = data
       arguments[["ng"]] = ng
       arguments[["iKeepIn"]] = iKeepIn
