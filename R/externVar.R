@@ -1224,7 +1224,7 @@ externVar = function(model,
         ns = nrow(mf)
         
         y = data[, paste0("class", 1:ng)]
-        y = as.matrix(y)
+        y = as.matrix(sapply(y, as.numeric))
         nBy = ncol(y)-1
         
         X = model.matrix(classmb, data)
