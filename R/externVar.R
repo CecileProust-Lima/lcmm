@@ -841,6 +841,9 @@ externVar = function(model,
       iVCOut = c()
       nVCIn = 0
       
+      #We need what is inside of longitudinal to still exist in the worker
+      argumentsIn[["longitudinal"]] = eval(argumentsIn[["longitudinal"]])
+      
       conditional = function(model,
                              data,
                              survival,
@@ -856,6 +859,8 @@ externVar = function(model,
                              iEst,
                              maxiter,
                              verbose,
+                             argumentsIn,
+                             funIn,
                              nproc,
                              convB,
                              convL,
@@ -870,11 +875,13 @@ externVar = function(model,
         
         B = B[iEst]
         
+        predCl = predictClass(model, data)
+        
         #First : let's compute P(C|\tilde C) (\tilde C : A)
         pAlY = sapply(1:ng, function(g){
-          return(as.numeric(predictClass(model, data)[,2] == g))
+          return(as.numeric(predCl[,2] == g))
         })
-        pClY = as.matrix(predictClass(model, data)[,3:(2+ng)])
+        pClY = as.matrix(predCl[,3:(2+ng)])
         if(any(is.nan(pClY))) stop("NaN in posterior classification probability")
         
         pA = apply(pAlY, 2, mean)
@@ -884,7 +891,7 @@ externVar = function(model,
         
         #Then : let's add it to dataset for each individual
         indivProb = pAlY%*%pClA
-        indivProb = cbind(predictClass(model, data)[,1], indivProb)
+        indivProb = cbind(predCl[,1], indivProb)
         colnames(indivProb)[1] = subject
         data = merge(data, indivProb, by = subject)
         
@@ -946,6 +953,8 @@ externVar = function(model,
       #technical options
       arguments[["maxiter"]] = maxiter
       arguments[["verbose"]] = verbose
+      arguments[["argumentsIn"]] = argumentsIn
+      arguments[["funIn"]] = funIn
       arguments[["nproc"]] = nproc
       arguments[["convB"]] = convB
       arguments[["convL"]] = convL
@@ -992,6 +1001,8 @@ externVar = function(model,
       
       nVCIn = 0
       
+      #We need what is inside of longitudinal to still exist in the worker
+      argumentsIn[["longitudinal"]] = eval(argumentsIn[["longitudinal"]])
       
       conditional = function(model,
                              data,
@@ -1006,6 +1017,8 @@ externVar = function(model,
                              iEst,
                              maxiter,
                              verbose,
+                             argumentsIn,
+                             funIn,
                              nproc,
                              convB,
                              convL,
@@ -1020,11 +1033,13 @@ externVar = function(model,
         
         B = B[iEst]
         
+        predCl = predictClass(model, data)
+        
         #First : let's compute P(C|\tilde C) (\tilde C : A)
         pAlY = sapply(1:ng, function(g){
-          return(as.numeric(predictClass(model, data)[,2] == g))
+          return(as.numeric(predCl[,2] == g))
         })
-        pClY = as.matrix(predictClass(model, data)[,3:(2+ng)])
+        pClY = as.matrix(predCl[,3:(2+ng)])
         if(any(is.nan(pClY))) stop("NaN in posterior classification probability")
         
         pA = apply(pAlY, 2, mean)
@@ -1034,7 +1049,7 @@ externVar = function(model,
         
         #Then : let's add it to dataset for each individual
         indivProb = pAlY%*%pClA
-        indivProb = cbind(predictClass(model, data)[,1], indivProb)
+        indivProb = cbind(predCl[,1], indivProb)
         colnames(indivProb)[1] = subject
         data = merge(data, indivProb, by = subject)
         
@@ -1097,6 +1112,8 @@ externVar = function(model,
       #technical options
       arguments[["maxiter"]] = maxiter
       arguments[["verbose"]] = verbose
+      arguments[["argumentsIn"]] = argumentsIn
+      arguments[["funIn"]] = funIn
       arguments[["nproc"]] = nproc
       arguments[["convB"]] = convB
       arguments[["convL"]] = convL
@@ -1135,6 +1152,9 @@ externVar = function(model,
       #Id of varcov estimates (none)
       iVCOut = c()
       nVCIn = 0
+
+      #We need what is inside of longitudinal to still exist in the worker
+      argumentsIn[["longitudinal"]] = eval(argumentsIn[["longitudinal"]])
       
       conditional = function(data,
                              ng,
@@ -1156,11 +1176,13 @@ externVar = function(model,
         
         B = B[iEst]
         
+        predCl = predictClass(model, data)
+        
         #First : let's compute P(\tilde C|C) (\tilde C : A)
         pAlY = sapply(1:ng, function(g){
-          return(as.numeric(predictClass(model, data)[,2] == g))
+          return(as.numeric(predCl[,2] == g))
         })
-        pClY = as.matrix(predictClass(model, data)[,3:(2+ng)])
+        pClY = as.matrix(predCl[,3:(2+ng)])
         if(any(is.nan(pClY))) stop("NaN in posterior classification probability")
         
         betas = c(model$best[1:(ng-1)], 0)
@@ -1175,7 +1197,7 @@ externVar = function(model,
         
         #Then : let's add the classification to the dataset for each individual
         indivProb = pAlY%*%t(pAlC)
-        indivProb = cbind(predictClass(model, data)[,1], indivProb)
+        indivProb = cbind(predCl[,1], indivProb)
         colnames(indivProb) = c(subject, paste0("class", 1:ng))
         data = merge(data, indivProb, by = subject)
         
