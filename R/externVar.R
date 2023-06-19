@@ -312,8 +312,13 @@ externVar = function(model,
   
   #nVCIn
   if(funIn == "mpjlcmm"){
-    nVCIn = model$N[6]
-    iVCIn = sum(model$N[1:5]) + 1:nVCIn
+    nVCIn = model$Nprm[3+2*model$K+(1:model$K)]
+    iVCIn = c()
+    prev = 0
+    for(k in 1:model$K){
+      iVCIn = c(iVCIn, sum(model$Nprm[c(1:3, 3:4*model$K-model$K+k-1)])+prev+1:nVCIn[k])
+      prev = prev+model$npmK[k]
+    }
   } else if(funIn == "Jointlcmm"){
     nVCIn = model$N[5]
     iVCIn = sum(model$N[1:4]) + 1:nVCIn
@@ -1525,16 +1530,16 @@ externVar = function(model,
     
     #replace chol for varcov in best
     if(!missing(fixed)){
-      modOut$cholesky[-(1:nVCIn)*(nVCIn != 0)] = modOut$best[iVCOut]
+      modOut$cholesky[-(1:sum(nVCIn))*(nVCIn != 0)] = modOut$best[iVCOut]
       if(idiag & inherits(modOut, "mpjlcmm")){ #idiag but not multlcmm because diff $chol structure
-        if(nVCIn == 0){
+        if(sum(nVCIn) == 0){
           modOut$best[iVCOut] = modOut$cholesky^2
         } else {
-          modOut$best[iVCOut] = modOut$cholesky[-(1:nVCIn)]^2
+          modOut$best[iVCOut] = modOut$cholesky[-(1:sum(nVCIn))]^2
         }
       } else if(inherits(modOut, "mpjlcmm")) { #only mpj (twoStage), because $contrainte is used to get multlcmm
         isMult = as.integer(modOut$contrainte[modOut$K] == 2)
-        NVC = sqrt(2*(length(modOut$cholesky)+isMult-nVCIn)+1/4)-1/2
+        NVC = sqrt(2*(length(modOut$cholesky)+isMult-sum(nVCIn))+1/4)-1/2
         cholMatrix = matrix(0, NVC, NVC)
         chols = modOut$best[iVCOut]
         if(modOut$contrainte[modOut$K] == 2) chols = c(1, chols) #mpjlcmm & mult : no 1 in $chol
