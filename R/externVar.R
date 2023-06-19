@@ -339,9 +339,7 @@ externVar = function(model,
   
   #Finding out the number of parameters is needed for all survival external outcome
   if(!missing(survival)){
-    #manage inputs
-    if(!is.null(argumentsIn[["survival"]])) stop('secondary survival model is not supported with "twoStageJoint" method if primary model already includes survival')
-    
+
     #Informations about secondary outcome model
     ##number of survival parameters to estimate
     ###number of events
@@ -631,6 +629,9 @@ externVar = function(model,
     
     #Yextern survival
     if(!missing(survival)){
+      #manage inputs
+      if(!is.null(argumentsIn[["survival"]])) stop('secondary survival model is not supported with "twoStageJoint" method if primary model already includes survival')
+      
       funOut = "mpjlcmm"
       
       #nOut : nuber of total final parameters
@@ -917,6 +918,13 @@ externVar = function(model,
         return(res)
       }
       
+      #With some type of input model, prob does not have the same name
+      if(!"prob1" %in% colnames(data)){
+        for(i in 1:ng){
+          data[[paste0("prob", i)]] = data[[paste0("probYT", i)]]
+        }
+      }
+      
       #we need to build the model
       arguments[["data"]] = data
       arguments[["survival"]] =  survival
@@ -1039,7 +1047,7 @@ externVar = function(model,
           arguments[["link"]] = link
         }
         
-        #With some kind of input model, prob does not have the same name
+        #With some type of input model, prob does not have the same name
         if(!"prob1" %in% colnames(data)){
           for(i in 1:ng){
             data[[paste0("prob", i)]] = data[[paste0("probYT", i)]]
