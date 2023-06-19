@@ -859,6 +859,7 @@ externVar = function(model,
         argumentsInEdit[["maxiter"]] = 0
         argumentsInEdit[["verbose"]] = F
         argumentsInEdit[["nproc"]] = nproc
+        argumentsInEdit[["data"]] = data
         model = do.call(funIn, argumentsInEdit)
         
         B = B[iEst]
@@ -1001,6 +1002,7 @@ externVar = function(model,
         argumentsInEdit[["maxiter"]] = 0
         argumentsInEdit[["verbose"]] = F
         argumentsInEdit[["nproc"]] = nproc
+        argumentsInEdit[["data"]] = data
         model = do.call(funIn, argumentsInEdit)
         
         B = B[iEst]
@@ -1136,6 +1138,7 @@ externVar = function(model,
         argumentsInEdit[["maxiter"]] = 0
         argumentsInEdit[["verbose"]] = F
         argumentsInEdit[["nproc"]] = nproc
+        argumentsInEdit[["data"]] = data
         model = do.call(funIn, argumentsInEdit)
         
         B = B[iEst]
