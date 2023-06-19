@@ -886,6 +886,13 @@ externVar = function(model,
         #We need dummy Y for the model to run
         data$dummyY = 1
         
+        #With some type of input model, prob does not have the same name
+        if(!"prob1" %in% colnames(data)){
+          for(i in 1:ng){
+            data[[paste0("prob", i)]] = data[[paste0("probYT", i)]]
+          }
+        }
+        
         #Finally : we need to build the model for ppriors !
         arguments = list()
         
@@ -916,13 +923,6 @@ externVar = function(model,
         res = do.call("Jointlcmm", arguments)
         res$call = match.call()
         return(res)
-      }
-      
-      #With some type of input model, prob does not have the same name
-      if(!"prob1" %in% colnames(data)){
-        for(i in 1:ng){
-          data[[paste0("prob", i)]] = data[[paste0("probYT", i)]]
-        }
       }
       
       #we need to build the model
