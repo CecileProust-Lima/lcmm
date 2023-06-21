@@ -401,7 +401,7 @@ externVar = function(model,
       (hazardtype == "Specific")*(ng-1)
     
     #we extract the number of base function parameter with constraints (ie, not PH parameters)
-    nSurvConstraint = hazN
+    nSurvConstraint = hazN*!logscale
     
     hazN = hazN  +
       (hazardtype == "PH")*(ng-1)
