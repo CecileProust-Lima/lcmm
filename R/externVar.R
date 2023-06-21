@@ -401,7 +401,7 @@ externVar = function(model,
       (hazardtype == "Specific")*(ng-1)
     
     #we extract the number of base function parameter with constraints (ie, not PH parameters)
-    nSurvConstraint = hazN*!logscale
+    nSurvConstraint = hazN
     
     hazN = hazN  +
       (hazardtype == "PH")*(ng-1)
@@ -1428,7 +1428,7 @@ externVar = function(model,
       
       survivalMissing = missing(survival)
       fixedMissing = missing(fixed)
-      modOuts <- parApply(clust, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, survivalMissing, fixedMissing){
+      modOuts <- parApply(clust, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, survivalMissing, fixedMissing, logscale){
         arguments[["B"]][iKeepOut] = coefs
         arguments[["nproc"]] = 1
         
@@ -1466,13 +1466,13 @@ externVar = function(model,
         }
         
         #Survival Base Function : need to be the same sign across bootstrap iterations
-        if(!survivalMissing){
+        if(!survivalMissing & !logscale){
           iSurvConstraint = 1:nSurvConstraint+modOut$N[1]
           modOut$best[iSurvConstraint] = abs(modOut$best[iSurvConstraint])
         }
         
         return(modOut)
-      }, arguments = arguments, iKeepOut = iKeepOut, funOut = funOut, iEst = iEst, survivalMissing = survivalMissing, fixedMissing = fixedMissing)
+      }, arguments = arguments, iKeepOut = iKeepOut, funOut = funOut, iEst = iEst, survivalMissing = survivalMissing, fixedMissing = fixedMissing, logscale = logscale)
       parallel::stopCluster(clust)
       
       #format output
@@ -1540,7 +1540,7 @@ externVar = function(model,
         }
         
         #Survival Base Function constraint : need to be the same sign across bootstrap iterations
-        if(!missing(survival)){
+        if(!missing(survival) & !logscale){
           iSurvConstraint = 1:nSurvConstraint+modOut$N[1]
           modOut$best[iSurvConstraint] = abs(modOut$best[iSurvConstraint])
         }
