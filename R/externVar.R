@@ -676,7 +676,7 @@ externVar = function(model,
       }
       #initial values
       if(missing(B)){
-        arguments[["B"]][iEst] = rep(1, nEst)
+        arguments[["B"]][iEst] = rep(0.1, nEst)
       } else {
         if(length(B) != length(iEst)) stop("B should be of length ", length(iEst))
         arguments[["B"]][iEst] = B
