@@ -1439,28 +1439,63 @@ externVar = function(model,
           #cholesky not varcov as output in best
           modOut$best = estimates(modOut)
           
-          if(inherits(modOut, "mpjlcmm")){
+          n = length(modOut$best)
+          if(inherits(modOut, "lcmm")){ #For lcmm
+            if(modOut$linktype == 2){ #with spline link
+              nSpl = n-sum(modOut$N[1:4]) #count number of link function parameters (the only one not in N)
+              modOut$best[n-2:nSpl+1+1] = abs(modOut$best[n-2:nSpl+1+1]) #all but the first
+            } else { #rest of lcmm
+              modOut$best[n] = abs(modOut$best[n]) #only the last one
+            }
+          } else if (inherits(modOut, "hlme")){ #hlme
+            modOut$best[n] = abs(modOut$best[n]) #only the last one
+          } else if(inherits(modOut, "multlcmm")){
+            nPreLink = modOut$N[1:5] #number of parameters before the one for the link function
+            numSPL = 0
+            for (ny in 1:modOut$N[8]){
+              if (modOut$linktype[ny]==0) nLink = 2
+              if (modOut$linktype[ny]==1) nLink = 4
+              if (modOut$linktype[ny]==2){
+                numSPL <- numSPL+1
+                nLink = modOut$nbnodes[numSPL]+2
+                modOut$best[nPreLink+2:nLink] = abs(modOut$best[nPreLink+2:nLink])
+              } else {
+                modOut$best[nPreLink+nLink] = abs(modOut$best[nPreLink+nLink])
+              }
+              nPreLink = nPreLink+nLink
+            }
+          } else if(inherits(modOut, "mpjlcmm")){
             #Residual Error : need to be the same sign across bootstrap iterations
-            countParamBeforeErrLink = sum(modOut$N[1:3])
+            nPre = sum(modOut$N[1:3])
             sumny = 0
             for(k in 1:modOut$K){
-              
+              if(modOut$contrainte[k] == 2){
+                nPre = nPre + sum(modOut$Nprm[3+1:7*modOut$K-modOut$K+k]) #add number of parameters before the one for the link function
+              } else {
+                nPre = nPre + sum(modOut$Nprm[3+1:8*modOut$K-modOut$K+k]) #add the number of parameters for this K
+              }
               for(y in 1:modOut$ny[k]){
                 sumny = sumny+1
                 
-                if(modOut$contrainte[k] == 2){
-                  countParamYBeforeErr = sum(modOut$Nprm[3+1:5*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
-                  modOut$best[countParamYBeforeErr:(countParamYBeforeErr+modOut$Nprm[3+6*modOut$ny[k]-modOut$ny[k]+y])]
-                  
-                  if(modOut$linktype[sumny] == 0)
-                    countParamYBeforeErrLink = sum(modOut$Nprm[3+1:8*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
-                  modOut$best[countParamYBeforeErrLink]
+                if(modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 2){ #for lcmm with spl link
+                  nSpl = sum(modOut$Nprm[3+7*modOut$K+1*modOut$K-modOut$K+k]) #count number of link function parameters (the only one not in N)
+                  modOut$best[nPre-2:nSpl+1+1] = abs(modOut$best[nPre-2:nSpl+1+1]) #all but the first
+                } else if (modOut$contrainte[k] == 0 | modOut$contrainte[k] == 1){ #hlme ou le reste de lcmm
+                  modOut$best[nPre] = abs(modOut$best[nPre]) #only the last one
+                } else if (modOut$contrainte[k] == 2) {
+                  numSPL = 0
+                  if (modOut$linktype[sumny]==0) nLink = 2
+                  if (modOut$linktype[sumny]==1) nLink = 4
+                  if (modOut$linktype[sumny]==2){
+                    numSPL <- numSPL+1
+                    nLink = modOut$call$longitudinal[[k]]$nbnodes[numSPL]+2
+                    modOut$best[nPre+2:nLink] = abs(modOut$best[nPre+2:nLink])
+                  } else {
+                    modOut$best[nPre+nLink] = abs(modOut$best[nPre+nLink])
+                  }
+                  nPre = nPre+nLink
                 }
               }
-              
-              countParamBeforeErrLink = countParamBeforeErrLink+modOut$npmK[k]
-              if(modOut$contrainte[k] == 0 | (modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 0))
-                modOut$best[countParamBeforeErrLink] = abs(modOut$best[countParamBeforeErrLink])
             }
           }
         }
@@ -1513,28 +1548,63 @@ externVar = function(model,
           #cholesky not varcov as output in best
           modOut$best = estimates(modOut)
           
-          if(inherits(modOut, "mpjlcmm")){
+          n = length(modOut$best)
+          if(inherits(modOut, "lcmm")){ #For lcmm
+            if(modOut$linktype == 2){ #with spline link
+              nSpl = n-sum(modOut$N[1:4]) #count number of link function parameters (the only one not in N)
+              modOut$best[n-2:nSpl+1+1] = abs(modOut$best[n-2:nSpl+1+1]) #all but the first
+            } else { #rest of lcmm
+              modOut$best[n] = abs(modOut$best[n]) #only the last one
+            }
+          } else if (inherits(modOut, "hlme")){ #hlme
+            modOut$best[n] = abs(modOut$best[n]) #only the last one
+          } else if(inherits(modOut, "multlcmm")){
+            nPreLink = modOut$N[1:5] #number of parameters before the one for the link function
+            numSPL = 0
+            for (ny in 1:modOut$N[8]){
+              if (modOut$linktype[ny]==0) nLink = 2
+              if (modOut$linktype[ny]==1) nLink = 4
+              if (modOut$linktype[ny]==2){
+                numSPL <- numSPL+1
+                nLink = modOut$nbnodes[numSPL]+2
+                modOut$best[nPreLink+2:nLink] = abs(modOut$best[nPreLink+2:nLink])
+              } else {
+                modOut$best[nPreLink+nLink] = abs(modOut$best[nPreLink+nLink])
+              }
+              nPreLink = nPreLink+nLink
+            }
+          } else if(inherits(modOut, "mpjlcmm")){
             #Residual Error : need to be the same sign across bootstrap iterations
-            countParamBeforeErrLink = sum(modOut$N[1:3])
+            nPre = sum(modOut$N[1:3])
             sumny = 0
             for(k in 1:modOut$K){
-              
+              if(modOut$contrainte[k] == 2){
+                nPre = nPre + sum(modOut$Nprm[3+1:7*modOut$K-modOut$K+k]) #add number of parameters before the one for the link function
+              } else {
+                nPre = nPre + sum(modOut$Nprm[3+1:8*modOut$K-modOut$K+k]) #add the number of parameters for this K
+              }
               for(y in 1:modOut$ny[k]){
                 sumny = sumny+1
                 
-                if(modOut$contrainte[k] == 2){
-                  countParamYBeforeErr = sum(modOut$Nprm[3+1:5*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
-                  modOut$best[countParamYBeforeErr:(countParamYBeforeErr+modOut$Nprm[3+6*modOut$ny[k]-modOut$ny[k]+y])]
-                  
-                  if(modOut$linktype[sumny] == 0)
-                    countParamYBeforeErrLink = sum(modOut$Nprm[3+1:8*modOut$ny[k]-modOut$ny[k]+y])+countParamBeforeErrLink
-                  modOut$best[countParamYBeforeErrLink]
+                if(modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 2){ #for lcmm with spl link
+                  nSpl = sum(modOut$Nprm[3+7*modOut$K+1*modOut$K-modOut$K+k]) #count number of link function parameters (the only one not in N)
+                  modOut$best[nPre-2:nSpl+1+1] = abs(modOut$best[nPre-2:nSpl+1+1]) #all but the first
+                } else if (modOut$contrainte[k] == 0 | modOut$contrainte[k] == 1){ #hlme ou le reste de lcmm
+                  modOut$best[nPre] = abs(modOut$best[nPre]) #only the last one
+                } else if (modOut$contrainte[k] == 2) {
+                  numSPL = 0
+                  if (modOut$linktype[sumny]==0) nLink = 2
+                  if (modOut$linktype[sumny]==1) nLink = 4
+                  if (modOut$linktype[sumny]==2){
+                    numSPL <- numSPL+1
+                    nLink = modOut$call$longitudinal[[k]]$nbnodes[numSPL]+2
+                    modOut$best[nPre+2:nLink] = abs(modOut$best[nPre+2:nLink])
+                  } else {
+                    modOut$best[nPre+nLink] = abs(modOut$best[nPre+nLink])
+                  }
+                  nPre = nPre+nLink
                 }
               }
-              
-              countParamBeforeErrLink = countParamBeforeErrLink+modOut$npmK[k]
-              if(modOut$contrainte[k] == 0 | (modOut$contrainte[k] == 1 & modOut$linktype[sumny] == 0))
-                modOut$best[countParamBeforeErrLink] = abs(modOut$best[countParamBeforeErrLink])
             }
           }
         }
