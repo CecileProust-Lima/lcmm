@@ -1148,7 +1148,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                                         nbg <- nbg[-1]
                                         
                                         vbb[which(nbgnef==1),setdiff(1:ncol(vbb),which(nbgnef!=1))] <- VB[which(nbg==1),setdiff(1:ncol(VB),which(nbg!=1))]
-                                        vbb[(nef-nprob+1):nrow(vbb),(nef-nprob+1):ncol(vbb)] <- VB[(nef2+1):nrow(VB),(nef2+1):ncol(VB)]
+                                        vbb[(nef-nprob-ncontr+1):nrow(vbb),(nef-nprob-ncontr+1):ncol(vbb)] <- VB[(nef2-ncontr+1):nrow(VB),(nef2-ncontr+1):ncol(VB)]
 
                                         
 
@@ -1195,6 +1195,11 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                                             }
                             
                                         ##les autres parametres sont inchanges
+                                        if(ncontr>0)
+                                        {
+                                            bb[nef-nprob-ncontr+1:ncontr] <- B$best[nef2-ncontr+1:ncontr]
+                                        }
+                                        
                                         if (ncor0>0)
                                             {
                                                 bb[nef-nprob+nvc+1:ncor0] <- B$best[(NPM2-ncor0):(NPM2-1)]
