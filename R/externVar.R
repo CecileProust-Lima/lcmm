@@ -1500,6 +1500,42 @@ externVar = function(model,
           }
         }
         
+        #nw & cor & alea
+        if(inherits(modOut, "multlcmm")){#with multlcmm
+          if(modOut$N[5] != 0) idnw = sum(modOut$N[3:4])+1:modOut$N[5]
+          if(modOut$N[6] != 0) idalea = sum(modOut$N[3:5])+1:modOut$N[6]
+          if(modOut$N[7] != 0) idcor = sum(modOut$N[3:6])+modOut$N[7]
+        } else if(inherits(modOut, "mpjlcmm")){#with mpjlcmm
+          nPre = sum(modOut$N[1:3])
+          idnw = c()
+          idcor = c()
+          idalea = c()
+          for(k in 1:modOut$K){
+            nprenw = nPre+sum(modOut$Nprm[c(3+1:3*modOut$K-modOut$K+k)])
+            if(modOut$Nprm[3+4*modOut$K-modOut$K+k] != 0){
+              idnw = c(idnw, nprenw+1:modOut$Nprm[3+4*modOut$K-modOut$K+k])
+            }
+            
+            nprecor = nPre+sum(modOut$Nprm[c(3+1:4*modOut$K-modOut$K+k)])
+            if(modOut$Nprm[3+5*modOut$K-modOut$K+k] != 0){
+              idcor = c(idcor, nprecor+modOut$Nprm[3+5*modOut$K-modOut$K+k])
+            }
+            
+            nprealea = nPre+sum(modOut$Nprm[c(3+1:6*modOut$K-modOut$K+k)])
+            if(modOut$Nprm[3+7*modOut$K-modOut$K+k] != 0){
+              idalea = c(idalea, nprealea+1:modOut$Nprm[3+7*modOut$K-modOut$K+k])
+            }
+            
+            nPre = nPre+sum(modOut$Nprm[c(3+1:8*modOut$K-modOut$K+k)])
+          }
+        } else {#with lcmm & hlme
+          if(modOut$N[4] != 0) idnw = sum(modOut$N[1:3])+1:modOut$N[4]
+          if(modOut$N[5] != 0) idcor = sum(modOut$N[1:4])+modOut$N[5]
+        }
+        modOut$best[idnw] = abs(modOut$best[idnw])
+        modOut$best[idcor] = abs(modOut$best[idcor])
+        modOut$best[idalea] = abs(modOut$best[idalea])
+        
         #Survival Base Function : need to be the same sign across bootstrap iterations
         if(!survivalMissing & !logscale){
           iSurvConstraint = 1:nSurvConstraint+modOut$N[1]
@@ -1608,6 +1644,42 @@ externVar = function(model,
             }
           }
         }
+        
+        #nw & cor & alea
+        if(inherits(modOut, "multlcmm")){#with multlcmm
+          if(modOut$N[5] != 0) idnw = sum(modOut$N[3:4])+1:modOut$N[5]
+          if(modOut$N[6] != 0) idalea = sum(modOut$N[3:5])+1:modOut$N[6]
+          if(modOut$N[7] != 0) idcor = sum(modOut$N[3:6])+modOut$N[7]
+        } else if(inherits(modOut, "mpjlcmm")){#with mpjlcmm
+          nPre = sum(modOut$N[1:3])
+          idnw = c()
+          idcor = c()
+          idalea = c()
+          for(k in 1:modOut$K){
+            nprenw = nPre+sum(modOut$Nprm[c(3+1:3*modOut$K-modOut$K+k)])
+            if(modOut$Nprm[3+4*modOut$K-modOut$K+k] != 0){
+              idnw = c(idnw, nprenw+1:modOut$Nprm[3+4*modOut$K-modOut$K+k])
+            }
+            
+            nprecor = nPre+sum(modOut$Nprm[c(3+1:4*modOut$K-modOut$K+k)])
+            if(modOut$Nprm[3+5*modOut$K-modOut$K+k] != 0){
+              idcor = c(idcor, nprecor+modOut$Nprm[3+5*modOut$K-modOut$K+k])
+            }
+            
+            nprealea = nPre+sum(modOut$Nprm[c(3+1:6*modOut$K-modOut$K+k)])
+            if(modOut$Nprm[3+7*modOut$K-modOut$K+k] != 0){
+              idalea = c(idalea, nprealea+1:modOut$Nprm[3+7*modOut$K-modOut$K+k])
+            }
+            
+            nPre = nPre+sum(modOut$Nprm[c(3+1:8*modOut$K-modOut$K+k)])
+          }
+        } else {#with lcmm & hlme
+          if(modOut$N[4] != 0) idnw = sum(modOut$N[1:3])+1:modOut$N[4]
+          if(modOut$N[5] != 0) idcor = sum(modOut$N[1:4])+modOut$N[5]
+        }
+        modOut$best[idnw] = abs(modOut$best[idnw])
+        modOut$best[idcor] = abs(modOut$best[idcor])
+        modOut$best[idalea] = abs(modOut$best[idalea])
         
         #Survival Base Function constraint : need to be the same sign across bootstrap iterations
         if(!missing(survival) & !logscale){
