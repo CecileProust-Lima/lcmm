@@ -1583,33 +1583,33 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                             {
                                 if(idiag[k]==1)
                                 {
-                                    b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+1:nvc[k]] <- sqrt(b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+1:nvc[k]])
+                                    b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]] <- sqrt(b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]])
                                 }
                                 else
                                 {
                                     mvc <- matrix(0,nea[k],nea[k])
                                     if(contrainte[k]==2)
                                     {
-                                        mvc[upper.tri(mvc,diag=TRUE)] <- c(1,b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+1:nvc[k]])
+                                        mvc[upper.tri(mvc,diag=TRUE)] <- c(1,b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]])
                                         mvc <- t(mvc)
-                                        mvc[upper.tri(mvc,diag=TRUE)] <- c(1,b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+1:nvc[k]])        
+                                        mvc[upper.tri(mvc,diag=TRUE)] <- c(1,b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]])        
                                     }
                                     else
                                     {
-                                        mvc[upper.tri(mvc,diag=TRUE)] <- b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+1:nvc[k]]
+                                        mvc[upper.tri(mvc,diag=TRUE)] <- b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]]
                                         mvc <- t(mvc)
-                                        mvc[upper.tri(mvc,diag=TRUE)] <- b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+1:nvc[k]]
+                                        mvc[upper.tri(mvc,diag=TRUE)] <- b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]]
                                     }
 
                                     ch <- chol(mvc)
 
                                     if(contrainte[k]==2)
                                     {
-                                        b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+1:nvc[k]] <- ch[upper.tri(ch,diag=TRUE)][-1]
+                                        b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]] <- ch[upper.tri(ch,diag=TRUE)][-1]
                                     }
                                     else
                                     {
-                                        b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+1:nvc[k]] <- ch[upper.tri(ch,diag=TRUE)]
+                                        b[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+1:nvc[k]] <- ch[upper.tri(ch,diag=TRUE)]
                                     }
                                 }
                             }
@@ -2272,7 +2272,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                     
                     if(idiag[k]==1)
                     {
-                        out$best[nprob+nrisqtot+nvarxevt+tmp+nef[k]+ncontr[k]+1:nvc[k]] <- out$best[nprob+nrisqtot+nvarxevt+tmp+nef[k]+1:nvc[k]]**2
+                        out$best[nprob+nrisqtot+nvarxevt+tmp+nef[k]+ncontr[k]+1:nvc[k]] <- out$best[nprob+nrisqtot+nvarxevt+tmp+nef[k]+ncontr[k]+1:nvc[k]]**2
                     }
                 }
                 else
