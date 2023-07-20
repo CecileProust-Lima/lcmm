@@ -237,6 +237,51 @@
 #' 
 #' summary(YextBoot) 
 #' 
+#' 
+#' ###### Example 3: Relationship between a latent class structure and         #
+#' #                      external outcome (survival)                     ######
+#' 
+#' # estimation of the secondary survival model with total variance
+#' # computed with the Hessian
+#' 
+#' YextHess = externVar(PrimMod2,   #primary model
+#'                      survival = Surv(Tevent,Event)~ X1+mixture(X2), #secondary model
+#'                      hazard="3-quant-splines", #secondary model
+#'                      hazardtype="PH", #secondary model
+#'                      subject="ID",
+#'                      data=data_lcmm,
+#'                      method = "twoStageJoint")
+#' summary(YextHess)
+#' 
+#' 
+#' # estimation of a secondary survival model with total variance
+#' # computed with parametric Bootstrap (much longer). When using the bootstrap
+#' # estimator, we recommend running first the analysis with option varest = "none"
+#' # which is faster but which underestimates the variance. And then use these values
+#' # as initial values when running the model with varest = "paramBoot" to obtain
+#' # a valid variance of the parameters.
+#' 
+#' YextNone = externVar(PrimMod2,   #primary model
+#'                      survival = Surv(Tevent,Event)~ X1+mixture(X2), #secondary model
+#'                      hazard="3-quant-splines", #secondary model
+#'                      hazardtype="PH", #secondary model
+#'                      subject="ID",
+#'                      data=data_lcmm,
+#'                      varest = "none",
+#'                      method = "twoStageJoint")
+#' 
+#' YextBoot = externVar(PrimMod2,   #primary model
+#'                      survival = Surv(Tevent,Event)~ X1+mixture(X2), #secondary model
+#'                      hazard="3-quant-splines", #secondary model
+#'                      hazardtype="PH", #secondary model
+#'                      subject="ID",
+#'                      data=data_lcmm,
+#'                      method = "twoStageJoint",
+#'                      B = YextNone$best,
+#'                      varest= "paramBoot")
+#' 
+#' summary(YextBoot)
+#' 
 #' }
 #'
 #'
