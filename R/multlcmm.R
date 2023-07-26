@@ -1719,12 +1719,20 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     predRE <- matrix(out$predRE,ncol=nea0,byrow=T)
     predRE <- data.frame(unique(IND),predRE)
     colnames(predRE) <- c(nom.subject,nom.X0[idea0!=0])
+    if(any(idlink0==3) & nea0>0)
+    {
+        predRE[,1+1:nea0] <- NA
+    }
 
     if (nalea0!=0)
         {
             predRE_Y <- matrix(out$predRE_Y,ncol=ny0,byrow=TRUE)
             predRE_Y <- data.frame(unique(IND),predRE_Y)
             colnames(predRE_Y)  <- c(nom.subject,nomsY)
+            if(any(idlink0==3))
+            {
+                predRE_Y[,1+1:ny0] <- NA
+            }
         }
     else
         {
@@ -1763,11 +1771,17 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     colnames(pred)<-c(nom.subject,"Yname","pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1)
     rownames(pred) <- NULL
 
+    if(any(idlink0==3))
+    {
+        pred[,3:ncol(pred)] <- NA
+    }
+
     if(!is.null(var.time))
     {
         pred <- data.frame(IND,outcome,pred_m,out$resid_m,pred_ss,out$resid_ss,out$Yobs,pred_m_g,pred_ss_g,timeobs)
         colnames(pred)<-c(nom.subject,"Yname","pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1,var.time)
     }
+
 
 ###estimlink
     ysim <- matrix(out$marker,nsim,ny0)
