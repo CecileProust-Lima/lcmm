@@ -2635,7 +2635,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
 ### noms des variables
         Names <- list(Xnames=nom.unique,Xnames2=ttesLesVar,Yname=nomY,
                       ID=nom.subject,Tnames=noms.surv,prior.name=nom.prior,
-                      TimeDepVar.name=nom.timedepvar)
+                      TimeDepVar.name=nom.timedepvar, pprior.name=nom.pprior)
 
         
         ## levels = modalites des variables dans X0 (si facteurs)
