@@ -7,7 +7,7 @@ static R_FortranMethodDef FortRout[] = {
   {"predictcont", (DL_FUNC) &F77_SUB(predictcont), 21},
   {"predictmult", (DL_FUNC) &F77_SUB(predictmult), 25},
   {"predictcondmult", (DL_FUNC) &F77_SUB(predictcondmult), 17},
-  {"cvpl", (DL_FUNC) &F77_SUB(cvpl), 41},
+  {"cvpl", (DL_FUNC) &F77_SUB(cvpl), 42},
   {"postprob2", (DL_FUNC) &F77_SUB(postprob2), 40},
   {"calculustransfo", (DL_FUNC) &F77_SUB(calculustransfo), 16},
   {"iteminfo", (DL_FUNC) &F77_SUB(iteminfo), 15},

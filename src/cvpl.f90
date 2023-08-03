@@ -29,7 +29,7 @@ end module commun_cvpl
 !--------------------------------------------------------------------
 
 
-subroutine cvpl(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0 &
+subroutine cvpl(Y0,X0,Prior0,pprior0,idprob0,idea0,idg0,idcor0 &
      ,idcom0,idspecif0,idtdv0 &
      ,ns0,ng0,ncor0,nv0,nobs0,nmes0,idiag0,nwg0,npmtot0,time0,typrisq0 &
      ,idtrunc0,risqcom0,nz0,zi0,Tentr0,Tevt0 &
@@ -53,6 +53,7 @@ subroutine cvpl(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0 &
   integer,dimension(nv0),intent(in)::idea0,idg0,idprob0,idcor0
   integer,dimension(nv0),intent(in)::idcom0,idspecif0,idtdv0
   integer,dimension(ns0),intent(in)::nmes0,prior0
+  double precision, dimension(ns0*ng0), intent(in)::pprior0
   double precision,dimension(ns0)::Tentr0,Tevt0
   double precision,dimension(nobs0),intent(in)::Y0,time0
   double precision,dimension(nobs0*nv0),intent(in)::X0
@@ -74,7 +75,7 @@ subroutine cvpl(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0 &
   double precision,dimension(ns0*nt)::contribt
   double precision, dimension(npmtot0*(npmtot0+1)/2),intent(in)::vopt
   !-------------------> variables locales joint
-  integer :: i,j,k,ktemp,nmestot
+  integer :: i,j,k,ktemp,nmestot,g
   double precision::eps
   integer::npm
   !-------------------> variables locales joint
@@ -103,7 +104,7 @@ subroutine cvpl(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0 &
   allocate(Y(nobs0),idprob(nv0),X(nobs0,nv0)   &
        ,idea(nv0),idg(nv0),idcor(nv0),nmes(ns0),Tsurv0(ns0),Tsurv(ns0)    &
        ,Tsurvint(ns0),ind_survint(ns0),idcom(nv0),idspecif(nv0)   &
-       ,idtdv(nv0),devt(ns0),prior(ns0),time_cvpl(nobs0))
+       ,idtdv(nv0),devt(ns0),prior(ns0),pprior(ns0,ng0),time_cvpl(nobs0))
 
 
   nbevt=1 !pas de competitif!
@@ -135,6 +136,7 @@ subroutine cvpl(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0 &
   idspecif=0
   idtdv=0
   prior=0
+  pprior=0.d0
   nmes=0
   time_cvpl=0.d0
 
@@ -217,10 +219,12 @@ subroutine cvpl(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0 &
            ktemp=ktemp+1
            jtemp=jtemp+1
            X(jtemp,k)=X0(ktemp)
+        end do           
+        do g=1,ng                 
+           pprior(i,g)=pprior0((i-1)*ng+g)
         end do
      end do
   end do
-
   nrisq=0
   if (risqcom(1).eq.1) then
      nrisq(1)=nprisq(1)
@@ -316,7 +320,7 @@ subroutine cvpl(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0 &
   ncg=0
   ncssg=0
   nprob=0 !ng-1
-  nvarprob=min(ng-1,1)
+  nvarprob=0 !min(ng-1,1)
   do k=1,nv
      if (idg(k).eq.1) then
         ncssg=ncssg+1      ! nb var. sans melange
@@ -445,7 +449,7 @@ subroutine cvpl(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0 &
      !--------> initialisation
 
 
-    !            write(*,*)' boucle', t
+     !           write(*,*)' boucle', t
 
 
      ns_s = 0
@@ -467,7 +471,7 @@ subroutine cvpl(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0 &
 
      do i=1,ns
 
-        !          write(*,*)'i',i,Tsurvint(i),valT(t),time_cvpl(nmescur+1)
+          !        write(*,*)'i',i,Tsurvint(i),valT(t),time_cvpl(nmescur+1)
 
         if (Tsurvint(i).ge.valT(t).and.(time_cvpl(nmescur+1).le.valT(t))) then
 
@@ -553,7 +557,7 @@ subroutine cvpl(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0 &
 !  write(*,*)'avant deallocate 1'
 
   deallocate(Y,idprob,X,idea,idg,idcor,nmes,Tsurv0,Tsurv,Tsurvint, &
-       ind_survint,idcom,idspecif,idtdv,devt,prior,zi,time_cvpl)
+       ind_survint,idcom,idspecif,idtdv,devt,prior,pprior,zi,time_cvpl)
 
 
 
@@ -1178,12 +1182,12 @@ double precision function funcpi_condt(b,npm,id,thi,jd,thj,i,t1,valt)
         pi(prior(i))=1.d0
      else
         Xprob=0.d0
-        Xprob(1)=1
+        !Xprob(1)=1
         l=0
         do k=1,nv
            if (idprob(k).eq.1) then
               l=l+1
-              Xprob(1+l)=X_s(nmes_curr_s+1,k)
+              Xprob(l)=X_s(nmes_curr_s+1,k)
            end if
         end do
         pi=0.d0

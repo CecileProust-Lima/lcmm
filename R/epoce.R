@@ -392,7 +392,7 @@ epoce <- function(model,pred.times,var.time,fun.time=identity,newdata=NULL,subse
     
 ###subset de data avec les variables utilisees
 
-            newdata1 <- data[,unique(c(model$Names$ID,model$Names$Yname,noms.surv,model$Names$Xnames2,model$Names$prior.name,model$Names$TimeDepVar.name,var.time)),drop=FALSE]
+            newdata1 <- data[,unique(c(model$Names$ID,model$Names$Yname,noms.surv,model$Names$Xnames2,model$Names$prior.name,model$Names$pprior.name,model$Names$TimeDepVar.name,var.time)),drop=FALSE]
 
 
     ## remplacer les NA de prior par 0  
@@ -657,22 +657,32 @@ epoce <- function(model,pred.times,var.time,fun.time=identity,newdata=NULL,subse
             PRIOR <- newdata1[,model$Names$prior.name]
             PRIOR[(is.na(PRIOR))] <- 0
         }
-
+    
+    ## PPRIOR 
+    if(is.null(model$Names$pprior.name))
+        { 
+            PPRIOR <- matrix(1,length(IND),ng0)
+        } 
+    else
+        {
+            PPRIOR <- newdata1[,model$Names$pprior.name]
+        }
 
 ### DATA SORTING on IND variable
-    matYX <- cbind(IND,PRIOR,Tentry,Tevent,Event,Tint,Y0,Time,X0)
+    matYX <- cbind(IND,PRIOR,PPRIOR,Tentry,Tevent,Event,Tint,Y0,Time,X0)
     matYXord <- matYX[order(IND),]
-    Y0 <- as.numeric(matYXord[,7])
-    Time <- as.numeric(matYXord[,9])
-    X0 <- apply(matYXord[,-c(1,2,3,4,5,6,7,8),drop=FALSE],2,as.numeric)
+    Y0 <- as.numeric(matYXord[,7+ng0])
+    Time <- as.numeric(matYXord[,8+ng0])
+    X0 <- apply(matYXord[,-c(1:(8+ng0)),drop=FALSE],2,as.numeric)
     #IDnum <- matYXord[,1]
     IND <- matYXord[,1]
     PRIOR <- as.numeric(matYXord[,2])
     PRIOR <- as.integer(as.vector(PRIOR))
+    PPRIOR <- apply(matYX[,2+1:ng0,drop=FALSE],2,as.numeric)
 
 ### Tevent, Tentry et Event de dim ns  
     nmes0 <- as.vector(table(IND))
-    data.surv <- data.frame(IND,apply(matYXord[,c(3,4,5,6)],2,as.numeric))
+    data.surv <- data.frame(IND,apply(matYXord[,ng0+c(3,4,5,6)],2,as.numeric))
     data.surv <- data.surv[cumsum(nmes0),]
     
     #data.surv <- unique(data.surv)
@@ -690,6 +700,7 @@ epoce <- function(model,pred.times,var.time,fun.time=identity,newdata=NULL,subse
     INDuniq <- unique(IND)
 
     prior0 <- unique(data.frame(IND,PRIOR))[,2]
+    pprior0 <- t(PPRIOR[!duplicated(IND),,drop=FALSE])
 
 
     contribt <- rep(0,length=ns0*nT)
@@ -709,6 +720,7 @@ epoce <- function(model,pred.times,var.time,fun.time=identity,newdata=NULL,subse
                     as.double(Y0),
                     as.double(X0),
                     as.integer(prior0),
+                    as.double(pprior0),
                     as.integer(idprob0),
                     as.integer(idea0),
                     as.integer(idg0),
