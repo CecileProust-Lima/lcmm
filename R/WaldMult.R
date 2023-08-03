@@ -30,8 +30,8 @@
 #' 
 WaldMult <- function(Mod,pos=NULL,contrasts=NULL,name=NULL,value=NULL)
 { 
-    if (!(class(Mod) %in% c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("applies to \"hlme\" or \"lcmm\" or \"multlcmm\" or \"Jointlcmm\" or \"mpjlcmm\" objects only")
-
+    #if (!(class(Mod) %in% c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm"))) stop("applies to \"hlme\" or \"lcmm\" or \"multlcmm\" or \"Jointlcmm\" or \"mpjlcmm\" objects only")
+    if(!inherits(Mod, c("hlme","lcmm","multlcmm","Jointlcmm","mpjlcmm", "externX", "externSurv"))) stop("applies to \"hlme\" or \"lcmm\" or \"multlcmm\" or \"Jointlcmm\" or \"mpjlcmm\" or \"externX\" or \"externSurv\" objects only")
 
     ## prm estimes et leur variance
     Mod$best <- estimates(Mod)

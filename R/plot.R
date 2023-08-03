@@ -375,3 +375,43 @@ plot.mpjlcmm <- function(x,which,event,...)
     plot.Jointlcmm(xx,which=which,event=event,...)
 }
 
+
+
+
+
+#' @rdname plot
+#' @export
+plot.externSurv <- function(x,which="hazard",event,...)
+{
+  if(missing(x)) stop("The model should be specified")
+  if(!inherits(x,"externSurv")) stop("Use with 'externSurv' objects only")
+  
+  if(!(which %in% c("postprob","hazard","baselinerisk","survival"))) stop(paste("Argument 'which' should be one of:",paste(c("postprob","hazard","baselinerisk","survival"),collapse=" ")))
+  
+  if(which=="postprob") .plotpostprob(x,...)
+  
+  if(which %in% c("hazard","baselinerisk"))
+  {
+    if(missing(event)) event <- 1
+    .plotbaselinerisk(x,event=event,...) #legend.loc legend add
+  }
+  
+  if(which=="survival") .plotsurvival(x,...)
+  
+}
+
+
+
+#' @rdname plot
+#' @export
+plot.externX <- function(x,which="postprob",event,...)
+{
+  if(missing(x)) stop("The model should be specified")
+  if(!inherits(x,"externX")) stop("Use with 'externX' objects only")
+  
+  if(!(which %in% c("postprob"))) stop(paste("Argument 'which' should be one of:",paste(c("postprob"),collapse=" ")))
+  
+  if(which=="postprob") .plotpostprob(x,...)
+  
+}
+

@@ -3,8 +3,12 @@
 summary.hlme <- function(object,...){
     x <- object
     if (!inherits(x, "hlme")) stop("use only with \"hlme\" objects")
-
-    cat("Heterogenous linear mixed model", "\n")
+    
+    if(inherits(x, "externVar")){
+      cat("Secondary linear mixed model", "\n")
+    } else {
+      cat("Heterogenous linear mixed model", "\n")
+    }
     cat("     fitted by maximum likelihood method", "\n")
 
     cl <- x$call
@@ -42,10 +46,21 @@ summary.hlme <- function(object,...){
         {
 
             cat(" \n")
-            cat("     Number of iterations: ", x$niter, "\n")
-            cat("     Convergence criteria: parameters=", signif(x$gconv[1],2), "\n")
-            cat("                         : likelihood=", signif(x$gconv[2],2), "\n") 
-            cat("                         : second derivatives=", signif(x$gconv[3],2), "\n")
+            if(inherits(x, "externVar")) {
+              if(x$varest == "paramBoot"){
+                cat("     Proportion of convergence on bootstrap iterations (%)=", x$Mconv, "\n")
+              } else {
+                cat("     Number of iterations: ", x$niter, "\n")
+                cat("     Convergence criteria: parameters=", signif(x$gconv[1],2), "\n")
+                cat("                         : likelihood=", signif(x$gconv[2],2), "\n")
+                cat("                         : second derivatives=", signif(x$gconv[3],2), "\n")
+              }
+            } else {
+              cat("     Number of iterations: ", x$niter, "\n")
+              cat("     Convergence criteria: parameters=", signif(x$gconv[1],2), "\n")
+              cat("                         : likelihood=", signif(x$gconv[2],2), "\n")
+              cat("                         : second derivatives=", signif(x$gconv[3],2), "\n")
+            }
             cat(" \n")
             cat("Goodness-of-fit statistics:", "\n")
             cat(paste("     maximum log-likelihood:", round(x$loglik,2))," \n")
@@ -288,6 +303,7 @@ summary.hlme <- function(object,...){
             if(any(c(NPROB+NEF+NVC+1:(NW+ncor+1)) %in% posfix)) maxch[1] <- maxch[1]-1
             colnames(std) <- c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
                                paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""))
+            if(inherits(x, "externVar")) colnames(std)[2] = paste(paste(rep(" ",max(maxch[2]-4,0)),collapse=""),"Se**",sep="")
             
             print(std,quote=FALSE,na.print="")
             cat("\n")
@@ -296,7 +312,12 @@ summary.hlme <- function(object,...){
                 {
                     cat(" * coefficient fixed by the user \n \n")
                 }
-
+            if(inherits(x, "externVar")){
+              if(x$varest == "none") cat(" ** total variance estimated witout correction for primary model uncertainty", "\n \n")
+              if(x$varest == "Hessian") cat(" ** total variance estimated through the Hessian of the joint likelihood", "\n \n")
+              if(x$varest == "paramBoot") cat(" ** total variance estimated through parametric bootstrap", "\n \n")
+            }
+              
             return(invisible(tTable))
         }
 }

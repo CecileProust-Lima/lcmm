@@ -5,7 +5,11 @@ summary.multlcmm <- function(object,...)
     x <- object
     if (!inherits(x, "multlcmm")) stop("use only with \"multlcmm\" objects")
 
-    cat("General latent class mixed model", "\n")
+    if(inherits(x, "externVar")){
+      cat("Secondary linear mixed model", "\n")
+    } else {
+      cat("General latent class mixed model", "\n")
+    }
     cat("     fitted by maximum likelihood method", "\n")
 
     cl <- x$call
@@ -75,10 +79,21 @@ summary.multlcmm <- function(object,...)
     else
         {
             cat(" \n")
-            cat("     Number of iterations: ", x$niter, "\n")
-            cat("     Convergence criteria: parameters=", signif(x$gconv[1],2), "\n")
-            cat("                         : likelihood=", signif(x$gconv[2],2), "\n")
-            cat("                         : second derivatives=", signif(x$gconv[3],2), "\n")
+            if(inherits(x, "externVar")) {
+              if(x$varest == "paramBoot"){
+                cat("     Proportion of convergence on bootstrap iterations (%)=", x$Mconv, "\n")
+              } else {
+                cat("     Number of iterations: ", x$niter, "\n")
+                cat("     Convergence criteria: parameters=", signif(x$gconv[1],2), "\n")
+                cat("                         : likelihood=", signif(x$gconv[2],2), "\n")
+                cat("                         : second derivatives=", signif(x$gconv[3],2), "\n")
+              }
+            } else {
+              cat("     Number of iterations: ", x$niter, "\n")
+              cat("     Convergence criteria: parameters=", signif(x$gconv[1],2), "\n")
+              cat("                         : likelihood=", signif(x$gconv[2],2), "\n")
+              cat("                         : second derivatives=", signif(x$gconv[3],2), "\n")
+            }
             cat(" \n")
             cat("Goodness-of-fit statistics:", "\n")
             cat(paste("     maximum log-likelihood:", round(x$loglik,2))," \n")
@@ -458,6 +473,7 @@ summary.multlcmm <- function(object,...)
                                paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""),
                                paste(paste(rep(" ",max(maxch[3]-4,0)),collapse=""),"Wald",sep=""),
                                paste(paste(rep(" ",max(maxch[4]-7,0)),collapse=""),"p-value",sep=""))
+            if(inherits(x, "externVar")) colnames(tmp)[2] = paste(paste(rep(" ",max(maxch[2]-5,0)),collapse=""),"Se***",sep="")
             cat("\n")
             print(tmp,quote=FALSE,na.print="")
             cat("\n")
@@ -470,6 +486,11 @@ summary.multlcmm <- function(object,...)
                 {
                     cat(" ** coefficient not estimated but obtained from the others as minus the sum of them \n \n")
                 }
+            if(inherits(x, "externVar")){
+              if(x$varest == "none") cat(" *** total variance estimated witout correction for primary model uncertainty", "\n \n")
+              if(x$varest == "Hessian") cat(" *** total variance estimated through the Hessian of the joint likelihood", "\n \n")
+              if(x$varest == "paramBoot") cat(" *** total variance estimated through parametric bootstrap", "\n \n")
+            }
             
             return(invisible(tTable))
         }

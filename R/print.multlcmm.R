@@ -3,8 +3,17 @@
 print.multlcmm <- function(x,...){
     if (!inherits(x, "multlcmm")) stop("use only with \"multlcmm\" objects")
 
+  if(inherits(x, "externVar")){
+    cat("Secondary linear mixed model", "\n")
+  } else {
     cat("General latent class mixed model", "\n")
-    cat("     fitted by maximum likelihood method", "\n")
+  }
+  cat("     fitted by maximum likelihood method", "\n")
+  if(inherits(x, "externVar")){
+    if(x$varest == "none") cat("     primary model variance not accounted for", "\n")
+    if(x$varest == "Hessian") cat("     primary model variance accounted for through the hessian of the joint likelihood", "\n")
+    if(x$varest == "paramBoot") cat("     primary model variance accounted for through parametric boostrap", "\n")
+  }
 
     cl <- x$call
     cl$B <- NULL
@@ -71,9 +80,21 @@ print.multlcmm <- function(x,...){
 
         cat(" \n")
         cat("     Number of iterations: ", x$niter, "\n")
-        cat("     Convergence criteria: parameters=", signif(x$gconv[1],2), "\n")
-        cat("                         : likelihood=", signif(x$gconv[2],2), "\n")
-        cat("                         : second derivatives=", signif(x$gconv[3],2), "\n")
+        if(inherits(x, "externVar")) {
+          if(x$varest == "paramBoot"){
+            cat("     Proportion of convergence on bootstrap iterations (%)=", x$Mconv, "\n")
+          } else {
+            cat("     Number of iterations: ", x$niter, "\n")
+            cat("     Convergence criteria: parameters=", signif(x$gconv[1],2), "\n")
+            cat("                         : likelihood=", signif(x$gconv[2],2), "\n")
+            cat("                         : second derivatives=", signif(x$gconv[3],2), "\n")
+          }
+        } else {
+          cat("     Number of iterations: ", x$niter, "\n")
+          cat("     Convergence criteria: parameters=", signif(x$gconv[1],2), "\n")
+          cat("                         : likelihood=", signif(x$gconv[2],2), "\n")
+          cat("                         : second derivatives=", signif(x$gconv[3],2), "\n")
+        }
         cat(" \n")
         cat("Goodness-of-fit statistics:", "\n")
         cat(paste("     maximum log-likelihood:", round(x$loglik,2))," \n")
