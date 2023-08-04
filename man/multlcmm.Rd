@@ -30,6 +30,7 @@ multlcmm(
   maxiter = 100,
   nsim = 100,
   prior,
+  pprior = NULL,
   range = NULL,
   subset = NULL,
   na.action = 1,
@@ -66,6 +67,7 @@ mlcmm(
   maxiter = 100,
   nsim = 100,
   prior,
+  pprior = NULL,
   range = NULL,
   subset = NULL,
   na.action = 1,
@@ -195,6 +197,10 @@ default, nsim=100.}
 membership. The covariate should be an integer with values in 0,1,...,ng.
 When there is no prior, the value should be 0. When there is a prior for the
 subject, the value should be the number of the latent class (in 1,...,ng).}
+
+\item{pprior}{optional vector specifying the names of the covariates containing the
+prior probabilities to belong to each latent class. These probabilities should be
+between 0 and 1 and should sum up to 1 for each subject.}
 
 \item{range}{optional vector indicating the range of the outcomes (that is
 the minimum and maximum). By default, the range is defined according to the

@@ -49,6 +49,7 @@ reference:
       - multlcmm
       - Jointlcmm
       - mpjlcmm
+      - externVar
       - gridsearch
       - loglik
       - permut

@@ -34,6 +34,7 @@ Jointlcmm(
   maxiter = 100,
   nsim = 100,
   prior = NULL,
+  pprior = NULL,
   logscale = FALSE,
   subset = NULL,
   na.action = 1,
@@ -74,6 +75,7 @@ jlcmm(
   maxiter = 100,
   nsim = 100,
   prior = NULL,
+  pprior = NULL,
   logscale = FALSE,
   subset = NULL,
   na.action = 1,
@@ -258,6 +260,10 @@ about the latent class membership. The covariate should be an integer with
 values in 0,1,...,ng. Value O indicates no prior for the subject while a
 value in 1,...,ng indicates that the subject belongs to the corresponding
 latent class.}
+
+\item{pprior}{optional vector specifying the names of the covariates containing the
+prior probabilities to belong to each latent class. These probabilities should be
+between 0 and 1 and should sum up to 1 for each subject.}
 
 \item{logscale}{optional boolean indicating whether an exponential
 (logscale=TRUE) or a square (logscale=FALSE -by default) transformation is

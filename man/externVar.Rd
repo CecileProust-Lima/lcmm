@@ -16,17 +16,20 @@ externVar(
   hazardtype = "Specific",
   hazardnodes = NULL,
   TimeDepVar = NULL,
-  nsim = 100,
   logscale = FALSE,
   idiag = FALSE,
   nwg = FALSE,
+  randomY = NULL,
   link = NULL,
   intnodes = NULL,
-  epsY = 0.5,
+  epsY = NULL,
+  cor = NULL,
+  nsim = NULL,
+  range = NULL,
   data,
   longitudinal,
   method,
-  varest = "Hessian",
+  varest,
   M = 200,
   B,
   convB = 1e-04,
@@ -40,7 +43,7 @@ externVar(
 )
 }
 \arguments{
-\item{model}{an object inheriting from class \code{lcmm}, 
+\item{model}{an object inheriting from class \code{hlme}, \code{lcmm}, 
 \code{Jointlcmm}, \code{multlcmm} or \code{mpjlcmm} giving the primary latent
  class model.}
 
@@ -60,13 +63,30 @@ random-effects on external outcome in the secondary model, if appropriate.
 By default, no random effect is included.}
 
 \item{subject}{name of the covariate representing the grouping structure.
-Even in the absence of a hierarchical structure. By default, the function will try to retrieve it
-from \code{model} argument.}
+Even in the absence of a hierarchical structure.}
 
 \item{classmb}{optional one-sided formula specifying the external predictors of 
 latent class membership to be modelled in the secondary class-membership multinomial 
-logistic model. Covariates are separated by \code{+} on the right of the \code{~}. 
-By default, an intercept is included.}
+logistic model. Covariates are separated by \code{+} on the right of the \code{~}.}
+
+\item{survival}{optional two-sided formula specifying the external survival part
+of the model.}
+
+\item{hazard}{optional family of hazard function assumed for the survival model
+(Weibull, piecewise or splines)}
+
+\item{hazardtype}{optional indicator for the type of baseline risk function
+(Specific, PH or Common)}
+
+\item{hazardnodes}{optional vector containing interior nodes if \code{splines} or
+\code{piecewise} is specified for the baseline hazard function in \code{hazard}}
+
+\item{TimeDepVar}{optional vector specifying the name of the time-depending covariate
+in the survival model}
+
+\item{logscale}{optional boolean indicating whether an exponential (logscale=TRUE) or
+a square (logscale=FALSE -by default) transformation is used to
+ensure positivity of parameters in the baseline risk functions}
 
 \item{idiag}{if appropriate, optional logical for the structure of the variance-covariance
 matrix of the random-effects in the secondary model. 
@@ -75,14 +95,19 @@ variance-covariance is considered (by default). If \code{TRUE} a diagonal
 matrix of variance-covariance is considered.}
 
 \item{nwg}{if appropriate, optional logical indicating if the variance-covariance of the
-random-effects in the secondary model is class-specific. If \code{FALSE} the variance-covariance
-matrix is common over latent classes (by default). If \code{TRUE} a
+random-effects in the secondary model is class-specific. If \code{FALSE} the
+variance-covariance matrix is common over latent classes (by default). If \code{TRUE} a
 class-specific proportional parameter multiplies the variance-covariance
 matrix in each class (the proportional parameter in the last latent class
 equals 1 to ensure identifiability).}
 
-\item{link}{optional family of parameterized link functions for the external outcome if appropriate.
-Defaults to NULL, corresponding to continuous Gaussian distribution (hlme function).}
+\item{randomY}{optional logical for including an outcome-specific random intercept.
+If FALSE no outcome-specific random intercept is added (default). If TRUE independent
+outcome-specific random intercept with parameterized variance are included}
+
+\item{link}{optional family of parameterized link functions for the external outcome
+if appropriate. Defaults to NULL, corresponding to continuous Gaussian distribution
+(hlme function).}
 
 \item{intnodes}{optional vector of interior nodes. This argument is only
 required for a I-splines link function with nodes entered manually.}
@@ -90,27 +115,46 @@ required for a I-splines link function with nodes entered manually.}
 \item{epsY}{optional definite positive real used to rescale the marker in (0,1)
 when the beta link function is used. By default, epsY=0.5.}
 
+\item{cor}{optional indicator for inclusion of an auto correlated Gaussian process
+in the latent process linear (latent process) mixed model. Option "BM" indicates
+a brownian motion with parameterized variance. Option "AR" specifies an
+autoregressive process of order 1 with parameterized variance and correlation
+intensity. Each option should be followed by the time variable in brackets as
+code{cor=BM(time)}. By default, no autocorrelated Gaussian process is added.}
+
+\item{nsim}{number of points to be used in the estimated link function. By default,
+nsom=100.}
+
+\item{range}{optional vector indicating the range of the outcomes (that is the
+minimum and maximum). By default, the range is defined according to the minimum
+and maximum observed values of the outcome. The option should be used
+only for Beta and Splines transformations.}
+
 \item{data}{Data frame containing the variables named in
 \code{fixed}, \code{mixture}, \code{random}, \code{classmb} and \code{subject},
 for both the current function arguments and the primary model arguments
 Check \code{details} to get information on the data structure, especially with
 external outcomes.}
 
-\item{longitudinal}{only with \code{mpjlcmm} primary models and "twoStageJoint" method:
-mandatory list containing the longitudinal submodels used in the primary latent class model.}
+\item{longitudinal}{only with \code{mpjlcmm} primary models and "twoStageJoint"
+method: mandatory list containing the longitudinal submodels used in the primary
+latent class model.}
 
 \item{method}{character indicating the inference technique to be used:
-only "twoStageJoint" for 2-stage estimation from the joint likelihood 
-is implemented at the moment.}
+\code{"twoStageJoint"} corresponds to 2-stage estimation. \code{"conditional"}
+corresponds to the method based on the distribution of Y conditionally to the
+true latent class membership.}
 
-\item{varest}{optional character indicating the method to be used to compute the variance of 
-the regression estimates. \code{"none"} does not account for the uncertainty in the primary latent 
-class model, \code{"paramBoot"} computes the total variance using a parametric bootstrap technique, 
-\code{"Hessian"} computes the total Hessian of the joint likelihood (implemented for \code{"twoStageJoint"}
-method only). Default to \code{"Hessian"} for \code{"twoStageJoint"} method}
+\item{varest}{optional character indicating the method to be used to compute the
+variance of the regression estimates. \code{"none"} does not account for the
+uncertainty in the primary latent class model, \code{"paramBoot"} computes the
+total variance using a parametric bootstrap technique, \code{"Hessian"} computes
+the total Hessian of the joint likelihood (implemented for \code{"twoStageJoint"}
+method only). Default to \code{"Hessian"} for \code{"twoStageJoint"} method and
+\code{"paramBoot"} for \code{"conditional"} method.}
 
-\item{M}{option integer indicating the number of draws for the parametric boostrap when \code{varest="paramBoot"}.
-Default to 200.}
+\item{M}{option integer indicating the number of draws for the parametric boostrap
+when \code{varest="paramBoot"}. Default to 200.}
 
 \item{B}{optional vector of initial parameter values for the secondary model. 
 If external outcome, the vector has the same structure as a latent class model
@@ -127,8 +171,8 @@ log-likelihood stability. By default, convL=0.0001.}
 \item{convG}{optional threshold for the convergence criterion based on the
 derivatives. By default, convG=0.0001.}
 
-\item{maxiter}{optional maximum number of iterations for the secondary model estimation using 
-Marquardt iterative algorithm. Defaults to 100}
+\item{maxiter}{optional maximum number of iterations for the secondary model
+estimation using Marquardt iterative algorithm. Defaults to 100}
 
 \item{posfix}{optional vector specifying indices in parameter vector B the 
 secondary model that should not be estimated. Default to NULL, all the 
@@ -270,6 +314,51 @@ YextBoot = externVar(PrimMod2,   #primary model
                      varest= "paramBoot")
 
 summary(YextBoot) 
+
+
+###### Example 3: Relationship between a latent class structure and         #
+#                      external outcome (survival)                     ######
+
+# estimation of the secondary survival model with total variance
+# computed with the Hessian
+
+YextHess = externVar(PrimMod2,   #primary model
+                     survival = Surv(Tevent,Event)~ X1+mixture(X2), #secondary model
+                     hazard="3-quant-splines", #secondary model
+                     hazardtype="PH", #secondary model
+                     subject="ID",
+                     data=data_lcmm,
+                     method = "twoStageJoint")
+summary(YextHess)
+
+
+# estimation of a secondary survival model with total variance
+# computed with parametric Bootstrap (much longer). When using the bootstrap
+# estimator, we recommend running first the analysis with option varest = "none"
+# which is faster but which underestimates the variance. And then use these values
+# as initial values when running the model with varest = "paramBoot" to obtain
+# a valid variance of the parameters.
+
+YextNone = externVar(PrimMod2,   #primary model
+                     survival = Surv(Tevent,Event)~ X1+mixture(X2), #secondary model
+                     hazard="3-quant-splines", #secondary model
+                     hazardtype="PH", #secondary model
+                     subject="ID",
+                     data=data_lcmm,
+                     varest = "none",
+                     method = "twoStageJoint")
+
+YextBoot = externVar(PrimMod2,   #primary model
+                     survival = Surv(Tevent,Event)~ X1+mixture(X2), #secondary model
+                     hazard="3-quant-splines", #secondary model
+                     hazardtype="PH", #secondary model
+                     subject="ID",
+                     data=data_lcmm,
+                     method = "twoStageJoint",
+                     B = YextNone$best,
+                     varest= "paramBoot")
+
+summary(YextBoot)
 
 }
 
