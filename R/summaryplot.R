@@ -1,7 +1,8 @@
 #' Summary of models
 #' 
 #' This function provides a plot summarizing the results of different models
-#' fitted by \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}.
+#' fitted by \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm},
+#' \code{mpjlcmm} or \code{externVar}.
 #' 
 #' Can be reported the usual criteria used to assess the fit and the clustering
 #'  of the data:
@@ -17,7 +18,7 @@
 #'  - %Class computed as the proportion of each class based on c_ig
 #' 
 #' @param m1 an object of class \code{hlme}, \code{lcmm}, \code{multlcmm},
-#' \code{Jointlcmm} or \code{mpjlcmm}
+#' \code{Jointlcmm}, \code{mpjlcmm}, \code{externVar} or \code{externVar}.
 #' @param \dots  further arguments, in particular other objects of class
 #' \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm} or \code{mpjlcmm}, and
 #' graphical parameters.

@@ -1,4 +1,5 @@
 #' Summary of a \code{hlme}, \code{lcmm}, \code{Jointlcmm}, \code{multlcmm},
+#' \code{mpjlcmm}, \code{externSurv}, \code{externX},
 #' \code{epoce} or \code{Diffepoce} objects
 #' 
 #' The function provides a summary of \code{hlme}, \code{lcmm}, \code{multlcmm}
@@ -7,11 +8,12 @@
 #' 
 #' 
 #' @aliases summary.hlme summary.lcmm summary.Jointlcmm summary.multlcmm
-#' summary.epoce summary.Diffepoce
+#' summary.epoce summary.Diffepoce summary.mpjlcmm summary.externSurv summary.externX
 #' @param object an object inheriting from classes \code{hlme}, \code{lcmm},
 #' \code{multlcmm} for fitted latent class mixed-effects, or class
-#' \code{Jointlcmm} for a Joint latent class mixed model or \code{epoce} or
-#' \code{Diffepoce} for predictive accuracy computations.
+#' \code{Jointlcmm}, \code{mpjlcmm} for a Joint latent class mixed model or \code{epoce} or
+#' \code{Diffepoce} for predictive accuracy computations or \code{externSurv}, \code{externX}
+#' for secondary regression models.
 #' @param \dots further arguments to be passed to or from other methods.  They
 #' are ignored in this function.
 #' @return For \code{epoce} or \code{Diffepoce} objects, returns NULL. For

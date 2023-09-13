@@ -105,8 +105,11 @@
 #' @importFrom mvtnorm rmvnorm
 #' @importFrom randtoolbox sobol
 #' @importFrom parallel makeCluster clusterExport stopCluster parLapply clusterEvalQ clusterSetRNGStream parSapply parApply
+#' @importFrom doParallel registerDoParallel
 #' @importFrom nlme ranef fixef
 #' @importFrom marqLevAlg mla
+#' @importFrom utils capture.output
+#' @importFrom numDeriv hessian
 #' @useDynLib lcmm, .registration=TRUE, .fixes="C_"
 NULL
 

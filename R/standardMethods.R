@@ -1,7 +1,8 @@
 
 #' Standard methods for estimated models
 #' 
-#' coef, vcov, fixef, ranef, fitted and residuals methods for estimated hlme,
+#' coef and vcov for hlme, lcmm, mutlcmm, Jointlcmm, mpjlcmm, externSurv, and externX
+#' models, fixef, ranef, fitted and residuals methods for estimated hlme,
 #' lcmm, mutlcmm and Jointlcmm models.
 #' 
 #' 
@@ -9,8 +10,9 @@
 #' 
 #'
 #' 
-#' @aliases coef.hlme coef.lcmm coef.Jointlcmm coef.multlcmm vcov.hlme
-#' vcov.lcmm vcov.Jointlcmm vcov.multlcmm fixef.hlme fixef.lcmm
+#' @aliases coef.hlme coef.lcmm coef.Jointlcmm coef.multlcmm coef.mpjlcmm
+#' coef.externSurv coef.externX vcov.hlme vcov.lcmm vcov.Jointlcmm vcov.multlcmm
+#' vcov.mpjlcmm vcov.externSurv vcov.externX fixef.hlme fixef.lcmm
 #' fixef.Jointlcmm fixef.multlcmm ranef.hlme ranef.lcmm ranef.Jointlcmm
 #' ranef.multlcmm fitted.hlme fitted.lcmm fitted.Jointlcmm fitted.multlcmm
 #' residuals.hlme residuals.lcmm residuals.Jointlcmm residuals.multlcmm

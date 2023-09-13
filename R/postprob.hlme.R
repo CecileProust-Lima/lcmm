@@ -69,8 +69,8 @@ postprob.hlme <- function(x,threshold=c(0.7,0.8,0.9),...)
 #' \code{multlcmm} or \code{Jointlcmm} estimation
 #' 
 #' This function provides informations about the posterior classification
-#' stemmed from a \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}
-#' object.
+#' stemmed from a \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm},
+#' \code{mpjlcmm}, \code{externSurv} or \code{externX} object.
 #' 
 #' This function provides the number of subjects classified a posteriori in
 #' each latent class, the percentage of subjects classified with a posterior
@@ -91,7 +91,7 @@ postprob.hlme <- function(x,threshold=c(0.7,0.8,0.9),...)
 #' pprob output matrix).
 #' 
 #' @aliases postprob postprob.hlme postprob.lcmm postprob.Jointlcmm
-#' postprob.multlcmm
+#' postprob.multlcmm postprob.mpjlcmm postprob.externSurv postprob.externX
 #' @param x an object inheriting from classes \code{hlme}, \code{lcmm},
 #' \code{Jointlcmm} or \code{multlcmm} representing respectively a fitted
 #' latent class linear mixed-effects model, a more general latent class mixed

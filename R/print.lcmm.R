@@ -7,11 +7,11 @@
 #' 
 #' 
 #' @aliases print.hlme print.lcmm print.Jointlcmm print.multlcmm print.epoce
-#' print.Diffepoce
-#' @param x an object inheriting from classes \code{hlme}, \code{lcmm} for
-#' fitted latent class mixed-effects, or class \code{Jointlcmm}for a Joint
-#' latent class mixed model or \code{epoce} for predictive accuracy
-#' computations.
+#' print.Diffepoce print.externSurv print.externX print.mpjlcmm
+#' @param x an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm}
+#' for fitted latent class mixed-effects, or class \code{Jointlcmm}, code{mpjclmm} for
+#' a Joint latent class mixed model or \code{epoce} for predictive accuracy
+#' computations or \code{externSurv}, \code{externX} for secondary regression models.
 #' @param \dots further arguments to be passed to or from other methods.  They
 #' are ignored in this function.
 #' @author Cecile Proust-Lima, Viviane Philipps, Amadou Diakite and Benoit

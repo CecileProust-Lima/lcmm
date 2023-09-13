@@ -2,8 +2,8 @@
 #'
 #' This function crosses the posterior classifications of two estimated models
 #'
-#' @param m1 an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm} or \code{mpjlcmm}
-#' @param m2 an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm} or \code{mpjlcmm}
+#' @param m1 an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm}, \code{mpjlcmm} or \code{externVar}
+#' @param m2 an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm}, \code{mpjlcmm} or \code{externVar}
 #' @return the contingency table of the two classifications
 #' @author Viviane Philipps and Cecile Proust-Lima
 #'
