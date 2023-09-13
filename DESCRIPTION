@@ -1,8 +1,8 @@
 Package: lcmm
 Type: Package
 Title: Extended Mixed Models Using Latent Classes and Latent Processes
-Version: 2.0.2
-Date: 2023-02-20
+Version: 2.1.0
+Date: 2023-09-13
 Authors@R: c(person("Cecile", "Proust-Lima", role=c("aut", "cre"), email="cecile.proust-lima@inserm.fr"),
              person("Viviane", "Philipps", role="aut"),
 	     person("Amadou", "Diakite", role="ctb"),
