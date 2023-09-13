@@ -7,7 +7,11 @@
 \alias{summary.multlcmm}
 \alias{summary.epoce}
 \alias{summary.Diffepoce}
+\alias{summary.mpjlcmm}
+\alias{summary.externSurv}
+\alias{summary.externX}
 \title{Summary of a \code{hlme}, \code{lcmm}, \code{Jointlcmm}, \code{multlcmm},
+\code{mpjlcmm}, \code{externSurv}, \code{externX},
 \code{epoce} or \code{Diffepoce} objects}
 \usage{
 \method{summary}{lcmm}(object, ...)
@@ -15,8 +19,9 @@
 \arguments{
 \item{object}{an object inheriting from classes \code{hlme}, \code{lcmm},
 \code{multlcmm} for fitted latent class mixed-effects, or class
-\code{Jointlcmm} for a Joint latent class mixed model or \code{epoce} or
-\code{Diffepoce} for predictive accuracy computations.}
+\code{Jointlcmm}, \code{mpjlcmm} for a Joint latent class mixed model or \code{epoce} or
+\code{Diffepoce} for predictive accuracy computations or \code{externSurv}, \code{externX}
+for secondary regression models.}
 
 \item{\dots}{further arguments to be passed to or from other methods.  They
 are ignored in this function.}

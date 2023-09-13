@@ -6,6 +6,9 @@
 \alias{estimates.lcmm}
 \alias{estimates.Jointlcmm}
 \alias{estimates.multlcmm}
+\alias{estimates.externSurv}
+\alias{estimates.externX}
+\alias{estimates.mpjlcmm}
 \title{Maximum likelihood estimates}
 \usage{
 estimates(x, cholesky = TRUE)
@@ -23,8 +26,8 @@ a vector with all estimates of the model.
 }
 \description{
 This function provides the vector of maximum likelihood estimates of a model
-estimated with \code{hlme}, \code{lcmm}, \code{multlcmm} or
-\code{Jointlcmm}.
+estimated with \code{hlme}, \code{lcmm}, \code{multlcmm},
+\code{Jointlcmm}, \code{mpjlcmm}, \code{externSurv}, or \code{externX}.
 }
 \seealso{
 \code{\link{VarCov}}, \code{\link{hlme}}, \code{\link{lcmm}},

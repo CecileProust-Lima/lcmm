@@ -7,16 +7,19 @@
 \alias{print.multlcmm}
 \alias{print.epoce}
 \alias{print.Diffepoce}
+\alias{print.externSurv}
+\alias{print.externX}
+\alias{print.mpjlcmm}
 \title{Brief summary of a \code{hlme}, \code{lcmm},
 \code{Jointlcmm},\code{multlcmm}, \code{epoce} or \code{Diffepoce} objects}
 \usage{
 \method{print}{lcmm}(x, ...)
 }
 \arguments{
-\item{x}{an object inheriting from classes \code{hlme}, \code{lcmm} for
-fitted latent class mixed-effects, or class \code{Jointlcmm}for a Joint
-latent class mixed model or \code{epoce} for predictive accuracy
-computations.}
+\item{x}{an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm}
+for fitted latent class mixed-effects, or class \code{Jointlcmm}, code{mpjclmm} for
+a Joint latent class mixed model or \code{epoce} for predictive accuracy
+computations or \code{externSurv}, \code{externX} for secondary regression models.}
 
 \item{\dots}{further arguments to be passed to or from other methods.  They
 are ignored in this function.}

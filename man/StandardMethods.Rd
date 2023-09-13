@@ -6,10 +6,16 @@
 \alias{coef.lcmm}
 \alias{coef.Jointlcmm}
 \alias{coef.multlcmm}
+\alias{coef.mpjlcmm}
+\alias{coef.externSurv}
+\alias{coef.externX}
 \alias{vcov.hlme}
 \alias{vcov.lcmm}
 \alias{vcov.Jointlcmm}
 \alias{vcov.multlcmm}
+\alias{vcov.mpjlcmm}
+\alias{vcov.externSurv}
+\alias{vcov.externX}
 \alias{fixef.hlme}
 \alias{fixef.lcmm}
 \alias{fixef.Jointlcmm}
@@ -58,7 +64,8 @@ For \code{residuals}, a vector containing the subject-specific residuals
 extracted from \code{object}.
 }
 \description{
-coef, vcov, fixef, ranef, fitted and residuals methods for estimated hlme,
+coef and vcov for hlme, lcmm, mutlcmm, Jointlcmm, mpjlcmm, externSurv, and externX
+models, fixef, ranef, fitted and residuals methods for estimated hlme,
 lcmm, mutlcmm and Jointlcmm models.
 }
 \author{

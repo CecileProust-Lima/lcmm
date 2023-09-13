@@ -7,9 +7,9 @@
 xclass(m1, m2)
 }
 \arguments{
-\item{m1}{an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm} or \code{mpjlcmm}}
+\item{m1}{an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm}, \code{mpjlcmm} or \code{externVar}}
 
-\item{m2}{an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm} or \code{mpjlcmm}}
+\item{m2}{an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm}, \code{mpjlcmm} or \code{externVar}}
 }
 \value{
 the contingency table of the two classifications

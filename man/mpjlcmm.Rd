@@ -114,7 +114,7 @@ convergence criteria (can solve non convergence due to estimates at the boundary
 of the parameter space - usually 0).}
 
 \item{verbose}{logical indicating whether information about computation should be
-reported. Default to TRUE.}
+reported. Default to FALSE.}
 
 \item{nproc}{the number cores for parallel computation.
 Default to 1 (sequential mode).}

@@ -14,7 +14,7 @@ summaryplot(
 }
 \arguments{
 \item{m1}{an object of class \code{hlme}, \code{lcmm}, \code{multlcmm},
-\code{Jointlcmm} or \code{mpjlcmm}}
+\code{Jointlcmm}, \code{mpjlcmm}, \code{externVar} or \code{externVar}.}
 
 \item{\dots}{further arguments, in particular other objects of class
 \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm} or \code{mpjlcmm}, and
@@ -31,7 +31,8 @@ Default to one line and length(which) columns.}
 }
 \description{
 This function provides a plot summarizing the results of different models
-fitted by \code{hlme}, \code{lcmm}, \code{multlcmm} or \code{Jointlcmm}.
+fitted by \code{hlme}, \code{lcmm}, \code{multlcmm}, \code{Jointlcmm},
+\code{mpjlcmm} or \code{externVar}.
 }
 \details{
 Can be reported the usual criteria used to assess the fit and the clustering
