@@ -188,6 +188,12 @@ reported. Default to FALSE.}
 
 \item{nproc}{the number cores for parallel computation. Default to 1 (sequential mode).}
 }
+\value{
+an object of class \code{externVar} and  
+\code{externSurv} for external survival outcomes,
+\code{externX} for external class predictors, and
+\code{hlme}, \code{lcmm}, or \code{multlcmm} for external longitudinal or cross-sectional outcomes.
+}
 \description{
 This function fits regression models to relate a latent class structure (stemmed 
 from a latent class model estimated within \code{lcmm} package) with either an external

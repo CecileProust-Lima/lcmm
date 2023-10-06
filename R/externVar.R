@@ -143,6 +143,10 @@
 #' @param verbose logical indicating whether information about computation should be
 #' reported. Default to FALSE.
 #' @param nproc the number cores for parallel computation. Default to 1 (sequential mode).
+#' @return an object of class \code{externVar} and  
+#' \code{externSurv} for external survival outcomes,
+#' \code{externX} for external class predictors, and
+#' \code{hlme}, \code{lcmm}, or \code{multlcmm} for external longitudinal or cross-sectional outcomes.
 #' 
 #' 
 #' @examples
