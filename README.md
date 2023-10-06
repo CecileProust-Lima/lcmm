@@ -1,5 +1,5 @@
 
-# lcmm
+# <img src="man/images/lcmm.png" align="right" width=130> lcmm
 
 
 ## Installation
