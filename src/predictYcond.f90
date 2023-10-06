@@ -31,6 +31,11 @@ subroutine predictcondmult(X0,condRE_Y,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,id
   integer,dimension(ny)::ntrtot
   double precision::alnorm
 
+
+  !! call GetRNGstate
+  call getrand()
+  
+  
   allocate(ysim(maxmes*ny),usim(maxmes*ny),Vi(maxmes*ny*(maxmes*ny+1)/2), &
        VC(maxmes*ny,maxmes*ny))
 
@@ -280,6 +285,9 @@ subroutine predictcondmult(X0,condRE_Y,nalea,ny,nerr,maxmes,npm,b1,debut,epsY,id
   deallocate(zitr,splaa)
   deallocate(ysim,usim,VC,Vi)
 
+  !! call PutRNGstate
+  call putrand()
+           
 
   return
 

@@ -1,6 +1,6 @@
 PKG_LIBS = $(BLAS_LIBS) $(FLIBS)
 
-CSRC = init.c
+CSRC = init.c runiran.c
 FMODSRC = compute.f90
 FSRC = hetmixOrd.f90 hetmixlin.f90 hetmixCont.f90 Jointhet.f90 calculusTransfo.f90 predictCont.f90 predictMult.f90 postprob2.f90 cvpl.f90 predictYcond.f90 mpjhet.f90 hetmixMult.f90 iteminfo.f90
 
@@ -24,4 +24,5 @@ calculusTransfo.o: compute.o
 mpjhet.o: compute.o
 hetmixMult.o: compute.o
 iteminfo.o: compute.o
+compute.o: runiran.o
 

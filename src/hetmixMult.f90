@@ -3070,6 +3070,9 @@ end do
         !          print*,"X0=",X0(nobs0-1:nobs+12)
         !          print*,"zitr0=",zitr0
 
+        !! call GetRNGstate
+        call getrand()
+
         ! sorties initialisees
 
         ppi0=0.d0
@@ -3431,6 +3434,10 @@ end do
 
 1589    continue
 
+           !! call PutRNGstate
+           call putrand()
+
+           
         deallocate(Y,X,idprob,idea,idg,idcor,idcontr,nmes,prior,pprior,uniqueY,indiceY,ntrtot)
 
 

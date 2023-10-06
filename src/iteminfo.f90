@@ -26,6 +26,9 @@ subroutine iteminfo(X0,condRE_Y,nalea,ny,maxmes,npm,b1,debut,nbzitr,idlink,&
   integer,dimension(ny)::ntrtot
   double precision::alnorm
 
+  !! call GetRNGstate
+  call getrand()
+
   m=nbmod(1)-1
   do yk=2,ny
      if(nbmod(yk)+1 .gt. m) m = nbmod(yk)-1
@@ -154,6 +157,9 @@ subroutine iteminfo(X0,condRE_Y,nalea,ny,maxmes,npm,b1,debut,nbzitr,idlink,&
   end do
 
   deallocate(ysim, grandPhi, petitphi)
+
+  !! call PutRNGstate
+  call putrand()
 
 
   return

@@ -45,6 +45,11 @@ subroutine predictmult(X0,idprob,idea,idg,idcor,idcontr &
 
 !     print*,"dans predictMult"
 
+
+  !! call GetRNGstate
+  call getrand()
+
+  
   !============= recup des places de parametres
 
   allocate(ysim(maxmes*ny),usim(maxmes*ny),mu(maxmes*ny),tcor(maxmes),Vi(maxmes*ny*(maxmes*ny+1)/2), &
@@ -1184,6 +1189,9 @@ end do
 !        print*,"avant delocate"
   deallocate(zitr,splaa)
   deallocate(Z,P,Corr,X00,X2,X01,ysim,usim,mu,tcor,VC,Vi,usim2,Sigma,wsim,asim)
+
+  !! call PutRNGstate
+  call putrand()
 
 
   return

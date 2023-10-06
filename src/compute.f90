@@ -20,7 +20,6 @@
 !! eval_splines
 !! inv_Isplines
 !! bgos
-!! uniran
 !! gausshermite
 
 
@@ -2431,7 +2430,7 @@ SUBROUTINE BGOS(SX,ID,X1,X2,RO)
   double precision ::RO,SX
   integer ::ID
   double precision ::F,V1,V2,S,DLS,RO2
-  double precision ::X1,X2,UNIRAN
+  double precision ::X1,X2,runiran
   !C     write(*,*)'dans bgos'
 
 
@@ -2442,8 +2441,8 @@ SUBROUTINE BGOS(SX,ID,X1,X2,RO)
   !C     X1=RAND()
   !C     X2=RAND()
 
-  X1=UNIRAN()
-  X2=UNIRAN()
+  X1=runiran()
+  X2=runiran()
 
   IF(ID.NE.1) GO TO 10
   F=2.*SQRT(3.)
@@ -2474,42 +2473,6 @@ END subroutine bgos
 
 
 !C ------------------- FIN SUBROUTINE BGOS -----------------
-
-
-!C ------------------------------------------------------
-
-DOUBLE PRECISION FUNCTION UNIRAN()
-  !C
-  !C     Random number generator(RCARRY), adapted from F. James
-  !C     "A Review of Random Number Generators"
-  !C      Comp. Phys. Comm. 60(1990), pp. 329-344.
-  !C
-  implicit none
-  DOUBLE PRECISION SEEDS(24), TWOM24, CARRY, ONE
-  PARAMETER ( ONE = 1, TWOM24 = ONE/16777216 )
-  INTEGER I, J
-  SAVE I, J, CARRY, SEEDS
-  DATA I, J, CARRY / 24, 10, 0.0 /
-  DATA SEEDS /      &
-       0.8804418, 0.2694365, 0.0367681, 0.4068699, 0.4554052, 0.2880635,      &
-       0.1463408, 0.2390333, 0.6407298, 0.1755283, 0.7132940, 0.4913043, &
-       0.2979918, 0.1396858, 0.3589528, 0.5254809, 0.9857749, 0.4612127, &
-       0.2196441, 0.7848351, 0.4096100, 0.9807353, 0.2689915, 0.5140357/
-  UNIRAN = SEEDS(I) - SEEDS(J) - CARRY
-  IF ( UNIRAN .LT. 0 ) THEN
-     UNIRAN = UNIRAN + 1
-     CARRY = TWOM24
-  ELSE
-     CARRY = 0
-  ENDIF
-  SEEDS(I) = UNIRAN
-  I = 24 - MOD( 25-I, 24 )
-  J = 24 - MOD( 25-J, 24 )
-
-  return
-END function uniran
-
-
 
 
 
