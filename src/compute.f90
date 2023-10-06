@@ -288,7 +288,7 @@ function alnorm ( x, upper )
   !
   !  Parameters:
   !
-  !    Input, real ( kind = 8 ) X, is one endpoint of the semi-infinite interval
+  !    Input, double precision X, is one endpoint of the semi-infinite interval
   !    over which the integration takes place.
   !
   !    Input, logical UPPER, determines whether the upper or lower
@@ -296,39 +296,39 @@ function alnorm ( x, upper )
   !    .TRUE.  => integrate from X to + Infinity;
   !    .FALSE. => integrate from - Infinity to X.
   !
-  !    Output, real ( kind = 8 ) ALNORM, the integral of the standard normal
+  !    Output, double precision ALNORM, the integral of the standard normal
   !    distribution over the desired interval.
   !
   implicit none
 
-  real ( kind = 8 ), parameter :: a1 = 5.75885480458D+00
-  real ( kind = 8 ), parameter :: a2 = 2.62433121679D+00
-  real ( kind = 8 ), parameter :: a3 = 5.92885724438D+00
-  real ( kind = 8 ) alnorm
-  real ( kind = 8 ), parameter :: b1 = -29.8213557807D+00
-  real ( kind = 8 ), parameter :: b2 = 48.6959930692D+00
-  real ( kind = 8 ), parameter :: c1 = -0.000000038052D+00
-  real ( kind = 8 ), parameter :: c2 = 0.000398064794D+00
-  real ( kind = 8 ), parameter :: c3 = -0.151679116635D+00
-  real ( kind = 8 ), parameter :: c4 = 4.8385912808D+00
-  real ( kind = 8 ), parameter :: c5 = 0.742380924027D+00
-  real ( kind = 8 ), parameter :: c6 = 3.99019417011D+00
-  real ( kind = 8 ), parameter :: con = 1.28D+00
-  real ( kind = 8 ), parameter :: d1 = 1.00000615302D+00
-  real ( kind = 8 ), parameter :: d2 = 1.98615381364D+00
-  real ( kind = 8 ), parameter :: d3 = 5.29330324926D+00
-  real ( kind = 8 ), parameter :: d4 = -15.1508972451D+00
-  real ( kind = 8 ), parameter :: d5 = 30.789933034D+00
-  real ( kind = 8 ), parameter :: ltone = 7.0D+00
-  real ( kind = 8 ), parameter :: p = 0.398942280444D+00
-  real ( kind = 8 ), parameter :: q = 0.39990348504D+00
-  real ( kind = 8 ), parameter :: r = 0.398942280385D+00
+  double precision, parameter :: a1 = 5.75885480458D+00
+  double precision, parameter :: a2 = 2.62433121679D+00
+  double precision, parameter :: a3 = 5.92885724438D+00
+  double precision alnorm
+  double precision, parameter :: b1 = -29.8213557807D+00
+  double precision, parameter :: b2 = 48.6959930692D+00
+  double precision, parameter :: c1 = -0.000000038052D+00
+  double precision, parameter :: c2 = 0.000398064794D+00
+  double precision, parameter :: c3 = -0.151679116635D+00
+  double precision, parameter :: c4 = 4.8385912808D+00
+  double precision, parameter :: c5 = 0.742380924027D+00
+  double precision, parameter :: c6 = 3.99019417011D+00
+  double precision, parameter :: con = 1.28D+00
+  double precision, parameter :: d1 = 1.00000615302D+00
+  double precision, parameter :: d2 = 1.98615381364D+00
+  double precision, parameter :: d3 = 5.29330324926D+00
+  double precision, parameter :: d4 = -15.1508972451D+00
+  double precision, parameter :: d5 = 30.789933034D+00
+  double precision, parameter :: ltone = 7.0D+00
+  double precision, parameter :: p = 0.398942280444D+00
+  double precision, parameter :: q = 0.39990348504D+00
+  double precision, parameter :: r = 0.398942280385D+00
   logical up
   logical upper
-  real ( kind = 8 ), parameter :: utzero = 18.66D+00
-  real ( kind = 8 ) x
-  real ( kind = 8 ) y
-  real ( kind = 8 ) z
+  double precision, parameter :: utzero = 18.66D+00
+  double precision x
+  double precision y
+  double precision z
 
   up = upper
   z = x
