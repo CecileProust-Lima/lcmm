@@ -602,7 +602,7 @@ minY0 <- min(Y0)
 maxY0 <- max(Y0)
 if ((!missing(range)) & length(range)==2)
 {
- if(minY0<range[1]|maxY0>range[2]) stop("The range specified do not cover the entire range of the data")
+ if(minY0<range[1]|maxY0>range[2]) stop(paste("The range specified does not cover the entire range of the data. \n Specified: ", paste(range, collapse=" "), paste(" and in data:", paste(c(minY0, maxY0), collapse=" "))))
  if (minY0>range[1]|maxY0<range[2])
  {
   minY0 <- range[1]
