@@ -1085,11 +1085,11 @@ externVar = function(model,
                 argumentsInEdit[["verbose"]] = F
                 argumentsInEdit[["nproc"]] = nproc
                 argumentsInEdit[["data"]] = data
-                model = do.call(funIn, argumentsInEdit)## ?? prendre pprob d'iici
+                model = do.call(funIn, argumentsInEdit)
                 
                 B = B[iEst]
                 ##predCl = predictClass(model, data) # pas utile # chgmt Viviane
-                predCl <- model$pprob #?? a tester
+                predCl <- model$pprob 
 
                 ##First : let's compute P(C|\tilde C) (\tilde C : A)
                 pAlY = sapply(1:ng, function(g){
