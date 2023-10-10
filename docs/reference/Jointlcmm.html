@@ -22,7 +22,7 @@ lcmm."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathj
     
     <a class="navbar-brand me-2" href="../index.html">lcmm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -115,6 +115,7 @@ continuous functions (splines or Beta CDF) can be specified as in
 <span>  maxiter <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  nsim <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  prior <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pprior <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  logscale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  subset <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na.action <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -155,6 +156,7 @@ continuous functions (splines or Beta CDF) can be specified as in
 <span>  maxiter <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  nsim <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  prior <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pprior <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  logscale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  subset <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na.action <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -394,6 +396,12 @@ about the latent class membership. The covariate should be an integer with
 values in 0,1,...,ng. Value O indicates no prior for the subject while a
 value in 1,...,ng indicates that the subject belongs to the corresponding
 latent class.</p></dd>
+
+
+<dt>pprior</dt>
+<dd><p>optional vector specifying the names of the covariates containing the
+prior probabilities to belong to each latent class. These probabilities should be
+between 0 and 1 and should sum up to 1 for each subject.</p></dd>
 
 
 <dt>logscale</dt>

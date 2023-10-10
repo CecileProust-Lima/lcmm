@@ -26,7 +26,7 @@ It returns an object from one of the lcmm package classes."><!-- mathjax --><scr
     
     <a class="navbar-brand me-2" href="../index.html">lcmm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -105,17 +105,20 @@ from a latent class model estimated within <code>lcmm</code> package) with eithe
 <span>  hazardtype <span class="op">=</span> <span class="st">"Specific"</span>,</span>
 <span>  hazardnodes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  TimeDepVar <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  nsim <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  logscale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  idiag <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  nwg <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  randomY <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  link <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  intnodes <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  epsY <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  epsY <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cor <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  nsim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  range <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">data</span>,</span>
 <span>  <span class="va">longitudinal</span>,</span>
 <span>  <span class="va">method</span>,</span>
-<span>  varest <span class="op">=</span> <span class="st">"Hessian"</span>,</span>
+<span>  <span class="va">varest</span>,</span>
 <span>  M <span class="op">=</span> <span class="fl">200</span>,</span>
 <span>  <span class="va">B</span>,</span>
 <span>  convB <span class="op">=</span> <span class="fl">1e-04</span>,</span>
@@ -132,7 +135,7 @@ from a latent class model estimated within <code>lcmm</code> package) with eithe
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>model</dt>
-<dd><p>an object inheriting from class <code>lcmm</code>, 
+<dd><p>an object inheriting from class <code>hlme</code>, <code>lcmm</code>, 
 <code>Jointlcmm</code>, <code>multlcmm</code> or <code>mpjlcmm</code> giving the primary latent
  class model.</p></dd>
 
@@ -160,15 +163,44 @@ By default, no random effect is included.</p></dd>
 
 <dt>subject</dt>
 <dd><p>name of the covariate representing the grouping structure.
-Even in the absence of a hierarchical structure. By default, the function will try to retrieve it
-from <code>model</code> argument.</p></dd>
+Even in the absence of a hierarchical structure.</p></dd>
 
 
 <dt>classmb</dt>
 <dd><p>optional one-sided formula specifying the external predictors of 
 latent class membership to be modelled in the secondary class-membership multinomial 
-logistic model. Covariates are separated by <code>+</code> on the right of the <code>~</code>. 
-By default, an intercept is included.</p></dd>
+logistic model. Covariates are separated by <code>+</code> on the right of the <code>~</code>.</p></dd>
+
+
+<dt>survival</dt>
+<dd><p>optional two-sided formula specifying the external survival part
+of the model.</p></dd>
+
+
+<dt>hazard</dt>
+<dd><p>optional family of hazard function assumed for the survival model
+(Weibull, piecewise or splines)</p></dd>
+
+
+<dt>hazardtype</dt>
+<dd><p>optional indicator for the type of baseline risk function
+(Specific, PH or Common)</p></dd>
+
+
+<dt>hazardnodes</dt>
+<dd><p>optional vector containing interior nodes if <code>splines</code> or
+<code>piecewise</code> is specified for the baseline hazard function in <code>hazard</code></p></dd>
+
+
+<dt>TimeDepVar</dt>
+<dd><p>optional vector specifying the name of the time-depending covariate
+in the survival model</p></dd>
+
+
+<dt>logscale</dt>
+<dd><p>optional boolean indicating whether an exponential (logscale=TRUE) or
+a square (logscale=FALSE -by default) transformation is used to
+ensure positivity of parameters in the baseline risk functions</p></dd>
 
 
 <dt>idiag</dt>
@@ -181,16 +213,23 @@ matrix of variance-covariance is considered.</p></dd>
 
 <dt>nwg</dt>
 <dd><p>if appropriate, optional logical indicating if the variance-covariance of the
-random-effects in the secondary model is class-specific. If <code>FALSE</code> the variance-covariance
-matrix is common over latent classes (by default). If <code>TRUE</code> a
+random-effects in the secondary model is class-specific. If <code>FALSE</code> the
+variance-covariance matrix is common over latent classes (by default). If <code>TRUE</code> a
 class-specific proportional parameter multiplies the variance-covariance
 matrix in each class (the proportional parameter in the last latent class
 equals 1 to ensure identifiability).</p></dd>
 
 
+<dt>randomY</dt>
+<dd><p>optional logical for including an outcome-specific random intercept.
+If FALSE no outcome-specific random intercept is added (default). If TRUE independent
+outcome-specific random intercept with parameterized variance are included</p></dd>
+
+
 <dt>link</dt>
-<dd><p>optional family of parameterized link functions for the external outcome if appropriate.
-Defaults to NULL, corresponding to continuous Gaussian distribution (hlme function).</p></dd>
+<dd><p>optional family of parameterized link functions for the external outcome
+if appropriate. Defaults to NULL, corresponding to continuous Gaussian distribution
+(hlme function).</p></dd>
 
 
 <dt>intnodes</dt>
@@ -203,6 +242,27 @@ required for a I-splines link function with nodes entered manually.</p></dd>
 when the beta link function is used. By default, epsY=0.5.</p></dd>
 
 
+<dt>cor</dt>
+<dd><p>optional indicator for inclusion of an auto correlated Gaussian process
+in the latent process linear (latent process) mixed model. Option "BM" indicates
+a brownian motion with parameterized variance. Option "AR" specifies an
+autoregressive process of order 1 with parameterized variance and correlation
+intensity. Each option should be followed by the time variable in brackets as
+codecor=BM(time). By default, no autocorrelated Gaussian process is added.</p></dd>
+
+
+<dt>nsim</dt>
+<dd><p>number of points to be used in the estimated link function. By default,
+nsom=100.</p></dd>
+
+
+<dt>range</dt>
+<dd><p>optional vector indicating the range of the outcomes (that is the
+minimum and maximum). By default, the range is defined according to the minimum
+and maximum observed values of the outcome. The option should be used
+only for Beta and Splines transformations.</p></dd>
+
+
 <dt>data</dt>
 <dd><p>Data frame containing the variables named in
 <code>fixed</code>, <code>mixture</code>, <code>random</code>, <code>classmb</code> and <code>subject</code>,
@@ -212,27 +272,31 @@ external outcomes.</p></dd>
 
 
 <dt>longitudinal</dt>
-<dd><p>only with <code>mpjlcmm</code> primary models and "twoStageJoint" method:
-mandatory list containing the longitudinal submodels used in the primary latent class model.</p></dd>
+<dd><p>only with <code>mpjlcmm</code> primary models and "twoStageJoint"
+method: mandatory list containing the longitudinal submodels used in the primary
+latent class model.</p></dd>
 
 
 <dt>method</dt>
 <dd><p>character indicating the inference technique to be used:
-only "twoStageJoint" for 2-stage estimation from the joint likelihood 
-is implemented at the moment.</p></dd>
+<code>"twoStageJoint"</code> corresponds to 2-stage estimation. <code>"conditional"</code>
+corresponds to the method based on the distribution of Y conditionally to the
+true latent class membership.</p></dd>
 
 
 <dt>varest</dt>
-<dd><p>optional character indicating the method to be used to compute the variance of 
-the regression estimates. <code>"none"</code> does not account for the uncertainty in the primary latent 
-class model, <code>"paramBoot"</code> computes the total variance using a parametric bootstrap technique, 
-<code>"Hessian"</code> computes the total Hessian of the joint likelihood (implemented for <code>"twoStageJoint"</code>
-method only). Default to <code>"Hessian"</code> for <code>"twoStageJoint"</code> method</p></dd>
+<dd><p>optional character indicating the method to be used to compute the
+variance of the regression estimates. <code>"none"</code> does not account for the
+uncertainty in the primary latent class model, <code>"paramBoot"</code> computes the
+total variance using a parametric bootstrap technique, <code>"Hessian"</code> computes
+the total Hessian of the joint likelihood (implemented for <code>"twoStageJoint"</code>
+method only). Default to <code>"Hessian"</code> for <code>"twoStageJoint"</code> method and
+<code>"paramBoot"</code> for <code>"conditional"</code> method.</p></dd>
 
 
 <dt>M</dt>
-<dd><p>option integer indicating the number of draws for the parametric boostrap when <code>varest="paramBoot"</code>.
-Default to 200.</p></dd>
+<dd><p>option integer indicating the number of draws for the parametric boostrap
+when <code>varest="paramBoot"</code>. Default to 200.</p></dd>
 
 
 <dt>B</dt>
@@ -259,8 +323,8 @@ derivatives. By default, convG=0.0001.</p></dd>
 
 
 <dt>maxiter</dt>
-<dd><p>optional maximum number of iterations for the secondary model estimation using 
-Marquardt iterative algorithm. Defaults to 100</p></dd>
+<dd><p>optional maximum number of iterations for the secondary model
+estimation using Marquardt iterative algorithm. Defaults to 100</p></dd>
 
 
 <dt>posfix</dt>
@@ -285,6 +349,15 @@ reported. Default to FALSE.</p></dd>
 <dd><p>the number cores for parallel computation. Default to 1 (sequential mode).</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>an object of class <code>externVar</code> and  
+<code>externSurv</code> for external survival outcomes,
+<code>externX</code> for external class predictors, and
+<code>hlme</code>, <code>lcmm</code>, or <code>multlcmm</code> for external longitudinal or cross-sectional outcomes.</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>A. DATA STRUCTURE</p>
@@ -397,6 +470,51 @@ parametric bootstrap can be used.</p>
 <span class="r-in"><span>                     varest<span class="op">=</span> <span class="st">"paramBoot"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">YextBoot</span><span class="op">)</span> </span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">###### Example 3: Relationship between a latent class structure and         #</span></span></span>
+<span class="r-in"><span><span class="co">#                      external outcome (survival)                     ######</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># estimation of the secondary survival model with total variance</span></span></span>
+<span class="r-in"><span><span class="co"># computed with the Hessian</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">YextHess</span> <span class="op">=</span> <span class="fu">externVar</span><span class="op">(</span><span class="va">PrimMod2</span>,   <span class="co">#primary model</span></span></span>
+<span class="r-in"><span>                     survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">Tevent</span>,<span class="va">Event</span><span class="op">)</span><span class="op">~</span> <span class="va">X1</span><span class="op">+</span><span class="fu"><a href="ForInternalUse.html">mixture</a></span><span class="op">(</span><span class="va">X2</span><span class="op">)</span>, <span class="co">#secondary model</span></span></span>
+<span class="r-in"><span>                     hazard<span class="op">=</span><span class="st">"3-quant-splines"</span>, <span class="co">#secondary model</span></span></span>
+<span class="r-in"><span>                     hazardtype<span class="op">=</span><span class="st">"PH"</span>, <span class="co">#secondary model</span></span></span>
+<span class="r-in"><span>                     subject<span class="op">=</span><span class="st">"ID"</span>,</span></span>
+<span class="r-in"><span>                     data<span class="op">=</span><span class="va">data_lcmm</span>,</span></span>
+<span class="r-in"><span>                     method <span class="op">=</span> <span class="st">"twoStageJoint"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">YextHess</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># estimation of a secondary survival model with total variance</span></span></span>
+<span class="r-in"><span><span class="co"># computed with parametric Bootstrap (much longer). When using the bootstrap</span></span></span>
+<span class="r-in"><span><span class="co"># estimator, we recommend running first the analysis with option varest = "none"</span></span></span>
+<span class="r-in"><span><span class="co"># which is faster but which underestimates the variance. And then use these values</span></span></span>
+<span class="r-in"><span><span class="co"># as initial values when running the model with varest = "paramBoot" to obtain</span></span></span>
+<span class="r-in"><span><span class="co"># a valid variance of the parameters.</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">YextNone</span> <span class="op">=</span> <span class="fu">externVar</span><span class="op">(</span><span class="va">PrimMod2</span>,   <span class="co">#primary model</span></span></span>
+<span class="r-in"><span>                     survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">Tevent</span>,<span class="va">Event</span><span class="op">)</span><span class="op">~</span> <span class="va">X1</span><span class="op">+</span><span class="fu"><a href="ForInternalUse.html">mixture</a></span><span class="op">(</span><span class="va">X2</span><span class="op">)</span>, <span class="co">#secondary model</span></span></span>
+<span class="r-in"><span>                     hazard<span class="op">=</span><span class="st">"3-quant-splines"</span>, <span class="co">#secondary model</span></span></span>
+<span class="r-in"><span>                     hazardtype<span class="op">=</span><span class="st">"PH"</span>, <span class="co">#secondary model</span></span></span>
+<span class="r-in"><span>                     subject<span class="op">=</span><span class="st">"ID"</span>,</span></span>
+<span class="r-in"><span>                     data<span class="op">=</span><span class="va">data_lcmm</span>,</span></span>
+<span class="r-in"><span>                     varest <span class="op">=</span> <span class="st">"none"</span>,</span></span>
+<span class="r-in"><span>                     method <span class="op">=</span> <span class="st">"twoStageJoint"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">YextBoot</span> <span class="op">=</span> <span class="fu">externVar</span><span class="op">(</span><span class="va">PrimMod2</span>,   <span class="co">#primary model</span></span></span>
+<span class="r-in"><span>                     survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">Tevent</span>,<span class="va">Event</span><span class="op">)</span><span class="op">~</span> <span class="va">X1</span><span class="op">+</span><span class="fu"><a href="ForInternalUse.html">mixture</a></span><span class="op">(</span><span class="va">X2</span><span class="op">)</span>, <span class="co">#secondary model</span></span></span>
+<span class="r-in"><span>                     hazard<span class="op">=</span><span class="st">"3-quant-splines"</span>, <span class="co">#secondary model</span></span></span>
+<span class="r-in"><span>                     hazardtype<span class="op">=</span><span class="st">"PH"</span>, <span class="co">#secondary model</span></span></span>
+<span class="r-in"><span>                     subject<span class="op">=</span><span class="st">"ID"</span>,</span></span>
+<span class="r-in"><span>                     data<span class="op">=</span><span class="va">data_lcmm</span>,</span></span>
+<span class="r-in"><span>                     method <span class="op">=</span> <span class="st">"twoStageJoint"</span>,</span></span>
+<span class="r-in"><span>                     B <span class="op">=</span> <span class="va">YextNone</span><span class="op">$</span><span class="va">best</span>,</span></span>
+<span class="r-in"><span>                     varest<span class="op">=</span> <span class="st">"paramBoot"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">YextBoot</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>

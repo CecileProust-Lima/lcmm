@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">lcmm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,6 +62,18 @@
       <small>Source: <a href="https://github.com/CecileProust-Lima/lcmm/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.1.0" id="changes-in-version-2-1-0-2023-10-06">Changes in Version 2.1.0 (2023-10-06) :<a class="anchor" aria-label="anchor" href="#changes-in-version-2-1-0-2023-10-06"></a></h2>
+<ul><li>new function <code>externVar</code> to perform a secondary regression analysis after the estimation of a primary latent class model</li>
+<li>new argument <code>pprior</code> in hlme, lcmm, multlcmm and Jointlcmm to fix the probability to belong to each latent class</li>
+<li>packages survival, parallel, mvtnorm, randtoolbox, marqLevAlg, doParallel, numDeriv are now listed in Imports rather than in Depends</li>
+<li>no subject-specific predictions in multlcmm with ordinal outcomes</li>
+<li>corrections in mpjlcmm</li>
+<li>correction in predictL without random effects</li>
+<li>correction in epoce and predictY.Jointlcmm</li>
+<li>use of R’s random number generator in Fortran codes</li>
+<li>use double precision rather than real(kind=8) in Fortran</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.2" id="changes-in-version-2-0-2-2023-02-17">Changes in Version 2.0.2 (2023-02-17)<a class="anchor" aria-label="anchor" href="#changes-in-version-2-0-2-2023-02-17"></a></h2><p class="text-muted">CRAN release: 2023-02-20</p>
 <ul><li>all vignettes excepted the introduction vignette (now renamed lcmm.Rmd) are removed from the CRAN version because of too long check time.</li>

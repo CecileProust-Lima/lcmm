@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">lcmm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -576,7 +576,7 @@ where <span class="math inline">\(X_{4i}\)</span> and <span class="math inline">
 <span><span class="fu"><a href="../reference/summarytable.html">summarytable</a></span><span class="op">(</span><span class="va">mj2</span>,<span class="va">mj2b</span>,<span class="va">mj2c</span>,<span class="va">mj2d</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      G    loglik npm      BIC  %class1  %class2</span></span>
 <span><span class="co">#&gt; mj2  2 -9337.187  21 18804.84 21.04208 78.95792</span></span>
-<span><span class="co">#&gt; mj2b 2 -9337.187  21 18804.84 21.04208 78.95792</span></span>
+<span><span class="co">#&gt; mj2b 2 -9337.187  21 18804.84 78.95792 21.04208</span></span>
 <span><span class="co">#&gt; mj2c 2 -9337.187  21 18804.84 78.95792 21.04208</span></span>
 <span><span class="co">#&gt; mj2d 2 -9337.187  21 18804.84 21.04208 78.95792</span></span></code></pre></div>
 </div>
@@ -881,16 +881,16 @@ where <span class="math inline">\(X_{4i}\)</span> and <span class="math inline">
 <span>                horizon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">8</span>, <span class="fl">9</span><span class="op">)</span>, fun.time <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fl">10</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">65</span> <span class="op">}</span>, </span>
 <span>                draws <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       ID landmark horizon    pred_50   pred_2.5  pred_97.5</span></span>
-<span><span class="co">#&gt;  [1,] 72       80       1 0.01795197 0.01098072 0.02888795</span></span>
-<span><span class="co">#&gt;  [2,] 72       80       3 0.07780573 0.05113366 0.11795039</span></span>
-<span><span class="co">#&gt;  [3,] 72       80       5 0.17588962 0.12255998 0.25236982</span></span>
-<span><span class="co">#&gt;  [4,] 72       80       8 0.30657896 0.23012800 0.40059527</span></span>
-<span><span class="co">#&gt;  [5,] 72       80       9 0.34209460 0.26215388 0.43806132</span></span>
-<span><span class="co">#&gt;  [6,] 72       90       1 0.07857517 0.03485307 0.15672202</span></span>
-<span><span class="co">#&gt;  [7,] 72       90       3 0.21756857 0.10348210 0.42943634</span></span>
-<span><span class="co">#&gt;  [8,] 72       90       5 0.30690293 0.18276839 0.54494728</span></span>
-<span><span class="co">#&gt;  [9,] 72       90       8 0.57902045 0.39304436 0.81516841</span></span>
-<span><span class="co">#&gt; [10,] 72       90       9 0.71475987 0.49663427 0.94906992</span></span>
+<span><span class="co">#&gt;  [1,] 72       80       1 0.01797469 0.01057306 0.02874129</span></span>
+<span><span class="co">#&gt;  [2,] 72       80       3 0.07759665 0.04932597 0.11964499</span></span>
+<span><span class="co">#&gt;  [3,] 72       80       5 0.17502587 0.11968848 0.25335711</span></span>
+<span><span class="co">#&gt;  [4,] 72       80       8 0.30397119 0.22710445 0.40682689</span></span>
+<span><span class="co">#&gt;  [5,] 72       80       9 0.33984358 0.25896848 0.44169340</span></span>
+<span><span class="co">#&gt;  [6,] 72       90       1 0.07702207 0.03484800 0.16304633</span></span>
+<span><span class="co">#&gt;  [7,] 72       90       3 0.21470383 0.10418011 0.42931156</span></span>
+<span><span class="co">#&gt;  [8,] 72       90       5 0.30736858 0.18049310 0.53129046</span></span>
+<span><span class="co">#&gt;  [9,] 72       90       8 0.58875265 0.39850522 0.83032473</span></span>
+<span><span class="co">#&gt; [10,] 72       90       9 0.72889171 0.49991931 0.95403561</span></span>
 <span><span class="co"># graph of predictions</span></span>
 <span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="va">dynp</span>, landmark <span class="op">=</span> <span class="fl">80</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">55</span>, <span class="fl">85</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>     ylab <span class="op">=</span> <span class="st">"normMMSE"</span>, main <span class="op">=</span> <span class="st">"At landmark age 80"</span>, xlab <span class="op">=</span> <span class="st">"age in years"</span><span class="op">)</span></span></code></pre></div>
@@ -917,11 +917,11 @@ where <span class="math inline">\(X_{4i}\)</span> and <span class="math inline">
 <span><span class="va">epoce3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/epoce.html">epoce</a></span><span class="op">(</span><span class="va">mj3b</span>, pred.times <span class="op">=</span> <span class="va">landmark</span>, var.time <span class="op">=</span> <span class="st">"age65"</span>,fun.time <span class="op">=</span> </span>
 <span>                  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fl">10</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">65</span> <span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Be patient, epoce function is running ... </span></span>
-<span><span class="co">#&gt; The program took 0.57 seconds</span></span>
+<span><span class="co">#&gt; The program took 0.56 seconds</span></span>
 <span><span class="va">epoce4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/epoce.html">epoce</a></span><span class="op">(</span><span class="va">mj4b</span>, pred.times <span class="op">=</span> <span class="va">landmark</span>, var.time <span class="op">=</span> <span class="st">"age65"</span>,fun.time <span class="op">=</span> </span>
 <span>                  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fl">10</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">65</span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Be patient, epoce function is running ... </span></span>
-<span><span class="co">#&gt; The program took 0.8 seconds</span></span></code></pre></div>
+<span><span class="co">#&gt; The program took 0.81 seconds</span></span></code></pre></div>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># computation of the differences in EPOCE</span></span>
 <span><span class="va">diff23</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Diffepoce.html">Diffepoce</a></span><span class="op">(</span><span class="va">epoce2</span>, <span class="va">epoce3</span><span class="op">)</span></span>
