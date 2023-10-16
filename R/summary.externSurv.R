@@ -6,7 +6,10 @@ summary.externSurv <- function(object,...){
   
   cat("Secondary survival model", "\n")
   cat("     fitted by maximum likelihood method", "\n")
-  
+    if(x$varest == "none") cat(" ** Parameter variance estimated without correction for primary model uncertainty **", "\n \n")
+    if(x$varest == "Hessian") cat(" ** Total parameter variance estimated using the Hessian of the joint likelihood **", "\n \n")
+    if(x$varest == "paramBoot") cat(" ** Total parameter variance estimated using parametric bootstrap **", "\n \n")
+
   cl <- x$call
   cl$B <- NULL
   if(is.data.frame(cl$data))
@@ -198,7 +201,7 @@ summary.externSurv <- function(object,...){
     if(any(c(1:(nrisqtot+nvarxevt)) %in% posfix)) maxch[1] <- maxch[1]-1
     dimnames(tmp) <- list(names(coef)[1:(nrisqtot+nvarxevt)],
                           c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
-                            paste(paste(rep(" ",max(maxch[2]-4,0)),collapse=""),"Se**",sep=""),
+                            paste(paste(rep(" ",max(maxch[2]-4,0)),collapse=""),"Se",sep=""),
                             paste(paste(rep(" ",max(maxch[3]-4,0)),collapse=""),"Wald",sep=""),
                             paste(paste(rep(" ",max(maxch[4]-7,0)),collapse=""),"p-value",sep="")))
     cat("\n")
@@ -209,10 +212,7 @@ summary.externSurv <- function(object,...){
     {
       cat(" *  coefficient fixed by the user \n")
     }
-    if(x$varest == "none") cat(" ** total variance estimated witout correction for primary model uncertainty", "\n \n")
-    if(x$varest == "Hessian") cat(" ** total variance estimated through the Hessian of the joint likelihood", "\n \n")
-    if(x$varest == "paramBoot") cat(" ** total variance estimated through parametric bootstrap", "\n \n")
-    
+   
     
     
   }
