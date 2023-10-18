@@ -161,12 +161,17 @@ summary.externX = function(object, ...){
       cat("\n")
     }
     
-    tTable = tmp
+    tTable <- cbind(round(coef[1:nprob],5),
+                   round(se[1:nprob],5),
+                   round(wald[1:nprob],3),
+                   round(pwald[1:nprob],5))
+    dimnames(tTable) <- list(names(coef)[1:nprob], c("coef", "Se", "Wald", "p-value"))
     
     if(length(posfix))
     {
-      cat(" *  coefficient fixed by the user \n")
+      cat(" *  coefficient fixed by the user \n \n")
     }
+    
     return(invisible(tTable))
   }
 }

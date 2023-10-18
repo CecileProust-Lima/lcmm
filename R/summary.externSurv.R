@@ -36,77 +36,78 @@ summary.externSurv <- function(object,...){
   
   for(ke in 1:nbevt)
   {
-    if(x$typrisq[ke]==1) nprisq[ke] <- x$nz[ke]-1
-    if(x$typrisq[ke]==2) nprisq[ke] <- 2
-    if(x$typrisq[ke]==3) nprisq[ke] <- x$nz[ke]+2
-    
-    nrisq[ke] <- x$Nprm[1+ke]
-    
-    cat(paste("     Event",ke,": \n"))
-    cat(paste("        Number of events: ", x$N[2+ke],"\n",sep=""))
-    if(x$ng>1)
-    {
-      if (x$hazardtype[ke]=="Specific") cat("        Class-specific hazards and \n")
-      if (x$hazardtype[ke]=="PH") cat("        Proportional hazards over latent classes and \n")
-      if (x$hazardtype[ke]=="Common") cat("        Common hazards over classes and \n")
-    }
-    
-    if (x$typrisq[ke]==2)
-    {
-      cat("        Weibull baseline risk function \n")
-    }
-    if (x$typrisq[ke]==1)
-    {
-      cat("        Piecewise constant baseline risk function with nodes \n")
-      cat("        ",x$hazardnodes[1:x$nz[ke],ke]," \n")
-    }
-    if (x$typrisq[ke]==3)
-    {
-      cat("        M-splines constant baseline risk function with nodes \n")
-      cat("        ",x$hazardnodes[1:x$nz[ke],ke]," \n")
-    }
-    
-    cat(" \n")
-    cat("Iteration process:", "\n")
-    
-    if(x$conv==1) cat("     Convergence criteria satisfied")
-    if(x$conv==2) cat("     Maximum number of iteration reached without convergence")
-    if(x$conv==3) cat("     Convergence with restrained Hessian matrix")
-    if(x$conv==4|x$conv==12)
-    {
+      if(x$typrisq[ke]==1) nprisq[ke] <- x$nz[ke]-1
+      if(x$typrisq[ke]==2) nprisq[ke] <- 2
+      if(x$typrisq[ke]==3) nprisq[ke] <- x$nz[ke]+2
+      
+      nrisq[ke] <- x$Nprm[1+ke]
+      
+      cat(paste("     Event",ke,": \n"))
+      cat(paste("        Number of events: ", x$N[2+ke],"\n",sep=""))
+      if(x$ng>1)
+      {
+          if (x$hazardtype[ke]=="Specific") cat("        Class-specific hazards and \n")
+          if (x$hazardtype[ke]=="PH") cat("        Proportional hazards over latent classes and \n")
+          if (x$hazardtype[ke]=="Common") cat("        Common hazards over classes and \n")
+      }
+      
+      if (x$typrisq[ke]==2)
+      {
+          cat("        Weibull baseline risk function \n")
+      }
+      if (x$typrisq[ke]==1)
+      {
+          cat("        Piecewise constant baseline risk function with nodes \n")
+          cat("        ",x$hazardnodes[1:x$nz[ke],ke]," \n")
+      }
+      if (x$typrisq[ke]==3)
+      {
+          cat("        M-splines constant baseline risk function with nodes \n")
+          cat("        ",x$hazardnodes[1:x$nz[ke],ke]," \n")
+      }
+  }
+  
+  cat(" \n")
+  cat("Iteration process:", "\n")
+  
+  if(x$conv==1) cat("     Convergence criteria satisfied")
+  if(x$conv==2) cat("     Maximum number of iteration reached without convergence")
+  if(x$conv==3) cat("     Convergence with restrained Hessian matrix")
+  if(x$conv==4|x$conv==12)
+  {
       cat("     The program stopped abnormally. No results can be displayed.\n")
-    }
-    else
-    {
-      cat(" \n")
-      if(x$varest == "paramBoot") {
+  }
+  else
+  {
+    cat(" \n")
+    if(x$varest == "paramBoot") {
         cat("     Proportion of convergence on bootstrap iterations (%)=", x$Mconv, "\n")
-      } else {
+    } else {
         cat("     Number of iterations: ", x$niter, "\n")
         cat("     Convergence criteria: parameters=", signif(x$gconv[1],2), "\n")
         cat("                         : likelihood=", signif(x$gconv[2],2), "\n")
         cat("                         : second derivatives=", signif(x$gconv[3],2), "\n")
-      }
-      cat(" \n")
-      cat("Goodness-of-fit statistics:", "\n")
-      cat(paste("     maximum log-likelihood:", round(x$loglik,2))," \n")
-      cat(paste("     AIC:", round(x$AIC,2))," \n")
-      cat(paste("     BIC:", round(x$BIC,2))," \n")
-      cat(" \n")
-      
-      cat(" \n")
-      cat(" \n")
-      cat("Maximum Likelihood Estimates:", "\n")
-      cat(" \n")
-      
-      nrisqtot <- x$N[1]
-      nvarxevt <- x$N[2]
-      NPM <- length(x$best)
-      
-      ## shorten names if > 20 characters
-      names_best <- names(x$best)
-      if(any(sapply(names_best, nchar)>20))
-      {
+    }
+    cat(" \n")
+    cat("Goodness-of-fit statistics:", "\n")
+    cat(paste("     maximum log-likelihood:", round(x$loglik,2))," \n")
+    cat(paste("     AIC:", round(x$AIC,2))," \n")
+    cat(paste("     BIC:", round(x$BIC,2))," \n")
+    cat(" \n")
+    
+    cat(" \n")
+    cat(" \n")
+    cat("Maximum Likelihood Estimates:", "\n")
+    cat(" \n")
+    
+    nrisqtot <- x$N[1]
+    nvarxevt <- x$N[2]
+    NPM <- length(x$best)
+    
+    ## shorten names if > 20 characters
+    names_best <- names(x$best)
+    if(any(sapply(names_best, nchar)>20))
+    {
         islong <- which(sapply(names_best, nchar)>20)
         split_names_best <- strsplit(names_best, split=":", fixed=TRUE)
         short_names_best <- lapply(split_names_best, gsub, pattern="\\(.*\\)", replacement="(...)")
@@ -118,74 +119,71 @@ summary.externSurv <- function(object,...){
         islong <- which(sapply(x$Names$Xnames, nchar)>20)
         if(length(islong))
         {
-          x$Names$Xnames[islong] <- sapply(x$Names$Xnames[islong], gsub, pattern="\\(.*\\)", replacement="(...)")
+            x$Names$Xnames[islong] <- sapply(x$Names$Xnames[islong], gsub, pattern="\\(.*\\)", replacement="(...)")
         }
-      }
     }
-    
     
     se <- rep(NA,NPM)
     if (x$conv==1 | x$conv==3)
     {
-      ##recuperation des indices de V
-      id <- 1:NPM
-      indice <- id*(id+1)/2
-      se <- sqrt(x$V[indice])
-      wald <- x$best/se
-      pwald <- 1-pchisq(wald**2,1)
-      coef <- x$best
+        ##recuperation des indices de V
+        id <- 1:NPM
+        indice <- id*(id+1)/2
+        se <- sqrt(x$V[indice])
+        wald <- x$best/se
+        pwald <- 1-pchisq(wald**2,1)
+        coef <- x$best
     }
     else
     {
-      se <- NA
-      wald <- NA
-      pwald <- NA
-      coef <- x$best
-      
-      sech <- rep(NA,length(coef))
-      waldch <- rep(NA,length(coef))
-      pwaldch <- rep(NA,length(coef))
+        se <- NA
+        wald <- NA
+        pwald <- NA
+        coef <- x$best
+          
+        sech <- rep(NA,length(coef))
+        waldch <- rep(NA,length(coef))
+        pwaldch <- rep(NA,length(coef))
     }
-    
     
     
     ow <- options("warn")
     options(warn=-1) # to avoid warnings with conv=3
     if(x$conv!=2)
     {
-      coefch <- format(as.numeric(sprintf("%.5f",coef)),nsmall=5,scientific=FALSE)
-      sech <- format(as.numeric(sprintf("%.5f",se)),nsmall=5,scientific=FALSE)
-      waldch <- format(as.numeric(sprintf("%.3f",wald)),nsmall=3,scientific=FALSE)
-      pwaldch <- format(as.numeric(sprintf("%.5f",pwald)),nsmall=5,scientific=FALSE)
+     coefch <- format(as.numeric(sprintf("%.5f",coef)),nsmall=5,scientific=FALSE)
+     sech <- format(as.numeric(sprintf("%.5f",se)),nsmall=5,scientific=FALSE)
+     waldch <- format(as.numeric(sprintf("%.3f",wald)),nsmall=3,scientific=FALSE)
+     pwaldch <- format(as.numeric(sprintf("%.5f",pwald)),nsmall=5,scientific=FALSE)
     }
     else
     {
-      coefch <- format(as.numeric(sprintf("%.5f",coef)),nsmall=5,scientific=FALSE)
+     coefch <- format(as.numeric(sprintf("%.5f",coef)),nsmall=5,scientific=FALSE)
     }
     options(ow)
-    
+      
     if(length(posfix))
     {
-      coefch[posfix] <- paste(coefch[posfix],"*",sep="")
-      sech[posfix] <- ""
-      waldch[posfix] <- ""
-      pwaldch[posfix] <- ""
+        coefch[posfix] <- paste(coefch[posfix],"*",sep="")
+        sech[posfix] <- ""
+        waldch[posfix] <- ""
+        pwaldch[posfix] <- ""
     }
     
     ## fct pr determiner la longueur max d'une chaine de caracteres
     ## (avec gestion des NA)
     maxchar <- function(x)
     {
-      xx <- na.omit(x)
-      if(length(xx))
-      {
-        res <- max(nchar(xx))
-      }
-      else
-      {
-        res <- 2
-      }
-      return(res)
+        xx <- na.omit(x)
+        if(length(xx))
+        {
+            res <- max(nchar(xx))
+        }
+        else
+        {
+            res <- 2
+        }
+        return(res)
     }
     
     
@@ -208,12 +206,17 @@ summary.externSurv <- function(object,...){
     print(tmp,quote=FALSE,na.print="")
     cat("\n")
     
+    tTable <- cbind(round(coef[1:(nrisqtot+nvarxevt)],5),
+                    round(se[1:(nrisqtot+nvarxevt)],5),
+                    round(wald[1:(nrisqtot+nvarxevt)],3),
+                    round(pwald[1:(nrisqtot+nvarxevt)],5))
+    dimnames(tTable) <- list(names(coef)[1:(nrisqtot+nvarxevt)], c("coef", "Se", "Wald", "p-value"))
+
     if(length(posfix))
     {
-      cat(" *  coefficient fixed by the user \n")
+        cat(" *  coefficient fixed by the user \n \n")
     }
-   
     
-    
+    return(invisible(tTable))
   }
 }
