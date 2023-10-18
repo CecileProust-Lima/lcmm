@@ -147,6 +147,7 @@
 #' \code{externSurv} for external survival outcomes,
 #' \code{externX} for external class predictors, and
 #' \code{hlme}, \code{lcmm}, or \code{multlcmm} for external longitudinal or cross-sectional outcomes.
+#' @author Maris Dussartre, Cecile Proust-Lima and Viviane Philipps
 #' 
 #' 
 #' @examples

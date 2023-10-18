@@ -150,8 +150,8 @@ Default to 1 (sequential mode).}
 The list returned is:
 \item{ns}{number of grouping units in the dataset}
 \item{ng}{number of latent classes}
-\item{loglik}{log-likelihood of the model} \
-item{best}{vector of parameter estimates in the same order as
+\item{loglik}{log-likelihood of the model}
+\item{best}{vector of parameter estimates in the same order as
 specified in \code{B} and detailed in section \code{details}}
 \item{V}{if the model converged (conv=1 or 3), vector containing the upper triangle
 matrix of variance-covariance estimates of \code{Best} with exception for

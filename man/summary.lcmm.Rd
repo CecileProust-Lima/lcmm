@@ -11,7 +11,7 @@
 \alias{summary.externSurv}
 \alias{summary.externX}
 \title{Summary of a \code{hlme}, \code{lcmm}, \code{Jointlcmm}, \code{multlcmm},
-\code{mpjlcmm}, \code{externSurv}, \code{externX},
+\code{mpjlcmm}, \code{externSurv}, \code{externX}
 \code{epoce} or \code{Diffepoce} objects}
 \usage{
 \method{summary}{lcmm}(object, ...)

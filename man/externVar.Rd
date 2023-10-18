@@ -372,3 +372,6 @@ summary(YextBoot)
 
 
 }
+\author{
+Maris Dussartre, Cecile Proust-Lima and Viviane Philipps
+}
