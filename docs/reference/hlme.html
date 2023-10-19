@@ -46,6 +46,7 @@ longitudinal outcomes, please see multlcmm."><!-- mathjax --><script src="https:
     <a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm_IRT.html">Continuous-time longitudinal IRT model</a>
     <a class="dropdown-item" href="../articles/joint_latent_class_model_with_Jointlcmm.html">How to estimate a joint latent class mixed model using Jointlcmm function</a>
     <a class="dropdown-item" href="../articles/multivariate_latent_class_model_with_mpjlcmm.html">How to estimate a multivariate latent class mixed model using mpjlcmm function</a>
+    <a class="dropdown-item" href="../articles/secondary_model_with_externVar.html">Accounting for latent class assignment uncertainty in subsequent analyses</a>
     <a class="dropdown-item" href="../articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a>
   </div>
 </li>
@@ -302,10 +303,12 @@ Default to 1 (sequential mode).</p></dd>
 
 <dt>loglik</dt>
 <dd><p>log-likelihood of the model</p></dd>
-</dl><p>\
-itembestvector of parameter estimates in the same order as
-specified in <code>B</code> and detailed in section <code>details</code></p>
-<dl><dt>V</dt>
+
+<dt>best</dt>
+<dd><p>vector of parameter estimates in the same order as
+specified in <code>B</code> and detailed in section <code>details</code></p></dd>
+
+<dt>V</dt>
 <dd><p>if the model converged (conv=1 or 3), vector containing the upper triangle
 matrix of variance-covariance estimates of <code>Best</code> with exception for
 variance-covariance parameters of the random-effects for which <code>V</code> contains

@@ -1,0 +1,347 @@
+---
+title: "Accounting for latent class assignment uncertainty in subsequent analyses"
+author: "Cecile Proust-Lima, Maris Dussartre, Viviane Philipps"
+output:
+  rmarkdown::html_vignette:
+    toc: true # table of content true
+    toc_depth : 3
+vignette: >
+  %\VignetteIndexEntry{Secondary model with externVar}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+<p align="justify">This vignette addresses the case where the latent class structure stemmed from a latent class model estimated with lcmm, hlme, multlcmm, Jointlcmm or mpjlcmm is to be used in secondary regressions. Please refer to vignettes [hlme](latent_class_model_with_hlme.html), [Jointlcmm](joint_latent_class_model_with_Jointlcmm.html), [mpjlcmm](multivariate_latent_class_model_with_mpjlcmm.html) for description of latent class model estimation. </p>
+
+<p align="justify">In the following, we call the "primary model" the latent class model from which the latent class structure is built, "external" variables, the variables not used in the primary model, and "secondary model" the subsequent regression model that: </p>
+
+- explains the latent class structure using external predictors, in a multinomial logistic regression;
+
+- explains external outcomes using the latent class structure as one of the predictors. Regression currently handled in the package are: linear regression, all the mixed-effect regressions of the package, and survival proportional hazard model. 
+
+<p align="justify">The statistical issue with the secondary use of latent class structures is that the latent class structure is latent, and that the posterior classification obtained from an estimated latent class model is an estimation with error. In addition to the statistical fluctuations to account for in the variance, the misclassification may also bias naive use of the posterior classification (Bakk & Kuha 2021).
+To account for the inherent misclassification (or error of classification) in a latent class model, different techniques exist (see Bakk & Kuha (2021) for a review). </p>
+
+
+# Secondary modeling approaches that account for misclassification 
+
+<p align="justify">In the lcmm package, we implemented in the function externVar two methods for estimating secondary models while accounting for the error of classification: a conditional regression on the truth, called "conditional" (Vermunt et al. 2010, Bakk et al. 2013), and a two-stage estimation of the joint likelihood, called "twoStageJoint" (Xue & Bandeen-Roche 2002, Bakk & Kuha 2018, Proust-Lima et al. 2023). These methods have been validated in simulations (paper to come). </p>
+
+## The conditional regression on the truth
+
+<p align="justify">The conditional regression on the truth uses the Bayes theorem to translate the secondary regression according to the posterior classification into a secondary regression according to the true latent class structure. This is done through the introduction of the probability of the latent class structure given the assignment (call the misclassification probability) when using an external outcome and the probability of the posterior assignment given the true latent class structure when using a external predictors. This trick allows to estimate parameters that do not suffer from the misclassification anymore. </p>
+
+<p align="justify">The variance of the secondary model estimates still need to account for the multiple step estimation (1. primary latent class model, 2. secondary regression) (Bakk et al., 2014). This is currently achieved by parametric bootstrap method in externVar. </p>
+
+## The two-stage estimation using the joint likelihood
+
+<p align="justify">With an external outcome, the two-stage method relies on the joint likelihood of the primary latent class model and of the secondary model. The estimates obtained from the primary model are entered in the joint likelihood as input, and the joint likelihood is maximized on the parameters of the secondary model only. </p>
+
+<p align="justify">With an external predictor, the two-stage method relies on the likelihood of the primary latent class model in which the latent class probability model is taken from the secondary model. As for an external outcome, estimates obtained from the primary model are entered in the likelihood as input, except those for the class-membership. The likelihood is then maximized according to the parameters of this secondary class-membership model. </p>
+
+<p align="justify">As for the conditional regression, the variance of the secondary model estimates still need to account for the multiple step estimation (1. primary latent class model, 2. secondary regression) (Bakk et al. 2018, Proust-Lima et al. 2023). This can be achieved by parametric bootstrap method or directly by computing the Hessian from the joint likelihood. Both approaches are implemented. The default method is "Hessian". </p>
+
+## Remarks for the secondary models: 
+
+<p align="justify">The secondary models may be estimated on the exact same population as the primary model, on a sub-population or on another independent population. However, in any case, the data used for the secondary model should contain all the variables used in the primary model in addition to those of the secondary model. </p>
+
+
+# Example on paquid DataSet
+
+```{r, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
+library(lcmm)
+```
+
+## Primary model
+
+<p align="justify">For all the methods, we first need to estimate a primary latent class model from which the latent class structure will be built. 
+We use the same example as in the vignette: ["How to estimate a latent class mixed model using hlme function"](latent_class_model_with_hlme.html). This model is a latent class linear mixed model to identify distinct profiles of trajectory of normalized MMSE over age, adjusted for CEP (common effect across classes).</p>
+
+### estimation 
+```{r}
+library(NormPsy)
+paquid$normMMSE <- normMMSE(paquid$MMSE)
+paquid$age65 <- (paquid$age - 65) / 10
+PrimModel <- hlme(normMMSE ~ age65 + I(age65^2) + CEP,
+                     random =~ age65 + I(age65^2),
+                     subject = 'ID',
+                     data = paquid,
+                     ng = 2,
+                     mixture =~ age65 + I(age65^2),
+                     B = c(0, 64, 63, 18, 3, -16, -4, 14, 221, -228, 429, 62, -121, 36, 10))
+```
+
+
+### brief description of the results
+
+```{r, comment='', fig.height=4, fig.width=6}
+datnew <- data.frame(age = seq(65, 95, 1))
+datnew$age65  <- (datnew$age - 65)/10
+datnew$CEP <- 0
+p <- predictY(PrimModel, datnew, draws=T)
+plot(p, shades=TRUE, col=c("deeppink", "deepskyblue"), lty=1, lwd=2)
+```
+
+<p align="justify">The posterior classification finds a small class (12.4% of the sample) characterized by a substantial decline over age and a large class (87.6% of the sample) with a relatively stable trajectory over age. The classification is correct: mean probability of 80% and 87%, for those classified in 1 and 2, respectively. </p>
+```{r}
+postprob(PrimModel)
+```
+
+## Secondary model for longitudinal external outcome: CES-D
+
+<p align="justify">In this example, we want to assess the profiles of trajectory of depressive symptomatology (CES-D scale for Center for Epidemiologic Studies - Depression) in the two classes identified on MMSE. </p>
+
+<p align="justify">CES-D is repeated at each occasion, we thus need a linear mixed model. The specification is the same as in all the other functions of the package. Given the strong asymmetry in the distribution of CES-D (see vignette [Pre-normalizing a dependent variable using lcmm](articles/pre_normalizing.html)), we use a curvilinear mixed model with a normalizing link function approximated by splines (i.e., same as lcmm function).</p>
+
+<p align="justify">We specify a quadratic model and adjust for sex (male). The latent class predictor is specified through "mixture" argument. </p>
+
+For this example, we apply the secondary model on the same sample "paquid". 
+
+### with two-stage approach
+
+```{r, eval=FALSE}
+CESD2stage = externVar(PrimModel,
+                      fixed = CESD ~ age65 + I(age65^2) + male,
+                      random = ~ age65 + I(age65^2),
+                      subject = "ID",
+                      data = paquid,
+                      mixture =~ age65 + I(age65^2),
+                      method = "twoStageJoint",
+                      link = "3-quant-splines")
+```
+
+```{r, echo=FALSE}
+load("SecondModels.RData")
+```
+
+```{r, eval=TRUE}
+sum2st <- summary(CESD2stage)
+```
+<p align="justify">The secondary model summary is very similar to any other summary of lcmm package. It includes information on the estimation procedure, and the estimates obtained. By default, the variance of the parameters are estimated by the Hessian. </p>
+
+<p align="justify">Main usual postfit functions of the package apply to externVar. For instance, the mean predicted trajectories can be computed and plotted:</p>
+
+```{r, comment='', fig.height=4, fig.width=6}
+data_pred <- data.frame(age = seq(65, 95, 1))
+data_pred$age65 <- (data_pred$age - 65) / 10
+data_pred$male <- 0
+predIC0 <- predictY(CESD2stage, data_pred, var.time = "age", draws=TRUE)
+data_pred$male <- 1
+predIC1 <- predictY(CESD2stage, data_pred, var.time = "age", draws=TRUE)
+
+plot(predIC0, col=c("deeppink", "deepskyblue"), lty=1, lwd=2, ylab="CESD", main="Predicted trajectories for CESD", ylim=c(0, 25), shades=TRUE)
+plot(predIC1, col=c("deeppink","deepskyblue"), lty=2, lwd=2, ylab="CESD", main="Predicted trajectories for CESD", legend=NULL, ylim=c(0,25), shades=TRUE, add=TRUE)
+```
+
+<p align="justify">In the large class 2, the CESD remains relatively constant then increases slowly after 80 years old while in small class 1, CESD is lower at 65 years old but increases constantly over the age span. </p>
+
+CESD model fit can be evaluated the same way as any model in lcmm package:
+
+```{r, comment='', fig.height=6, fig.width=8}
+plot(CESD2stage, cex.main=0.8)
+```
+
+```{r, comment='', fig.height=4, fig.width=6}
+plot(CESD2stage, which="fit", var.time="age", marg=FALSE, shades = TRUE, col=c("deeppink", "deepskyblue"), ylim=c(0, 2.5))
+```
+
+These graphs suggest a good fit to the data.
+
+### with conditional regression
+
+<p align="justify">This procedure is much longer as based on parametric bootstrap for the variance estimation. The default number of replicates is 200.</p>
+
+```{r, eval=FALSE}
+CESDCond = externVar(PrimModel,
+                      fixed = CESD ~ age65 + I(age65^2) + male,
+                      random = ~ age65 + I(age65^2),
+                      subject = "ID",
+                      data = paquid,
+                      mixture =~ age65 + I(age65^2),
+                      method = "conditional",
+                      link = "3-quant-splines")
+
+```
+
+<p align="justify">To limit the computation time, starting values close to the optimum can be rapidly obtained by estimating the model with the uncorrected variance varest="none", and then use these estimates as initial values when running the parametric bootstrap: </p>
+
+```{r, eval=FALSE}
+CESDCondNone <- externVar(PrimModel,
+                      fixed = CESD ~ age65 + I(age65^2) + male,
+                      random = ~ age65 + I(age65^2),
+                      subject = "ID",
+                      data = paquid,
+                      mixture =~ age65 + I(age65^2),
+                      method = "conditional",
+                      link = "3-quant-splines",
+                      varest="none")
+CESDCondPBoot <- externVar(PrimModel,
+                      fixed = CESD ~ age65 + I(age65^2) + male,
+                      random = ~ age65 + I(age65^2),
+                      subject = "ID",
+                      data = paquid,
+                      mixture =~ age65 + I(age65^2),
+                      method = "conditional",
+                      link = "3-quant-splines",
+                      B=CESDCondNone$best)
+```
+
+
+```{r, eval=FALSE, echo=FALSE}
+# check que r?sultats similaires
+cbind(summary(CESDCondPBoot), summary(CESDCond))
+```
+
+
+```{r}
+summary(CESDCond)
+```
+
+<p align="justify">The two methods (two-stage -plain, conditional  -dashed) provide very close predicted trajectories of CESD</p>
+
+```{r, comment='', fig.height=4, fig.width=8}
+data_pred$male <- 0
+predIC0Cond <- predictY(CESDCond, data_pred, var.time = "age", draws=TRUE)
+data_pred$male <- 1
+predIC1Cond <- predictY(CESDCond, data_pred, var.time = "age", draws=TRUE)
+par(mfrow=c(1,2))
+plot(predIC0, col=c("deeppink", "deepskyblue"), lty=1, lwd=2, ylab="CESD", main="Predicted CESD in men", ylim=c(0, 25), shades=TRUE)
+plot(predIC0Cond, col=c("orchid3", "skyblue3"), lty=2, lwd=2, ylab="CESD", main="", ylim=c(0, 25), shades=TRUE, add=TRUE)
+
+plot(predIC1, col=c("deeppink", "deepskyblue"), lty=1, lwd=2, ylab="CESD", main="Predicted CESD in women", ylim=c(0, 25), shades=TRUE, legend=NULL)
+plot(predIC1Cond, col=c("orchid3", "skyblue3"), lty=2, lwd=2, ylab="CESD", main="", ylim=c(0, 25), shades=TRUE, add=TRUE)
+```
+
+## Secondary model for time-to-event outcome
+
+<p align="justify">Time-to-event external outcomes with one or multiple competing causes are handled in externVar under parametric proportional hazard models. The specification is very similar to the one of Jointlcmm and mpjlcmm. Notably the procedure handles left truncated data. 
+The baseline risk is either Weibull or approximated by splines. Here, we use a model with class-specific Weibull hazards for the time to dementia. </p>
+
+
+### with two-stage approach
+
+```{r}
+Dem2stage = externVar(PrimModel,
+                     survival = Surv(age_init, agedem, dem) ~ CEP + male,
+                     hazard = "Weibull",
+                     subject = "ID",
+                     data = paquid,
+                     method = "twoStageJoint",
+                     B = c(0.1, 0.1, 0.1, 0.1, 0.1, 0.1))
+```
+
+<p align="justify">With hazardtype argument, we can also assume a proportional hazard across classes with either a Weibull baseline risk function or a splines baseline risk function.</p>
+
+```{r}
+Dem2stageWPH = externVar(PrimModel,
+                      survival = Surv(age_init, agedem, dem) ~ CEP + male,
+                      hazard = "Weibull",
+                      hazardtype = "PH",
+                      subject = "ID",
+                      data = paquid,
+                      method = "twoStageJoint")
+
+Dem2stageSPH = externVar(PrimModel,
+                      survival = Surv(age_init, agedem, dem) ~ CEP + male,
+                      hazard = "splines",
+                      hazardtype = "PH",
+                      subject = "ID",
+                      data = paquid,
+                      method = "twoStageJoint")
+
+summarytable(Dem2stage, Dem2stageWPH, Dem2stageSPH, which = c("npm","loglik","BIC","AIC"))
+```
+<p align="justify">The three models give the same likelihood so the parcimonious model (Weibull proportional hazard) is selected according to AIC. The predicted survival for the reference category (male=0, CEP=0) are:</p>
+
+```{r, comment='', fig.height=4, fig.width=6}
+plot(Dem2stageWPH, which="survival", var.time="age", col=c("deeppink", "deepskyblue"))
+```
+```{r}
+summary(Dem2stageWPH)
+```
+
+
+<p align="justify">The risk of dementia is much larger in latent class 1 compared to latent class 2 with a log hazard ratio of 2.99425 (se=0.34645). 
+For instance, at 80 years old, the dementia-free probability remains almost at 1 in latent 2 while it is around 60% in latent class 1. At 90 years old, it is 0 for latent class 1 while it is around 70% in latent class 2. </p>
+
+
+### with conditional regression
+
+This is not yet operational
+
+```{r, echo=FALSE, eval=FALSE}
+DemCondWPH = externVar(PrimModel,
+                      survival = Surv(age_init, agedem, dem) ~ CEP + male,
+                      hazard = "Weibull",
+                      hazardtype = "PH",
+                      subject = "ID",
+                      data = paquid,
+                      method = "conditional")
+# attention, ne semble pas marcher ... survie et conditional
+```
+
+
+
+## Secondary model for predictors of latent class membership 
+
+<p align="justify">It is frequent to try to characterize the latent classes according to covariates of interest. This corresponds to model in a secondary model the latent class membership according to covariates. For instance, with this example, we may want to assess whether male and CEP are associated with latent class structure. </p>
+This is implemented in externVar by specifying the classmb model: 
+
+```{r}
+maleCEPmodel = externVar(PrimModel,
+                    classmb = ~ male + CEP,
+                    subject = "ID",
+                    data = paquid,
+                    method = "twoStageJoint")
+Class2stage <- summary(maleCEPmodel)
+```
+<p align="justify">In latent class membership models, the reference class is always the last one. Here, using the two-stage approach, both male and CEP are significantly associated with the class membership, males being less likely in latent class 1 than in latent class 2 (log odds-ratio = -1.09687 se=0.44277), and participants with CEP=1 more likely in latent class 1 than in latent class 2 (log odds-ratio = 0.904 se=0.507).</p>
+
+<p align="justify">With the conditional regression, the estimated parameters are slightly different although the two methods have been shown to provide unbiased estimates. </p>
+
+
+```{r}
+maleCEPmodelCond = externVar(PrimModel,
+                    classmb = ~ male + CEP,
+                    subject = "ID",
+                    data = paquid,
+                    method = "conditional")
+ClassCond <- summary(maleCEPmodelCond)
+```
+```{r}
+cbind(Class2stage,ClassCond)
+```
+
+
+
+```{r, eval=FALSE, echo=FALSE}
+save(CESD2stage,CESDCond,Class2stage,ClassCond,CESDCondPBoot, CESDCondNone, file="SecondModels.RData")
+```
+
+
+
+# References:
+
+Bakk, Z. & Kuha, J. Relating latent class membership to external variables: An overview. Br J Math Stat Psychol 74, 340–362 (2021).
+
+Bakk, Z., Oberski, D. L. & Vermunt, J. K. Relating Latent Class Assignments to External Variables: Standard Errors for Correct Inference. Political Analysis 22, 520–540 (2014).
+
+Bakk, Z., Tekle, F. B. & Vermunt, J. K. Estimating the Association between Latent Class Membership and External Variables Using Bias-adjusted Three-step Approaches. Sociological Methodology 43, 272–311 (2013).
+
+Bakk, Z. & Kuha, J. Two-Step Estimation of Models Between Latent Classes and External Variables. Psychometrika 83, 871–892 (2018).
+
+Proust-Lima, C. et al. Describing complex disease progression using joint latent class models for multivariate longitudinal markers and clinical endpoints. Stat Med 42, 3996–4014 (2023).
+
+Vermunt, J. K. Latent Class Modeling with Covariates: Two Improved Three-Step Approaches. Political Analysis 18, 450–469 (2010).
+
+Xue, Q. L. & Bandeen-Roche, K. Combining complete multivariate outcomes with incomplete covariate information: A latent class approach. Biometrics. 58, 110–120 (2002).
+

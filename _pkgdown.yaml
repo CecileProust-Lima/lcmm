@@ -23,6 +23,8 @@ navbar:
           href: articles/joint_latent_class_model_with_Jointlcmm.html
         - text: How to estimate a multivariate latent class mixed model using mpjlcmm function
           href: articles/multivariate_latent_class_model_with_mpjlcmm.html
+        - text: Accounting for latent class assignment uncertainty in subsequent analyses
+          href: articles/secondary_model_with_externVar.html
         - text: Pre-normalizing a dependent variable using lcmm
           href: articles/pre_normalizing.html
     - text: "FAQ"

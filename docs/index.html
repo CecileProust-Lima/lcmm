@@ -47,6 +47,7 @@
     <a class="dropdown-item" href="articles/latent_process_model_with_multlcmm_IRT.html">Continuous-time longitudinal IRT model</a>
     <a class="dropdown-item" href="articles/joint_latent_class_model_with_Jointlcmm.html">How to estimate a joint latent class mixed model using Jointlcmm function</a>
     <a class="dropdown-item" href="articles/multivariate_latent_class_model_with_mpjlcmm.html">How to estimate a multivariate latent class mixed model using mpjlcmm function</a>
+    <a class="dropdown-item" href="articles/secondary_model_with_externVar.html">Accounting for latent class assignment uncertainty in subsequent analyses</a>
     <a class="dropdown-item" href="articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a>
   </div>
 </li>
@@ -101,10 +102,11 @@
 <p>The lcmm package depends on other R package, namely :</p>
 <ul>
 <li>survival (&gt;=2.37-2) for dealing with the survival outcomes</li>
-<li>parallel for parallelizing some time consuming functions</li>
+<li>parallel and doParallel for parallelizing some time consuming functions</li>
 <li>mvtnorm for generating random parameters</li>
 <li>randtoolbox for the quasi Monte Carlo sequences</li>
 <li>marqLevAlg (&gt;2.0) for the numerical optimization</li>
+<li>numDeriv for computing the Hessian</li>
 </ul>
 <p>To run the examples proposed in this website, the following package are also needed :</p>
 <ul>

@@ -14,5 +14,7 @@
 ^vignettes/multivariate\_latent\_class\_model\_with\_mpjlcmm\.Rmd
 ^vignettes/pre\_normalizing\.Rmd
 ^vignettes/usual\_problems\.Rmd
+^vignettes/secondary\_model\_with\_externVar\.Rmd
+^vignettes/SecondModels\.RData
 ^docs$
 ^_pkgdown\.yaml$

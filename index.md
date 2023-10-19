@@ -42,10 +42,11 @@ remotes::install_github("CecileProust-Lima/lcmm")
 The lcmm package depends on other R package, namely :
 
 - survival (>=2.37-2) for dealing with the survival outcomes
-- parallel for parallelizing some time consuming functions
+- parallel and doParallel for parallelizing some time consuming functions
 - mvtnorm for generating random parameters
 - randtoolbox for the quasi Monte Carlo sequences
 - marqLevAlg (>2.0) for the numerical optimization
+- numDeriv for computing the Hessian
 
 
 To run the examples proposed in this website, the following package are also needed :
