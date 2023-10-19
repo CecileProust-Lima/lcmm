@@ -32,6 +32,7 @@ from a hlme, lcmm, multlcmm or Jointlcmm object."><!-- mathjax --><script src="h
     <a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm_IRT.html">Continuous-time longitudinal IRT model</a>
     <a class="dropdown-item" href="../articles/joint_latent_class_model_with_Jointlcmm.html">How to estimate a joint latent class mixed model using Jointlcmm function</a>
     <a class="dropdown-item" href="../articles/multivariate_latent_class_model_with_mpjlcmm.html">How to estimate a multivariate latent class mixed model using mpjlcmm function</a>
+    <a class="dropdown-item" href="../articles/secondary_model_with_externVar.html">Accounting for latent class assignment uncertainty in subsequent analyses</a>
     <a class="dropdown-item" href="../articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a>
   </div>
 </li>
@@ -162,7 +163,7 @@ to legend</p></dd>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="fu"><a href="predictL.html">predictL</a></span><span class="op">(</span><span class="va">m</span>,<span class="va">firstdata</span>,var.time<span class="op">=</span><span class="st">"Time"</span><span class="op">)</span>,legend.loc<span class="op">=</span><span class="st">"right"</span>,bty<span class="op">=</span><span class="st">"l"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot.predict-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span> <span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="co">################# Prediction from a joint latent class model</span></span></span>
 <span class="r-in"><span><span class="co">## fitted model - see help of Jointlcmm function for details on the model</span></span></span>
 <span class="r-in"><span><span class="va">m3</span> <span class="op">&lt;-</span> <span class="fu"><a href="Jointlcmm.html">Jointlcmm</a></span><span class="op">(</span>fixed<span class="op">=</span> <span class="va">Ydep1</span><span class="op">~</span><span class="va">Time</span><span class="op">*</span><span class="va">X1</span>,mixture<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,random<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,</span></span>
@@ -176,7 +177,8 @@ to legend</p></dd>
 <span class="r-in"><span><span class="co">#(with characteristics of subject ID=193)</span></span></span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data_lcmm</span><span class="op">[</span><span class="va">data_lcmm</span><span class="op">$</span><span class="va">ID</span><span class="op">==</span><span class="fl">193</span>,<span class="op">]</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="fu"><a href="predictY.html">predictY</a></span><span class="op">(</span><span class="va">m3</span>,newdata<span class="op">=</span><span class="va">data</span>,var.time<span class="op">=</span><span class="st">"Time"</span><span class="op">)</span>,bty<span class="op">=</span><span class="st">"l"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-plt img"><img src="plot.predict-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

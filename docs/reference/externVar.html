@@ -386,7 +386,7 @@ parametric bootstrap can be used.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">###### Estimation of the primary latent class model                   ######</span></span></span>
@@ -395,6 +395,7 @@ parametric bootstrap can be used.</p>
 <span class="r-in"><span><span class="va">PrimMod</span> <span class="op">&lt;-</span> <span class="fu"><a href="hlme.html">hlme</a></span><span class="op">(</span><span class="va">Ydep1</span><span class="op">~</span><span class="va">Time</span>,random<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,subject<span class="op">=</span><span class="st">'ID'</span>,ng<span class="op">=</span><span class="fl">1</span>,data<span class="op">=</span><span class="va">data_lcmm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">PrimMod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="hlme.html">hlme</a></span><span class="op">(</span><span class="va">Ydep1</span><span class="op">~</span><span class="va">Time</span>,mixture<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,random<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,subject<span class="op">=</span><span class="st">'ID'</span>,</span></span>
 <span class="r-in"><span>                 ng<span class="op">=</span><span class="fl">2</span>,data<span class="op">=</span><span class="va">data_lcmm</span>,B<span class="op">=</span><span class="fu">random</span><span class="op">(</span><span class="va">PrimMod</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(cl$B[[2]], parent.env(environment())):</span> object 'PrimMod' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">###### Example 1: Relationship between a latent class structure and         #</span></span></span>
 <span class="r-in"><span><span class="co">#                   external class predictors                          ######</span></span></span>
@@ -407,7 +408,9 @@ parametric bootstrap can be used.</p>
 <span class="r-in"><span>                      subject <span class="op">=</span> <span class="st">"ID"</span>,</span></span>
 <span class="r-in"><span>                      data <span class="op">=</span> <span class="va">data_lcmm</span>,</span></span>
 <span class="r-in"><span>                      method <span class="op">=</span> <span class="st">"twoStageJoint"</span><span class="op">)</span> </span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in externVar(PrimMod2, classmb = ~X1 + X2 + X3 + X4, subject = "ID",     data = data_lcmm, method = "twoStageJoint"):</span> object 'PrimMod2' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">XextHess</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary(XextHess):</span> object 'XextHess' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># estimation of a secondary multinomial logistic model with total variance</span></span></span>
 <span class="r-in"><span><span class="co"># computed with parametric Bootstrap (much longer). When using the bootstrap </span></span></span>
@@ -422,6 +425,7 @@ parametric bootstrap can be used.</p>
 <span class="r-in"><span>                      data <span class="op">=</span> <span class="va">data_lcmm</span>,</span></span>
 <span class="r-in"><span>                      varest <span class="op">=</span> <span class="st">"none"</span>,</span></span>
 <span class="r-in"><span>                      method <span class="op">=</span> <span class="st">"twoStageJoint"</span><span class="op">)</span> </span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in externVar(PrimMod2, classmb = ~X1 + X2 + X3 + X4, subject = "ID",     data = data_lcmm, varest = "none", method = "twoStageJoint"):</span> object 'PrimMod2' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">XextBoot</span> <span class="op">&lt;-</span> <span class="fu">externVar</span><span class="op">(</span><span class="va">PrimMod2</span>,</span></span>
 <span class="r-in"><span>                      classmb <span class="op">=</span> <span class="op">~</span><span class="va">X1</span> <span class="op">+</span> <span class="va">X2</span> <span class="op">+</span> <span class="va">X3</span> <span class="op">+</span> <span class="va">X4</span>, </span></span>
@@ -430,7 +434,9 @@ parametric bootstrap can be used.</p>
 <span class="r-in"><span>                      varest <span class="op">=</span> <span class="st">"paramBoot"</span>,</span></span>
 <span class="r-in"><span>                      method <span class="op">=</span> <span class="st">"twoStageJoint"</span>,</span></span>
 <span class="r-in"><span>                      B <span class="op">=</span> <span class="va">XextNone</span><span class="op">$</span><span class="va">best</span><span class="op">)</span> </span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in externVar(PrimMod2, classmb = ~X1 + X2 + X3 + X4, subject = "ID",     data = data_lcmm, varest = "paramBoot", method = "twoStageJoint",     B = XextNone$best):</span> object 'PrimMod2' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">XextBoot</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary(XextBoot):</span> object 'XextBoot' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span> </span></span>
 <span class="r-in"><span><span class="co">###### Example 2: Relationship between a latent class structure and         #</span></span></span>
@@ -446,6 +452,7 @@ parametric bootstrap can be used.</p>
 <span class="r-in"><span>                     subject<span class="op">=</span><span class="st">"ID"</span>,</span></span>
 <span class="r-in"><span>                     data<span class="op">=</span><span class="va">data_lcmm</span>,</span></span>
 <span class="r-in"><span>                     method <span class="op">=</span> <span class="st">"twoStageJoint"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in externVar(PrimMod2, fixed = Ydep2 ~ Time * X1, random = ~Time,     mixture = ~Time, subject = "ID", data = data_lcmm, method = "twoStageJoint"):</span> object 'PrimMod2' not found</span>
 <span class="r-in"><span>                     </span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># estimation of a secondary linear mixed model with total variance</span></span></span>
@@ -463,6 +470,7 @@ parametric bootstrap can be used.</p>
 <span class="r-in"><span>                     data<span class="op">=</span><span class="va">data_lcmm</span>,</span></span>
 <span class="r-in"><span>                     varest <span class="op">=</span> <span class="st">"none"</span>,</span></span>
 <span class="r-in"><span>                     method <span class="op">=</span> <span class="st">"twoStageJoint"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in externVar(PrimMod2, fixed = Ydep2 ~ Time * X1, random = ~Time,     mixture = ~Time, subject = "ID", data = data_lcmm, varest = "none",     method = "twoStageJoint"):</span> object 'PrimMod2' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">YextBoot</span> <span class="op">=</span> <span class="fu">externVar</span><span class="op">(</span><span class="va">PrimMod2</span>,   <span class="co">#primary model</span></span></span>
 <span class="r-in"><span>                     fixed <span class="op">=</span> <span class="va">Ydep2</span> <span class="op">~</span> <span class="va">Time</span><span class="op">*</span><span class="va">X1</span>,  <span class="co">#secondary model</span></span></span>
@@ -473,8 +481,10 @@ parametric bootstrap can be used.</p>
 <span class="r-in"><span>                     method <span class="op">=</span> <span class="st">"twoStageJoint"</span>,</span></span>
 <span class="r-in"><span>                     B <span class="op">=</span> <span class="va">YextNone</span><span class="op">$</span><span class="va">best</span>,</span></span>
 <span class="r-in"><span>                     varest<span class="op">=</span> <span class="st">"paramBoot"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in externVar(PrimMod2, fixed = Ydep2 ~ Time * X1, random = ~Time,     mixture = ~Time, subject = "ID", data = data_lcmm, method = "twoStageJoint",     B = YextNone$best, varest = "paramBoot"):</span> object 'PrimMod2' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">YextBoot</span><span class="op">)</span> </span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary(YextBoot):</span> object 'YextBoot' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">###### Example 3: Relationship between a latent class structure and         #</span></span></span>
@@ -490,7 +500,9 @@ parametric bootstrap can be used.</p>
 <span class="r-in"><span>                     subject<span class="op">=</span><span class="st">"ID"</span>,</span></span>
 <span class="r-in"><span>                     data<span class="op">=</span><span class="va">data_lcmm</span>,</span></span>
 <span class="r-in"><span>                     method <span class="op">=</span> <span class="st">"twoStageJoint"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in externVar(PrimMod2, survival = Surv(Tevent, Event) ~ X1 + mixture(X2),     hazard = "3-quant-splines", hazardtype = "PH", subject = "ID",     data = data_lcmm, method = "twoStageJoint"):</span> object 'PrimMod2' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">YextHess</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary(YextHess):</span> object 'YextHess' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># estimation of a secondary survival model with total variance</span></span></span>
@@ -508,6 +520,7 @@ parametric bootstrap can be used.</p>
 <span class="r-in"><span>                     data<span class="op">=</span><span class="va">data_lcmm</span>,</span></span>
 <span class="r-in"><span>                     varest <span class="op">=</span> <span class="st">"none"</span>,</span></span>
 <span class="r-in"><span>                     method <span class="op">=</span> <span class="st">"twoStageJoint"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in externVar(PrimMod2, survival = Surv(Tevent, Event) ~ X1 + mixture(X2),     hazard = "3-quant-splines", hazardtype = "PH", subject = "ID",     data = data_lcmm, varest = "none", method = "twoStageJoint"):</span> object 'PrimMod2' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">YextBoot</span> <span class="op">=</span> <span class="fu">externVar</span><span class="op">(</span><span class="va">PrimMod2</span>,   <span class="co">#primary model</span></span></span>
 <span class="r-in"><span>                     survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">Tevent</span>,<span class="va">Event</span><span class="op">)</span><span class="op">~</span> <span class="va">X1</span><span class="op">+</span><span class="fu"><a href="ForInternalUse.html">mixture</a></span><span class="op">(</span><span class="va">X2</span><span class="op">)</span>, <span class="co">#secondary model</span></span></span>
@@ -518,10 +531,12 @@ parametric bootstrap can be used.</p>
 <span class="r-in"><span>                     method <span class="op">=</span> <span class="st">"twoStageJoint"</span>,</span></span>
 <span class="r-in"><span>                     B <span class="op">=</span> <span class="va">YextNone</span><span class="op">$</span><span class="va">best</span>,</span></span>
 <span class="r-in"><span>                     varest<span class="op">=</span> <span class="st">"paramBoot"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in externVar(PrimMod2, survival = Surv(Tevent, Event) ~ X1 + mixture(X2),     hazard = "3-quant-splines", hazardtype = "PH", subject = "ID",     data = data_lcmm, method = "twoStageJoint", B = YextNone$best,     varest = "paramBoot"):</span> object 'PrimMod2' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">YextBoot</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary(YextBoot):</span> object 'YextBoot' not found</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>

@@ -40,6 +40,7 @@ lcmm, Jointlcmm or multlcmm object."><!-- mathjax --><script src="https://cdnjs.
     <a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm_IRT.html">Continuous-time longitudinal IRT model</a>
     <a class="dropdown-item" href="../articles/joint_latent_class_model_with_Jointlcmm.html">How to estimate a joint latent class mixed model using Jointlcmm function</a>
     <a class="dropdown-item" href="../articles/multivariate_latent_class_model_with_mpjlcmm.html">How to estimate a multivariate latent class mixed model using mpjlcmm function</a>
+    <a class="dropdown-item" href="../articles/secondary_model_with_externVar.html">Accounting for latent class assignment uncertainty in subsequent analyses</a>
     <a class="dropdown-item" href="../articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a>
   </div>
 </li>
@@ -146,7 +147,7 @@ intervals (if ndraws&gt;0).</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span> <span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Univariate mixed model with splines link funciton</span></span></span>
 <span class="r-in"><span><span class="va">m14</span><span class="op">&lt;-</span><span class="fu"><a href="lcmm.html">lcmm</a></span><span class="op">(</span><span class="va">Ydep2</span><span class="op">~</span><span class="va">Time</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">Time</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,random<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,subject<span class="op">=</span><span class="st">'ID'</span>,ng<span class="op">=</span><span class="fl">1</span>,</span></span>
@@ -157,6 +158,7 @@ intervals (if ndraws&gt;0).</p>
 <span class="r-in"><span><span class="co">##Transformed values of several scores and their confidence intervals</span></span></span>
 <span class="r-in"><span><span class="va">transf.m14</span> <span class="op">&lt;-</span> <span class="fu">predictlink</span><span class="op">(</span><span class="va">m14</span>,ndraws<span class="op">=</span><span class="fl">2000</span>,Yvalues<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">7</span><span class="op">:</span><span class="fl">30</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">transf.m14</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="predictlink-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Multivariate mixed model with splines link functions</span></span></span>
@@ -169,7 +171,8 @@ intervals (if ndraws&gt;0).</p>
 <span class="r-in"><span><span class="co">##Confidence intervals for the transformed values (given in m1$estimlink)</span></span></span>
 <span class="r-in"><span><span class="va">transf.m1</span> <span class="op">&lt;-</span> <span class="fu">predictlink</span><span class="op">(</span><span class="va">m1</span>,ndraws<span class="op">=</span><span class="fl">200</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">transf.m1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-plt img"><img src="predictlink-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -4,9 +4,7 @@ outcome and a right-censored (possibly left-truncated) time-to-event. The
 function handles competing risks and Gaussian or non Gaussian (curvilinear)
 longitudinal outcomes. For curvilinear longitudinal outcomes, normalizing
 continuous functions (splines or Beta CDF) can be specified as in
-lcmm."><title>Estimation of joint latent class models for longitudinal and time-to-event
-data — Jointlcmm • lcmm</title><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Estimation of joint latent class models for longitudinal and time-to-event
-data — Jointlcmm"><meta property="og:description" content="This function fits joint latent class mixed models for a longitudinal
+lcmm."><title>Estimation of joint latent class models for longitudinal and time-to-event data — Jointlcmm • lcmm</title><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Estimation of joint latent class models for longitudinal and time-to-event data — Jointlcmm"><meta property="og:description" content="This function fits joint latent class mixed models for a longitudinal
 outcome and a right-censored (possibly left-truncated) time-to-event. The
 function handles competing risks and Gaussian or non Gaussian (curvilinear)
 longitudinal outcomes. For curvilinear longitudinal outcomes, normalizing
@@ -71,8 +69,7 @@ lcmm."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathj
 </nav><div class="container template-reference-topic">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Estimation of joint latent class models for longitudinal and time-to-event
-data</h1>
+      <img src="" class="logo" alt=""><h1>Estimation of joint latent class models for longitudinal and time-to-event data</h1>
       <small class="dont-index">Source: <a href="https://github.com/CecileProust-Lima/lcmm/blob/HEAD/R/Jointlcmm.R" class="external-link"><code>R/Jointlcmm.R</code></a></small>
       <div class="d-none name"><code>Jointlcmm.Rd</code></div>
     </div>
@@ -673,7 +670,428 @@ in Medical Research 23, 74-90.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co">#### Example of a joint latent class model estimated for a varying number</span></span></span>
+<span class="r-in"><span><span class="co"># of latent classes: </span></span></span>
+<span class="r-in"><span><span class="co"># The linear mixed model includes a subject- (ID) and class-specific </span></span></span>
+<span class="r-in"><span><span class="co"># linear trend (intercept and Time in fixed, random and mixture components)</span></span></span>
+<span class="r-in"><span><span class="co"># and a common effect of X1 and its interaction with time over classes </span></span></span>
+<span class="r-in"><span><span class="co"># (in fixed).</span></span></span>
+<span class="r-in"><span><span class="co"># The variance of the random intercept and slopes are assumed to be equal </span></span></span>
+<span class="r-in"><span><span class="co"># over classes (nwg=F).</span></span></span>
+<span class="r-in"><span><span class="co"># The covariate X3 predicts the class membership (in classmb). </span></span></span>
+<span class="r-in"><span><span class="co"># The baseline hazard function is modelled with cubic M-splines -3 </span></span></span>
+<span class="r-in"><span><span class="co"># nodes at the quantiles- (in hazard) and a proportional hazard over </span></span></span>
+<span class="r-in"><span><span class="co"># classes is assumed (in hazardtype). Covariates X1 and X2 predict the </span></span></span>
+<span class="r-in"><span><span class="co"># risk of event (in survival) with a common effect over classes for X1</span></span></span>
+<span class="r-in"><span><span class="co"># and a class-specific effect of X2.</span></span></span>
+<span class="r-in"><span><span class="co"># !CAUTION: for illustration, only default initial values where used but </span></span></span>
+<span class="r-in"><span><span class="co"># other sets of initial values should be tried to ensure convergence</span></span></span>
+<span class="r-in"><span><span class="co"># towards the global maximum.</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#### estimation with 1 latent class (ng=1): independent models for the </span></span></span>
+<span class="r-in"><span><span class="co"># longitudinal outcome and the time of event</span></span></span>
+<span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu">Jointlcmm</span><span class="op">(</span>fixed<span class="op">=</span> <span class="va">Ydep1</span><span class="op">~</span><span class="va">X1</span><span class="op">*</span><span class="va">Time</span>,random<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,subject<span class="op">=</span><span class="st">'ID'</span>,</span></span>
+<span class="r-in"><span>survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">Tevent</span>,<span class="va">Event</span><span class="op">)</span><span class="op">~</span> <span class="va">X1</span><span class="op">+</span><span class="va">X2</span> ,hazard<span class="op">=</span><span class="st">"3-quant-splines"</span>,</span></span>
+<span class="r-in"><span>hazardtype<span class="op">=</span><span class="st">"PH"</span>,ng<span class="op">=</span><span class="fl">1</span>,data<span class="op">=</span><span class="va">data_lcmm</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m1</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Joint latent class model for quantitative outcome and competing risks </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      fitted by maximum likelihood method </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Jointlcmm(fixed = Ydep1 ~ X1 * Time, random = ~Time, subject = "ID", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ng = 1, survival = Surv(Tevent, Event) ~ X1 + X2, hazard = "3-quant-splines", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     hazardtype = "PH", data = data_lcmm)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Statistical Model: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Dataset: data_lcmm </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of subjects: 300 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of observations: 1678 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of latent classes: 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of parameters: 15  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Event 1: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Number of events: 150</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         M-splines constant baseline risk function with nodes </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         0 11.3966 29.413  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iteration process: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Convergence criteria satisfied </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of iterations:  20 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Convergence criteria: parameters= 1.8e-08 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          : likelihood= 7.7e-06 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          : second derivatives= 2.3e-05 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Goodness-of-fit statistics: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      maximum log-likelihood: -3944.77  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      AIC: 7919.54  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      BIC: 7975.1  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Score test statistic for CI assumption: 6.972 (p-value=0.0306) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Maximum Likelihood Estimates: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters in the proportional hazard model:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                              coef      Se   Wald p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines1) -0.00002 0.03608 -0.001 0.99956</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines2) -0.00012 0.03508 -0.004 0.99717</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines3)  0.71702 0.08667  8.273 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines4)  0.97684 0.15461  6.318 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines5)  0.19824 1.06538  0.186 0.85238</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1                        0.08284 0.16411  0.505 0.61373</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X2                        0.58997 0.17572  3.357 0.00079</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fixed effects in the longitudinal model:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               coef      Se   Wald p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept 10.56540 0.15584 67.795 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1         1.47962 0.21803  6.786 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time      -1.65689 0.17293 -9.581 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1:Time   -0.08363 0.24237 -0.345 0.73004</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Variance-covariance matrix of the random-effects:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           intercept    Time</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept   0.92225        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time        0.56615 1.22619</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                             coef      Se</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual standard error  1.50053 0.02991</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="co">#Goodness-of-fit statistics for m1:</span></span></span>
+<span class="r-in"><span><span class="co">#    maximum log-likelihood: -3944.77 ; AIC: 7919.54  ;  BIC: 7975.09  </span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#### estimation with 2 latent classes (ng=2)</span></span></span>
+<span class="r-in"><span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu">Jointlcmm</span><span class="op">(</span>fixed<span class="op">=</span> <span class="va">Ydep1</span><span class="op">~</span><span class="va">Time</span><span class="op">*</span><span class="va">X1</span>,mixture<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,random<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,</span></span>
+<span class="r-in"><span>classmb<span class="op">=</span><span class="op">~</span><span class="va">X3</span>,subject<span class="op">=</span><span class="st">'ID'</span>,survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">Tevent</span>,<span class="va">Event</span><span class="op">)</span><span class="op">~</span><span class="va">X1</span><span class="op">+</span><span class="fu"><a href="ForInternalUse.html">mixture</a></span><span class="op">(</span><span class="va">X2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>hazard<span class="op">=</span><span class="st">"3-quant-splines"</span>,hazardtype<span class="op">=</span><span class="st">"PH"</span>,ng<span class="op">=</span><span class="fl">2</span>,data<span class="op">=</span><span class="va">data_lcmm</span>,</span></span>
+<span class="r-in"><span>B<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.64</span>,<span class="op">-</span><span class="fl">0.62</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0.52</span>,<span class="fl">0.81</span>,<span class="fl">0.41</span>,<span class="fl">0.78</span>,<span class="fl">0.1</span>,<span class="fl">0.77</span>,<span class="op">-</span><span class="fl">0.05</span>,<span class="fl">10.43</span>,<span class="fl">11.3</span>,<span class="op">-</span><span class="fl">2.6</span>,</span></span>
+<span class="r-in"><span><span class="op">-</span><span class="fl">0.52</span>,<span class="fl">1.41</span>,<span class="op">-</span><span class="fl">0.05</span>,<span class="fl">0.91</span>,<span class="fl">0.05</span>,<span class="fl">0.21</span>,<span class="fl">1.5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Joint latent class model for quantitative outcome and competing risks </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      fitted by maximum likelihood method </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Jointlcmm(fixed = Ydep1 ~ Time * X1, mixture = ~Time, random = ~Time, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     subject = "ID", classmb = ~X3, ng = 2, survival = Surv(Tevent, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Event) ~ X1 + mixture(X2), hazard = "3-quant-splines", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     hazardtype = "PH", data = data_lcmm)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Statistical Model: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Dataset: data_lcmm </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of subjects: 300 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of observations: 1678 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of latent classes: 2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of parameters: 21  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Event 1: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Number of events: 150</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Proportional hazards over latent classes and </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         M-splines constant baseline risk function with nodes </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         0 11.3966 29.413  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iteration process: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Convergence criteria satisfied </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of iterations:  2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Convergence criteria: parameters= 1.7e-07 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          : likelihood= 2.9e-05 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          : second derivatives= 1.4e-05 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Goodness-of-fit statistics: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      maximum log-likelihood: -3921.28  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      AIC: 7884.56  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      BIC: 7962.34  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Score test statistic for CI assumption: 4.868 (p-value=0.0877) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Maximum Likelihood Estimates: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fixed effects in the class-membership model:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (the class of reference is the last class) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                      coef      Se    Wald p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class1  0.64179 0.23639   2.715 0.00663</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X3 class1        -0.62135 0.18720  -3.319 0.00090</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters in the proportional hazard model:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                              coef      Se    Wald p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines1) -0.00007 0.02194  -0.003 0.99752</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines2) -0.00014 0.04412  -0.003 0.99747</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines3)  0.50421 0.10396   4.850 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines4)  0.80901 0.15970   5.066 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines5)  0.43681 0.39996   1.092 0.27477</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 SurvPH class1      0.78331 0.35394   2.213 0.02689</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1                        0.10318 0.16729   0.617 0.53739</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X2 class1                 0.76963 0.20998   3.665 0.00025</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X2 class2                -0.04521 0.57232  -0.079 0.93703</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fixed effects in the longitudinal model:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                      coef      Se    Wald p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class1 10.42612 0.19161  54.414 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class2 11.29780 0.23627  47.816 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time class1      -2.59556 0.17992 -14.426 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time class2      -0.52342 0.17642  -2.967 0.00301</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1                1.41450 0.22174   6.379 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time:X1          -0.04995 0.20647  -0.242 0.80886</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Variance-covariance matrix of the random-effects:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           intercept    Time</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept   0.91249        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time        0.05005 0.21387</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                             coef      Se</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual standard error  1.50271 0.03000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="co">#Goodness-of-fit statistics for m2:</span></span></span>
+<span class="r-in"><span><span class="co">#       maximum log-likelihood: -3921.27; AIC: 7884.54; BIC: 7962.32  </span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co">#### estimation with 3 latent classes (ng=3)</span></span></span>
+<span class="r-in"><span><span class="va">m3</span> <span class="op">&lt;-</span> <span class="fu">Jointlcmm</span><span class="op">(</span>fixed<span class="op">=</span> <span class="va">Ydep1</span><span class="op">~</span><span class="va">Time</span><span class="op">*</span><span class="va">X1</span>,mixture<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,random<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,</span></span>
+<span class="r-in"><span>classmb<span class="op">=</span><span class="op">~</span><span class="va">X3</span>,subject<span class="op">=</span><span class="st">'ID'</span>,survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">Tevent</span>,<span class="va">Event</span><span class="op">)</span><span class="op">~</span> <span class="va">X1</span><span class="op">+</span><span class="fu"><a href="ForInternalUse.html">mixture</a></span><span class="op">(</span><span class="va">X2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>hazard<span class="op">=</span><span class="st">"3-quant-splines"</span>,hazardtype<span class="op">=</span><span class="st">"PH"</span>,ng<span class="op">=</span><span class="fl">3</span>,data<span class="op">=</span><span class="va">data_lcmm</span>,</span></span>
+<span class="r-in"><span>B<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.77</span>,<span class="fl">0.4</span>,<span class="op">-</span><span class="fl">0.82</span>,<span class="op">-</span><span class="fl">0.27</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0.3</span>,<span class="fl">0.62</span>,<span class="fl">2.62</span>,<span class="fl">5.31</span>,<span class="op">-</span><span class="fl">0.03</span>,<span class="fl">1.36</span>,<span class="fl">0.82</span>,</span></span>
+<span class="r-in"><span><span class="op">-</span><span class="fl">13.5</span>,<span class="fl">10.17</span>,<span class="fl">10.24</span>,<span class="fl">11.51</span>,<span class="op">-</span><span class="fl">2.62</span>,<span class="op">-</span><span class="fl">0.43</span>,<span class="op">-</span><span class="fl">0.61</span>,<span class="fl">1.47</span>,<span class="op">-</span><span class="fl">0.04</span>,<span class="fl">0.85</span>,<span class="fl">0.04</span>,<span class="fl">0.26</span>,<span class="fl">1.5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m3</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Joint latent class model for quantitative outcome and competing risks </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      fitted by maximum likelihood method </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Jointlcmm(fixed = Ydep1 ~ Time * X1, mixture = ~Time, random = ~Time, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     subject = "ID", classmb = ~X3, ng = 3, survival = Surv(Tevent, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Event) ~ X1 + mixture(X2), hazard = "3-quant-splines", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     hazardtype = "PH", data = data_lcmm)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Statistical Model: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Dataset: data_lcmm </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of subjects: 300 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of observations: 1678 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of latent classes: 3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of parameters: 27  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Event 1: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Number of events: 150</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Proportional hazards over latent classes and </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         M-splines constant baseline risk function with nodes </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         0 11.3966 29.413  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iteration process: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Convergence criteria satisfied </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of iterations:  29 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Convergence criteria: parameters= 4.3e-07 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          : likelihood= 1.1e-09 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          : second derivatives= 6.7e-11 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Goodness-of-fit statistics: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      maximum log-likelihood: -3890.05  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      AIC: 7834.1  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      BIC: 7934.1  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Score test statistic for CI assumption: 0.637 (p-value=0.7274) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Maximum Likelihood Estimates: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fixed effects in the class-membership model:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (the class of reference is the last class) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       coef        Se    Wald p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class1   0.75756   0.22141   3.422 0.00062</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class2   0.40955   0.24279   1.687 0.09163</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X3 class1         -0.82323   0.21625  -3.807 0.00014</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X3 class2         -0.27369   0.20649  -1.325 0.18503</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters in the proportional hazard model:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                               coef        Se    Wald p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines1)   0.00000   0.00423   0.000 1.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines2)   0.00000   0.00894   0.000 0.99999</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines3)   0.00000   0.02692   0.000 0.99998</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines4)   0.28375   0.11500   2.467 0.01361</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines5)   0.63381   0.19725   3.213 0.00131</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 SurvPH class1       2.63246   0.63219   4.164 0.00003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 SurvPH class2       5.39638   0.77249   6.986 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1                        -0.02725   0.21981  -0.124 0.90134</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X2 class1                  1.39796   0.34967   3.998 0.00006</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X2 class2                  0.81682   0.35735   2.286 0.02227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X2 class3                -15.00568 727.90723  -0.021 0.98355</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fixed effects in the longitudinal model:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       coef        Se    Wald p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class1  10.16395   0.21262  47.803 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class2  10.23942   0.32064  31.935 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class3  11.51088   0.24749  46.511 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time class1       -2.62195   0.18621 -14.081 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time class2       -0.45529   0.42106  -1.081 0.27956</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time class3       -0.60547   0.18213  -3.324 0.00089</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1                 1.47305   0.21620   6.813 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time:X1           -0.03833   0.20343  -0.188 0.85055</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Variance-covariance matrix of the random-effects:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           intercept    Time</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept   0.85124        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time        0.03889 0.26245</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                              coef        Se</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual standard error   1.49821   0.02976</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="co">#Goodness-of-fit statistics for m3:</span></span></span>
+<span class="r-in"><span><span class="co">#       maximum log-likelihood: -3890.26 ; AIC: 7834.53;  BIC: 7934.53  </span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#### estimation with 4 latent classes (ng=4)</span></span></span>
+<span class="r-in"><span><span class="va">m4</span> <span class="op">&lt;-</span> <span class="fu">Jointlcmm</span><span class="op">(</span>fixed<span class="op">=</span> <span class="va">Ydep1</span><span class="op">~</span><span class="va">Time</span><span class="op">*</span><span class="va">X1</span>,mixture<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,random<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,</span></span>
+<span class="r-in"><span>classmb<span class="op">=</span><span class="op">~</span><span class="va">X3</span>,subject<span class="op">=</span><span class="st">'ID'</span>,survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">Tevent</span>,<span class="va">Event</span><span class="op">)</span><span class="op">~</span> <span class="va">X1</span><span class="op">+</span><span class="fu"><a href="ForInternalUse.html">mixture</a></span><span class="op">(</span><span class="va">X2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>hazard<span class="op">=</span><span class="st">"3-quant-splines"</span>,hazardtype<span class="op">=</span><span class="st">"PH"</span>,ng<span class="op">=</span><span class="fl">4</span>,data<span class="op">=</span><span class="va">data_lcmm</span>,</span></span>
+<span class="r-in"><span>B<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.54</span>,<span class="op">-</span><span class="fl">0.42</span>,<span class="fl">0.36</span>,<span class="op">-</span><span class="fl">0.94</span>,<span class="op">-</span><span class="fl">0.64</span>,<span class="op">-</span><span class="fl">0.28</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0.34</span>,<span class="fl">0.59</span>,<span class="fl">2.6</span>,<span class="fl">2.56</span>,<span class="fl">5.26</span>,</span></span>
+<span class="r-in"><span><span class="op">-</span><span class="fl">0.1</span>,<span class="fl">1.27</span>,<span class="fl">1.34</span>,<span class="fl">0.7</span>,<span class="op">-</span><span class="fl">5.72</span>,<span class="fl">10.54</span>,<span class="fl">9.02</span>,<span class="fl">10.2</span>,<span class="fl">11.58</span>,<span class="op">-</span><span class="fl">2.47</span>,<span class="op">-</span><span class="fl">2.78</span>,<span class="op">-</span><span class="fl">0.28</span>,<span class="op">-</span><span class="fl">0.57</span>,</span></span>
+<span class="r-in"><span><span class="fl">1.48</span>,<span class="op">-</span><span class="fl">0.06</span>,<span class="fl">0.61</span>,<span class="op">-</span><span class="fl">0.07</span>,<span class="fl">0.31</span>,<span class="fl">1.5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m4</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Joint latent class model for quantitative outcome and competing risks </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      fitted by maximum likelihood method </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Jointlcmm(fixed = Ydep1 ~ Time * X1, mixture = ~Time, random = ~Time, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     subject = "ID", classmb = ~X3, ng = 4, survival = Surv(Tevent, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Event) ~ X1 + mixture(X2), hazard = "3-quant-splines", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     hazardtype = "PH", data = data_lcmm)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Statistical Model: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Dataset: data_lcmm </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of subjects: 300 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of observations: 1678 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of latent classes: 4 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of parameters: 33  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Event 1: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Number of events: 150</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Proportional hazards over latent classes and </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         M-splines constant baseline risk function with nodes </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         0 11.3966 29.413  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iteration process: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Convergence criteria satisfied </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Number of iterations:  23 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Convergence criteria: parameters= 1e-10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          : likelihood= 1.4e-12 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          : second derivatives= 4.2e-10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Goodness-of-fit statistics: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      maximum log-likelihood: -3886.79  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      AIC: 7839.57  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      BIC: 7961.8  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Score test statistic for CI assumption: 0.346 (p-value=0.8409) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Maximum Likelihood Estimates: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fixed effects in the class-membership model:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (the class of reference is the last class) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       coef         Se    Wald p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class1   0.53190    0.32083   1.658 0.09734</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class2  -0.43372    0.75883  -0.572 0.56761</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class3   0.37259    0.25684   1.451 0.14686</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X3 class1         -0.94387    0.25601  -3.687 0.00023</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X3 class2         -0.63606    0.31291  -2.033 0.04208</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X3 class3         -0.28567    0.21009  -1.360 0.17392</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters in the proportional hazard model:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                               coef         Se    Wald p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines1)   0.00000    0.00470   0.000 0.99998</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines2)   0.00000    0.00979   0.000 1.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines3)   0.00000    0.03174   0.000 0.99995</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines4)   0.31294    0.13189   2.373 0.01766</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines5)   0.59938    0.19421   3.086 0.00203</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 SurvPH class1       2.61561    0.68721   3.806 0.00014</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 SurvPH class2       2.60884    0.92257   2.828 0.00469</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 SurvPH class3       5.35037    0.78672   6.801 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1                        -0.09759    0.23075  -0.423 0.67233</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X2 class1                  1.31521    0.45671   2.880 0.00398</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X2 class2                  1.37384    0.87228   1.575 0.11526</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X2 class3                  0.70985    0.38073   1.864 0.06226</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X2 class4                -14.76730 1359.85851  -0.011 0.99134</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fixed effects in the longitudinal model:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       coef         Se    Wald p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class1  10.53172    0.32850  32.060 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class2   9.01620    0.63969  14.095 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class3  10.21078    0.32793  31.137 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class4  11.57527    0.23866  48.501 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time class1       -2.46960    0.24229 -10.193 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time class2       -2.78091    0.37354  -7.445 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time class3       -0.31449    0.47238  -0.666 0.50556</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time class4       -0.57283    0.18578  -3.083 0.00205</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1                 1.48476    0.21615   6.869 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time:X1           -0.05422    0.20810  -0.261 0.79444</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Variance-covariance matrix of the random-effects:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           intercept    Time</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept   0.61385        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time       -0.06706 0.30641</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                              coef         Se</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual standard error   1.49827    0.02976</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="co">#Goodness-of-fit statistics for m4:</span></span></span>
+<span class="r-in"><span><span class="co">#   maximum log-likelihood: -3886.93 ; AIC: 7839.86;  BIC: 7962.09  </span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">##### The model with 3 latent classes is retained according to the BIC  </span></span></span>
+<span class="r-in"><span><span class="co">##### and the conditional independence assumption is not rejected at</span></span></span>
+<span class="r-in"><span><span class="co">##### the 5% level. </span></span></span>
+<span class="r-in"><span><span class="co"># posterior classification</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">m3</span>,which<span class="op">=</span><span class="st">"postprob"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="Jointlcmm-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># Class-specific predicted baseline risk &amp; survival functions in the </span></span></span>
+<span class="r-in"><span><span class="co"># 3-class model retained (for the reference value of the covariates) </span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">m3</span>,which<span class="op">=</span><span class="st">"baselinerisk"</span>,bty<span class="op">=</span><span class="st">"l"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">m3</span>,which<span class="op">=</span><span class="st">"baselinerisk"</span>,ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">5</span><span class="op">)</span>,bty<span class="op">=</span><span class="st">"l"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">m3</span>,which<span class="op">=</span><span class="st">"survival"</span>,bty<span class="op">=</span><span class="st">"l"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="Jointlcmm-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># class-specific predicted trajectories in the 3-class model retained </span></span></span>
+<span class="r-in"><span><span class="co"># (with characteristics of subject ID=193)</span></span></span>
+<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data_lcmm</span><span class="op">[</span><span class="va">data_lcmm</span><span class="op">$</span><span class="va">ID</span><span class="op">==</span><span class="fl">193</span>,<span class="op">]</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="fu"><a href="predictY.html">predictY</a></span><span class="op">(</span><span class="va">m3</span>,var.time<span class="op">=</span><span class="st">"Time"</span>,newdata<span class="op">=</span><span class="va">data</span>,bty<span class="op">=</span><span class="st">"l"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># predictive accuracy of the model evaluated with EPOCE</span></span></span>
+<span class="r-in"><span><span class="va">vect</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">15</span></span></span>
+<span class="r-in"><span><span class="va">cvpl</span> <span class="op">&lt;-</span> <span class="fu"><a href="epoce.html">epoce</a></span><span class="op">(</span><span class="va">m3</span>,var.time<span class="op">=</span><span class="st">"Time"</span>,pred.times<span class="op">=</span><span class="va">vect</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Be patient, epoce function is running ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The program took 1.89 seconds </span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cvpl</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Expected Prognostic Observed Cross-Entropy (EPOCE) of the joint latent class model: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Jointlcmm(fixed = Ydep1 ~ Time * X1, mixture = ~Time, random = ~Time, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     subject = "ID", classmb = ~X3, ng = 3, survival = Surv(Tevent, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Event) ~ X1 + mixture(X2), hazard = "3-quant-splines", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     hazardtype = "PH", data = data_lcmm)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> EPOCE estimators on data used for estimation: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Mean Prognostic Observed Log-likelihood (MPOL) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     and Cross-validated Prognostic Observed Log-likelihood (CVPOL) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     (CVPOL is the bias-corrected MPOL obtained by approximated cross-validation) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   pred. times  N at risk  N events     MPOL    CVPOL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             1        300       150 1.783568 1.820241</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             2        300       150 1.742254 1.790633</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             3        299       150 1.826218 1.863230</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             4        296       150 1.949889 1.993681</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             5        291       149 2.017346 2.052373</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             6        275       139 2.015122 2.040244</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             7        258       127 1.815015 1.834785</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             8        229       116 1.840222 1.860101</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             9        205       107 1.883315 1.904273</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            10        184        97 1.914311 1.932993</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            11        158        81 1.712072 1.736477</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            12        143        75 1.695109 1.715466</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            13        129        68 1.779851 1.784777</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            14        116        59 1.390196 1.413929</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            15         99        49 1.492425 1.498591</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">cvpl</span>,bty<span class="op">=</span><span class="st">"l"</span>,ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">############## end of example ##############</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-plt img"><img src="Jointlcmm-3.png" alt="" width="700" height="433"></span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

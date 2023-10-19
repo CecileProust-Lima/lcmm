@@ -34,6 +34,7 @@ simultaneously the observed outcome."><!-- mathjax --><script src="https://cdnjs
     <a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm_IRT.html">Continuous-time longitudinal IRT model</a>
     <a class="dropdown-item" href="../articles/joint_latent_class_model_with_Jointlcmm.html">How to estimate a joint latent class mixed model using Jointlcmm function</a>
     <a class="dropdown-item" href="../articles/multivariate_latent_class_model_with_mpjlcmm.html">How to estimate a multivariate latent class mixed model using mpjlcmm function</a>
+    <a class="dropdown-item" href="../articles/secondary_model_with_externVar.html">Accounting for latent class assignment uncertainty in subsequent analyses</a>
     <a class="dropdown-item" href="../articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a>
   </div>
 </li>
@@ -143,7 +144,7 @@ Confidence bands (if available) are represented as dotted lines.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Joint latent class model with 2 classes :</span></span></span>
 <span class="r-in"><span><span class="va">m32</span> <span class="op">&lt;-</span> <span class="fu"><a href="Jointlcmm.html">Jointlcmm</a></span><span class="op">(</span><span class="va">Ydep1</span><span class="op">~</span><span class="va">Time</span><span class="op">*</span><span class="va">X1</span>,mixture<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,random<span class="op">=</span><span class="op">~</span><span class="va">Time</span>,subject<span class="op">=</span><span class="st">"ID"</span>,</span></span>
@@ -155,13 +156,22 @@ Confidence bands (if available) are represented as dotted lines.</p>
 <span class="r-in"><span><span class="co">## Predictions at landmark 10 and 12 for horizon 3, 5 and 10 for two subjects :</span></span></span>
 <span class="r-in"><span><span class="va">dynpred.m32</span> <span class="op">&lt;-</span> <span class="fu"><a href="dynpred.html">dynpred</a></span><span class="op">(</span><span class="va">m32</span>,landmark<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">12</span><span class="op">)</span>,horizon<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">5</span>,<span class="fl">10</span><span class="op">)</span>,var.time<span class="op">=</span><span class="st">"Time"</span>,</span></span>
 <span class="r-in"><span>fun.time<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fl">10</span><span class="op">*</span><span class="va">x</span><span class="op">}</span>,newdata<span class="op">=</span><span class="va">data_lcmm</span><span class="op">[</span><span class="fl">4</span><span class="op">:</span><span class="fl">8</span>,<span class="op">]</span>,draws<span class="op">=</span><span class="cn">TRUE</span>,ndraws<span class="op">=</span><span class="fl">2000</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      ID landmark horizon   pred_50  pred_2.5 pred_97.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  2       10       3 0.3257151 0.2405236 0.4290371</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  2       10       5 0.5235755 0.4011774 0.6543117</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  2       10      10 0.8375403 0.7240167 0.9217258</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]  2       12       3 0.4039691 0.2957617 0.5321660</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  2       12       5 0.6122489 0.4731127 0.7508410</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6,]  2       12      10 0.8880138 0.7794120 0.9550849</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Plot of the predictions at landmark 10 for horizon 3,5,10 :</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">dynpred.m32</span>,landmark<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot.dynpred-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Plot of the predictions at landmark 10 and 12 for horizon 3 :</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">dynpred.m32</span>,horizon<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-plt img"><img src="plot.dynpred-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

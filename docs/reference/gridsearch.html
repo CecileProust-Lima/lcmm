@@ -34,6 +34,7 @@ Jointlcmm functions."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/
     <a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm_IRT.html">Continuous-time longitudinal IRT model</a>
     <a class="dropdown-item" href="../articles/joint_latent_class_model_with_Jointlcmm.html">How to estimate a joint latent class mixed model using Jointlcmm function</a>
     <a class="dropdown-item" href="../articles/multivariate_latent_class_model_with_mpjlcmm.html">How to estimate a multivariate latent class mixed model using mpjlcmm function</a>
+    <a class="dropdown-item" href="../articles/secondary_model_with_externVar.html">Accounting for latent class assignment uncertainty in subsequent analyses</a>
     <a class="dropdown-item" href="../articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a>
   </div>
 </li>
@@ -144,7 +145,7 @@ Analysis, 41(3-4), 561-575.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="co"># initial model with ng=1 for the random initial values</span></span></span>
 <span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="hlme.html">hlme</a></span><span class="op">(</span><span class="va">Y</span> <span class="op">~</span> <span class="va">Time</span> <span class="op">*</span> <span class="va">X1</span>, random <span class="op">=</span><span class="op">~</span> <span class="va">Time</span>, subject <span class="op">=</span> <span class="st">'ID'</span>, ng <span class="op">=</span> <span class="fl">1</span>, </span></span>
 <span class="r-in"><span>      data <span class="op">=</span> <span class="va">data_hlme</span><span class="op">)</span></span></span>
@@ -153,7 +154,7 @@ Analysis, 41(3-4), 561-575.</p>
 <span class="r-in"><span><span class="va">m2d</span> <span class="op">&lt;-</span> <span class="fu">gridsearch</span><span class="op">(</span>rep <span class="op">=</span> <span class="fl">50</span>, maxiter <span class="op">=</span> <span class="fl">10</span>, minit <span class="op">=</span> <span class="va">m1</span>, <span class="fu"><a href="hlme.html">hlme</a></span><span class="op">(</span><span class="va">Y</span> <span class="op">~</span> <span class="va">Time</span> <span class="op">*</span> <span class="va">X1</span>,</span></span>
 <span class="r-in"><span>      mixture <span class="op">=</span><span class="op">~</span> <span class="va">Time</span>, random <span class="op">=</span><span class="op">~</span> <span class="va">Time</span>, classmb <span class="op">=</span><span class="op">~</span> <span class="va">X2</span> <span class="op">+</span> <span class="va">X3</span>, subject <span class="op">=</span> <span class="st">'ID'</span>,</span></span>
 <span class="r-in"><span>          ng <span class="op">=</span> <span class="fl">2</span>, data <span class="op">=</span> <span class="va">data_hlme</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>        <span class="op">}</span></span></span>
+<span class="r-in"><span>        <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

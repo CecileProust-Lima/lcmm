@@ -38,6 +38,7 @@ Carlo method."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/li
     <a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm_IRT.html">Continuous-time longitudinal IRT model</a>
     <a class="dropdown-item" href="../articles/joint_latent_class_model_with_Jointlcmm.html">How to estimate a joint latent class mixed model using Jointlcmm function</a>
     <a class="dropdown-item" href="../articles/multivariate_latent_class_model_with_mpjlcmm.html">How to estimate a multivariate latent class mixed model using mpjlcmm function</a>
+    <a class="dropdown-item" href="../articles/secondary_model_with_externVar.html">Accounting for latent class assignment uncertainty in subsequent analyses</a>
     <a class="dropdown-item" href="../articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a>
   </div>
 </li>
@@ -219,10 +220,23 @@ Methods in Medical Research 23, 74-90.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  2       12       3 0.4077001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [11,]  2       12       5 0.6157664</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [12,]  2       12      10 0.8859773</span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="fu">dynpred</span><span class="op">(</span><span class="va">m32</span>,landmark<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">12</span><span class="op">)</span>,horizon<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">5</span>,<span class="fl">10</span><span class="op">)</span>,var.time<span class="op">=</span><span class="st">"Time"</span>,</span></span>
 <span class="r-in"><span>fun.time<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fl">10</span><span class="op">*</span><span class="va">x</span><span class="op">}</span>,newdata<span class="op">=</span><span class="va">data_lcmm</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span>,<span class="op">]</span>,draws<span class="op">=</span><span class="cn">TRUE</span>,ndraws<span class="op">=</span><span class="fl">2000</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ID landmark horizon   pred_50  pred_2.5 pred_97.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  1       10       3 0.2358876 0.1773737 0.3214147</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  1       10       5 0.3830814 0.2903455 0.5149652</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]  1       10      10 0.6438571 0.4967695 0.8297853</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  1       12       3 0.4183860 0.3178894 0.5383852</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  1       12       5 0.6248616 0.4990747 0.7529744</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  1       12      10 0.8823067 0.7868488 0.9499321</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  2       10       3 0.3224306 0.2433315 0.4282778</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  2       10       5 0.5191261 0.4078956 0.6519505</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  2       10      10 0.8359254 0.7270727 0.9194506</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  2       12       3 0.4010582 0.3026248 0.5337415</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [11,]  2       12       5 0.6097972 0.4823007 0.7511258</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [12,]  2       12      10 0.8868189 0.7825965 0.9558910</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

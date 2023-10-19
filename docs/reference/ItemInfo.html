@@ -38,6 +38,7 @@ Confidence bands (and median) can be computed by a Monte Carlo approximation."><
     <a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm_IRT.html">Continuous-time longitudinal IRT model</a>
     <a class="dropdown-item" href="../articles/joint_latent_class_model_with_Jointlcmm.html">How to estimate a joint latent class mixed model using Jointlcmm function</a>
     <a class="dropdown-item" href="../articles/multivariate_latent_class_model_with_mpjlcmm.html">How to estimate a multivariate latent class mixed model using mpjlcmm function</a>
+    <a class="dropdown-item" href="../articles/secondary_model_with_externVar.html">Accounting for latent class assignment uncertainty in subsequent analyses</a>
     <a class="dropdown-item" href="../articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a>
   </div>
 </li>
@@ -172,7 +173,7 @@ percentiles of the approximated posterior distribution of the probability and in
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="co">## This is a toy example to illustrate the information functions.</span></span></span>
 <span class="r-in"><span><span class="co">## The binary outcomes are arbitrarily created, please do not</span></span></span>
 <span class="r-in"><span><span class="co">## consider them as relevent indicators.</span></span></span>
@@ -182,12 +183,15 @@ percentiles of the approximated posterior distribution of the probability and in
 <span class="r-in"><span>data<span class="op">=</span><span class="va">data_lcmm</span>,link<span class="op">=</span><span class="st">"thresholds"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">info</span> <span class="op">&lt;-</span> <span class="fu">ItemInfo</span><span class="op">(</span><span class="va">m</span>,lprocess<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">4</span>,<span class="fl">4</span>,length.out<span class="op">=</span><span class="fl">100</span><span class="op">)</span>,draws<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">info</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="ItemInfo-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">info</span>, which<span class="op">=</span><span class="st">"LevelInfo"</span>, outcome<span class="op">=</span><span class="st">"Yord1"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">info</span>, which<span class="op">=</span><span class="st">"LevelInfo"</span>, outcome<span class="op">=</span><span class="st">"Yord2"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="ItemInfo-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">info</span>, which<span class="op">=</span><span class="st">"LevelProb"</span>, outcome<span class="op">=</span><span class="st">"Yord1"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">info</span>, which<span class="op">=</span><span class="st">"LevelProb"</span>, outcome<span class="op">=</span><span class="st">"Yord2"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-plt img"><img src="ItemInfo-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

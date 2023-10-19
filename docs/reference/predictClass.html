@@ -32,6 +32,7 @@ class-membership probabilities for external data."><!-- mathjax --><script src="
     <a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm_IRT.html">Continuous-time longitudinal IRT model</a>
     <a class="dropdown-item" href="../articles/joint_latent_class_model_with_Jointlcmm.html">How to estimate a joint latent class mixed model using Jointlcmm function</a>
     <a class="dropdown-item" href="../articles/multivariate_latent_class_model_with_mpjlcmm.html">How to estimate a multivariate latent class mixed model using mpjlcmm function</a>
+    <a class="dropdown-item" href="../articles/secondary_model_with_externVar.html">Accounting for latent class assignment uncertainty in subsequent analyses</a>
     <a class="dropdown-item" href="../articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a>
   </div>
 </li>
@@ -108,7 +109,7 @@ ng posterior class-membership probabilities.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">NormPsy</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">paquid</span><span class="op">$</span><span class="va">normMMSE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/NormPsy/man/normMMSE.html" class="external-link">normMMSE</a></span><span class="op">(</span><span class="va">paquid</span><span class="op">$</span><span class="va">MMSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">paquid</span><span class="op">$</span><span class="va">age65</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">paquid</span><span class="op">$</span><span class="va">age</span> <span class="op">-</span> <span class="fl">65</span><span class="op">)</span><span class="op">/</span><span class="fl">10</span></span></span>
@@ -116,7 +117,10 @@ ng posterior class-membership probabilities.</p>
 <span class="r-in"><span>data <span class="op">=</span> <span class="va">paquid</span>, ng <span class="op">=</span> <span class="fl">2</span>, mixture <span class="op">=</span><span class="op">~</span> <span class="va">age65</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, B <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">60</span>, <span class="fl">40</span>, <span class="fl">0</span>, <span class="op">-</span><span class="fl">4</span>, <span class="fl">0</span>, <span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span>,</span></span>
 <span class="r-in"><span><span class="fl">212.869397</span>, <span class="op">-</span><span class="fl">216.421323</span>,<span class="fl">456.229910</span>, <span class="fl">55.713775</span>, <span class="op">-</span><span class="fl">145.715516</span>, <span class="fl">59.351000</span>, <span class="fl">10.072221</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">predictClass</span><span class="op">(</span><span class="va">m2b</span>, newdata<span class="op">=</span><span class="va">paquid</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>,<span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ID class     prob1     prob2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1     1 0.8412575 0.1587425</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  2     1 0.8913364 0.1086636</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

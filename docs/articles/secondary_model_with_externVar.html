@@ -651,19 +651,19 @@ With the conditional regression, the estimated parameters are slightly different
 <span><span class="co">#&gt; (the class of reference is the last class) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                      coef    Se     Wald p-value</span></span>
-<span><span class="co">#&gt; intercept class1 -1.57015 0.61644 -2.547 0.01086</span></span>
-<span><span class="co">#&gt; male class1      -1.42201 0.56839 -2.502 0.01236</span></span>
-<span><span class="co">#&gt; CEP class1        0.90214 0.64235  1.404 0.16019</span></span></code></pre></div>
+<span><span class="co">#&gt; intercept class1 -1.51721 0.57259 -2.650 0.00806</span></span>
+<span><span class="co">#&gt; male class1      -1.44882 0.56739 -2.553 0.01066</span></span>
+<span><span class="co">#&gt; CEP class1        0.86248 0.60579  1.424 0.15452</span></span></code></pre></div>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">Class2stage</span>,<span class="va">ClassCond</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                      coef      Se   Wald p-value     coef      Se   Wald</span></span>
-<span><span class="co">#&gt; intercept class1 -1.68614 0.50262 -3.355 0.00079 -1.57015 0.61644 -2.547</span></span>
-<span><span class="co">#&gt; male class1      -1.09687 0.44277 -2.477 0.01324 -1.42201 0.56839 -2.502</span></span>
-<span><span class="co">#&gt; CEP class1        0.90387 0.50666  1.784 0.07443  0.90214 0.64235  1.404</span></span>
+<span><span class="co">#&gt; intercept class1 -1.68614 0.50262 -3.355 0.00079 -1.51721 0.57259 -2.650</span></span>
+<span><span class="co">#&gt; male class1      -1.09687 0.44277 -2.477 0.01324 -1.44882 0.56739 -2.553</span></span>
+<span><span class="co">#&gt; CEP class1        0.90387 0.50666  1.784 0.07443  0.86248 0.60579  1.424</span></span>
 <span><span class="co">#&gt;                  p-value</span></span>
-<span><span class="co">#&gt; intercept class1 0.01086</span></span>
-<span><span class="co">#&gt; male class1      0.01236</span></span>
-<span><span class="co">#&gt; CEP class1       0.16019</span></span></code></pre></div>
+<span><span class="co">#&gt; intercept class1 0.00806</span></span>
+<span><span class="co">#&gt; male class1      0.01066</span></span>
+<span><span class="co">#&gt; CEP class1       0.15452</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

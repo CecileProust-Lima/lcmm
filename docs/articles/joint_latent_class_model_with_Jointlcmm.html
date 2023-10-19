@@ -47,6 +47,7 @@
     <a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm_IRT.html">Continuous-time longitudinal IRT model</a>
     <a class="dropdown-item" href="../articles/joint_latent_class_model_with_Jointlcmm.html">How to estimate a joint latent class mixed model using Jointlcmm function</a>
     <a class="dropdown-item" href="../articles/multivariate_latent_class_model_with_mpjlcmm.html">How to estimate a multivariate latent class mixed model using mpjlcmm function</a>
+    <a class="dropdown-item" href="../articles/secondary_model_with_externVar.html">Accounting for latent class assignment uncertainty in subsequent analyses</a>
     <a class="dropdown-item" href="../articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a>
   </div>
 </li>
@@ -576,9 +577,9 @@ where <span class="math inline">\(X_{4i}\)</span> and <span class="math inline">
 <span><span class="fu"><a href="../reference/summarytable.html">summarytable</a></span><span class="op">(</span><span class="va">mj2</span>,<span class="va">mj2b</span>,<span class="va">mj2c</span>,<span class="va">mj2d</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      G    loglik npm      BIC  %class1  %class2</span></span>
 <span><span class="co">#&gt; mj2  2 -9337.187  21 18804.84 21.04208 78.95792</span></span>
-<span><span class="co">#&gt; mj2b 2 -9337.187  21 18804.84 78.95792 21.04208</span></span>
+<span><span class="co">#&gt; mj2b 2 -9337.187  21 18804.84 21.04208 78.95792</span></span>
 <span><span class="co">#&gt; mj2c 2 -9337.187  21 18804.84 78.95792 21.04208</span></span>
-<span><span class="co">#&gt; mj2d 2 -9337.187  21 18804.84 21.04208 78.95792</span></span></code></pre></div>
+<span><span class="co">#&gt; mj2d 2 -9337.187  21 18804.84 78.95792 21.04208</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="model-with-more-than-2-latent-classes">3.2 Model with more than 2 latent classes<a class="anchor" aria-label="anchor" href="#model-with-more-than-2-latent-classes"></a>
@@ -881,16 +882,16 @@ where <span class="math inline">\(X_{4i}\)</span> and <span class="math inline">
 <span>                horizon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">8</span>, <span class="fl">9</span><span class="op">)</span>, fun.time <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fl">10</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">65</span> <span class="op">}</span>, </span>
 <span>                draws <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       ID landmark horizon    pred_50   pred_2.5  pred_97.5</span></span>
-<span><span class="co">#&gt;  [1,] 72       80       1 0.01797469 0.01057306 0.02874129</span></span>
-<span><span class="co">#&gt;  [2,] 72       80       3 0.07759665 0.04932597 0.11964499</span></span>
-<span><span class="co">#&gt;  [3,] 72       80       5 0.17502587 0.11968848 0.25335711</span></span>
-<span><span class="co">#&gt;  [4,] 72       80       8 0.30397119 0.22710445 0.40682689</span></span>
-<span><span class="co">#&gt;  [5,] 72       80       9 0.33984358 0.25896848 0.44169340</span></span>
-<span><span class="co">#&gt;  [6,] 72       90       1 0.07702207 0.03484800 0.16304633</span></span>
-<span><span class="co">#&gt;  [7,] 72       90       3 0.21470383 0.10418011 0.42931156</span></span>
-<span><span class="co">#&gt;  [8,] 72       90       5 0.30736858 0.18049310 0.53129046</span></span>
-<span><span class="co">#&gt;  [9,] 72       90       8 0.58875265 0.39850522 0.83032473</span></span>
-<span><span class="co">#&gt; [10,] 72       90       9 0.72889171 0.49991931 0.95403561</span></span>
+<span><span class="co">#&gt;  [1,] 72       80       1 0.01799152 0.01052602 0.02909231</span></span>
+<span><span class="co">#&gt;  [2,] 72       80       3 0.07760504 0.04945196 0.11804102</span></span>
+<span><span class="co">#&gt;  [3,] 72       80       5 0.17435840 0.11901419 0.25339617</span></span>
+<span><span class="co">#&gt;  [4,] 72       80       8 0.30476483 0.22568065 0.40105076</span></span>
+<span><span class="co">#&gt;  [5,] 72       80       9 0.34044818 0.25599286 0.43704937</span></span>
+<span><span class="co">#&gt;  [6,] 72       90       1 0.07842202 0.03557152 0.15747161</span></span>
+<span><span class="co">#&gt;  [7,] 72       90       3 0.21730362 0.10833181 0.41958386</span></span>
+<span><span class="co">#&gt;  [8,] 72       90       5 0.30892572 0.18348309 0.52958927</span></span>
+<span><span class="co">#&gt;  [9,] 72       90       8 0.58014948 0.39234710 0.82050840</span></span>
+<span><span class="co">#&gt; [10,] 72       90       9 0.71692087 0.48912324 0.94624805</span></span>
 <span><span class="co"># graph of predictions</span></span>
 <span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="va">dynp</span>, landmark <span class="op">=</span> <span class="fl">80</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">55</span>, <span class="fl">85</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>     ylab <span class="op">=</span> <span class="st">"normMMSE"</span>, main <span class="op">=</span> <span class="st">"At landmark age 80"</span>, xlab <span class="op">=</span> <span class="st">"age in years"</span><span class="op">)</span></span></code></pre></div>
@@ -913,15 +914,15 @@ where <span class="math inline">\(X_{4i}\)</span> and <span class="math inline">
 <span><span class="va">epoce2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/epoce.html">epoce</a></span><span class="op">(</span><span class="va">mj2</span>, pred.times <span class="op">=</span> <span class="va">landmark</span>, var.time <span class="op">=</span> <span class="st">"age65"</span>,fun.time <span class="op">=</span> </span>
 <span>                  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fl">10</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">65</span> <span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Be patient, epoce function is running ... </span></span>
-<span><span class="co">#&gt; The program took 0.36 seconds</span></span>
+<span><span class="co">#&gt; The program took 0.37 seconds</span></span>
 <span><span class="va">epoce3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/epoce.html">epoce</a></span><span class="op">(</span><span class="va">mj3b</span>, pred.times <span class="op">=</span> <span class="va">landmark</span>, var.time <span class="op">=</span> <span class="st">"age65"</span>,fun.time <span class="op">=</span> </span>
 <span>                  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fl">10</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">65</span> <span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Be patient, epoce function is running ... </span></span>
-<span><span class="co">#&gt; The program took 0.56 seconds</span></span>
+<span><span class="co">#&gt; The program took 0.57 seconds</span></span>
 <span><span class="va">epoce4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/epoce.html">epoce</a></span><span class="op">(</span><span class="va">mj4b</span>, pred.times <span class="op">=</span> <span class="va">landmark</span>, var.time <span class="op">=</span> <span class="st">"age65"</span>,fun.time <span class="op">=</span> </span>
 <span>                  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fl">10</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">65</span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Be patient, epoce function is running ... </span></span>
-<span><span class="co">#&gt; The program took 0.81 seconds</span></span></code></pre></div>
+<span><span class="co">#&gt; The program took 0.8 seconds</span></span></code></pre></div>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># computation of the differences in EPOCE</span></span>
 <span><span class="va">diff23</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Diffepoce.html">Diffepoce</a></span><span class="op">(</span><span class="va">epoce2</span>, <span class="va">epoce3</span><span class="op">)</span></span>

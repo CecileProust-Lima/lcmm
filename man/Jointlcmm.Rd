@@ -458,8 +458,7 @@ for details).
 }
 \examples{
 
-
-
+\dontrun{
 #### Example of a joint latent class model estimated for a varying number
 # of latent classes: 
 # The linear mixed model includes a subject- (ID) and class-specific 
@@ -479,12 +478,11 @@ for details).
 # towards the global maximum.
 
 
-\dontrun{
 #### estimation with 1 latent class (ng=1): independent models for the 
 # longitudinal outcome and the time of event
-m1 <- Jointlcmm(fixed= Ydep1~X1*Time,random=~Time,subject='ID'
-,survival = Surv(Tevent,Event)~ X1+X2 ,hazard="3-quant-splines"
-,hazardtype="PH",ng=1,data=data_lcmm)
+m1 <- Jointlcmm(fixed= Ydep1~X1*Time,random=~Time,subject='ID',
+survival = Surv(Tevent,Event)~ X1+X2 ,hazard="3-quant-splines",
+hazardtype="PH",ng=1,data=data_lcmm)
 summary(m1)
 #Goodness-of-fit statistics for m1:
 #    maximum log-likelihood: -3944.77 ; AIC: 7919.54  ;  BIC: 7975.09  
@@ -536,7 +534,7 @@ plot(m3,which="survival",bty="l")
 # class-specific predicted trajectories in the 3-class model retained 
 # (with characteristics of subject ID=193)
 data <- data_lcmm[data_lcmm$ID==193,]
-plot(predictY(m3,var.time="Time",newdata=data,bty="l")
+plot(predictY(m3,var.time="Time",newdata=data,bty="l"))
 # predictive accuracy of the model evaluated with EPOCE
 vect <- 1:15
 cvpl <- epoce(m3,var.time="Time",pred.times=vect)
