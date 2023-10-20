@@ -85,7 +85,7 @@
                         <h4 data-toc-skip class="author">Cecile Proust-Lima, Maris Dussartre, Viviane Philipps</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/CecileProust-Lima/lcmm/blob/HEAD/vignettes/secondary_model_with_externVar.Rmd" class="external-link"><code>vignettes/secondary_model_with_externVar.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/CecileProust-Lima/lcmm/blob/HEAD/../vignettes/secondary_model_with_externVar.Rmd" class="external-link"><code>../vignettes/secondary_model_with_externVar.Rmd</code></a></small>
       <div class="d-none name"><code>secondary_model_with_externVar.Rmd</code></div>
     </div>
 
@@ -211,7 +211,7 @@ The posterior classification finds a small class (12.4% of the sample) character
 In this example, we want to assess the profiles of trajectory of depressive symptomatology (CES-D scale for Center for Epidemiologic Studies - Depression) in the two classes identified on MMSE.
 </p>
 <p align="justify">
-CES-D is repeated at each occasion, we thus need a linear mixed model. The specification is the same as in all the other functions of the package. Given the strong asymmetry in the distribution of CES-D (see vignette <a href="articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a>), we use a curvilinear mixed model with a normalizing link function approximated by splines (i.e., same as lcmm function).
+CES-D is repeated at each occasion, we thus need a linear mixed model. The specification is the same as in all the other functions of the package. Given the strong asymmetry in the distribution of CES-D (see vignette <a href="pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a>), we use a curvilinear mixed model with a normalizing link function approximated by splines (i.e., same as lcmm function).
 </p>
 <p align="justify">
 We specify a quadratic model and adjust for sex (male). The latent class predictor is specified through “mixture” argument.
@@ -636,7 +636,7 @@ With the conditional regression, the estimated parameters are slightly different
 <span><span class="co">#&gt;  </span></span>
 <span><span class="co">#&gt; Iteration process: </span></span>
 <span><span class="co">#&gt;      Convergence criteria satisfied </span></span>
-<span><span class="co">#&gt;      Proportion of convergence on bootstrap iterations (%)= 99.5 </span></span>
+<span><span class="co">#&gt;      Proportion of convergence on bootstrap iterations (%)= 100 </span></span>
 <span><span class="co">#&gt;  </span></span>
 <span><span class="co">#&gt; Goodness-of-fit statistics: </span></span>
 <span><span class="co">#&gt;      maximum log-likelihood: -180.44  </span></span>
@@ -651,19 +651,19 @@ With the conditional regression, the estimated parameters are slightly different
 <span><span class="co">#&gt; (the class of reference is the last class) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                      coef    Se     Wald p-value</span></span>
-<span><span class="co">#&gt; intercept class1 -1.51721 0.57259 -2.650 0.00806</span></span>
-<span><span class="co">#&gt; male class1      -1.44882 0.56739 -2.553 0.01066</span></span>
-<span><span class="co">#&gt; CEP class1        0.86248 0.60579  1.424 0.15452</span></span></code></pre></div>
+<span><span class="co">#&gt; intercept class1 -1.57512 0.57809 -2.725 0.00644</span></span>
+<span><span class="co">#&gt; male class1      -1.43894 0.57802 -2.489 0.01279</span></span>
+<span><span class="co">#&gt; CEP class1        0.87433 0.61569  1.420 0.15558</span></span></code></pre></div>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">Class2stage</span>,<span class="va">ClassCond</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                      coef      Se   Wald p-value     coef      Se   Wald</span></span>
-<span><span class="co">#&gt; intercept class1 -1.68614 0.50262 -3.355 0.00079 -1.51721 0.57259 -2.650</span></span>
-<span><span class="co">#&gt; male class1      -1.09687 0.44277 -2.477 0.01324 -1.44882 0.56739 -2.553</span></span>
-<span><span class="co">#&gt; CEP class1        0.90387 0.50666  1.784 0.07443  0.86248 0.60579  1.424</span></span>
+<span><span class="co">#&gt; intercept class1 -1.68614 0.50262 -3.355 0.00079 -1.57512 0.57809 -2.725</span></span>
+<span><span class="co">#&gt; male class1      -1.09687 0.44277 -2.477 0.01324 -1.43894 0.57802 -2.489</span></span>
+<span><span class="co">#&gt; CEP class1        0.90387 0.50666  1.784 0.07443  0.87433 0.61569  1.420</span></span>
 <span><span class="co">#&gt;                  p-value</span></span>
-<span><span class="co">#&gt; intercept class1 0.00806</span></span>
-<span><span class="co">#&gt; male class1      0.01066</span></span>
-<span><span class="co">#&gt; CEP class1       0.15452</span></span></code></pre></div>
+<span><span class="co">#&gt; intercept class1 0.00644</span></span>
+<span><span class="co">#&gt; male class1      0.01279</span></span>
+<span><span class="co">#&gt; CEP class1       0.15558</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

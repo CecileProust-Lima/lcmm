@@ -100,7 +100,7 @@ postprob(PrimModel)
 
 <p align="justify">In this example, we want to assess the profiles of trajectory of depressive symptomatology (CES-D scale for Center for Epidemiologic Studies - Depression) in the two classes identified on MMSE. </p>
 
-<p align="justify">CES-D is repeated at each occasion, we thus need a linear mixed model. The specification is the same as in all the other functions of the package. Given the strong asymmetry in the distribution of CES-D (see vignette [Pre-normalizing a dependent variable using lcmm](articles/pre_normalizing.html)), we use a curvilinear mixed model with a normalizing link function approximated by splines (i.e., same as lcmm function).</p>
+<p align="justify">CES-D is repeated at each occasion, we thus need a linear mixed model. The specification is the same as in all the other functions of the package. Given the strong asymmetry in the distribution of CES-D (see vignette [Pre-normalizing a dependent variable using lcmm](pre_normalizing.html)), we use a curvilinear mixed model with a normalizing link function approximated by splines (i.e., same as lcmm function).</p>
 
 <p align="justify">We specify a quadratic model and adjust for sex (male). The latent class predictor is specified through "mixture" argument. </p>
 
