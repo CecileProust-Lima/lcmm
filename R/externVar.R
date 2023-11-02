@@ -355,6 +355,8 @@ externVar = function(model,
     ##Informations about primary model
     argumentsIn = as.list(model$call)
     funIn = as.character(argumentsIn[[1]])
+    if(funIn == "jlcmm") funIn <- "Jointlcmm"
+    if(funIn == "mlcmm") funIn <- "multlcmm"
     argumentsIn[[1]] = NULL
     ng = model$ng
     nIn = length(model$best)
