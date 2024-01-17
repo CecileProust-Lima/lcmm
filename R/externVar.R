@@ -389,7 +389,7 @@ externVar = function(model,
         K = length(longitudinal)
         for(k in 1:K){
             cl_long = as.list(longitudinal[[k]]$call)
-            cl_long[["computeDiscrete"]] = FALSE
+            if(inherits(longitudinal[[k]], "lcmm")) cl_long[["computeDiscrete"]] = FALSE
             longitudinal[[k]]$call = as.call(cl_long)
             
             assign(as.character(longCall[[k+1]]), longitudinal[[k]])
@@ -1359,7 +1359,7 @@ externVar = function(model,
             
         }
     }
-    
+
     if(varest != "paramBoot"){
         arguments[["B"]][iKeepOut] = model$best[iKeepIn]
         if(verbose){cat("Model estimation...\n\n")}
@@ -1935,7 +1935,7 @@ externVar = function(model,
         modOut$conv = as.integer(modOut$Mconv > 90)
       }
     }
-    
+
     class(modOut) = c("externSurv", "externVar")
     
   }
