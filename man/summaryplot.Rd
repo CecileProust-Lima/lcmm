@@ -42,11 +42,11 @@ Can be reported the usual criteria used to assess the fit and the clustering
  - AIC (the lower the better) computed as -2L+2P 
  - BIC (the lower the better) computed as -2L+ P log(N) where N is the number of subjects
  - SABIC (the lower the better) computed as -2L+ P log((N+2)/24)
- - Entropy (the closer to one the better) computed as 1-sum[pi_ig*log(pi_ig)]/(N*log(G))
+ - Entropy (the closer to one the better) computed as 1+sum[pi_ig*log(pi_ig)]/(N*log(G))
    where pi_ig is the posterior probability that subject i belongs to class g
  - ICL (the lower the better) computed in two ways : ICL1 = BIC - sum[pi_ig*log(pi_ig)]
    or ICL2 = BIC - 2*sum(log(max(pi_ig)), where the max is taken over the classes for each subject.
- - %Class computed as the proportion of each class based on c_ig
+ - \%class computed as the proportion of each class based on c_ig
 }
 \examples{
 \dontrun{

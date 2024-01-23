@@ -122,11 +122,11 @@ Default to one line and length(which) columns.</p></dd>
  - AIC (the lower the better) computed as -2L+2P 
  - BIC (the lower the better) computed as -2L+ P log(N) where N is the number of subjects
  - SABIC (the lower the better) computed as -2L+ P log((N+2)/24)
- - Entropy (the closer to one the better) computed as 1-sum[pi_ig*log(pi_ig)]/(N*log(G))
+ - Entropy (the closer to one the better) computed as 1+sum[pi_ig*log(pi_ig)]/(N*log(G))
    where pi_ig is the posterior probability that subject i belongs to class g
  - ICL (the lower the better) computed in two ways : ICL1 = BIC - sum[pi_ig*log(pi_ig)]
    or ICL2 = BIC - 2*sum(log(max(pi_ig)), where the max is taken over the classes for each subject.
- - <!-- %Class computed as the proportion of each class based on c_ig --></p>
+ - %class computed as the proportion of each class based on c_ig</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -148,6 +148,8 @@ Default to one line and length(which) columns.</p></dd>
 <span class="r-in"><span>ng <span class="op">=</span> <span class="fl">2</span>, mixture<span class="op">=</span><span class="op">~</span><span class="va">age65</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, B<span class="op">=</span><span class="va">m1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m3g</span> <span class="op">&lt;-</span> <span class="fu"><a href="gridsearch.html">gridsearch</a></span><span class="op">(</span><span class="fu"><a href="hlme.html">hlme</a></span><span class="op">(</span><span class="va">normMMSE</span><span class="op">~</span><span class="va">age65</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">+</span><span class="va">CEP</span>, random<span class="op">=</span><span class="op">~</span><span class="va">age65</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, subject<span class="op">=</span><span class="st">'ID'</span>,</span></span>
 <span class="r-in"><span>data<span class="op">=</span><span class="va">paquid</span>, ng<span class="op">=</span><span class="fl">3</span>, mixture<span class="op">=</span><span class="op">~</span><span class="va">age65</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>, rep<span class="op">=</span><span class="fl">100</span>, maxiter<span class="op">=</span><span class="fl">30</span>, minit<span class="op">=</span><span class="va">m1</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Numerical problem by computing fn </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           value of function is : NaN </span>
 <span class="r-in"><span><span class="fu">summaryplot</span><span class="op">(</span><span class="va">m1</span>, <span class="va">m2</span>, <span class="va">m3g</span>, which<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BIC"</span>,<span class="st">"entropy"</span>,<span class="st">"ICL"</span><span class="op">)</span>,bty<span class="op">=</span><span class="st">"l"</span>,pch<span class="op">=</span><span class="fl">20</span>,col<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="summaryplot-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
