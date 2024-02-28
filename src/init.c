@@ -4,6 +4,7 @@
 #include "lcmm.h"
 
 static R_FortranMethodDef FortRout[] = {
+  {"integ", (DL_FUNC) &F77_SUB(integ), 17},
   {"predictcont", (DL_FUNC) &F77_SUB(predictcont), 21},
   {"predictmult", (DL_FUNC) &F77_SUB(predictmult), 25},
   {"predictcondmult", (DL_FUNC) &F77_SUB(predictcondmult), 17},

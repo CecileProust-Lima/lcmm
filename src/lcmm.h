@@ -1,6 +1,23 @@
 #include <R_ext/RS.h>
 
-		      
+void F77_SUB(integ)(double * X0,
+		    int * idprob,
+		    int * idea,
+		    int * idg,
+		    int * idcor,
+		    int * ng,
+		    int * ncor,
+		    int * nv,
+		    int * maxmes,
+		    int * idiag,
+		    int * nwg,
+		    int * npm,
+		    double * b1,
+		    int * nsim,
+		    int * methInteg,
+		    double * points,
+		    double * weights);
+
 
 void F77_SUB(predictcont)(double * X0,
 			   int * idprob,
