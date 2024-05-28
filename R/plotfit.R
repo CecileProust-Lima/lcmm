@@ -5,7 +5,7 @@
     if(missing(var.time)) stop("Argument var.time should be specified")
     if(class(x)=="lcmm")
         {
-            if(x$linktype==3) stop("This function is not available for thresholds mixed models")
+            if(any(x$linktype == 3)) stop("This function is not available for thresholds mixed models")
         }
     
     if(!is.null(x$data))

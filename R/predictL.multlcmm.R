@@ -28,33 +28,36 @@ predictL.multlcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE,...)
         olddata <- eval(x$call$data)
     }
   termes <- x$Xnames[-1]
-  
+
    #cas ou une variable dans le dataset du modele est un facteur
    for(v in x$Xnames2[-1])
    {                                                          
     if (is.factor(olddata[,v]))
     {
      mod <- levels(olddata[,v])
+
      if (!(levels(as.factor(newdata[,v])) %in% mod)) stop(paste("invalid level in factor", v))
      newdata[,v] <- factor(newdata[,v], levels=mod)
-  
+ 
      for(m in mod)
      {
       termes <- gsub(paste(v,m,sep=""),v,termes)
+
      }
      
     }
    }
-  
    #cas ou on a factor() dans l'appel de la fonction
    dans_appel <- c(all.names(x$call$fixed),all.names(x$call$random),all.names(x$call$mixture),all.names(x$call$classmb))
    ind_factor <- which(dans_appel=="factor")
    if(length(ind_factor))
    {
     nom.factor <- dans_appel[ind_factor+1]
+
     for (v in nom.factor)
     {
      mod <- levels(as.factor(olddata[,v]))
+
      if (!all(levels(as.factor(newdata[,v])) %in% mod)) stop(paste("invalid level in factor", v))
      newdata[,v] <- factor(newdata[,v], levels=mod)
      
@@ -65,8 +68,6 @@ predictL.multlcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE,...)
      }
     }
    }
-
-
 
   ## pour poly()
   if(any(grep("poly",termes)))
@@ -113,12 +114,10 @@ predictL.multlcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE,...)
    colnames(newdata) <- x$Xnames2
    times <- times[-linesNA]
   }
-  
 
-  
-  
   ###matrice avec toutes les var et toutes les interactions
   newdata1 <- model.matrix(as.formula(paste("~",paste(termes,collapse="+"))),data=newdata)
+
   #remettre les termes dans le bon ordre
    Xnames <- x$Xnames[-1]
    z <- grep("factor\\(",Xnames) 
@@ -139,7 +138,7 @@ predictL.multlcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE,...)
    }
 
    newdata1 <- newdata1[,c("(Intercept)",Xnames),drop=FALSE]
-  
+
   ###calcul des predictions
      
   X1 <- NULL
@@ -198,8 +197,6 @@ predictL.multlcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE,...)
    }
   }
 
-
-  
   Y<-matrix(0,length(newdata1[,1]),x$ng)
   colnames(Y) <- paste("class",1:x$ng,sep="")
   for(g in 1:x$ng)
@@ -218,10 +215,10 @@ predictL.multlcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE,...)
   ny <- length(x$Ynames)
 
   #extraction de Var(beta) 
-  Vbeta <- matrix(0,x$N[3]-x$N[2]-x$N[1],x$N[3]-x$N[2]-x$N[1])
+  Vbeta <- matrix(0,x$N[3]-x$N[2]-x$N[1]-x$N[10],x$N[3]-x$N[2]-x$N[1]-x$N[10])
   npm <- length(x$best)
   indice <- 1:npm * (1:npm+1) /2
-  indtmp <- indice[(x$N[1]+1):(x$N[3]-x$N[2])]
+  indtmp <- indice[(x$N[1]+1):(x$N[3]-x$N[2]-x$N[10])]
   indtmp <- cbind(indtmp-0:(length(indtmp)-1),indtmp)
   
   indV <- NULL

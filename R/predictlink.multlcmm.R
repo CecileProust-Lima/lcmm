@@ -6,6 +6,7 @@ predictlink.multlcmm <- function(x,ndraws=2000,Yvalues,...)
     if(!(inherits(x,"multlcmm"))) stop("To use only with \"multlcmm\" objects")
     #if(!missing(Yvalues) & x$linktype==3) warning("With thresholds links, no \"Yvalues\" should be specified. Default values will be used. \n")
     if(x$conv!=1 & ndraws!=0) stop("No confidence intervals can be produced since the program did not converge properly")
+    if(x$randomVar == 1) stop("This function is not implemented for the model with heteroscedastic error.")
 
 
     if(x$conv %in% c(1,2,3))

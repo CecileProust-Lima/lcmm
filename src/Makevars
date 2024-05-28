@@ -1,4 +1,13 @@
-PKG_LIBS = $(BLAS_LIBS) $(FLIBS)
+# -*- Makefile -*-  vim : ft = make
+# This file is derived from Rmpi package
+
+PKG_CFLAGS   = $(ARCHCFLAGS)
+
+PKG_FCFLAGS  = -DPACKAGE_NAME=\"\" -DPACKAGE_TARNAME=\"\" -DPACKAGE_VERSION=\"\" -DPACKAGE_STRING=\"\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -I/opt/ohpc/pub/mpi/openmpi/3.1.0/include -pthread -I/opt/ohpc/pub/mpi/openmpi/3.1.0/lib/ -I -DMPI2 -DOPENMPI -Wl,-rpath  $(ARCHCFLAGS)
+
+PKG_LIBS     = -pthread -I/opt/ohpc/pub/mpi/openmpi/3.1.0/lib/ -Wl,-rpath -Wl,/opt/ohpc/pub/mpi/openmpi/3.1.0/lib/ -Wl,--enable-new-dtags -L/opt/ohpc/pub/mpi/openmpi/3.1.0/lib/ -lmpi_usempif08 -lmpi_usempi_ignore_tkr -lmpi_mpifh -lmpi  -lutil -lpthread $(ARCHLIB) $(BLAS_LIBS) $(FLIBS)
+
+
 
 CSRC = init.c
 FMODSRC = AOptim.f90

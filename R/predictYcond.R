@@ -62,7 +62,7 @@ predictYcond <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2
     if((!class(x) %in% c("lcmm","multlcmm","Jointlcmm"))) stop("Use only with lcmm, multlcmm or Jointlcmm objects")
     if((class(x)=="lcmm") & any(x$linktype==3)) stop("This function is not available for ordinal outcome")
     if((class(x)=="Jointlcmm") & any(x$linktype==-1)) stop("This function is not available without any link function")
-    
+    if(x$randomVar == 1) stop("This function is not implemented for the model with heteroscedastic error.")
     if(x$conv!=1 & draws==TRUE)
     {
         cat("No confidence interval will be provided since the program did not converge properly \n")

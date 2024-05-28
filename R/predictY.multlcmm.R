@@ -6,10 +6,13 @@ predictY.multlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE
 if(missing(newdata)) stop("The argument newdata should be specified")
 if(missing(x)) stop("The argument x should be specified")
 if (!inherits(x, "multlcmm")) stop("use only with \"lcmm\" or \"multlcmm\" objects")
+if(x$randomVar == 1) stop("This function is not implemented for the model with heteroscedastic error.")
 if (!all(x$Xnames2 %in% colnames(newdata))) stop(paste(c("newdata should at least include the following covariates: ","\n",x$Xnames2),collapse=" "))
 if (!inherits(newdata, "data.frame")) stop("newdata should be a data.frame object")
 #if(missing(var.time)) stop("missing argument 'var.time'")
 #if(!(var.time %in% colnames(newdata))) stop("'var.time' should be included in newdata")
+
+
 
 if(x$conv==1 | x$conv==2 | x$conv==3) 
 {

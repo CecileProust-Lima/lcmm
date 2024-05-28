@@ -12,6 +12,7 @@ multlcmm(
   fixed,
   mixture,
   random,
+  randomRSE,
   subject,
   classmb,
   ng = 1,
@@ -39,13 +40,15 @@ multlcmm(
   returndata = FALSE,
   methInteg = "QMC",
   nMC = 1000,
-  cholesky = TRUE
+  cholesky = TRUE, 
+  sobol.seed = 4711
 )
 
 mlcmm(
   fixed,
   mixture,
   random,
+  randomRSE,
   subject,
   classmb,
   ng = 1,
@@ -73,7 +76,8 @@ mlcmm(
   returndata = FALSE,
   methInteg = "QMC",
   nMC = 1000,
-  cholesky = TRUE
+  cholesky = TRUE,
+  sobol.seed = 4711
 )
 }
 \arguments{
@@ -97,6 +101,14 @@ latent process mixed model. At least one random effect should be included
 for identifiability purposes. Covariates with a random-effect are separated
 by \code{+}. By default, an intercept is included. If no intercept,
 \code{-1} should be the first term included.}
+
+\item{randomRSE}{an optional one-sided formula for the  location-scale models. 
+It should include fixed effects in the sub-model for the residual variance. 
+By including covariates in the residual variance sub-model, a random-effect is
+also considered in this submodel. By default, an intercept is included. Currently, the 
+location-scale model is available only for the thresholds link function, one
+outcome and without considering latent classes. }
+
 
 \item{subject}{name of the covariate representing the grouping structure.}
 
@@ -221,6 +233,10 @@ are considered. 'MCO' for ordinary Monte Carlo, 'MCA' for antithetic Monte Carlo
 'QMC' for quasi MonteCarlo.}
 
 \item{nMC}{integer, number of Monte Carlo simulations}
+
+
+\item{sobol.seed}{seed used for Owen-type scrambling Sobol sequence in Quasi-Monte Carlo method.}
+
 }
 \value{
 The list returned is: \item{ns}{number of grouping units in the
@@ -417,6 +433,25 @@ postprob(m2)
 newdata <- data.frame(Time=seq(0,5,length=100),X1=rep(0,100),X2=rep(0,100),X3=rep(0,100))
 predGH <- predictY(m2,newdata,var.time="Time",methInteg=0,nsim=20) 
 head(predGH)
+
+
+#### Location-scale latent process mixed model with threshold link functions
+data(ordinal_score_data)
+# create spline variables
+ns <- ns(ordinal_score_data$time,   knots  = 1)
+ordinal_score_data$ns1 <- ns[,1]; ordinal_score_data$ns2 <- ns[,2]
+# Create a vector of initial values
+Binit <- c( -0.1,  0.01, -0.1, -0.1, -1.78, -0.11, -0.61, 
+            1.17, -1.01, 0.52, 1.5, -2.14, 1.28, 1.22, 1.36, 
+            1.44)
+# Fit the model using multlcmm
+m3 <- multlcmm(score~ns1+ns2+ns1:treatment+ns2:treatment,random=~ns1+ns2,
+	 randomRSE=~treatment, subject="i",data = ordinal_score_data, 
+         link = "thresholds", nMC = 1000, B = Binit)
+# summary of the estimation
+summary(m2)
+
+
 }
 
 }

@@ -3,6 +3,7 @@ fitY.multlcmm <- function(x)
     {
         if(missing(x)) stop("The model should be specified")
         if(!inherits(x,"multlcmm")) stop("Use with 'multlcmm' objects only")
+	if(x$randomVar == 1) stop("This function is not implemented for the model with heteroscedastic error.")
 
         if(!is.null(x$data))
         {

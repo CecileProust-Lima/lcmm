@@ -5,10 +5,10 @@ module communmo
   integer,save ::ny,ns,ng,nv,idiag,ncssg,nvc,nea,ncg,nwg,ncor &
        ,nprob,nvarprob,maxmes,nobs,nef,ncontr,nalea &
        ,nySPL,ntotvalSPL,nyORD,ntotvalORD,npmtot &
-       ,nMC,methInteg,chol
+       ,nMC,methInteg,chol,randomvi,ntau
   double precision,dimension(:),allocatable,save::Y,uniqueY,minY,maxY,rangeY
   double precision,dimension(:,:),allocatable,save ::X
-  integer,dimension(:),allocatable,save ::idea,idg,idprob,idcor,idcontr,indiceY
+  integer,dimension(:),allocatable,save ::idea,idg,idprob,idcor,idcontr,idtau,indiceY
   integer,dimension(:),allocatable,save ::prior
   integer,dimension(:),allocatable,save ::idlink,ntrtot
   integer,dimension(:,:),allocatable,save ::nmes
@@ -35,13 +35,13 @@ end module donnees_indivmo
 
 
 
-subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
+subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0,idtau0 &
      ,ny0,ns0,ng0,nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0,nalea0&
      ,npmtot0,btot,Vopt,vrais,ni,istop,gconv,ppi0,resid_m &
      ,resid_ss,pred_m_g,pred_ss_g,pred_RE,pred_RE_Y,convB,convL,convG &
      ,maxiter0,epsY0,idlink0,nbzitr0,zitr0,uniqueY0,indiceY0 &
      ,nvalSPLORD0,marker,transfY,nsim0,Yobs,Ydiscret,vraisdiscret,UACV,rlindiv&
-     ,pbH0,fix0,methInteg0,nMC0,dimMC0,seqMC0,chol0)
+     ,pbH0,fix0,methInteg0,nMC0,dimMC0,seqMC0,chol0,randomvi0)
 
   use parameters
   use communmo
@@ -50,14 +50,14 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
   IMPLICIT NONE
 
   !Declaration des variables en entree
-  integer,intent(in)::nv0,maxiter0,Ydiscret,ny0,nMC0,methInteg0,dimMC0,chol0
+  integer,intent(in)::nv0,maxiter0,Ydiscret,ny0,nMC0,methInteg0,dimMC0,chol0,randomvi0
   integer, intent(in)::ns0,ng0,nobs0,idiag0,nwg0,npmtot0,nea0,nsim0,ncor0,nalea0
   double precision,dimension(ny0),intent(in)::epsY0
   integer, dimension(ny0),intent(in)::idlink0,nbzitr0,nvalSPLORD0
   double precision,dimension(maxval(nbzitr0),ny0),intent(in)::zitr0
   integer,dimension(nobs0),intent(in)::indiceY0
   double precision,dimension(sum(nvalSPLORD0(:))),intent(in)::uniqueY0
-  integer, dimension(nv0),intent(in)::idea0,idg0,idprob0,idcor0,idcontr0
+  integer, dimension(nv0),intent(in)::idea0,idg0,idprob0,idcor0,idcontr0,idtau0
   integer, dimension(ns0),intent(in)::prior0
   integer,dimension(ns0,ny0)::nmes0   
   double precision,dimension(nobs0),intent(in)::Y0
@@ -117,7 +117,6 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
   vraisdiscret=0.d0
   UACV=0.d0
   rlindiv=0.d0
-
 
 
   ! fin en prevision
@@ -238,7 +237,7 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
 
 
   allocate(Y(nobs0),idprob(nv0),X(nobs0,nv0),uniqueY(ntotvalSPL+ntotvalORD) &
-       ,idea(nv0),idg(nv0),idcor(nv0),idcontr(nv0),nmes(ns0,ny0),prior(ns0) &
+       ,idea(nv0),idg(nv0),idcor(nv0),idcontr(nv0),idtau(nv0),nmes(ns0,ny0),prior(ns0) &
        ,indiceY(nobs0))
 
   eps=1.d-20
@@ -251,6 +250,7 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
   nobs=nobs0
   ncor=ncor0
   nalea=nalea0
+  randomvi = randomvi0
   if (nwg0.eq.0) then
      nwg=0
   else
@@ -281,6 +281,7 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
      idg(k)=idg0(k)
      idcor(k)=idcor0(k)
      idcontr(k)=idcontr0(k)
+     idtau(k)=idtau0(k)
 
      jtemp=0
      DO i=1,ns
@@ -332,6 +333,7 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
   !nvarprob=min(ng-1,1)  (a remettre si on remet idprob[1]=0)
   nvarprob=0
   ncontr=0
+  ntau = 0
   do k=1,nv
      if (idg(k).eq.1) then
         ncssg=ncssg+1      ! nb var. sans melange
@@ -342,25 +344,26 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
      nprob=nprob+(idprob(k))*(ng-1)
      nvarprob=nvarprob+idprob(k)
      ncontr=ncontr+idcontr(k)*(ny-1) 
+     ntau = ntau + idtau0(k)
   end do
 
+  if(randomvi.eq.0)ntau = 0
 
 
   !  nb effets fixes = nb effets fixes sans melange
   !                  + ng fois le nb de var dans melange
 
-
   if (idiag.eq.1) then
-     nvc=nea-1
+     nvc=nea-1!+randomvi
   else if(idiag.eq.0) then
      nvc=(nea+1)*nea/2-1
   end if
-
-  nef=ncssg+ncg*ng-1
+! ny corresponds to randomvi - parameter for the variance of random effect in the variance of the residual error or simply variance of the residual error
+  nef=ncssg+ncg*ng-1+ntau
   npmtot=nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sum(ntrtot(:))
-  !print*,nprob,nef,ncontr,nvc,nwg,ncor,ny,nalea,ntrtot
-  !print*,"npmtot=",npmtot
-  !print*,"btot=",btot
+!  print*,nprob,nef,ncontr,nvc,nwg,ncor,ny,nalea,ntrtot
+!  print*,"npmtot=",npmtot
+ ! print*,"btot=",btot
   ! if (verbose==1 ) write(*,*)"npm0=",npm0,"npm=",npm
 
   !  write(*,*)'idlink',idlink
@@ -379,18 +382,18 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
   ! si idiag=0, on met dans le vecteur des parms, les parms
   ! de la transformee de Cholesky
 
-  if (idiag.eq.0) then
-
-     mvc(1)=1.d0
-     DO j=1,nvc
-        mvc(1+j)=btot(nprob+nef+ncontr+j)
-     END DO
-
-     CALL dmfsd(mvc,nea,EPS,IER)
-     DO j=1,nvc
-        btot(nprob+nef+ncontr+j)=mvc(1+j)
-     END DO
-  end if
+!  if (idiag.eq.0) then
+!
+!     mvc(1)=1.d0
+!     DO j=1,nvc
+!        mvc(1+j)=btot(nprob+nef+ncontr+j)
+!     END DO
+!
+!     CALL dmfsd(mvc,nea,EPS,IER)
+!     DO j=1,nvc
+!        btot(nprob+nef+ncontr+j)=mvc(1+j)
+!     END DO
+!  end if
   if (nwg.gt.0) then
      do i=1,nwg
         btot(nprob+nef+ncontr+nvc+i)=abs(btot(nprob+nef+ncontr+nvc+i))
@@ -399,13 +402,13 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
 
 
   ! points qmc
-  !if(all(idlink.ne.3) .or. methInteg.ne.3) then
   if(methInteg.ne.3) then 
      allocate(seqMC(1))
   else
      allocate(seqMC(dimMC0*nMC))
      seqMC = seqMC0(1:dimMC0*nMC) 
   end if
+
   
   ! creation du vecteur b avec slt les prm a estimer
   b=0.d0
@@ -441,7 +444,6 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
      end if
   end if
 
-  
   !print*,"npmtot=",npmtot, " npm=",npm
   !print*,"b=",b, " bfix=",bfix
   ! lancement de l'optimisation
@@ -486,13 +488,13 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
 
      if (istop.eq.1.or.istop.eq.2.or.istop.eq.3) then  
         !if (verbose==1) write(*,*)'avant transfo'
-        !call transfos_estimees(btot,npmtot,nsim0,marker,transfY)
+        call transfos_estimees_2(btot,npmtot,nsim0,marker,transfY)
         ! end if  
 
         !if (istop.eq.1) then
         if (ng.gt.1) then
            !                if(verbose==1)  write(*,*)'avant postprob'
-           !   call postprobmo(btot,npmtot,PPI)
+              call postprobmo(btot,npmtot,PPI)
         end if
 
 
@@ -505,7 +507,7 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
 
         ig=0
         ij=0
-        do i=1,ns                                 
+        do i=1,ns
            do g=1,ng0
               ig=ig+1
               ppi0(ig)=PPI(i,g)
@@ -537,13 +539,12 @@ subroutine hetmixmult(Y0,X0,Prior0,idprob0,idea0,idg0,idcor0,idcontr0 &
   
 1589 continue
 
-  deallocate(Y,X,idprob,idea,idg,idcor,idcontr,nmes,prior,uniqueY,indiceY,ntrtot)
+  deallocate(Y,X,idprob,idea,idg,idcor,idcontr,idtau,nmes,prior,uniqueY,indiceY,ntrtot)
 
 
   deallocate(zitr,mm,mm1,mm2,im,im1,im2,minY,maxY,rangeY,idlink,nvalSPL,nvalORD,epsY)
 
   deallocate(fix,bfix,pbH,seqMC)
-
 
   !write(*,*)'fin'
   return
@@ -568,32 +569,31 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
   use donnees_indivmo,only:nmescur
 
   IMPLICIT NONE
-  integer ::i,j,k,l,m,g,l2,m2,id,jd,jj,npm,ll,ii,numSPL,ykord
+  integer ::i,j,k,l,m,g,l2,m2,id,jd,jj,npm,ll,ii,numSPL,ykord,nstd_err
   integer ::ier,nmoins,kk,j1,j2,q,sumMesYk,yk,sumntrtot,sumntr
-  double precision,dimension(maxmes,nv) ::X00,X2
+  double precision,dimension(maxmes,nv) ::X00,X2, X02
   double precision,dimension(maxmes,nea) ::Z,P
   double precision,dimension(maxmes,(ncontr+sum(idcontr)))::X01
   double precision,dimension(ncontr+sum(idcontr))::b01
-  double precision,dimension(nprob) ::Xprob,bprob  !dim=nprob+1 si idprob[1]=0
+  double precision,dimension(nprob) ::Xprob,bprob
   double precision,dimension(nea,nea) ::Ut,Ut1,varB
   double precision,dimension(maxmes,maxmes) ::VC,Corr
   double precision,dimension(npm) :: b
   double precision,dimension(maxmes*(maxmes+1)/2) ::Vi
-  double precision,dimension(nv) :: b0,b2
+  double precision,dimension(nv) :: b0,b2,b02
   double precision,dimension(npmtot)::b1
   double precision,dimension(nvc+1)::mvc
 
-  double precision :: vrais,eps,det,som,thi,thj,temp,eta0,vrais_Y
+  double precision :: vrais,eps,det,som,thi,thj,temp,eta0,vrais_Y,vieps
   double precision ::Y4,expo,jacobien,beta_densite,ytemp
-  double precision,dimension(maxmes) :: mu,Y1,Y2,Y3,tcor
+  double precision,dimension(maxmes) :: mu,Y1,Y2,Y3,tcor,mu_residual
   double precision,dimension(ng) :: pi
-  !double precision,dimension(maxval(ntrtot))::splaa ! essayer avec premier indice =-1
   double precision,dimension(-1:maxval(ntrtot)-3)::splaa
   double precision::aa1,bb1,dd1,aa,bb,betai,cc1
   double precision,dimension(nea)::ui,usim
   double precision,dimension(maxmes)::wi,wsim
   double precision,dimension(ny)::asim
-  double precision::ai,binf,bsup
+  double precision::ai,binf,bsup,var_vi
   double precision::SX,x22,div,vrais_l
   double precision,external::alnorm
 
@@ -605,7 +605,6 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
   !if(i==1 .and. id==0 .and. jd==0) then
   !print*, "b=",b   
   !end if
-
   b1=0.d0
   eps=1.D-20
   l=0
@@ -623,14 +622,14 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
      end if
   end do
 
-
+  if(randomvi.eq.1)var_vi = b1(npmtot)*b1(npmtot)
   !----------- rappel des parametres utilises ---------
 
 
 
   !        write(*,*)'i',i,nmescur,nmescur + nmes(i)
-
-
+nstd_err = 1
+if(randomvi.eq.1)nstd_err = 0
   Ut=0.d0
   Ut(1,1)=1.d0
   if (nea>1) then 
@@ -658,7 +657,6 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
 
   end if
 
-!print*,"au debut Ut=",Ut
   vrais_Y=0.d0
   jacobien=0.d0
   ! -------- creation de Vi = ZiGZi'+se*seIni ----------
@@ -701,7 +699,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
      end do
 
      ! passer en cholesky si on a de l ordinal
-     if(any(idlink.eq.3)) then
+     if(any(idlink.eq.3).or.nMC.ne.0) then
         jj=0
         Vi=0.d0
         do j=1,sum(nmes(i,:))
@@ -732,7 +730,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
   do yk=1,ny
 
      ! si que du continu, ajouter alpha et sigma dans corr
-     if(all(idlink.ne.3)) then
+     if(all(idlink.ne.3).and.nMC.eq.0) then
         do j1=1,nmes(i,yk)
            Corr(sumMesYk+j1,sumMesYk+j1) =  Corr(sumMesYk+j1,sumMesYk+j1)+b1(nprob+nef+ncontr+nvc+nwg+ncor+yk)**2 !variance de l'erreur k
            if (nalea.eq.ny) then
@@ -746,10 +744,10 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
      if (idlink(yk).eq.0) then  ! Linear link
 
         do j=1,nmes(i,yk)
-           Y1(sumMesYk+j)=(dble(Y(nmescur+sumMesYk+j))-b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+1)) &
-                /abs(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+2))
+           Y1(sumMesYk+j)=(dble(Y(nmescur+sumMesYk+j))-b1(nprob+nef+ncontr+nvc+nwg+ncor+ny*nstd_err+nalea+sumntrtot+1)) &
+                /abs(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny*nstd_err+nalea+sumntrtot+2))
 
-           jacobien = jacobien - log(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+2))
+           jacobien = jacobien - log(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny*nstd_err+nalea+sumntrtot+2))
         end do
 
      else if (idlink(yk).eq.1) then  ! Beta link
@@ -795,10 +793,8 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
            splaa(kk-3)=b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)&
                 *b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)
         end do
-        !if(i==1 .and. id==0 .and. jd==0) print*,"eta0=",eta0,"splaa=",sqrt(splaa)
         do j=1,nmes(i,yk)
            ll=0
-           !if(i==1 .and. id==0 .and. jd==0) print*,"Y=",Y(nmescur+sumMesYk+j)
            if (Y(nmescur+sumMesYk+j).eq.zitr(ntrtot(yk)-2,numSPL)) then
               ll=ntrtot(yk)-3
            end if
@@ -813,7 +809,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
 
            if (ll.lt.1.or.ll.gt.ntrtot(yk)-3) then          
               vrais_multo_i=-1.d9
-              print*,"-1.d9 ll<1 ou ll>ntrtot-3",ll!," ntrtot=",ntrtot(yk)," numSPL=",numSPL," y=",Y(nmescur+sumMesYk+j)
+              !print*,"-1.d9 ll<1 ou ll>ntrtot-3",ll!," ntrtot=",ntrtot(yk)," numSPL=",numSPL," y=",Y(nmescur+sumMesYk+j)
               goto 654
            end if
            if (ll.gt.1) then
@@ -832,36 +828,16 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                 +splaa(ll-1)*mm1(indiceY(nmescur+sumMesYk+j))&
                 +splaa(ll)*mm(indiceY(nmescur+sumMesYk+j)))
 
-           !print*,"jac=",jacobien
-           !print*,"ll =",ll
-           !print*,"splaa =",splaa(ll-2)
-           !print*,"nmescur+sumMesYk+j =",nmescur+sumMesYk+j
-           !print*,"indiceY= ",indiceY(nmescur+sumMesYk+j)
-           !print*,"mm =",mm(nmescur+sumMesYk+j)
-           !print*,"mm1 =",mm1(nmescur+sumMesYk+j)
-           !print*,"mm2 =",mm2(nmescur+sumMesYk+j)
-           !print*,"Y =",Y(nmescur+sumMesYk+j)
-
-           !                write(*,*)'Y',Y1(sumMesYk+j),sumMesYk,yk,j,jacobien
         end do
      else if (idlink(yk).eq.3) then
         do j=1,nmes(i,yk)
            Y1(sumMesYk+j)=Y(nmescur+sumMesYk+j)
-           !if(nmescur.lt.15) then
-           !   print*,"nmescur=",nmescur," sumMesYk=",sumMesYk," j=",j
-           !   print*,"Y=",Y(nmescur+sumMesYk+j), "  Y1=",Y1(sumMesYk+j)
-           !end if
         end do
      end if
      sumMesYk=sumMesYk+nmes(i,yk)
      sumntrtot=sumntrtot+ntrtot(yk)
   end do !fin boucle yk
 
-
-  !         if (i.lt.3)then
-  !            write(*,*)'nmes',nmes(i),b1((nprob+nef+ncontr+nvc+nwg+1):npm),nprob+nef+ncontr
-  !            write(*,*)'Y1',Y1
-  !         end if
 
 
   if(chol.eq.0) then
@@ -884,7 +860,6 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
            end if
         end do
      end do
-!     print*,"varB=",varB
 
      ! calculer la cholesky pour les points MC
      mvc=0.d0
@@ -904,30 +879,28 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
            Ut(j1,j2) = mvc(j)
         end do
      end do
-!print*,'chol=',mvc
-!print*,'Ut=',Ut
            
   else
      ! parametrisation cholesky
-     varB = matmul(transpose(Ut),Ut)
+     varB = matmul(transpose(Ut),Ut) !- this is not correct
+   !   varB = matmul(Ut,transpose(Ut))
   end if
-  
-
-
   ! contribution individuelle a la vraisemblance
-  ! print*,"i=",i," -ni*log(2pi)=",-sum(nmes(i,:))*dlog(dble(2*3.14159265)), " log(det)=",det
-  ! print*,"Vi=",VC
-  ! sans classes latentes : ng=1
   vrais_multo_i=0.d0
 
-  if (ng.eq.1) then
 
+  if (ng.eq.1) then
+     ! sans classes latentes : ng=1
+     
      b0=0.d0
      b01=0.d0
+     b02=0.d0
      l=0
      m=0
+     ll=0
      X00=0.d0
      X01=0.d0
+     X02=0.d0
      do k=1,nv
         if (idg(k).ne.0) then
            l=l+1
@@ -961,11 +934,27 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
               end if
            end do
         end if
-     end do
+    !covariables pour les effets fixte dans l'expression de la variance de SE
+        if(randomvi.eq.1) then
+          if(idtau(k).ne.0) then
+            ll=ll+1
+             do j=1,sum(nmes(i,:))
+              X02(j,ll)=dble(X(nmescur+j,k))  
+            end do
+             ! idg ne 0 pour l'intercept forcement donc on met le parm a 0
+     !      if (ll.eq.1) then
+     !         b02(ll)=0.d0
+     !      else
+              b02(ll)=b1(nprob+ncssg+ll-1)
+      !     end if
 
+          end if
+        end if
+
+
+     end do
      if(all(idlink.ne.3) .and. nMC.eq.0) then
 !!!!!!!!!!! que du continu !!!!!!!!!!!!!!!
-!print*,"que continu"
         P=0.d0
         P=MATMUL(Z,Ut)
         VC=0.d0
@@ -991,12 +980,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
         CALL dsinv(Vi,sum(nmes(i,:)),eps,ier,det)
         if (ier.eq.-1) then
            vrais_multo_i=-1.d9
-           print*,"-1.d9 dsinv que continu"
-           !print*,"b=",b
-           !print*,"bfix=",bfix
-           !print*,"id=",id,"thi=",thi
-           !print*,"jd=",jd,"thj=",thj
-           !print*,"fix=",fix
+           !print*,"-1.d9 dsinv que continu"
            goto 654
         end if
 
@@ -1020,7 +1004,6 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
         Y2=Y1-mu
         Y3=matmul(VC,Y2)
         Y4=DOT_PRODUCT(Y2,Y3)
-        !print*,"Y4=",Y4
 
         vrais_Y=-sum(nmes(i,:))*dlog(dble(2*3.14159265))-det
         vrais_Y = vrais_Y-Y4
@@ -1028,7 +1011,6 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
 
      else
 !!!!!!!!!! au moins 1 ordinal !!!!!!!!!!!!!
-        !if(i.lt.4)print*,"avant MC, nMC=",nMC
 
         som=0.d0
         do l=1,nMC
@@ -1046,11 +1028,9 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                  SX=1.d0
                  do j=1,nea
                     call bgos(SX,0,usim(j),x22,0.d0)
-                    !print*,"usim=",usim(j)
                  end do
                  ui=0.d0
                  ui=matmul(Ut,usim)
-                 !print*,"usim=",usim(j)," ui=",ui, " Ut=",Ut, "  nea=",nea
               end if
 
               ! simuler le BM ou AR
@@ -1111,7 +1091,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                  ui=0.d0
                  ui=matmul(Ut,usim)
               end if
-                 
+       j =1 ! in case there is no AR or BM we initialize j to 1          
               ! simuler le BM ou AR
               if(ncor.gt.0) then
                  wsim=0.d0
@@ -1121,20 +1101,21 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                  wi=0.d0
                  wi=matmul(Corr,wsim)
               end if
-              
 
+             ! simuler vi (random effect for variance of epsilon) only works with QMC for now
+             if(randomvi.eq.1)then
+!write(*,*)"sqrt(var_vi),nMC*(nea+j+l)",sqrt(var_vi),nMC*(nea+j)+l,nea,j
+                  vieps =sqrt(var_vi)* seqMC(nMC*(nea+j-1)+l) 
+!we take j from previous loop, if there is correlation process, j would be the number of observations, otherwise it would be 0
+             end if
            end if ! fin if methInteg
-
 
            ! esperance conditionnelle
            mu = matmul(X00,b0)+matmul(X01,b01)+matmul(Z,ui)
+	  if(randomvi.eq.1)then 
+             mu_residual = matmul(X02,b02)+vieps
+           end if
            if(ncor.gt.0) mu = mu+wi
-           !if(i.lt.4) then
-           !print*,"i=",i," nmes=",nmes(i,1)," nmescur=",nmescur
-           !print*,"Xb=",matmul(X00,b0)+matmul(X01,b01)
-           !print*,"mu=",mu
-           !print*,"ui=",ui, " wi=",wi," xb=",matmul(X00,b0)+matmul(X01,b01)
-           !end if
            sumMesYk=0
            sumntr=0
            ykord=0
@@ -1150,7 +1131,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                     if(methInteg.eq.1) then
                        !! MCO
                        call bgos(SX,0,asim(yk),x22,0.d0)
-                       ai = b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+yk)*asim(yk)
+                       ai = b1(nprob+nef+ncontr+nvc+nwg+ncor+ny*nstd_err+yk)*asim(yk)
                     else if(methInteg.eq.2) then
                        !! MCA
                        if(mod(l,2).eq.0) then
@@ -1158,12 +1139,12 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                           ai = -ai
                        else
                           call bgos(SX,0,asim(yk),x22,0.d0)
-                          ai = b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+yk)*asim(yk)
+                          ai = b1(nprob+nef+ncontr+nvc+nwg+ncor+ny*nstd_err+yk)*asim(yk)
                        end if
                     else
                        !! QMC
                        asim(yk) = seqMC(nMC*(nea+sum(nmes(i,:)))+l)
-                       ai = b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+yk)*asim(yk)
+                       ai = b1(nprob+nef+ncontr+nvc+nwg+ncor+ny*nstd_err+yk)*asim(yk)
                     end if
                  end if
 
@@ -1173,49 +1154,57 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                     if(nalea.gt.0) mu(sumMesYk+j) = mu(sumMesYk+j)+ai
 
                     !! trouver binf et bsup tq binf < lambda + epsilon < bsup
-
                     !! initialiser au premier seuil
-                    binf = b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntr+1)
+                    binf = b1(nprob+nef+ncontr+nvc+nwg+ncor+ny*nstd_err+nalea+sumntr+1)
                     bsup = binf
-
+!write(*,*)binf
                     !! si Y>minY ajouter b1(..)^2
                     if(indiceY(nmescur+sumMesYk+j).gt.1) then
                        do ll=2,min(indiceY(nmescur+sumMesYk+j),ntrtot(yk))
-                          bsup = bsup + b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntr+ll)**2
+                          bsup = bsup + b1(nprob+nef+ncontr+nvc+nwg+ncor+ny*nstd_err+nalea+sumntr+ll)**2
                           if(ll.lt.indiceY(nmescur+sumMesYk+j)) then
-                             binf = binf + b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntr+ll)**2
+                             binf = binf + b1(nprob+nef+ncontr+nvc+nwg+ncor+ny*nstd_err+nalea+sumntr+ll)**2
                           end if
                        end do
                     end if
-                    !if(i.lt.4)print*,"y=",Y1(sumMesYk+j)," indiceY=",indiceY(nmescur+sumMesYk+j), " Y=",Y(nmescur+sumMesYk+j)
-                    !print*," binf=",binf," bsup=",bsup
+  !  write(*,*)binf,bsup                
                     !! centrer et standardiser
+		if(randomvi.eq.0)then
                     binf = (binf - mu(sumMesYk+j))/b1(nprob+nef+ncontr+nvc+nwg+ncor+yk)
                     bsup = (bsup - mu(sumMesYk+j))/b1(nprob+nef+ncontr+nvc+nwg+ncor+yk)
+		else 
+			binf = (binf - mu(sumMesYk+j))/sqrt(exp(mu_residual(j)))
+			bsup = (bsup - mu(sumMesYk+j))/sqrt(exp(mu_residual(j)))
+		end if
+!if(i.eq.1)write(*,*)binf, bsup, mu(sumMesYk+j),b1(nprob+nef+ncontr+nvc+nwg+ncor+yk)
 
                     if(indiceY(nmescur+sumMesYk+j).eq.1) then
                        !! si Y=minY
                        vrais_l = vrais_l * alnorm(binf,.false.)
+!if(i.eq.1)write(*,*)"1",vrais_l, alnorm(binf,.false.)
 
                     else if(indiceY(nmescur+sumMesYk+j).eq.nvalORD(ykord)) then
                        !! si Y=maxY
                        vrais_l = vrais_l * (1.d0-alnorm(bsup,.false.))
-
+!if(i.eq.1)write(*,*)"2",vrais_l,(1.d0-alnorm(bsup,.false.))
                     else
                        !! minY < Y < maxY
                        vrais_l = vrais_l * (alnorm(bsup,.false.)-alnorm(binf,.false.))
+!if(i.eq.1)write(*,*)"3",vrais_l,alnorm(bsup,.false.),alnorm(binf,.false.)
+
 
                     end if
-                    !if(i.lt.4) print*,"vrais_l=",vrais_l
-
+  !   stop               
                  end do
 
 
               else
                  !! yk est continu
-!print*,"MC continu"
+
+                 if(nmes(i,yk).gt.0) then
                  !! variance de Y|ui,wi
                  VC=0.d0
+		if(randomvi.eq.0) then
                  do j1=1,nmes(i,yk)
                     VC(j1,j1) = b1(nprob+nef+ncontr+nvc+nwg+ncor+yk)**2 !variance de l'erreur yk
                     if (nalea.eq.ny) then ! intercept aleatoire de yk
@@ -1225,6 +1214,11 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                        end do
                     end if
                  end do
+		else 
+ 		do j1=1,nmes(i,yk)
+                    VC(j1,j1) = exp(mu_residual(j)) !variance de l'erreur yk
+                  end do
+		end if
 
                  ! Vi en vecteur
                  jj=0
@@ -1240,12 +1234,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                  CALL dsinv(Vi,nmes(i,yk),eps,ier,det)
                  if (ier.eq.-1) then
                     vrais_multo_i=-1.d9
-                    print*,"-1.d9 dsinv continu MC"
-                    !print*,"b=",b
-                    !print*,"bfix=",bfix
-                    !print*,"id=",id,"thi=",thi
-                    !print*,"jd=",jd,"thj=",thj
-                    !print*,"fix=",fix
+                    !print*,"-1.d9 dsinv continu MC"
                     goto 654
                  end if
 
@@ -1271,25 +1260,28 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                  Y3=matmul(VC,Y2)
                  Y4=DOT_PRODUCT(Y2,Y3)
                  
-                 div = (dble(2*3.14159265)**(nmes(i,yk)/2))*sqrt(exp(det))
+                 div = (dble(2*3.14159265)**(dble(nmes(i,yk)/2)))*sqrt(exp(det))
 
                  vrais_l = vrais_l * exp(-Y4/2.d0)/div
 
               end if
 
+           end if
+
               sumMesYk = sumMesYk+nmes(i,yk)
               sumntr = sumntr + ntrtot(yk)
            end do ! fin boucle yk
 
-           som = som + vrais_l
-           
-           !if(l.lt.3) print*,"l=", l, " som=",som
-        end do ! fin boucle MC
 
+           som = som + vrais_l
+!write(*,*)som,log(som),vrais_l
+          
+        end do ! fin boucle MC
+!stop
+!write(*,*)"som",som,'dlog(dble(nMC))',dlog(dble(nMC))
         vrais_Y = log(som) - dlog(dble(nMC))
 
      end if
-     !if (verbose==1) write(*,*)"vrais",vrais
      ! avec classes latentes:  ng>1  
   else
 
@@ -1319,7 +1311,6 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
            temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
 
            pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
-           !write(*,*)"pi(g)",pi(g)
         end do
 
         pi(ng)=1/(1+temp)
@@ -1371,112 +1362,15 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
            end do
         end if
      end do
+     
 
-
-     do l=1,nMC
-
-        if(methInteg.eq.1) then 
-           ! !!!!!!!!!!!!! MCO !!!!!!!!!!!!!
-
-           ! simuler les effets aleatoires
-           if(nea.gt.0) then
-              usim=0.d0
-              x22=0.d0
-              SX=1.d0
-              do j=1,nea
-                 call bgos(SX,0,usim(j),x22,0.d0)
-                 !print*,"usim=",usim(j)
-              end do
-              ui=0.d0
-              !ui=matmul(Ut,usim)
-              !print*," ui=",ui, " Ut=",Ut, "  nea=",nea(k)
-           end if
-
-           ! simuler le BM ou AR
-           if(ncor.gt.0) then
-              wsim=0.d0
-              x22=0.d0
-              SX=1.d0
-              do j=1,sum(nmes(i,:))
-                 call bgos(SX,0,wsim(j),x22,0.d0)
-              end do
-              wi=0.d0
-              wi=matmul(Corr,wsim)
-           end if
-
-           ! simuler EA specif
-           if(nalea.gt.0) then
-              asim=0.d0
-              x22=0.d0
-              SX=1.d0
-              do j=1,ny
-                 call bgos(SX,0,asim(j),x22,0.d0)
-              end do
-           end if
-
-        else if(methInteg.eq.2) then 
-           ! !!!!!!!!!!!!! MCA !!!!!!!!!!!!!
-
-
-           if(mod(l,2).eq.0) then
-              ! si l est pair on prend l'oppose des precedents
-              usim = -usim
-              wsim = -wsim
-              asim = -asim
-           else
-              ! sinon on simule des nouveaux
-
-              ! simuler les effets aleatoires
-              if(nea.gt.0) then
-                 usim=0.d0
-                 x22=0.d0
-                 SX=1.d0
-                 do j=1,nea
-                    call bgos(SX,0,usim(j),x22,0.d0)
-                 end do
-                 ui=0.d0
-                 !ui=matmul(Ut,usim)
-              end if
-
-              ! simuler le BM ou AR
-              if(ncor.gt.0) then
-                 wsim=0.d0
-                 x22=0.d0
-                 SX=1.d0
-                 do j=1,sum(nmes(i,:))
-                    call bgos(SX,0,wsim(j),x22,0.d0)
-                 end do
-                 wi=0.d0
-                 wi=matmul(Corr,wsim)
-              end if
-
-              ! simuler EA specif
-              if(nalea.gt.0) then
-                 asim=0.d0
-                 x22=0.d0
-                 SX=1.d0
-                 do j=1,ny
-                    call bgos(SX,0,asim(j),x22,0.d0)
-                 end do
-              end if
-
-           end if
-
-        else 
-           ! !!!!!!!!!!!!! QMC !!!!!!!!!!!!!
-
-           ! a voir si on peut utiliser LowDiscrepancy.f
-           ! ou si on cree les points dans R avec randtoolbox
-
-        end if
-
-
+     
+     if(all(idlink.ne.3).and.nMC.eq.0) then
         b2=0.d0
         b0=0.d0
         vrais=0.d0
         !! boucle sur les classes
         do g=1,ng
-           expo=1.d0
            nmoins=0
            l2=0
            m2=0
@@ -1524,63 +1418,235 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
            end if
 
 
-           if(all(idlink.ne.3)) then
-              if(l.eq.1) then
-                 P=0.d0
-                 P=MATMUL(Z,Ut1)
-                 VC=0.d0
-                 VC=MATMUL(P,transpose(P))+Corr
+           P=0.d0
+           P=MATMUL(Z,Ut1)
+           VC=0.d0
+           VC=MATMUL(P,transpose(P))+Corr
 
-                 ! Vi en vecteur
-                 Vi=0.d0
-                 jj=0
-                 do j=1,sum(nmes(i,:))
-                    do k=j,sum(nmes(i,:))
-                       jj=j+k*(k-1)/2
-                       Vi(jj)=VC(j,k)
-                    end do
-                 end do
+           ! Vi en vecteur
+           Vi=0.d0
+           jj=0
+           do j=1,sum(nmes(i,:))
+              do k=j,sum(nmes(i,:))
+                 jj=j+k*(k-1)/2
+                 Vi(jj)=VC(j,k)
+              end do
+           end do
 
 
-                 CALL dsinv(Vi,sum(nmes(i,:)),eps,ier,det)
-                 if (ier.eq.-1) then
-                    vrais_multo_i=-1.d9
-                    print*,"-1.d9 dsinv 2"
-                    goto 654
+           CALL dsinv(Vi,sum(nmes(i,:)),eps,ier,det)
+           if (ier.eq.-1) then
+              vrais_multo_i=-1.d9
+              !print*,"-1.d9 dsinv 2"
+              goto 654
+           end if
+
+           !     retransformation du vecteur Vi en matrice :
+           VC=0.d0
+           do j=1,sum(nmes(i,:))
+              do k=1,sum(nmes(i,:))
+                 if (k.ge.j) then
+                    VC(j,k)=Vi(j+k*(k-1)/2)
+                 else
+                    VC(j,k)=Vi(k+j*(j-1)/2)
                  end if
+              end do
+           end do
 
-                 !     retransformation du vecteur Vi en matrice :
-                 VC=0.d0
-                 do j=1,sum(nmes(i,:))
-                    do k=1,sum(nmes(i,:))
-                       if (k.ge.j) then
-                          VC(j,k)=Vi(j+k*(k-1)/2)
-                       else
-                          VC(j,k)=Vi(k+j*(j-1)/2)
-                       end if
-                    end do
+
+           mu=0.d0
+           y2=0.d0
+           y3=0.d0
+           y4=0.d0
+           mu=matmul(X00,b0)+matmul(X2,b2)+matmul(X01,b01)
+           Y2=Y1-mu
+           Y3=Matmul(VC,Y2)
+           Y4=0.d0
+           Y4=DOT_PRODUCT(Y2,Y3)
+           vrais_Y = vrais_Y + pi(g)*exp((-det-Y4)/2.d0)
+        end do
+
+        vrais_Y = -sum(nmes(i,:))*dlog(dble(2*3.14159265)) + log(vrais_Y)
+
+     else
+        !! au moins 1 ordinal
+        !ppi(i,:) = 0.d0
+        som = 0.d0   
+        do l=1,nMC
+           
+           
+           if(methInteg.eq.1) then 
+              ! !!!!!!!!!!!!! MCO !!!!!!!!!!!!!
+              
+              ! simuler les effets aleatoires
+              if(nea.gt.0) then
+                 usim=0.d0
+                 x22=0.d0
+                 SX=1.d0
+                 do j=1,nea
+                    call bgos(SX,0,usim(j),x22,0.d0)
+                    !print*,"usim=",usim(j)
                  end do
-
-
-                 mu=0.d0
-                 y2=0.d0
-                 y3=0.d0
-                 y4=0.d0
-                 mu=matmul(X00,b0)+matmul(X2,b2)+matmul(X01,b01)
-                 Y2=Y1-mu
-                 Y3=Matmul(VC,Y2)
-                 Y4=0.d0
-                 Y4=DOT_PRODUCT(Y2,Y3)
-                 !write(*,*)"y1=",y1
-                 !write(*,*)"y2=",y2
-                 !write(*,*)"y3=",y3
-                 !write(*,*)"y4=",y4
-                 vrais_Y = vrais_Y + pi(g)*exp((-det-Y4)/2.d0)
-                 !write(*,*)"expo =",expo
+                 ui=0.d0
+                 !ui=matmul(Ut,usim)
+                 !print*," ui=",ui, " Ut=",Ut, "  nea=",nea(k)
               end if
 
-           else
-              !! au moins 1 ordinal
+              ! simuler le BM ou AR
+              if(ncor.gt.0) then
+                 wsim=0.d0
+                 x22=0.d0
+                 SX=1.d0
+                 do j=1,sum(nmes(i,:))
+                    call bgos(SX,0,wsim(j),x22,0.d0)
+                 end do
+                 wi=0.d0
+                 wi=matmul(Corr,wsim)
+              end if
+if(i.eq.1.and.l.eq.1)write(*,*)ui,wi(1:5),"wsim",wsim(1:3)
+
+              ! simuler EA specif
+              if(nalea.gt.0) then
+                 asim=0.d0
+                 x22=0.d0
+                 SX=1.d0
+                 do j=1,ny
+                    call bgos(SX,0,asim(j),x22,0.d0)
+                 end do
+              end if
+
+           else if(methInteg.eq.2) then 
+              ! !!!!!!!!!!!!! MCA !!!!!!!!!!!!!
+
+
+              if(mod(l,2).eq.0) then
+                 ! si l est pair on prend l'oppose des precedents
+                 usim = -usim
+                 wsim = -wsim
+                 asim = -asim
+              else
+                 ! sinon on simule des nouveaux
+
+                 ! simuler les effets aleatoires
+                 if(nea.gt.0) then
+                    usim=0.d0
+                    x22=0.d0
+                    SX=1.d0
+                    do j=1,nea
+                       call bgos(SX,0,usim(j),x22,0.d0)
+                    end do
+                    ui=0.d0
+                    !ui=matmul(Ut,usim)
+                 end if
+
+                 ! simuler le BM ou AR
+                 if(ncor.gt.0) then
+                    wsim=0.d0
+                    x22=0.d0
+                    SX=1.d0
+                    do j=1,sum(nmes(i,:))
+                       call bgos(SX,0,wsim(j),x22,0.d0)
+                    end do
+                    wi=0.d0
+                    wi=matmul(Corr,wsim)
+                 end if
+
+                 ! simuler EA specif
+                 if(nalea.gt.0) then
+                    asim=0.d0
+                    x22=0.d0
+                    SX=1.d0
+                    do j=1,ny
+                       call bgos(SX,0,asim(j),x22,0.d0)
+                    end do
+                 end if
+
+              end if
+
+           else 
+              ! !!!!!!!!!!!!! QMC !!!!!!!!!!!!!
+
+              ! simuler les effets aleatoires
+              if(nea.gt.0) then
+                 usim=0.d0
+                 do j=1,nea
+                    usim(j)=seqMC(nMC*(j-1)+l)
+                 end do
+                 ui=0.d0
+                 !ui=matmul(Ut,usim)
+              end if
+
+              ! simuler le BM ou AR
+              if(ncor.gt.0) then
+                 wsim=0.d0
+                 do j=1,sum(nmes(i,:))
+                    wsim(j)=seqMC(nMC*(nea+j-1)+l)
+                 end do
+                 wi=0.d0
+                 wi=matmul(Corr,wsim)
+              end if
+if(i.eq.1.and.l.eq.1)write(*,*)ui,wi(1:5),"wsim",wsim(1:3)
+
+              ! simuler EA specif
+              if(nalea.gt.0) then
+                 asim=0.d0
+                 do j=1,ny
+                    asim(j) = seqMC(nMC*(nea+sum(nmes(i,:)))+l)
+                 end do
+              end if
+           endif
+
+           b2=0.d0
+           b0=0.d0
+           vrais=0.d0
+           !! boucle sur les classes
+           do g=1,ng
+              vrais_l = 1.d0
+              nmoins=0
+              l2=0
+              m2=0
+              do k=1,nv
+                 if (idg(k).eq.1) then
+                    ! parametre a 0 pour l'intercept
+                    if (k.eq.1) then
+                       m2=m2+1
+                       b0(m2)=0.d0
+                    else
+                       m2=m2+1
+                       b0(m2)=b1(nprob+nmoins+1)
+                       nmoins=nmoins+1
+                    end if
+                 else if (idg(k).eq.2) then
+                    ! parametre a 0 pour l'intercept de la premiere classe
+                    if (k.eq.1) then
+                       if (g.eq.1) then
+                          l2=l2+1
+                          b2(l2)=0.d0
+                          nmoins=nmoins+ng-1
+                       else
+                          l2=l2+1
+                          b2(l2)=b1(nprob+nmoins+g-1)
+                          nmoins=nmoins+ng-1
+                       end if
+                    else
+                       l2=l2+1
+                       b2(l2)=b1(nprob+nmoins+g)
+                       nmoins=nmoins+ng
+                    end if
+                 end if
+              end do
+
+
+              ! variance covariance si spec aux classes :
+              Ut1=Ut
+              if (nwg.ne.0) then
+                 Ut1=0.d0
+                 if (g.eq.ng) then
+                    Ut1=Ut
+                 else
+                    Ut1=Ut*abs(b1(nprob+nef+ncontr+nvc+g))
+                 end if
+              end if
 
               !! EA avec variance specif a la classe
               ui=matmul(Ut1,usim)
@@ -1588,27 +1654,28 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
 
               ! esperance conditionnelle
               mu = matmul(X00,b0)+matmul(X01,b01)+matmul(X2,b2)
-              mu = mu+matmul(Z,ui)+wi
+              mu = mu+matmul(Z,ui)
+              if(ncor.gt.0) mu = mu + wi
 
               sumMesYk=0
               sumntr=0
-              q=0
+              ykord=0
               do yk =1,ny
 
                  if(idlink(yk).eq.3) then
                     !! yk est ordinal
-                    q=q+1
+                    ykord=ykord+1
 
                     !! EA specifique au test
                     ai=0.d0
-                    if(nalea.gt.0) then
+                    if(nalea.gt.0) then                       
                        ai = b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+yk)*asim(yk)
                     end if
 
                     do j=1,nmes(i,yk)
 
                        !! on ajoute ai a mu
-                       mu(sumMesYk+j) = mu(sumMesYk+j)+ai
+                       if(nalea.gt.0) mu(sumMesYk+j) = mu(sumMesYk+j)+ai
 
                        !! trouver binf et bsup tq binf < lambda + epsilon < bsup :
 
@@ -1618,7 +1685,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
 
                        !! si Y>minY ajouter b1(..)^2
                        if(indiceY(nmescur+sumMesYk+j).gt.1) then
-                          do ll=2,indiceY(nmescur+sumMesYk+j)
+                          do ll=2,min(indiceY(nmescur+sumMesYk+j),ntrtot(yk))
                              bsup = bsup + b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntr+ll)**2
                              if(ll.lt.indiceY(nmescur+sumMesYk+j)) then
                                 binf = binf + b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntr+ll)**2
@@ -1632,15 +1699,15 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
 
                        if(indiceY(nmescur+sumMesYk+j).eq.1) then
                           !! si Y=minY
-                          expo = expo*alnorm(binf,.false.)
+                          vrais_l = vrais_l*alnorm(binf,.false.)
 
-                       else if(indiceY(nmescur+sumMesYk+j).eq.nvalORD(q)) then
+                       else if(indiceY(nmescur+sumMesYk+j).eq.nvalORD(ykord)) then
                           !! si Y=maxY
-                          expo = expo*(1.d0-alnorm(bsup,.false.))
+                          vrais_l = vrais_l*(1.d0-alnorm(bsup,.false.))
 
                        else
                           !! minY < Y < maxY
-                          expo = expo*(alnorm(bsup,.false.)-alnorm(binf,.false.))
+                          vrais_l = vrais_l*(alnorm(bsup,.false.)-alnorm(binf,.false.))
 
                        end if
 
@@ -1650,6 +1717,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                  else
                     !! yk est continu
 
+                    if(nmes(i,yk).gt.0) then
                     !! variance de Y|ui,wi
                     VC=0.d0
                     do j1=1,nmes(i,yk)
@@ -1676,12 +1744,6 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                     CALL dsinv(Vi,nmes(i,yk),eps,ier,det)
                     if (ier.eq.-1) then
                        vrais_multo_i=-1.d9
-                       !print*,"-1.d9 dsinv"
-                       !print*,"b=",b
-                       !print*,"bfix=",bfix
-                       !print*,"id=",id,"thi=",thi
-                       !print*,"jd=",jd,"thj=",thj
-                       !print*,"fix=",fix
                        goto 654
                     end if
 
@@ -1707,37 +1769,39 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
                     Y3=matmul(VC,Y2)
                     Y4=DOT_PRODUCT(Y2,Y3) 
 
-                    !! partie a sommer sur l
-                    expo = expo * exp((-det-Y4)/2.d0)
-                    ! print*,"expo=",expo
+                    !! densite gaussienne de yk
+                    vrais_l = vrais_l * exp((-det-Y4)/2.d0)
 
-                    if(l.eq.1) vrais_multo_i = vrais_multo_i -nmes(i,yk)/2.d0*dlog(dble(2*3.14159265))
-
+                    if(l.eq.1) vrais_multo_i = vrais_multo_i -dble(nmes(i,yk)/2.d0)*dlog(dble(2*3.14159265))
                  end if
+
+              end if
 
                  sumMesYk = sumMesYk+nmes(i,yk)
                  sumntr = sumntr + ntrtot(yk)
               end do ! fin boucle yk
 
-           end if
-
-           vrais = vrais+pi(g)*expo
-
-        end do ! fin boucle g
-
-        vrais_Y = vrais_Y + log(vrais)/dble(nMC)
-
-     end do !fin MC
-
-
+              vrais = vrais + pi(g) * vrais_l
+              
+           end do ! fin boucle g
+           
+           som = som + vrais
+              
+        end do ! fin boucle MC
+        
+        vrais_Y = log(som) - dlog(dble(nMC))
+     
+     end if
+     
   end if !fin if ng
-!print*,"i=",i," vrais_Y=",vrais_Y,"jac=",jacobien," vrais_multo_i=",vrais_multo_i
+!  if(i.eq.1)print*,"i=",i," vrais_Y=",vrais_Y,b1!,"jac=",jacobien," vrais_multo_i=",vrais_multo_i
   vrais_multo_i = vrais_multo_i + vrais_Y + jacobien
- ! print*,"vrais_multo_i=",vrais_multo_i
+ !  print*,"vrais_multo_i=",vrais_multo_i
+
 654 continue
-
+  
   return
-
+  
 end function vrais_multo_i
 
 
@@ -1759,8 +1823,10 @@ double precision function vrais_multo(b,m,id,thi,jd,thj)
 
   nmescur=0
   vrais_multo=0.d0
-  do i=1,ns
-     temp=vrais_multo_i(b,m,id,thi,jd,thj,i)          
+  do i=1,ns !1!
+!if(i.eq.1)write(*,*)"multo_i",b
+     temp=vrais_multo_i(b,m,id,thi,jd,thj,i)  
+  
      vrais_multo = vrais_multo + temp
      if (temp.eq.-1.d9 .or. temp/temp.ne.1) then 
         !if (temp/temp.ne.1) write(*,*)"i=",i,"vrais= ",temp
@@ -1771,6 +1837,7 @@ double precision function vrais_multo(b,m,id,thi,jd,thj)
         goto 541
      end iF
      nmescur = nmescur + sum(nmes(i,:))
+
   end do
 541 continue
   return
@@ -1863,3 +1930,970 @@ end do
 
       end subroutine design_splines_multo
 !fin design_splines
+
+
+      
+      subroutine postprobmo(b,npm,PPI)
+        use communmo
+        use optim
+        implicit none
+
+        integer ::i,j,k,l,m,g,l2,m2,jj,npm,ier,nmoins,kk,ii,ll,j1,j2,nmescur
+        integer::q,numSPL,sumMesYk,yk,sumntrtot,sumntr,ykord
+        double precision,dimension(maxmes,nea) ::Z,P
+        double precision,dimension(maxmes,nv) ::X00,X2
+        double precision,dimension(nprob) ::Xprob,bprob
+        double precision,dimension(nea,nea) ::Ut,Ut1,varB
+        double precision,dimension(maxmes,(ncontr+sum(idcontr)))::X01
+        double precision,dimension(ncontr+sum(idcontr))::b01
+        double precision,dimension(maxmes,maxmes) ::VC,Corr
+        double precision,dimension(npm) :: b,b1
+        double precision,dimension(maxmes*(maxmes+1)/2) ::Vi
+        double precision,dimension(nvc+1)::mvc
+        double precision,dimension(nv) :: b0,b2
+        double precision :: eps,det,som,temp,Y4,f,ytemp
+        double precision,dimension(ng) ::fi,pi
+        double precision,dimension(ns,ng) ::PPI
+        double precision,dimension(maxmes) :: mu,Y1,Y2,Y3,tcor
+        double precision,dimension(-1:(maxval(ntrtot)-3))::splaa
+        double precision::aa1,bb1,dd1,aa,bb,betai,cc1,eta0
+        double precision,dimension(nea)::ui,usim
+        double precision,dimension(maxmes)::wi,wsim
+        double precision,dimension(ny)::asim
+        double precision::ai,binf,bsup
+        double precision::SX,x22,div,vrais_l
+        double precision,external::alnorm
+        
+
+        eps=1.D-20
+
+        PPI=0.D0
+
+        do k=1,npm
+           b1(k)=b(k)
+        end do
+
+        ! cholesky de la variance des EA
+        Ut=0.d0
+        Ut(1,1)=1.d0
+        if (nea>1) then 
+
+           If (idiag.eq.1) then
+              do j=2,nea
+                 do k=2,nea
+                    if (j.eq.k) then
+                       Ut(j,k)=b1(nprob+nef+ncontr+j-1)
+                    else
+                       Ut(j,k)=0.d0
+                    end if
+                 end do
+              end do
+           end if
+
+           If (idiag.eq.0) then
+              do j=2,nea
+                 do k=1,j
+                    ! Ut triangulaire inferieure
+                    Ut(j,k)=b1(nprob+nef+ncontr+k-1+j*(j-1)/2)
+                 end do
+              end do
+           end if
+
+        end if
+
+        ! ----------- boucle sur les individus -------------
+        nmescur=0
+        do i=1,ns
+
+           ! creation de Zi
+           Z=0.d0
+           l=0
+           do k=1,nv
+              if (idea(k).eq.1) then
+                 l=l+1
+                 do j=1,sum(nmes(i,:))
+                    Z(j,l)=dble(X(nmescur+j,k))
+                 end do
+              end if
+           end do
+
+           !matrice Corr variance de BM/AR
+           Corr=0.d0
+           tcor=0.d0
+           if (ncor.gt.0) then
+              do k=1,nv
+                 if (idcor(k).eq.1) then
+                    do j=1,sum(nmes(i,:))
+                       tcor(j) = X(nmescur+j,k)
+                    end do
+                 end if
+              end do
+              do j1=1,sum(nmes(i,:))
+                 do j2=1,sum(nmes(i,:))
+                    if (ncor.eq.1) then 
+                       Corr(j1,j2) = Corr(j1,j2)+b1(nprob+nef+ncontr+nvc+nwg+ncor)* &
+                            b1(nprob+nef+ncontr+nvc+nwg+ncor)*min(tcor(j1),tcor(j2))
+                    else if (ncor.eq.2) then
+                       Corr(j1,j2) = Corr(j1,j2)+b1(nprob+nef+ncontr+nvc+nwg+ncor)* &
+                            b1(nprob+nef+ncontr+nvc+nwg+ncor)* &
+                            exp(-b1(nprob+nef+ncontr+nvc+nwg+1)*abs(tcor(j1)-tcor(j2)))
+                    end if
+                 end do
+              end do
+
+              ! passer en cholesky si on a de l ordinal
+              if(any(idlink.eq.3)) then
+                 jj=0
+                 Vi=0.d0
+                 do j=1,sum(nmes(i,:))
+                    do k=j,sum(nmes(i,:))
+                       jj=j+k*(k-1)/2
+                       Vi(jj)=Corr(j,k)
+                    end do
+                 end do
+
+                 CALL DMFSD(Vi,sum(nmes(i,:)),EPS,IER)
+
+                 Corr=0.d0
+                 do j=1,sum(nmes(i,:))
+                    do k=1,j
+                       Corr(j,k)=Vi(k+j*(j-1)/2)
+                    end do
+                 end do
+              end if
+           end if
+
+           ! creation de Y1
+           Y1=0.d0
+           splaa=0.d0
+           sumMesYk = 0
+           sumntrtot=0
+           numSPL=0
+           do yk=1,ny
+
+              ! si que du continu, ajouter alpha et sigma dans corr
+              if(all(idlink.ne.3)) then
+                 do j1=1,nmes(i,yk)
+                    Corr(sumMesYk+j1,sumMesYk+j1) =  Corr(sumMesYk+j1,sumMesYk+j1)+b1(nprob+nef+ncontr+nvc+nwg+ncor+yk)**2 !variance de l'erreur k
+                    if (nalea.eq.ny) then
+                       do j2=1,nmes(i,yk)
+                          Corr(sumMesYk+j1,sumMesYk+j2) = Corr(sumMesYk+j1,sumMesYk+j2)+b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+yk)**2 ! effet aleatoire specfique au test k
+                       end do
+                    end if
+                 end do
+              end if
+
+
+              ! transformations
+              if (idlink(yk).eq.0) then  ! Linear link
+
+                 do j=1,nmes(i,yk)
+                    Y1(sumMesYk+j)=(dble(Y(nmescur+sumMesYk+j))-b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+1)) &
+                         /abs(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+2))
+
+                 end do
+
+              else if (idlink(yk).eq.1) then  ! Beta link
+
+
+                 aa1=exp(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+1))/ &
+                      (1+exp(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+1)))
+                 bb1=exp(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+2))/ &
+                      (1+exp(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+2)))
+                 bb1=aa1*(1.d0-aa1)*bb1
+
+                 cc1=abs(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+3))
+
+                 dd1=abs(b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+4))
+
+                 aa=aa1*aa1*(1-aa1)/bb1-aa1
+                 bb=aa*(1-aa1)/aa1
+
+                 do j=1,nmes(i,yk)
+
+                    ytemp=(dble(Y(nmescur+sumMesYk+j))-minY(yk)+epsY(yk))/(maxY(yk)-minY(yk)+2*epsY(yk))
+                    Y1(sumMesYk+j)=(betai(aa,bb,ytemp)-cc1)/dd1
+
+
+                    if (Y1(sumMesYk+j).eq.999.d0) then
+                       ppi=-1.d0
+                       goto 654
+                    end if
+
+                 end do
+
+              else if (idlink(yk).eq.2) then ! Splines link
+                 numSPL=numSPL+1
+
+                 splaa=0.d0
+                 eta0=0.d0
+                 eta0=b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
+
+                 do kk=2,ntrtot(yk)
+                    splaa(kk-3)=b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)&
+                         *b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)
+                 end do
+
+                 do j=1,nmes(i,yk)
+                    ll=0
+                    if (Y(nmescur+sumMesYk+j).eq.zitr(ntrtot(yk)-2,numSPL)) then
+                       ll=ntrtot(yk)-3
+                    end if
+
+                    som=0.d0
+                    do kk = 2,ntrtot(yk)-2
+                       if ((Y(nmescur+sumMesYk+j).ge.zitr(kk-1,numSPL)).and. &
+                            (Y(nmescur+sumMesYk+j).lt.zitr(kk,numSPL))) then
+                          ll=kk-1
+                       end if
+                    end do
+
+                    if (ll.lt.1.or.ll.gt.ntrtot(yk)-3) then
+                       ppi=-1.d0
+                       goto 654
+                    end if
+                    if (ll.gt.1) then
+                       do ii=2,ll
+                          som=som+splaa(ii-3)
+                       end do
+                    end if
+
+                    Y1(sumMesYk+j)=eta0+som +splaa(ll-2)*im2(indiceY(nmescur+sumMesYk+j)) &
+                         +splaa(ll-1)*im1(indiceY(nmescur+sumMesYk+j))&
+                         + splaa(ll)*im(indiceY(nmescur+sumMesYk+j))
+
+                 end do
+              else if (idlink(yk).eq.3) then
+                 do j=1,nmes(i,yk)
+                    Y1(sumMesYk+j)=Y(nmescur+sumMesYk+j)
+                 end do
+              end if
+              sumMesYk=sumMesYk+nmes(i,yk)
+              sumntrtot=sumntrtot+ntrtot(yk)
+           end do !fin boucle yk
+
+
+           if(chol.eq.0) then
+              ! parametrisation sd et cor
+              varB=0.d0
+              do j1=1,nea
+                 do j2=1,j1
+                    if(j1.eq.j2) then
+                       varB(j1,j2) = Ut(j1,j2)*Ut(j1,j2)
+                    else
+                       varB(j1,j2) = (exp(Ut(j1,j2))-1)/(exp(Ut(j1,j2)+1))
+                       varB(j2,j1) = varB(j1,j2)
+                    end if
+                 end do
+              end do
+              do j1=1,nea
+                 do j2=1,nea
+                    if(j1.ne.j2) then
+                       varB(j1,j2) = varB(j1,j2)*sqrt(varB(j1,j1)*varB(j2,j2))
+                    end if
+                 end do
+              end do
+
+              ! calculer la cholesky pour les points MC
+              mvc=0.d0
+              j=0
+              do j1=1,nea
+                 do j2=1,j1
+                    j = j+1
+                    mvc(j)=varB(j1,j2)
+                 end do
+              end do
+              CALL dmfsd(mvc,nea,EPS,IER)
+              Ut=0.d0
+              j=0
+              do j1=1,nea
+                 do j2=1,j1
+                    j = j+1
+                    Ut(j1,j2) = mvc(j)
+                 end do
+              end do
+
+           else
+              ! parametrisation cholesky
+              varB = matmul(transpose(Ut),Ut)
+           end if
+
+
+           !! proba de chaque classe 
+           if (prior(i).ne.0) then
+              pi=0.d0
+              pi(prior(i))=1.d0
+           else
+
+              ! transformation des  pig=exp(Xbg)/(1+somme(Xbk,k=1,G-1))
+              Xprob=0.d0
+              l=0
+              do k=1,nv
+                 if (idprob(k).eq.1) then
+                    l=l+1
+                    Xprob(l)=X(nmescur+1,k)
+                 end if
+              end do
+              pi=0.d0
+              temp=0.d0
+              Do g=1,ng-1
+                 bprob=0.d0
+                 do k=1,nvarprob
+                    bprob(k)=b1((k-1)*(ng-1)+g)
+                 end do
+
+                 temp=temp+exp(DOT_PRODUCT(bprob,Xprob))
+
+                 pi(g)=exp(DOT_PRODUCT(bprob,Xprob))
+              end do
+
+              pi(ng)=1/(1+temp)
+
+              do g=1,ng-1
+                 pi(g)=pi(g)*pi(ng)
+              end do
+
+           end if
+
+           ! creation des vecteurs de variables explicatives
+           l=0
+           m=0
+           q=0
+           X00=0.d0
+           X2=0.d0
+           X01=0.d0
+           b01=0.d0
+           do k=1,nv
+              if (idg(k).eq.2) then ! en mixture
+                 l=l+1
+                 do j=1,sum(nmes(i,:))
+                    X2(j,l)=dble(X(nmescur+j,k))
+                 end do
+              else if (idg(k).eq.1) then ! en fixed commun
+                 m=m+1
+                 do j=1,sum(nmes(i,:))
+                    X00(j,m)=dble(X(nmescur+j,k))
+                 end do
+              end if
+
+              !contrast : 
+              if (idcontr(k).ne.0) then
+                 q=q+1
+                 sumMesYk=0
+                 do yk=1,ny
+                    ! creation matrice design des contrastes: X01
+                    do j=1,nmes(i,yk)
+                       X01(sumMesYk+j,(q-1)*ny+yk) = dble(X(nmescur+sumMesYk+j,k))
+                    end do
+                    sumMesYk=sumMesYk+nmes(i,yk)
+                    ! creation vecteur parms des contrastes: b01
+                    if (yk<ny) THEN
+                       b01((q-1)*ny+yk)=b1(nprob+nef+(q-1)*(ny-1)+yk)
+                    else
+                       b01((q-1)*ny+ny) =-sum(b1((nprob+nef+(q-1)*(ny-1)+1) &
+                            :(nprob+nef+(q-1)*(ny-1)+ny-1)))
+                    end if
+                 end do
+              end if
+           end do
+
+
+           !! cas tous les y sont continus
+           if(all(idlink.ne.3).and.nMC.eq.0) then
+              b2=0.d0
+              b0=0.d0
+              f=0.d0
+              fi=0.d0
+              !! boucle sur les classes
+              do g=1,ng
+                 nmoins=0
+                 l2=0
+                 m2=0
+                 do k=1,nv
+                    if (idg(k).eq.1) then
+                       ! parametre a 0 pour l'intercept
+                       if (k.eq.1) then
+                          m2=m2+1
+                          b0(m2)=0.d0
+                       else
+                          m2=m2+1
+                          b0(m2)=b1(nprob+nmoins+1)
+                          nmoins=nmoins+1
+                       end if
+                    else if (idg(k).eq.2) then
+                       ! parametre a 0 pour l'intercept de la premiere classe
+                       if (k.eq.1) then
+                          if (g.eq.1) then
+                             l2=l2+1
+                             b2(l2)=0.d0
+                             nmoins=nmoins+ng-1
+                          else
+                             l2=l2+1
+                             b2(l2)=b1(nprob+nmoins+g-1)
+                             nmoins=nmoins+ng-1
+                          end if
+                       else
+                          l2=l2+1
+                          b2(l2)=b1(nprob+nmoins+g)
+                          nmoins=nmoins+ng
+                       end if
+                    end if
+                 end do
+
+
+                 ! variance covariance si spec aux classes :
+                 Ut1=Ut
+                 if (nwg.ne.0) then
+                    Ut1=0.d0
+                    if (g.eq.ng) then
+                       Ut1=Ut
+                    else
+                       Ut1=Ut*abs(b1(nprob+nef+ncontr+nvc+g))
+                    end if
+                 end if
+
+
+                 P=0.d0
+                 P=MATMUL(Z,Ut1)
+                 VC=0.d0
+                 VC=MATMUL(P,transpose(P))+Corr
+
+                 ! Vi en vecteur
+                 Vi=0.d0
+                 jj=0
+                 do j=1,sum(nmes(i,:))
+                    do k=j,sum(nmes(i,:))
+                       jj=j+k*(k-1)/2
+                       Vi(jj)=VC(j,k)
+                    end do
+                 end do
+
+
+                 CALL dsinv(Vi,sum(nmes(i,:)),eps,ier,det)
+                 if (ier.eq.-1) then
+                    ppi=-1.d0
+                    goto 654
+                 end if
+
+                 !     retransformation du vecteur Vi en matrice :
+                 VC=0.d0
+                 do j=1,sum(nmes(i,:))
+                    do k=1,sum(nmes(i,:))
+                       if (k.ge.j) then
+                          VC(j,k)=Vi(j+k*(k-1)/2)
+                       else
+                          VC(j,k)=Vi(k+j*(j-1)/2)
+                       end if
+                    end do
+                 end do
+
+
+                 mu=0.d0
+                 y2=0.d0
+                 y3=0.d0
+                 y4=0.d0
+                 mu=matmul(X00,b0)+matmul(X2,b2)+matmul(X01,b01)
+                 Y2=Y1-mu
+                 Y3=Matmul(VC,Y2)
+                 Y4=0.d0
+                 Y4=DOT_PRODUCT(Y2,Y3)
+                 
+                 fi(g)=fi(g)- sum(nmes(i,:))*log(dble(2*3.14159265))
+                 fi(g)=fi(g) -det
+                 fi(g)=fi(g) - Y4
+                 fi(g)=fi(g)/(2.d0)
+                 fi(g)=exp(fi(g))
+                 
+              end do
+
+              
+
+           else
+              !! cas au moins 1 y est ordinal
+              
+              som = 0.d0
+              f=0.d0
+              fi=0.d0
+              do l=1,nMC
+
+
+                 if(methInteg.eq.1) then 
+                    ! !!!!!!!!!!!!! MCO !!!!!!!!!!!!!
+
+                    ! simuler les effets aleatoires
+                    if(nea.gt.0) then
+                       usim=0.d0
+                       x22=0.d0
+                       SX=1.d0
+                       do j=1,nea
+                          call bgos(SX,0,usim(j),x22,0.d0)
+                       end do
+                       ui=0.d0
+                    end if
+
+                    ! simuler le BM ou AR
+                    if(ncor.gt.0) then
+                       wsim=0.d0
+                       x22=0.d0
+                       SX=1.d0
+                       do j=1,sum(nmes(i,:))
+                          call bgos(SX,0,wsim(j),x22,0.d0)
+                       end do
+                       wi=0.d0
+                       wi=matmul(Corr,wsim)
+                    end if
+
+                    ! simuler EA specif
+                    if(nalea.gt.0) then
+                       asim=0.d0
+                       x22=0.d0
+                       SX=1.d0
+                       do j=1,ny
+                          call bgos(SX,0,asim(j),x22,0.d0)
+                       end do
+                    end if
+
+                 else if(methInteg.eq.2) then 
+                    ! !!!!!!!!!!!!! MCA !!!!!!!!!!!!!
+
+
+                    if(mod(l,2).eq.0) then
+                       ! si l est pair on prend l'oppose des precedents
+                       usim = -usim
+                       wsim = -wsim
+                       asim = -asim
+                    else
+                       ! sinon on simule des nouveaux
+
+                       ! simuler les effets aleatoires
+                       if(nea.gt.0) then
+                          usim=0.d0
+                          x22=0.d0
+                          SX=1.d0
+                          do j=1,nea
+                             call bgos(SX,0,usim(j),x22,0.d0)
+                          end do
+                          ui=0.d0
+                       end if
+
+                       ! simuler le BM ou AR
+                       if(ncor.gt.0) then
+                          wsim=0.d0
+                          x22=0.d0
+                          SX=1.d0
+                          do j=1,sum(nmes(i,:))
+                             call bgos(SX,0,wsim(j),x22,0.d0)
+                          end do
+                          wi=0.d0
+                          wi=matmul(Corr,wsim)
+                       end if
+
+                       ! simuler EA specif
+                       if(nalea.gt.0) then
+                          asim=0.d0
+                          x22=0.d0
+                          SX=1.d0
+                          do j=1,ny
+                             call bgos(SX,0,asim(j),x22,0.d0)
+                          end do
+                       end if
+
+                    end if
+
+                 else 
+                    ! !!!!!!!!!!!!! QMC !!!!!!!!!!!!!
+
+                    ! simuler les effets aleatoires
+                    if(nea.gt.0) then
+                       usim=0.d0
+                       do j=1,nea
+                          usim(j)=seqMC(nMC*(j-1)+l)
+                       end do
+                       ui=0.d0
+                    end if
+
+                    ! simuler le BM ou AR
+                    if(ncor.gt.0) then
+                       wsim=0.d0
+                       do j=1,sum(nmes(i,:))
+                          wsim(j)=seqMC(nMC*(nea+j-1)+l)
+                       end do
+                       wi=0.d0
+                       wi=matmul(Corr,wsim)
+                    end if
+
+                    ! simuler EA specif
+                    if(nalea.gt.0) then
+                       asim=0.d0
+                       do j=1,ny
+                          asim(j) = seqMC(nMC*(nea+sum(nmes(i,:)))+l)
+                       end do
+                    end if
+                 endif
+
+                 b2=0.d0
+                 b0=0.d0
+                 !! boucle sur les classes
+                 do g=1,ng
+                    vrais_l = 1.d0
+                    nmoins=0
+                    l2=0
+                    m2=0
+                    do k=1,nv
+                       if (idg(k).eq.1) then
+                          ! parametre a 0 pour l'intercept
+                          if (k.eq.1) then
+                             m2=m2+1
+                             b0(m2)=0.d0
+                          else
+                             m2=m2+1
+                             b0(m2)=b1(nprob+nmoins+1)
+                             nmoins=nmoins+1
+                          end if
+                       else if (idg(k).eq.2) then
+                          ! parametre a 0 pour l'intercept de la premiere classe
+                          if (k.eq.1) then
+                             if (g.eq.1) then
+                                l2=l2+1
+                                b2(l2)=0.d0
+                                nmoins=nmoins+ng-1
+                             else
+                                l2=l2+1
+                                b2(l2)=b1(nprob+nmoins+g-1)
+                                nmoins=nmoins+ng-1
+                             end if
+                          else
+                             l2=l2+1
+                             b2(l2)=b1(nprob+nmoins+g)
+                             nmoins=nmoins+ng
+                          end if
+                       end if
+                    end do
+
+
+                    ! variance covariance si spec aux classes :
+                    Ut1=Ut
+                    if (nwg.ne.0) then
+                       Ut1=0.d0
+                       if (g.eq.ng) then
+                          Ut1=Ut
+                       else
+                          Ut1=Ut*abs(b1(nprob+nef+ncontr+nvc+g))
+                       end if
+                    end if
+
+                    !! EA avec variance specif a la classe
+                    ui=matmul(Ut1,usim)
+
+
+                    ! esperance conditionnelle
+                    mu = matmul(X00,b0)+matmul(X01,b01)+matmul(X2,b2)
+                    mu = mu+matmul(Z,ui)
+                    if(ncor.gt.0) mu = mu + wi
+
+                    sumMesYk=0
+                    sumntr=0
+                    ykord=0
+                    do yk =1,ny
+
+                       if(idlink(yk).eq.3) then
+                          !! yk est ordinal
+                          ykord=ykord+1
+
+                          !! EA specifique au test
+                          ai=0.d0
+                          if(nalea.gt.0) then                       
+                             ai = b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+yk)*asim(yk)
+                          end if
+
+                          do j=1,nmes(i,yk)
+
+                             !! on ajoute ai a mu
+                             if(nalea.gt.0) mu(sumMesYk+j) = mu(sumMesYk+j)+ai
+
+                             !! trouver binf et bsup tq binf < lambda + epsilon < bsup :
+
+                             !! initialiser au premier seuil
+                             binf = b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntr+1)
+                             bsup = binf
+
+                             !! si Y>minY ajouter b1(..)^2
+                             if(indiceY(nmescur+sumMesYk+j).gt.1) then
+                                do ll=2,min(indiceY(nmescur+sumMesYk+j),ntrtot(yk))
+                                   bsup = bsup + b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntr+ll)**2
+                                   if(ll.lt.indiceY(nmescur+sumMesYk+j)) then
+                                      binf = binf + b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+nalea+sumntr+ll)**2
+                                   end if
+                                end do
+                             end if
+
+                             !! centrer et standardiser
+                             binf = (binf - mu(sumMesYk+j))/b1(nprob+nef+ncontr+nvc+nwg+ncor+yk)
+                             bsup = (bsup - mu(sumMesYk+j))/b1(nprob+nef+ncontr+nvc+nwg+ncor+yk)
+
+                             if(indiceY(nmescur+sumMesYk+j).eq.1) then
+                                !! si Y=minY
+                                vrais_l = vrais_l*alnorm(binf,.false.)
+
+                             else if(indiceY(nmescur+sumMesYk+j).eq.nvalORD(ykord)) then
+                                !! si Y=maxY
+                                vrais_l = vrais_l*(1.d0-alnorm(bsup,.false.))
+
+                             else
+                                !! minY < Y < maxY
+                                vrais_l = vrais_l*(alnorm(bsup,.false.)-alnorm(binf,.false.))
+
+                             end if
+
+                          end do
+
+
+                       else
+                          !! yk est continu
+
+                          !! variance de Y|ui,wi
+                          VC=0.d0
+                          do j1=1,nmes(i,yk)
+                             VC(j1,j1) = b1(nprob+nef+ncontr+nvc+nwg+ncor+yk)**2 !variance de l'erreur yk
+                             if (nalea.eq.ny) then ! intercept aleatoire de yk
+                                do j2=1,nmes(i,yk)
+                                   VC(j1,j2) = VC(j1,j2) + &
+                                        b1(nprob+nef+ncontr+nvc+nwg+ncor+ny+yk)**2
+                                end do
+                             end if
+                          end do
+
+                          ! Vi en vecteur
+                          jj=0
+                          Vi=0.d0
+                          do j1=1,nmes(i,yk)
+                             do j2=j1,nmes(i,yk)
+                                jj=j1+j2*(j2-1)/2
+                                Vi(jj)=VC(j1,j2)
+                             end do
+                          end do
+
+                          ! inversion
+                          CALL dsinv(Vi,nmes(i,yk),eps,ier,det)
+                          if (ier.eq.-1) then
+                             ppi=-1.d0
+                             goto 654
+                          end if
+
+                          ! retransformation du vecteur Vi en matrice :
+                          VC=0.d0
+                          do j1=1,nmes(i,yk)
+                             do j2=1,nmes(i,yk)
+                                if (j2.ge.j1) then
+                                   VC(j1,j2)=Vi(j1+j2*(j2-1)/2)
+                                else
+                                   VC(j1,j2)=Vi(j2+j1*(j1-1)/2)
+                                end if
+                             end do
+                          end do
+
+                          ! calcul de la vrais
+                          Y2=0.d0
+                          Y3=0.d0
+                          Y4=0.d0
+                          do j=1,nmes(i,yk)
+                             Y2(j) = Y1(sumMesYk+j)-mu(sumMesYk+j)
+                          end do
+                          Y3=matmul(VC,Y2)
+                          Y4=DOT_PRODUCT(Y2,Y3) 
+
+                          !! densite gaussienne
+                          vrais_l = vrais_l * dble(2*3.14159265)**(dble(nmes(i,yk)/2))*exp((-det-Y4)/2.d0)
+                      
+                       end if
+
+                       sumMesYk = sumMesYk+nmes(i,yk)
+                       sumntr = sumntr + ntrtot(yk)
+                    end do ! fin boucle yk
+
+                    fi(g) = fi(g) + vrais_l / dble(nMC)
+                 end do ! fin boucle g
+
+              end do ! fin boucle MC
+
+           end if
+
+
+           f=DOT_PRODUCT(pi,fi)
+           do g=1,ng
+              PPI(i,g)=pi(g)*fi(g)/f
+           end do
+           
+           nmescur = nmescur + sum(nmes(i,:))
+
+        end do
+
+654     continue
+        return
+
+      end subroutine postprobmo
+
+
+
+
+          subroutine transfos_estimees_2(b,npm,nsim,marker,transfY)
+
+      use communmo
+
+      implicit none
+
+      integer::kk,nsim,npm,j,k,yk,sumntrtot,numSPL,l
+      double precision,dimension(nsim*ny)::marker,transfY
+      double precision,dimension(maxval(ntrtot))::splaa
+      double precision,dimension(maxval(ntrtot))::Xspl
+      double precision,dimension(nsim)::mmm,mmm1,mmm2,iim,iim1,iim2
+      double precision::aa1,bb1,dd1,aa,bb,betai,eps,pas,ytemp,cc1
+      double precision, dimension(npm)::b,b1
+      double precision ::ht,htm,ht2,ht3,hht,h,hh,h2,h3,h2n,hn
+
+
+      b1=0.d0
+      eps=1.D-20
+      do k=1,npm
+         b1(k)=b(k)
+      end do
+
+ !     print*,"dans trasnfos"
+ !      write(*,*)'infos',minY,maxY,nsim,npm
+ !      write(*,*)'b',(b1(j),j=1,npm)
+
+
+
+       marker=0.d0
+       transfY=0.d0
+       
+       sumntrtot = 0
+       numSPL =0
+       do yk=1,ny
+
+       pas=(maxY(yk)-minY(yk))/dble(nsim-1)
+       j=1
+       marker((yk-1)*nsim+1)=minY(yk)
+       do while(j.lt.nsim)
+           j=j+1
+           marker((yk-1)*nsim+j)=marker((yk-1)*nsim+j-1)+pas
+       end do
+       marker(yk*nsim)=maxY(yk)
+
+
+       if (idlink(yk).eq.2) then
+       numSPL = numSPL+1
+        splaa=0.d0
+
+        splaa(1)=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)
+        do kk=2,ntrtot(yk)
+           splaa(kk)=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)*b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+kk)
+        end do
+        
+        !calcul de H(y) pour remplacer call estim_splines..
+        do j=1,nsim
+! ou se trouve la valeur
+         l=0
+
+         do k = 2,ntrtot(yk)-2
+               if ((marker((yk-1)*nsim+j).ge.zitr(k-1,numSPL)).and.(marker((yk-1)*nsim+j).lt.zitr(k,numSPL))) then
+                  l=k-1
+               end if
+        end do
+
+           if (marker((yk-1)*nsim+j).eq.zitr(ntrtot(yk)-2,numSPL)) then
+               l=ntrtot(yk)-3
+            end if
+
+!         if (l.lt.1.or.l.gt.ntrtot-1) then
+!            write(*,*)'probleme estim splines',l
+!            write(*,*)'j=',j,'test(j)',test(j)
+!            stop
+!         end if
+
+
+               ht2 = zitr(l+1,numSPL)-marker((yk-1)*nsim+j)
+               htm= marker((yk-1)*nsim+j)-zitr(l-1,numSPL)
+               ht = marker((yk-1)*nsim+j)-zitr(l,numSPL)
+               ht3 = zitr(l+2,numSPL)-marker((yk-1)*nsim+j)
+               hht = marker((yk-1)*nsim+j)-zitr(l-2,numSPL)
+               h = zitr(l+1,numSPL)-zitr(l,numSPL)
+               hh= zitr(l+1,numSPL)-zitr(l-1,numSPL)
+               hn= zitr(l+1,numSPL)-zitr(l-2,numSPL)
+               h2n=zitr(l+2,numSPL)-zitr(l-1,numSPL)
+               h2= zitr(l+2,numSPL)-zitr(l,numSPL)
+               h3= zitr(l+3,numSPL)-zitr(l,numSPL)
+
+               if (marker((yk-1)*nsim+j).ne.zitr(ntrtot(yk)-2,numSPL)) then
+                  mmm2(j) = (3.d0*ht2*ht2)/(hh*h*hn)
+                  mmm1(j) = (3.d0*htm*ht2)/(h2n*hh*h)+(3.d0*ht*ht3)/(h2*h*h2n)
+                  mmm(j)  = (3.d0*ht*ht)/(h3*h2*h)
+               end if
+               if (marker((yk-1)*nsim+j).eq.zitr(ntrtot(yk)-2,numSPL)) then
+                  mmm2(j) = 0.d0
+                  mmm1(j) = 0.d0
+                  mmm(j)  = 3.d0/h
+               end if
+
+               iim2(j)=hht*mmm2(j)/(3.d0)+ h2n*mmm1(j)/(3.d0) &
+      +h3*mmm(j)/(3.d0)
+               iim1(j)=htm*mmm1(j)/(3.d0)+h3*mmm(j)/(3.d0)
+
+               iim(j)=ht*mmm(j)/(3.d0)
+
+!-------- transformation et IC de la transformation :
+
+            Xspl=0.d0
+            Xspl(1)=1
+            do k=2,l
+               Xspl(k)=1
+            end do
+            Xspl(l+1)=iim2(j)
+            Xspl(l+2)=iim1(j)
+            Xspl(l+3)=iim(j)
+            transfY((yk-1)*nsim+j)= dot_product(Xspl,splaa)
+      end do
+        !fin H(y)
+
+
+            !call   mult_estim_splines_ssstd(nsim,splaa(1:ntrtot(yk)),marker,transfY,yk) 
+            
+            
+            
+
+        else if (idlink(yk).eq.1) then
+
+            aa1=exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1))/ &
+             (1+exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)))
+            bb1=exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2))/ &
+             (1+exp(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2)))
+            bb1=aa1*(1.d0-aa1)*bb1
+            cc1=b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+3)
+            dd1=abs(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+4))
+
+            aa=aa1*aa1*(1-aa1)/bb1-aa1
+            bb=aa*(1-aa1)/aa1
+
+            do j=1,nsim
+                  ytemp=(marker((yk-1)*nsim+j)-minY(yk)+epsY(yk))/(maxY(yk)-minY(yk)+2*epsY(yk))
+                  transfY((yk-1)*nsim+j)=(betai(aa,bb,ytemp)-cc1)/dd1
+                  if (transfY((yk-1)*nsim+j).eq.999.d0) then
+!                    write(*,*)'problem'
+                  end if
+
+               end do
+
+
+        else if (idlink(yk).eq.0) then
+
+                 do j=1,nsim
+                    transfY((yk-1)*nsim+j)=(marker((yk-1)*nsim+j)-b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+1)) &
+                    /abs(b1(nef+nvc+nwg+ncor+ny+nalea+sumntrtot+2))
+                 end do
+        end if
+        sumntrtot = sumntrtot + ntrtot(yk)
+        end do
+ !     write(*,*)(marker(j),j=1,ny*nsim)
+ !     write(*,*)(transfY(j),j=1,ny*nsim)          
+        end subroutine transfos_estimees_2
+        !fin transfos_estimeees

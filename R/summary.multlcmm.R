@@ -30,6 +30,9 @@ summary.multlcmm <- function(object,...)
     cat(paste("     Number of parameters:", length(x$best))," \n")
     if(length(posfix)) cat(paste("     Number of estimated parameters:", length(x$best)-length(posfix))," \n")
 
+	nyy <- 1
+	
+
     ntrtot <- rep(NA,x$N[8])
     numSPL <- 0
     cat("     Link functions: ")
@@ -98,6 +101,7 @@ summary.multlcmm <- function(object,...)
             nalea <- x$N[6]
             ncor <- x$N[7]
             ny <- x$N[8]
+	    nefRSE <- x$N[10]
             NPM <- length(x$best)
             
             
@@ -124,12 +128,10 @@ summary.multlcmm <- function(object,...)
                     waldch <- rep(NA,length(coef))
                     pwaldch <- rep(NA,length(coef))
                 }
-
             if(nw>0) coef[nef+nvc+1:nw] <- abs(coef[nef+nvc+1:nw])
             if(ncor>0) coef[nef+nvc+nw+ncor] <- abs(coef[nef+nvc+nw+ncor])
-            coef[nef+nvc+nw+ncor+1:ny] <- abs(coef[nef+nvc+nw+ncor+1:ny])
-            if(nalea>0) coef[nef+nvc+nw+ncor+ny+1:ny] <- abs(coef[nef+nvc+nw+ncor+ny+1:ny])
-
+            if(x$randomVar == 0)coef[nef+nvc+nw+ncor+1:ny] <- abs(coef[nef+nvc+nw+ncor+1:ny])
+            if(x$randomVar ==0)if(nalea>0) coef[nef+nvc+nw+ncor+ny+1:ny] <- abs(coef[nef+nvc+nw+ncor+ny+1:ny])
             if(x$conv!=2)
                 {
                     coefch <- format(as.numeric(sprintf("%.5f",coef)),nsmall=5,scientific=FALSE)
@@ -310,6 +312,12 @@ summary.multlcmm <- function(object,...)
             
 
             
+
+	
+
+
+
+
             cat("\n")
             cat("Variance-covariance matrix of the random-effects:\n" )
             cat("(the variance of the first random effect is not estimated)\n")
@@ -317,25 +325,26 @@ summary.multlcmm <- function(object,...)
                 {
                     if (nvc>0) 
                         {
-                            Mat.cov <- diag(c(1,coef[(nef+1):(nef+nvc)]))
-                        }
+                            Mat.cov <- diag(c(1,coef[(nef+1):(nef+nvc)]))                          }
                     else
                         {
-                            Mat.cov <- matrix(1,ncol=1)
-                        }
+                            Mat.cov <- matrix(1,ncol=1)                        }
                     Mat.cov[lower.tri(Mat.cov)] <- 0
                     Mat.cov[upper.tri(Mat.cov)] <- NA
                 }
+
             if(x$idiag==0)
                 {
                     Mat.cov<-matrix(0,ncol=sum(x$idea0),nrow=sum(x$idea0))
                     if(nvc>0) 
                         {
-                            Mat.cov[upper.tri(Mat.cov,diag=TRUE)]<-c(1,coef[(nef+1):(nef+nvc)])
-                            Mat.cov <-t(Mat.cov)
+			  Mat.cov[upper.tri(Mat.cov,diag=TRUE)]<-c(1,coef[(nef+1):(nef+nvc)])
+				                            Mat.cov <-t(Mat.cov)
                             Mat.cov[upper.tri(Mat.cov)] <- NA
                         }
-                    else Mat.cov[1,1] <- 1
+                    else{ 
+			Mat.cov[1,1] <- 1
+			}
                 }
             colnames(Mat.cov) <-x$Xnames[x$idea0==1]
             rownames(Mat.cov) <-x$Xnames[x$idea0==1]
@@ -389,16 +398,23 @@ summary.multlcmm <- function(object,...)
             
             std.err <- NULL
             nom <- NULL
-            std.err <- rbind(std.err,coefch[nef+nvc+nw+ncor+1:ny])
-            nom <- c(nom, "Residual standard error:")
+            
+            if(x$randomVar==1){
+		std.err <- rbind(std.err,coefch[length(coefch)])
+		nom <- c(nom, "Standard error of the random effect in the residual variance:")
+
+	}else{
+		std.err <- rbind(std.err,coefch[nef+nvc+nw+ncor+1:ny])
+		nom <- c(nom, "Residual standard error:")
+	    
             if(nalea>0)
                 {
                     std.err <- rbind(std.err,coefch[nef+nvc+nw+ncor+ny+1:nalea])
                     nom <- c(nom, "Standard error of the random effect:")
                 }  
-
+	}
             rownames(std.err) <- nom
-            maxch <- apply(std.err,2,maxchar)
+           maxch <- apply(std.err,2,maxchar)
             if(any(c(nef+nvc+nw+ncor+1:(ny+nalea)) %in% posfix))
                 {
                     if(nalea>0)
@@ -411,24 +427,26 @@ summary.multlcmm <- function(object,...)
                         }
                 }
             colnames(std.err) <- sapply(1:ny,function(k) paste(paste(rep(" ",max(0,maxch[k]-maxchar(x$Ynames[k]))),collapse=""),x$Ynames[k],sep=""))
-            print(std.err,quote=FALSE,na.print="")
+	    
+            
+	print(std.err,quote=FALSE,na.print="")
             
             cat("\n")
             
             cat("Parameters of the link functions:\n" )
             
-            tmp <- cbind(coefch[(nef+nvc+nw+ncor+ny+nalea+1):NPM],
-                         sech[(nef+nvc+nw+ncor+ny+nalea+1):NPM],
-                         waldch[(nef+nvc+nw+ncor+ny+nalea+1):NPM],
-                         pwaldch[(nef+nvc+nw+ncor+ny+nalea+1):NPM])
+            tmp <- cbind(coefch[(nef+nvc+nw+ncor+nyy+nalea+1-x$randomVar):(NPM-x$randomVar)],
+                         sech[(nef+nvc+nw+ncor+nyy+nalea+1-x$randomVar):(NPM-x$randomVar)],
+                         waldch[(nef+nvc+nw+ncor+nyy+nalea+1-x$randomVar):(NPM-x$randomVar)],
+                         pwaldch[(nef+nvc+nw+ncor+nyy+nalea+1-x$randomVar):(NPM-x$randomVar)])
             tmp.rownames <- NULL
             for (yk in 1:ny)
                 {
-                    tmp.rownames <- c(tmp.rownames, paste(rep(x$Ynames[yk],ntrtot[yk]),names(coef[(nef+nvc+nw+ncor+ny+nalea+sum(ntrtot[1:yk])-ntrtot[yk]+1):(nef+nvc+nw+ncor+ny+nalea+sum(ntrtot[1:yk]))]),sep="-"))
+                    tmp.rownames <- c(tmp.rownames, paste(rep(x$Ynames[yk],ntrtot[yk]),names(coef[(nef+nvc+nw+ncor+nyy+nalea+sum(ntrtot[1:yk])-ntrtot[yk]+1-x$randomVar):(nef+nvc+nw+ncor+nyy+nalea+sum(ntrtot[1:yk])-x$randomVar)]),sep="-"))
                 }
             rownames(tmp) <- tmp.rownames
             maxch <- apply(tmp,2,maxchar)
-            if(any(c((nef+nvc+nw+ncor+ny+nalea+1):NPM) %in% posfix)) maxch[1] <- maxch[1]-1
+            if(any(c((nef+nvc+nw+ncor+ny+nalea+1-x$randomVar):(NPM-x$randomVar)) %in% posfix)) maxch[1] <- maxch[1]-1
             colnames(tmp) <- c(paste(paste(rep(" ",max(maxch[1]-4,0)),collapse=""),"coef",sep=""),
                                paste(paste(rep(" ",max(maxch[2]-2,0)),collapse=""),"Se",sep=""),
                                paste(paste(rep(" ",max(maxch[3]-4,0)),collapse=""),"Wald",sep=""),

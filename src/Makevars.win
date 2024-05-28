@@ -1,0 +1,23 @@
+# -*- Makefile -*-  vim : ft = make
+# This file is derived from Rmpi package
+
+ifeq "$(MPI_HOME)" ""
+MPI_HOME = C:/Program Files (x86)/Microsoft SDKs/MPI
+endif
+
+PKG_CPPFLAGS = -I"$(MPI_HOME)/Include" -DMPI2 -DWin32
+
+all: $(SHLIB)
+
+ifeq "$(WIN)" "64" 
+PKG_LIBS     = -L. -lmsmpi64
+$(SHLIB): libmsmpi64.a
+else
+PKG_LIBS     = "$(MPI_HOME)/Lib/x86/msmpi.lib"
+endif
+
+##msmpi.def:
+#Run c:\rtools\mingw_64\bin\gendef  c:/Windows/System32/msmpi.dll
+#copy msmpi.def into Rmpi/src folder
+libmsmpi64.a: msmpi.def
+	$(DLLTOOL) -k -d msmpi.def -l libmsmpi64.a -D msmpi.dll $(DT_ARCH)

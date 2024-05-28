@@ -4,6 +4,7 @@ VarExpl.multlcmm <- function(x,values)
 {
  if(missing(x)) stop("The model should be specified")
  if (!inherits(x, "multlcmm")) stop("use only with \"multlcmm\" objects")
+ if(x$randomVar == 1) stop("This function is not implemented for the model with heteroscedastic error.")
  if(missing(values)) values <- data.frame("intercept"=1)
  if (!inherits(values, "data.frame")) stop("values should be a data.frame object")
  if(any(is.na(values))) stop("values should not contain any missing values")
