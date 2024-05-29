@@ -79,6 +79,7 @@ reference:
       - predictRE
       - predictY
       - predictYcond
+      - predictYback
   - title : Plots
     contents:
       - plot
