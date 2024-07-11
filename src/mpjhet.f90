@@ -2233,6 +2233,8 @@ subroutine postprob_mpj(b,npm,ppi,ppiy)
               sumntr = sumntr + ntr(sumny+yk) ! sert a incrementer tmp
            end do
 
+           if(nmesparK(i,k).eq.0) goto 300
+           
            ! matrice de variance de Yik
            P=0.d0
            P=MATMUL(Z,Ut)
@@ -2366,6 +2368,8 @@ subroutine postprob_mpj(b,npm,ppi,ppiy)
 
            fi1(g) = fi1(g) + (-nmesparK(i,k)*log(dble(2*3.14159265)) -det -Y4)/2.d0
 
+300        continue
+           
            sumny = sumny + ny(k)
            tmp = tmp + nef(k)+ncontr(k)+nvc(k)+nw(k)+ncor(k)+nerr(k)+nalea(k)+sumntr
            sumparK=sumparK+nmesparK(i,k)
