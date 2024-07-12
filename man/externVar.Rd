@@ -50,7 +50,8 @@ externVar(
 \item{fixed}{optional two sided linear formula object for specifying the
 fixed-effects in the secondary model with an external outcome variable.
 The response outcome is on the left of \code{~} and the covariates are separated
-by \code{+} on the right of the \code{~}. By default, an intercept is included.}
+by \code{+} on the right of the \code{~}. The right side should be \code{~1} to
+describe the outcome by the latent classes only.}
 
 \item{mixture}{optional one-sided formula object for the class-specific fixed effects
 in the model for the external outcome. Among the list of covariates included in fixed,
@@ -70,7 +71,8 @@ latent class membership to be modelled in the secondary class-membership multino
 logistic model. Covariates are separated by \code{+} on the right of the \code{~}.}
 
 \item{survival}{optional two-sided formula specifying the external survival part
-of the model.}
+of the model. The right side should be \code{~1} to get the survival associated to
+each latent class without any other covariate.}
 
 \item{hazard}{optional family of hazard function assumed for the survival model
 (Weibull, piecewise or splines)}

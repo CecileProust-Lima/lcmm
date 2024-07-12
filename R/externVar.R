@@ -39,7 +39,8 @@
 #' @param fixed optional two sided linear formula object for specifying the
 #' fixed-effects in the secondary model with an external outcome variable.
 #' The response outcome is on the left of \code{~} and the covariates are separated
-#' by \code{+} on the right of the \code{~}. By default, an intercept is included.
+#' by \code{+} on the right of the \code{~}. The right side should be \code{~1} to
+#' describe the outcome by the latent classes only.
 #' @param mixture optional one-sided formula object for the class-specific fixed effects
 #' in the model for the external outcome. Among the list of covariates included in fixed,
 #' the covariates with class-specific regression parameters are entered in
@@ -54,7 +55,8 @@
 #' latent class membership to be modelled in the secondary class-membership multinomial 
 #' logistic model. Covariates are separated by \code{+} on the right of the \code{~}.
 #' @param survival optional two-sided formula specifying the external survival part
-#' of the model.
+#' of the model. The right side should be \code{~1} to get the survival associated to
+#' each latent class without any other covariate.
 #' @param hazard optional family of hazard function assumed for the survival model
 #' (Weibull, piecewise or splines)
 #' @param hazardtype optional indicator for the type of baseline risk function
@@ -398,11 +400,17 @@ externVar = function(model,
     
     ##nVCIn
     if(funIn == "mpjlcmm"){
-        nVCIn = model$Nprm[3+2*model$K+(1:model$K)]
+        ##nVCIn = model$Nprm[3+2*model$K+(1:model$K)]        
+        l <- 3
+        if(model$nbevt>1) l <- 2+model$nbevt
+        nVCIn = model$Nprm[l+2*model$K+(1:model$K)]
+        nef <- model$Nprm[l+1:K]
+        ncontr <- model$Nprm[l+K+1:K]
         iVCIn = c()
         prev = 0
         for(k in 1:model$K){
-            iVCIn = c(iVCIn, sum(model$Nprm[c(1:3, 3:4*model$K-model$K+k-1)])+prev+1:nVCIn[k])
+            ##iVCIn = c(iVCIn, sum(model$Nprm[c(1:3, 3:4*model$K-model$K+k-1)])+prev+1:nVCIn[k])
+            iVCIn = c(iVCIn, sum(model$N[1:3])+prev+nef[k]+ncontr[k]+1:nVCIn[k])
             prev = prev+model$npmK[k]
         }
     } else if(funIn == "Jointlcmm"){
@@ -973,7 +981,7 @@ externVar = function(model,
                 arguments[["subject"]] = subject
                 arguments[["classmb"]] = ~-1
                 arguments[["ng"]] = ng
-                arguments[["pprior"]] = c("prob1", "prob2")
+                arguments[["pprior"]] = paste("prob", 1:ng, sep="")
                 arguments[["posfix"]] = 1:2+length(iEst)
                 ##technical options
                 arguments[["maxiter"]] = maxiter
@@ -1149,7 +1157,7 @@ externVar = function(model,
                 arguments[["mixture"]] = mixture
                 arguments[["classmb"]] = ~-1
                 arguments[["ng"]] = ng
-                arguments[["pprior"]] = c("prob1", "prob2")
+                arguments[["pprior"]] =  paste("prob", 1:ng, sep="")
                 ##technical options
                 arguments[["maxiter"]] = maxiter
                 arguments[["verbose"]] = verbose
@@ -1386,7 +1394,7 @@ externVar = function(model,
         V22 = V22[iEst, iEst]
         n2 = modOut$ns
         
-        modOut
+        ##modOut
         if(nproc == 1){
             I12 = -hessienne(modOut)
         } else {
@@ -1406,7 +1414,7 @@ externVar = function(model,
     if(varest == "paramBoot"){
         if(verbose){cat("Bootstrap estimation...\n\n")}
         est = estimates(model)
-        
+        #browser()
         Vin = matrix(0, length(est), length(est))
         Vin[upper.tri(Vin, diag = T)] = model$V
         Vin[lower.tri(Vin, diag = F)] = t(Vin)[lower.tri(t(Vin), diag=F)]
@@ -1418,7 +1426,7 @@ externVar = function(model,
         coefss = as.data.frame(coefss)
         colnames(coefss) = names(model$best)[iKeepIn]
         ##we just need to build back varcov into the coefs instead of cholesky matrix
-        coefss = apply(coefss, 1, function(coefs, model, data, iVCKeep){
+        ff <- function(coefs, model, data, iVCKeep){
             if(funIn == "mpjlcmm"){
                 varcovMods = longitudinal
             } else {
@@ -1432,25 +1440,26 @@ externVar = function(model,
             countChol = 0
             for(varcovMod in varcovMods){
                 ncolRandMod = ncol(model.matrix(formula(varcovMod$call$random), data))
-                
+
+                ismult <- as.integer(inherits(varcovMod, "multlcmm"))
                 if(varcovMod$idiag){
-                    nChol = ncolRandMod-as.integer(funIn == "multlcmm")
+                    nChol = ncolRandMod-ismult
                     
                     vc = chols[1:nChol+countChol]
                     
                     varcov = c(varcov, (vc^2))
                 } else {
-                    nChol = ncolRandMod*(ncolRandMod+1)/2-as.integer(funIn == "multlcmm")
+                    nChol = ncolRandMod*(ncolRandMod+1)/2-ismult
                     
                     ##cholMatrix
                     cholMatrix = matrix(0, ncolRandMod, ncolRandMod)
                     cholsToMatrix = chols[1:nChol+countChol]
-                    if(funIn == "multlcmm") cholsToMatrix = c(1, cholsToMatrix)
+                    if(ismult) cholsToMatrix = c(1, as.numeric(cholsToMatrix))
                     cholMatrix[upper.tri(cholMatrix, diag = T)] = cholsToMatrix
                     
                     vc = t(cholMatrix)%*%cholMatrix
                     varcov = c(varcov, vc[upper.tri(vc, diag = T)])
-                    if(funIn == "multlcmm") varcov = varcov[-1]
+                    if(ismult) varcov = varcov[-1]
                 }
                 
                 countChol = countChol + nChol
@@ -1458,7 +1467,8 @@ externVar = function(model,
             coefs[iVCKeep] = varcov
             
             return(coefs)
-        }, model = model, data = data, iVCKeep = iVCKeep)
+        }
+      coefss = apply(coefss, 1, ff, model = model, data = data, iVCKeep = iVCKeep)
         
         if(nproc > 1)
         {

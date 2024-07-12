@@ -79,9 +79,6 @@ predictClass <- function(model, newdata, subject=NULL){
       }
       
   }
-  w <- options()$warn
-  options(warn=-1)
-  on.exit(options(warn=w))
   newmodel <- do.call(argfunction , c(arguments))
   return(newmodel$pprob)
 }

@@ -707,7 +707,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         dataY <- dataY[which(dataY[,nom.subject] %in% selectid),,drop=FALSE]
         newdata <- newdata[which(newdata[,nom.subject] %in% selectid),,drop=FALSE]
         nsdata <- unique(newdata[,c(nom.subject,varSurvClas,nom.prior),drop=FALSE])
-        if(nrow(nsdata)!=ns) stop("No time-dependant variable should appear in survival nor in classmb")
+        if(nrow(nsdata)!=ns) stop("No time-dependent variable should appear in survival nor in classmb")
         nsdata <- nsdata[order(nsdata[,1]),,drop=FALSE] # tri
         prior <- nsdata[,nom.prior]
         if(is.null(nom.prior)) prior <- rep(0,ns)
