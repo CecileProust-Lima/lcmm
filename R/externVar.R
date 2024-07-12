@@ -2030,6 +2030,7 @@ externVar = function(model,
     
     class(modOut) = c("externX", "externVar")
   }
+    modOut$pprob <- NA
   
   if(verbose){cat(paste("The externVar program took", round(cost[3],2), "seconds\n"))}
   
