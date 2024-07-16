@@ -24,7 +24,7 @@
 #' @param hazardnodes optional vector containing interior nodes if
 #' \code{splines} or \code{piecewise} is specified for the baseline hazard
 #' function in \code{hazard}
-#' @param TimeDepVar optional vector specifying the name of the time-depending
+#' @param TimeDepVar optional vector specifying the name of the time-dependent
 #' covariate in the survival model
 #' @param data data frame containing all the variables used in the model
 #' @param B optional specification for the initial values of the parameters.

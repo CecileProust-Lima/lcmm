@@ -1,52 +1,57 @@
-#' Marginal predictions in the natural scale of a pre-trandormed outcome
+#' Marginal predictions in the natural scale of a pre-transformed outcome
 #'
 #' The function computes the predicted values of the longitudinal marker
-#' (in each latent class of ng>1) for a specified profile of covariates, when a
-#' pre-transformation is applied. A Gauss-Hermite or Monte-Carlo integration is used to
-#' numerically compute the back-transformed predictions.
+#' (in each latent class if ng>1) for a specified profile of covariates, when a
+#' non-parameterized pre-transformation was applied (e.g., log, square root). 
+#' A Gauss-Hermite or Monte-Carlo integration is 
+#' used to numerically compute the back-transformed predictions.
 #' 
-#' @param x an object inheriting from class \code{hlme} representing a general latent
-#' class mixed model.
-#' @param newdata data frame containing the data from which predictions are to be
-#' computed. The data frame should include at least all the covariates listed
-#' in x$Xnames2. Names in the data frame should be exactly x$Xnames2 that are
+#' @param x an object inheriting from class \code{hlme} representing a general 
+#' latent class mixed model.
+#' @param newdata data frame containing the data from which predictions are to 
+#' be computed. The data frame should include at least all the covariates listed
+#' in x$Xnames2. Names in the data frame should be exactly x$Xnames2, i.e., 
 #' the names of covariates specified in \code{hlme} calls.
 #' @param var.time A character string containing the name of the variable that
 #' corresponds to time in the data frame (x axis in the plot).
 #' @param methInteg optional integer specifying the type of numerical
-#' integration required only for predictions with splines or Beta link
+#' integration. Required only for predictions with splines or Beta link
 #' functions. Value 0 (by default) specifies a Gauss-Hermite integration which
 #' is very rapid but neglects the correlation between the predicted values (in
 #' presence of random-effects). Value 1 refers to a Monte-Carlo integration
-#' which is slower but correctly account for the correlation between the
+#' which is slower but correctly accounts for the correlation between the
 #' predicted values.
 #' @param nsim number of points used in the numerical integration.
 #' For methInteg=0, nsim should be chosen among
 #' the following values: 5, 7, 9, 15, 20, 30, 40 or 50 (nsim=20 by default). If
 #' methInteg=1, nsim should be relatively important (more than 200).
 #' @param draws boolean specifying whether confidence bands should be computed.
-#' If draws=TRUE, a Monte Carlo approximation of the posterior distribution of the
-#' predicted values is computed and the median, 2.5\% and 97.5\% percentiles
+#' If draws=TRUE, a Monte Carlo approximation of the posterior distribution of 
+#' the predicted values is computed and the median, 2.5\% and 97.5\% percentiles
 #' are given. Otherwise, the predicted values are computed at the point
 #' estimate. By default, draws=FALSE.
-#' @param ndraws integer. If draws=TRUE, ndraws specifies the number of draws that
-#' should be generated to approximate the posterior distribution of the predicted values.
-#' By default, ndraws=2000.
+#' @param ndraws integer. If draws=TRUE, ndraws specifies the number of draws 
+#' that should be generated to approximate the posterior distribution of the 
+#' predicted values. By default, ndraws=2000.
 #' @param na.action Integer indicating how NAs are managed. The default is 1
 #' for 'na.omit'. The alternative is 2 for 'na.fail'. Other options such as
 #' 'na.pass' or 'na.exclude' are not implemented in the current version.
 #' @param back function to back-transform the outcome in the original scale.
+#' @param \dots further arguments to be passed to or from other methods. They
+#' are ignored in this function.
 #' @return An object of class \code{predictY}.
 #' 
 #' @examples
 #' data_lcmm$transfYdep2 <- sqrt(30 - data_lcmm$Ydep2)
-#' m1 <- hlme(transfYdep2 ~ Time, random= ~ Time, subject = "ID", data = data_lcmm)
-#' pred1 <- predictYback(m1, newdata = data.frame(Time = seq(0, 3, 0.1)), var.time = "Time", back = function(x) {30 - x^2})
-#' plot(preed1)
+#' m1 <- hlme(transfYdep2 ~ Time, random=~ Time, subject="ID", data = data_lcmm)
+#' pred1 <- predictYback(m1, newdata = data.frame(Time = seq(0, 3, 0.1)), 
+#' var.time = "Time", back = function(x) {30 - x^2})
+#' plot(pred1)
 #' 
 #' @export
 #'
-predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws = FALSE, ndraws = 2000, na.action = 1, back, ...){
+predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, 
+                  draws = FALSE, ndraws = 2000, na.action = 1, back, ...){
 
 
     if(missing(newdata)) stop("The argument newdata should be specified")
@@ -81,14 +86,16 @@ predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws =
 
         if((x$conv == 2) & (draws == TRUE))
         {
-            cat("No confidence interval will be provided since the program did not converge properly \n")
+            cat("No confidence interval will be provided since the program did
+                not converge properly \n")
             draws <- FALSE
         }
 
 
         if((x$conv == 3) & (draws == TRUE))
         {
-            cat("No confidence interval will be provided since the program did not converge properly \n")
+            cat("No confidence interval will be provided since the program 
+                did not converge properly \n")
             draws <- FALSE
         }
 
@@ -98,7 +105,8 @@ predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws =
         b2 <- NULL
 
 
-        if(!(na.action %in% c(1, 2))) stop("only 1 for 'na.omit' or 2 for 'na.fail' are required in na.action argument") 
+        if(!(na.action %in% c(1, 2))) stop("only 1 for 'na.omit' or 2 for 
+                            'na.fail' are required in na.action argument") 
 
         if(na.action == 1){
             na.action <- na.omit
@@ -114,7 +122,8 @@ predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws =
             {
                 if(!is.null(x$levels$levelsdata[[v]]))
                 {
-                    newdata1[, v] <- factor(newdata1[, v], levels = x$levels$levelsdata[[v]])
+                    newdata1[, v] <- factor(newdata1[, v], 
+                                            levels = x$levels$levelsdata[[v]])
                 }
             }
         }        
@@ -129,7 +138,8 @@ predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws =
 
         ## Traitement des donnees manquantes
 
-        mcall <- match.call()[c(1, match(c("data", "subset", "na.action"), names(match.call()), 0))]
+        mcall <- match.call()[c(1, match(c("data", "subset", "na.action"), 
+                                         names(match.call()), 0))]
         mcall$na.action <- na.action
         mcall$data <- newdata1
 
@@ -141,7 +151,8 @@ predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws =
         na.fixed <- attr(m, "na.action")
 
         ## mixture
-        if((length(attr(terms(call_mixture),"term.labels")) + attr(terms(call_mixture),"intercept")) > 0){
+        if((length(attr(terms(call_mixture),"term.labels")) + 
+            attr(terms(call_mixture),"intercept")) > 0){
             id.X_mixture <- 1
             m <- mcall
             m$formula <- call_mixture
@@ -154,7 +165,8 @@ predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws =
         }
 
         ## random
-        if((length(attr(terms(call_random), "term.labels")) + attr(terms(call_random),"intercept")) > 0){
+        if((length(attr(terms(call_random), "term.labels")) + 
+            attr(terms(call_random),"intercept")) > 0){
             id.X_random <- 1
             m <- mcall
             m$formula <- call_random
@@ -167,7 +179,8 @@ predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws =
         }
         
         ## classmb
-        if((length(attr(terms(call_classmb),"term.labels")) + attr(terms(call_classmb),"intercept")) > 0){ 
+        if((length(attr(terms(call_classmb),"term.labels")) + 
+            attr(terms(call_classmb),"intercept")) > 0){ 
             id.X_classmb <- 1
             m <- mcall	
             m$formula <- call_classmb
@@ -194,7 +207,8 @@ predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws =
         ##var.time
         if(!missing(var.time))
         {
-            if(!(var.time %in% colnames(newdata))) stop("'var.time' should be included in newdata")
+            if(!(var.time %in% colnames(newdata))) stop("'var.time' should 
+                                                        be included in newdata")
             if(var.time %in% colnames(newdata1))
             {
                 times <- newdata1[, var.time, drop = FALSE]
@@ -224,8 +238,10 @@ predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws =
             {
                 if(!is.null(x$levels$levelsfixed[[v]]))
                 {
-                    newdata1fixed[, v] <- factor(newdata1fixed[, v], levels = x$levels$levelsfixed[[v]])
-                    if(any(is.na(newdata1fixed[, v]))) stop(paste("Wrong factor level in variable", v))
+                    newdata1fixed[, v] <- factor(newdata1fixed[, v], 
+                                            levels = x$levels$levelsfixed[[v]])
+                    if(any(is.na(newdata1fixed[, v]))) stop(paste("Wrong factor 
+                                                      level in variable", v))
                 }
             }
         }
@@ -236,8 +252,10 @@ predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws =
             {
                 if(!is.null(x$levels$levelsmixture[[v]]))
                 {
-                    newdata1mixture[, v] <- factor(newdata1mixture[, v], levels = x$levels$levelsmixture[[v]])
-                    if(any(is.na(newdata1mixture[, v]))) stop(paste("Wrong factor level in variable", v))
+                    newdata1mixture[, v] <- factor(newdata1mixture[, v], 
+                                      levels = x$levels$levelsmixture[[v]])
+                    if(any(is.na(newdata1mixture[, v]))) stop(paste("Wrong 
+                                                factor level in variable", v))
                 }
             }
         }
@@ -248,8 +266,10 @@ predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws =
             {
                 if(!is.null(x$levels$levelsrandom[[v]]))
                 {
-                    newdata1random[, v] <- factor(newdata1random[, v], levels = x$levels$levelsrandom[[v]])
-                    if(any(is.na(newdata1random[, v]))) stop(paste("Wrong factor level in variable", v))
+                    newdata1random[, v] <- factor(newdata1random[, v], 
+                                          levels = x$levels$levelsrandom[[v]])
+                    if(any(is.na(newdata1random[, v]))) stop(paste("Wrong factor 
+                                                      level in variable", v))
                 }
             }
         }
@@ -260,8 +280,10 @@ predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws =
             {
                 if(!is.null(x$levels$levelsclassmb[[v]]))
                 {
-                    newdata1classmb[, v] <- factor(newdata1classmb[, v], levels = x$levels$levelsclassmb[[v]])
-                    if(any(is.na(newdata1classmb[, v]))) stop(paste("Wrong factor level in variable", v))
+                    newdata1classmb[, v] <- factor(newdata1classmb[, v], 
+                                        levels = x$levels$levelsclassmb[[v]])
+                    if(any(is.na(newdata1classmb[, v]))) stop(paste("Wrong 
+                                              factor level in variable", v))
                 }
             }
         }
@@ -271,7 +293,8 @@ predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws =
         ## Construction de nouvelles var eplicatives sur la nouvelle table
         ## fixed
 	
-	X_fixed <- model.matrix(formula(paste("~", call_fixed, sep = "")), data = newdata1fixed)
+	X_fixed <- model.matrix(formula(paste("~", call_fixed, sep = "")), 
+	                        data = newdata1fixed)
 	if(colnames(X_fixed)[1] == "(Intercept)"){
             colnames(X_fixed)[1] <- "intercept"
             int.fixed <- 1
@@ -387,11 +410,13 @@ predictYback <- function(x, newdata, var.time, methInteg = 0, nsim = 20, draws =
             
             Ypred <- matrix(NA, nrow = maxmes, ncol = x$ng)
             if(x$ng == 1) colnames(Ypred) <- "Ypred"
-            if(x$ng > 1) colnames(Ypred) <- paste("Ypred_class", 1:x$ng, sep = "")
+            if(x$ng > 1) colnames(Ypred) <- paste("Ypred_class", 
+                                                  1:x$ng, sep = "")
 
             for(g in 1:x$ng)
             {
-                gpoints <- matrix(backpoints[(g - 1) * maxmes * nsim + 1:(maxmes * nsim)], maxmes, nsim)
+                gpoints <- matrix(backpoints[(g - 1) * maxmes * nsim 
+                                             + 1:(maxmes * nsim)], maxmes, nsim)
                 wgpoints <- sweep(gpoints, 2, out$weights, "*")
                 gpred <- apply(wgpoints, 1, sum)
                 Ypred[, g] <- gpred

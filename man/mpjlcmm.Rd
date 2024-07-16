@@ -56,7 +56,7 @@ class-membership multinomial logistic model}
 \code{splines} or \code{piecewise} is specified for the baseline hazard
 function in \code{hazard}}
 
-\item{TimeDepVar}{optional vector specifying the name of the time-depending
+\item{TimeDepVar}{optional vector specifying the name of the time-dependent
 covariate in the survival model}
 
 \item{data}{data frame containing all the variables used in the model}

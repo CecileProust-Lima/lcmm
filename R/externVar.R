@@ -3,101 +3,130 @@
 #' This function fits regression models to relate a latent class structure (stemmed 
 #' from a latent class model estimated within \code{lcmm} package) with either an external
 #'  outcome or external class predictors. 
-#'  Two inference techniques are implemented to account for the classification error: 
+#'  Two inference techniques are implemented. They both account for the 
+#'  classification error in the posterior class assignment: 
 #'  
 #'  - a 2-stage estimation of the joint likelihood of the primary latent class model 
 #'  and the secondary/ external regression;
 #'  
-#'  - a regression between the posterior latent class assignment and the external variable 
-#'  which internally corrects for the assignment misclassification. 
+#'  - a conditional regression of the external outcome given the underlying 
+#'  latent class structure, or of the underlying class structure given external
+#'   covariates. 
 #'  
-#' It returns an object from one of the \code{lcmm} package classes.
+#' It returns an object of one of the \code{lcmm} package classes.
 #' 
 #' A. DATA STRUCTURE
 #' 
-#' The \code{data} argument must follow specific structure for individual variables,
-#' i.e. variables with a unique constant value for each subject. For an individual variable
-#' given as external outcome, data value must be present only once per subject,
-#' independently of any time variable used in the primary latent class.
-#' For an individual variable given as external class predictor,
-#' data values must be given for every row of every individual (as usual)
+#' The \code{data} argument must follow specific structure. It must include all
+#' the data necessary to compute the posterior classification probabilities
+#'  (so a longitudinal format usually) as well as the information for the 
+#'  secondary analysis. 
+#' For time-invariant variables in the secondary analyses: 
+#' - if used as an external outcome: the information should not be duplicated 
+#' at each row of the subject. It should appear once for each individual. 
+#' - if used as an external covariate: the information can be duplicated at 
+#' each row of the subject (as usual)
 #' 
 #' B. VARIANCE ESTIMATION
 #' 
-#' Not taking into account first stage variance with specifing \code{"none"} may lead to
-#' underestimation of the final variance. When possible, Method \code{"Hessian"} 
-#' which relies on the combination of Hessians from the primary and secondary
-#' model is recommended. However, it may become numerically intensive in the event 
-#' of very high number of parameters in the primary latent class model. As an 
-#' alternative, especially in situations with a complex primary model but rather 
-#' parcimonious secondary model, method \code{"paramBoot"} which implements a 
-#' parametric bootstrap can be used.
+#' The two techniques rely on a sequential analysis (two-stage analysis) so the
+#' variance calculation should account for both the uncertainty in the first and 
+#' the second stage. 
+#' Not taking into account the first-stage uncertainty by specifying 
+#' \code{varest="none"} may lead to the underestimation of the final variance. 
+#' When possible, Method \code{varest="Hessian"} which relies on the 
+#' combination of Hessians from the primary and secondary models is recommended. 
+#' However, it may become numerically intensive when the primary latent class 
+#' model includes a high number of parameters. As an alternative, especially 
+#' when the primary model is complex and the second model includes a limited
+#' number of parameters, the parametric Bootstrap method
+#' \code{varest="paramBoot"} can be favored.
 #' 
 #' @param model an object inheriting from class \code{hlme}, \code{lcmm}, 
 #' \code{Jointlcmm}, \code{multlcmm} or \code{mpjlcmm} giving the primary latent
 #'  class model.
-#' @param fixed optional two sided linear formula object for specifying the
-#' fixed-effects in the secondary model with an external outcome variable.
+#' @param fixed optional, for secondary analyses on an external outcome variable: 
+#' two-sided linear formula object for specifying the outcome and fixed-effect 
+#' part in the secondary model.
 #' The response outcome is on the left of \code{~} and the covariates are separated
 #' by \code{+} on the right of the \code{~}. The right side should be \code{~1} to
-#' describe the outcome by the latent classes only.
-#' @param mixture optional one-sided formula object for the class-specific fixed effects
-#' in the model for the external outcome. Among the list of covariates included in fixed,
+#' model the outcome according to the latent classes only.
+#' @param mixture optional, for secondary analyses on an external outcome variable: 
+#' one-sided formula object for the class-specific fixed effects in the model 
+#' for the external outcome. Among the list of covariates included in fixed,
 #' the covariates with class-specific regression parameters are entered in
 #' mixture separated by \code{+}. By default, an intercept is included.
 #' If no intercept, \code{-1} should be the first term included.
-#' @param random optional one-sided linear formula object for specifying the
-#' random-effects on external outcome in the secondary model, if appropriate. 
+#' @param random optional, for secondary analyses on an external outcome variable: 
+#' one-sided linear formula object for specifying the
+#' random effects in the secondary model, if appropriate. 
 #' By default, no random effect is included.
 #' @param subject name of the covariate representing the grouping structure.
 #' Even in the absence of a hierarchical structure.
-#' @param classmb optional one-sided formula specifying the external predictors of 
-#' latent class membership to be modelled in the secondary class-membership multinomial 
+#' @param classmb optional, for secondary analyses on latent class membership 
+#' according to external covariates: 
+#' optional one-sided formula specifying the external predictors of 
+#' latent class membership to be modeled in the secondary class-membership multinomial 
 #' logistic model. Covariates are separated by \code{+} on the right of the \code{~}.
-#' @param survival optional two-sided formula specifying the external survival part
+#' @param survival optional, for secondary analyses on an external survival outcome:
+#'  two-sided formula specifying the external survival part
 #' of the model. The right side should be \code{~1} to get the survival associated to
 #' each latent class without any other covariate.
-#' @param hazard optional family of hazard function assumed for the survival model
+#' @param hazard optional, for secondary analyses on an external survival outcome:
+#'  family of hazard function assumed for the survival model
 #' (Weibull, piecewise or splines)
-#' @param hazardtype optional indicator for the type of baseline risk function
+#' @param hazardtype optional, for secondary analyses on an external survival outcome:
+#'  indicator for the type of baseline risk function
 #' (Specific, PH or Common)
-#' @param hazardnodes optional vector containing interior nodes if \code{splines} or
+#' @param hazardnodes optional, for secondary analyses on an external survival outcome:
+#'   vector containing interior nodes if \code{splines} or
 #' \code{piecewise} is specified for the baseline hazard function in \code{hazard}
-#' @param TimeDepVar optional vector specifying the name of the time-depending covariate
-#' in the survival model
-#' @param logscale optional boolean indicating whether an exponential (logscale=TRUE) or
+#' @param TimeDepVar optional, for secondary analyses on an external survival outcome:
+#'   vector specifying the name of the time-dependent covariate
+#' in the survival model (only a irreversible event time in allowed)
+#' @param logscale optional, for secondary analyses on an external survival outcome:
+#'   boolean indicating whether an exponential (logscale=TRUE) or
 #' a square (logscale=FALSE -by default) transformation is used to
 #' ensure positivity of parameters in the baseline risk functions
-#' @param idiag if appropriate, optional logical for the structure of the variance-covariance
+#' @param idiag optional, for secondary analyses on an external outcome:
+#'   if appropriate, logical for the structure of the variance-covariance
 #' matrix of the random-effects in the secondary model. 
 #' If \code{FALSE}, a non structured matrix of
 #' variance-covariance is considered (by default). If \code{TRUE} a diagonal
 #' matrix of variance-covariance is considered.
-#' @param nwg if appropriate, optional logical indicating if the variance-covariance of the
+#' @param nwg optional, for secondary analyses on an external outcome:
+#'   if appropriate, logical indicating if the variance-covariance of the
 #' random-effects in the secondary model is class-specific. If \code{FALSE} the
 #' variance-covariance matrix is common over latent classes (by default). If \code{TRUE} a
 #' class-specific proportional parameter multiplies the variance-covariance
 #' matrix in each class (the proportional parameter in the last latent class
 #' equals 1 to ensure identifiability).
-#' @param randomY optional logical for including an outcome-specific random intercept.
+#' @param randomY optional, for secondary analyses on an external outcome:
+#'   if appropriate, logical for including an outcome-specific random intercept.
 #' If FALSE no outcome-specific random intercept is added (default). If TRUE independent
 #' outcome-specific random intercept with parameterized variance are included
-#' @param link optional family of parameterized link functions for the external outcome
+#' @param link optional, for secondary analyses on an external outcome:
+#'   if appropriate, family of parameterized link functions for the external outcome
 #' if appropriate. Defaults to NULL, corresponding to continuous Gaussian distribution
 #' (hlme function).
-#' @param intnodes optional vector of interior nodes. This argument is only
+#' @param intnodes optional, for secondary analyses on an external outcome:
+#'   if appropriate, vector of interior nodes. This argument is only
 #' required for a I-splines link function with nodes entered manually.
-#' @param epsY optional definite positive real used to rescale the marker in (0,1)
+#' @param epsY optional, for secondary analyses on an external outcome:
+#'   if appropriate, definite positive real used to rescale the marker in (0,1)
 #' when the beta link function is used. By default, epsY=0.5.
-#' @param cor optional indicator for inclusion of an auto correlated Gaussian process
+#' @param cor optional, for secondary analyses on an external outcome:
+#'   if appropriate, indicator for inclusion of an auto correlated Gaussian process
 #' in the latent process linear (latent process) mixed model. Option "BM" indicates
 #' a brownian motion with parameterized variance. Option "AR" specifies an
 #' autoregressive process of order 1 with parameterized variance and correlation
 #' intensity. Each option should be followed by the time variable in brackets as
 #' code{cor=BM(time)}. By default, no autocorrelated Gaussian process is added.
-#' @param nsim number of points to be used in the estimated link function. By default,
+#' @param nsim optional, for secondary analyses on an external outcome:
+#'   if appropriate, number of points to be used in the estimated link function. By default,
 #' nsom=100.
-#' @param range optional vector indicating the range of the outcomes (that is the
+#' @param range optional, for secondary analyses on an external outcome:
+#'   if appropriate, vector indicating the range of the outcomes (that is the
 #' minimum and maximum). By default, the range is defined according to the minimum
 #' and maximum observed values of the outcome. The option should be used
 #' only for Beta and Splines transformations.
@@ -110,11 +139,12 @@
 #' method: mandatory list containing the longitudinal submodels used in the primary
 #' latent class model.
 #' @param method character indicating the inference technique to be used:
-#' \code{"twoStageJoint"} corresponds to 2-stage estimation. \code{"conditional"}
-#' corresponds to the method based on the distribution of Y conditionally to the
-#' true latent class membership.
+#' \code{"twoStageJoint"} corresponds to 2-stage estimation using the 
+#' joint log-likelihood. \code{"conditional"} corresponds to the conditional 
+#' regression using the underlying true latent class membership.
 #' @param varest optional character indicating the method to be used to compute the
-#' variance of the regression estimates. \code{"none"} does not account for the
+#' variance of the regression estimates in the secondary regression. 
+#' \code{"none"} does not account for the
 #' uncertainty in the primary latent class model, \code{"paramBoot"} computes the
 #' total variance using a parametric bootstrap technique, \code{"Hessian"} computes
 #' the total Hessian of the joint likelihood (implemented for \code{"twoStageJoint"}
@@ -123,10 +153,11 @@
 #' @param M option integer indicating the number of draws for the parametric boostrap
 #' when \code{varest="paramBoot"}. Default to 200.
 #' @param B optional vector of initial parameter values for the secondary model. 
-#' If external outcome, the vector has the same structure as a latent class model
+#' With an external outcome, the vector has the same structure as a latent class model
 #' estimated in the other functions of \code{lcmm} package for the same type of 
-#' outcome. If external class predictors (of size p), the vector is of length 
-#' (ng-1)*(1+p). If \code{B=NULL} (by default), internal initial values are selected. 
+#' outcome except that no parameters should be included for the latent class membership. 
+#' With external class predictors (of size p), the vector is of length 
+#' (ng-1)*(1+p). If \code{B=NULL} (by default), internal initial values are considered 
 #' @param convB optional threshold for the convergence criterion based on the
 #' parameter stability. By default, convB=0.0001.
 #' @param convL optional threshold for the convergence criterion based on the
@@ -158,14 +189,18 @@
 #' 
 #' 
 #' ###### Estimation of the primary latent class model                   ######
+#' # this is a linear latent class mixed model for Ydep1
+#' # with 2 classes and a linear trajectory
 #' 
 #' set.seed(1234)
 #' PrimMod <- hlme(Ydep1~Time,random=~Time,subject='ID',ng=1,data=data_lcmm)
 #' PrimMod2 <- hlme(Ydep1~Time,mixture=~Time,random=~Time,subject='ID',
 #'                  ng=2,data=data_lcmm,B=random(PrimMod))
 #' 
-#' ###### Example 1: Relationship between a latent class structure and         #
+#' ###### Example 1: Relationship between the latent class structure and       #
 #' #                   external class predictors                          ######
+#'       
+#' # We consider here 4 external predictors X1-X4.       
 #'                   
 #' # estimation of the secondary multinomial logistic model with total variance
 #' # computed with the Hessian
@@ -178,11 +213,12 @@
 #' summary(XextHess)
 #' 
 #' # estimation of a secondary multinomial logistic model with total variance
-#' # computed with parametric Bootstrap (much longer). When using the bootstrap 
-#' # estimator, we recommend running first the analysis with option varest = "none" 
-#' # which is faster but which underestimates the variance. And then use these values
-#' # as initial values when running the model with varest = "paramBoot" to obtain 
-#' # a valid variance of the parameters. 
+#' # computed with parametric Bootstrap (much longer). When planning to use
+#' # the bootstrap estimator, we recommend running first the analysis 
+#' # with option varest = "none" which is faster but which underestimates 
+#' # the variance. And then use these values as plausible initial values when 
+#' # running the estimation with varest = "paramBoot" to obtain  a valid 
+#' # variance of the parameters. 
 #' 
 #' XextNone <- externVar(PrimMod2,
 #'                       classmb = ~X1 + X2 + X3 + X4, 
@@ -203,7 +239,11 @@
 #'  
 #' ###### Example 2: Relationship between a latent class structure and         #
 #' #                external outcome (repeatedly measured over time)     ######
-#'                   
+#'                 
+#'                 
+#' # We want to estimate a linear mixed model for Ydep2 with a linear trajectory
+#' # adjusted on X1. 
+#'   
 #' # estimation of the secondary linear mixed model with total variance
 #' # computed with the Hessian
 #' 
@@ -217,11 +257,12 @@
 #'                      
 #' 
 #' # estimation of a secondary linear mixed model with total variance
-#' # computed with parametric Bootstrap (much longer). When using the bootstrap 
-#' # estimator, we recommend running first the analysis with option varest = "none" 
-#' # which is faster but which underestimates the variance. And then use these values
-#' # as initial values when running the model with varest = "paramBoot" to obtain 
-#' # a valid variance of the parameters. 
+#' # computed with parametric Bootstrap (much longer). When planning to use
+#' # the bootstrap estimator, we recommend running first the analysis 
+#' # with option varest = "none" which is faster but which underestimates 
+#' # the variance. And then use these values as plausible initial values when 
+#' # running the estimation with varest = "paramBoot" to obtain  a valid 
+#' # variance of the parameters. 
 #' 
 #' YextNone = externVar(PrimMod2,   #primary model
 #'                      fixed = Ydep2 ~ Time*X1,  #secondary model
@@ -248,6 +289,10 @@
 #' ###### Example 3: Relationship between a latent class structure and         #
 #' #                      external outcome (survival)                     ######
 #' 
+#' # We want to estimate a proportional hazard model (with proportional hazard 
+#' # across classes) for time to event Tevent (indicator Event) and assuming 
+#' # a splines baseline risk with 3 knots.
+#' 
 #' # estimation of the secondary survival model with total variance
 #' # computed with the Hessian
 #' 
@@ -262,11 +307,12 @@
 #' 
 #' 
 #' # estimation of a secondary survival model with total variance
-#' # computed with parametric Bootstrap (much longer). When using the bootstrap
-#' # estimator, we recommend running first the analysis with option varest = "none"
-#' # which is faster but which underestimates the variance. And then use these values
-#' # as initial values when running the model with varest = "paramBoot" to obtain
-#' # a valid variance of the parameters.
+#' # computed with parametric Bootstrap (much longer). When planning to use
+#' # the bootstrap estimator, we recommend running first the analysis 
+#' # with option varest = "none" which is faster but which underestimates 
+#' # the variance. And then use these values as plausible initial values when 
+#' # running the estimation with varest = "paramBoot" to obtain  a valid 
+#' # variance of the parameters. 
 #' 
 #' YextNone = externVar(PrimMod2,   #primary model
 #'                      survival = Surv(Tevent,Event)~ X1+mixture(X2), #secondary model
@@ -337,6 +383,8 @@ externVar = function(model,
                      nproc = 1){
   
     ptm <- proc.time()
+ 
+ 
     
     if(missing(model)) stop("model argument must be given")
     if(!inherits(model, c("hlme", "lcmm", "multlcmm", "Jointlcmm", "mpjlcmm"))) stop('primary model class must be either "hlme", "lcmm", "multlcmm", "Jointlcmm" or "mpjlcmm"')
@@ -348,35 +396,36 @@ externVar = function(model,
     if(method == "conditional" & missing(varest)) varest = "paramBoot"
     if(!varest %in% c("none", "paramBoot", "Hessian")) stop('Variance estimation method "varest" must be either "none", "paramBoot" or "Hessian"')
     if(!is.null(link) & missing(fixed)) stop("The argument link is not to be used with external class predictor")
+#    if(missing(subject)) stop("subject argument must be given")
+    if(M == 0) stop("if no bootstrap is to be considered, specify varest='none'")
     
+    if(missing(posfix)) posfix <- c()
     
-    if(missing(posfix)) posfix = c()
-    
-    cl = match.call()
+    cl <- match.call()
     
     ##Informations about primary model
-    argumentsIn = as.list(model$call)
-    funIn = as.character(argumentsIn[[1]])
+    argumentsIn <- as.list(model$call)
+    funIn <- as.character(argumentsIn[[1]])
     if(funIn == "jlcmm") funIn <- "Jointlcmm"
     if(funIn == "mlcmm") funIn <- "multlcmm"
-    argumentsIn[[1]] = NULL
-    ng = model$ng
-    nIn = length(model$best)
+    argumentsIn[[1]] <- NULL
+    ng <- model$ng
+    nIn <- length(model$best)
     
     if(is.null(argumentsIn[["classmb"]])){
-        oldclassmb = ~ 1
+        oldclassmb <- ~ 1
     } else {
-        oldclassmb = formula(argumentsIn[["classmb"]])
+        oldclassmb <- formula(argumentsIn[["classmb"]])
     }
     if(!missing(classmb) & oldclassmb != ~1) stop("Primary model already has class predictor")
     
     ##number of MB parameters in primary model
-    nInMB = ncol(model.matrix(oldclassmb, data))*(ng-1)
+    nInMB <- ncol(model.matrix(oldclassmb, data))*(ng-1)
     
     ##Get subject
     if(missing(subject)){
         if (model$call$subject %in% colnames(data)){
-            subject = model$call$subject
+            subject <- model$call$subject
         } else {
             stop("The argument subject must be specified if different from the subject argument used in the primary model")
         }
@@ -386,13 +435,13 @@ externVar = function(model,
     if(funIn == "mpjlcmm"){
         if(missing(longitudinal)) stop("The argument longitudinal is mandatory with a mpjlcmm primary model")
         
-        longCall = substitute(longitudinal)
+        longCall <- substitute(longitudinal)
         
-        K = length(longitudinal)
+        K <- length(longitudinal)
         for(k in 1:K){
-            cl_long = as.list(longitudinal[[k]]$call)
-            if(inherits(longitudinal[[k]], "lcmm")) cl_long[["computeDiscrete"]] = FALSE
-            longitudinal[[k]]$call = as.call(cl_long)
+            cl_long <- as.list(longitudinal[[k]]$call)
+            if(inherits(longitudinal[[k]], "lcmm")) cl_long[["computeDiscrete"]] <- FALSE
+            longitudinal[[k]]$call <- as.call(cl_long)
             
             assign(as.character(longCall[[k+1]]), longitudinal[[k]])
         }
@@ -400,41 +449,41 @@ externVar = function(model,
     
     ##nVCIn
     if(funIn == "mpjlcmm"){
-        ##nVCIn = model$Nprm[3+2*model$K+(1:model$K)]        
+        ##nVCIn <- model$Nprm[3+2*model$K+(1:model$K)]        
         l <- 3
         if(model$nbevt>1) l <- 2+model$nbevt
-        nVCIn = model$Nprm[l+2*model$K+(1:model$K)]
+        nVCIn <- model$Nprm[l+2*model$K+(1:model$K)]
         nef <- model$Nprm[l+1:K]
         ncontr <- model$Nprm[l+K+1:K]
-        iVCIn = c()
-        prev = 0
+        iVCIn <- c()
+        prev <- 0
         for(k in 1:model$K){
-            ##iVCIn = c(iVCIn, sum(model$Nprm[c(1:3, 3:4*model$K-model$K+k-1)])+prev+1:nVCIn[k])
-            iVCIn = c(iVCIn, sum(model$N[1:3])+prev+nef[k]+ncontr[k]+1:nVCIn[k])
-            prev = prev+model$npmK[k]
+            ##iVCIn <- c(iVCIn, sum(model$Nprm[c(1:3, 3:4*model$K-model$K+k-1)])+prev+1:nVCIn[k])
+            iVCIn <- c(iVCIn, sum(model$N[1:3])+prev+nef[k]+ncontr[k]+1:nVCIn[k])
+            prev <- prev+model$npmK[k]
         }
     } else if(funIn == "Jointlcmm"){
-        nVCIn = model$N[5]
-        iVCIn = sum(model$N[1:4]) + 1:nVCIn
+        nVCIn <- model$N[5]
+        iVCIn <- sum(model$N[1:4]) + 1:nVCIn
     } else if(funIn == "multlcmm"){
-        nVCIn = model$N[4]
-        iVCIn = sum(model$N[3]) + 1:nVCIn
+        nVCIn <- model$N[4]
+        iVCIn <- sum(model$N[3]) + 1:nVCIn
     } else {
-        nVCIn = model$N[3]
-        iVCIn = sum(model$N[1:2]) + 1:nVCIn
+        nVCIn <- model$N[3]
+        iVCIn <- sum(model$N[1:2]) + 1:nVCIn
     }
     
     ##pprob with new data
-    argumentsInEdit = argumentsIn
-    argumentsInEdit[["data"]] = data
-    argumentsInEdit[["maxiter"]] = 0
-    argumentsInEdit[["B"]] = model$best
-    argumentsInEdit[["verbose"]] = FALSE
-    modelEdit = do.call(funIn, argumentsInEdit)
-    pprob = modelEdit$pprob
+    argumentsInEdit <- argumentsIn
+    argumentsInEdit[["data"]] <- data
+    argumentsInEdit[["maxiter"]] <- 0
+    argumentsInEdit[["B"]] <- model$best
+    argumentsInEdit[["verbose"]] <- FALSE
+    modelEdit <- do.call(funIn, argumentsInEdit)
+    pprob <- modelEdit$pprob
     
     
-    arguments = list()
+    arguments <- list()
     
     ##Finding out the number of parameters is needed for all survival external outcome
     if(!missing(survival)){
@@ -478,27 +527,27 @@ externVar = function(model,
             hazard[which(hazard %in% c("piecewise","Piecewise"))] <- "5-quant-piecewise" 
         }
         
-        hazWhat = hazard
+        hazWhat <- hazard
         ##when not weibull, keep only the last word of hazard
-        hazWhat[hazard != 'Weibull'] = sapply(strsplit(hazard[hazard != 'Weibull'], "-"), `[`, 3)
-        hazN = rep(2, nbevt)
-        hazN[hazard != 'Weibull'] = sapply(strsplit(hazard[hazard != 'Weibull'], "-"), `[`, 1)
-        hazN = as.integer(hazN)
-        hazN = hazN +
+        hazWhat[hazard != 'Weibull'] <- sapply(strsplit(hazard[hazard != 'Weibull'], "-"), `[`, 3)
+        hazN <- rep(2, nbevt)
+        hazN[hazard != 'Weibull'] <- sapply(strsplit(hazard[hazard != 'Weibull'], "-"), `[`, 1)
+        hazN <- as.integer(hazN)
+        hazN <- hazN +
             (hazWhat == "Weibull")*0 +
             (hazWhat == "piecewise")*(-1) +
             (hazWhat == "splines")*(2)
-        hazN = hazN + hazN *
+        hazN <- hazN + hazN *
             (hazardtype == "Specific")*(ng-1)
         
         ##we extract the number of base function parameter with constraints (ie, not PH parameters)
-        nSurvConstraint = hazN
+        nSurvConstraint <- hazN
         
-        hazN = hazN  +
+        hazN <- hazN  +
             (hazardtype == "PH")*(ng-1)
         
         ##we now have all base functions parameters :
-        nEstY = sum(hazN)
+        nEstY <- sum(hazN)
         
         ##get number of parameters for survival covariates
         form.surv <- cl$survival[3]
@@ -598,72 +647,73 @@ externVar = function(model,
         }
         
         ##I extract number of variable in each formula (through model.matrix) excluding intercept
-        ncols = sapply(c(form.commun, form.cause, form.mixture, form.causek), function(x, data){
-            mm = model.matrix(x, data)
-            mm = mm[,-1]
+        ncols <- sapply(c(form.commun, form.cause, form.mixture, form.causek), function(x, data){
+            mm <- model.matrix(x, data)
+            mm <- mm[,-1]
             if(is.null(ncol(mm))) {return(1)}
             else {return(ncol(mm))}
         }, data = data)
         
         ##I also need how many parameters each kind of covariate makes
-        nparam = c(1, nbevt, ng, nbevt*ng)
+        nparam <- c(1, nbevt, ng, nbevt*ng)
         
         ##we now have all the survival covariates parameters :
-        nEstX = sum(ncols*nparam)
+        nEstX <- sum(ncols*nparam)
         
-        nEst = nEstY + nEstX
+        nEst <- nEstY + nEstX
     }
     
     ##A model structure is needed for all longitudinal external outcome
     if(!missing(fixed)){ 
         ##Manage inputs
-        
-        if(missing(mixture)) mixture = ~1
-        if(missing(random)) random = ~-1
+      
+      
+        if(missing(mixture)) mixture <- ~1
+        if(missing(random)) random <- ~-1
         
         if(!inherits(fixed,"formula")) stop("The argument fixed must be a formula")
         if(!inherits(mixture,"formula")) stop("The argument mixture must be a formula")
         if(!inherits(random,"formula")) stop("The argument random must be a formula")
         
         if(length(fixed[[2]]) != 1){
-            argfunctionStrMod = "multlcmm"
+            argfunctionStrMod <- "multlcmm"
         } else if(is.null(link)){
-            argfunctionStrMod = "hlme"
+            argfunctionStrMod <- "hlme"
         } else {
-            argfunctionStrMod = "lcmm"
+            argfunctionStrMod <- "lcmm"
         }
         
         ##let's create structure for secondary model
-        argumentsStrMod = list()
-        argumentsStrMod[["fixed"]] = fixed
-        argumentsStrMod[["random"]] = random
-        argumentsStrMod[["subject"]] = subject
-        argumentsStrMod[["ng"]] = 1
-        argumentsStrMod[["idiag"]] = idiag
-        argumentsStrMod[["randomY"]] = randomY
+        argumentsStrMod <- list()
+        argumentsStrMod[["fixed"]] <- fixed
+        argumentsStrMod[["random"]] <- random
+        argumentsStrMod[["subject"]] <- subject
+        argumentsStrMod[["ng"]] <- 1
+        argumentsStrMod[["idiag"]] <- idiag
+        argumentsStrMod[["randomY"]] <- randomY
         if(argfunctionStrMod %in% c("lcmm", "multlcmm", "Jointlcmm")){
-            argumentsStrMod[["link"]] = link
-            argumentsStrMod[["intnodes"]] = intnodes
+            argumentsStrMod[["link"]] <- link
+            argumentsStrMod[["intnodes"]] <- intnodes
         }
-        argumentsStrMod[["epsY"]] = epsY
-        argumentsStrMod[["cor"]] = substitute(cor)
-        argumentsStrMod[["nsim"]] = nsim
-        argumentsStrMod[["range"]] = range
-        argumentsStrMod[["data"]] = data
-        argumentsStrMod[["maxiter"]] = 0
-        argumentsStrMod[["verbose"]] = FALSE
+        argumentsStrMod[["epsY"]] <- epsY
+        argumentsStrMod[["cor"]] <- substitute(cor)
+        argumentsStrMod[["nsim"]] <- nsim
+        argumentsStrMod[["range"]] <- range
+        argumentsStrMod[["data"]] <- data
+        argumentsStrMod[["maxiter"]] <- 0
+        argumentsStrMod[["verbose"]] <- FALSE
         
-        strMod = do.call(argfunctionStrMod, c(argumentsStrMod))
+        strMod <- do.call(argfunctionStrMod, c(argumentsStrMod))
         
-        argumentsStrMod[["mixture"]] = mixture
-        argumentsStrMod[["classmb"]] = ~1
-        argumentsStrMod[["ng"]] = ng
-        argumentsStrMod[["nwg"]] = nwg
-        argumentsStrMod[["B"]] = as.name("strMod")
+        argumentsStrMod[["mixture"]] <- mixture
+        argumentsStrMod[["classmb"]] <- ~1
+        argumentsStrMod[["ng"]] <- ng
+        argumentsStrMod[["nwg"]] <- nwg
+        argumentsStrMod[["B"]] <- as.name("strMod")
         
-        strMod = do.call(argfunctionStrMod, c(argumentsStrMod))
+        strMod <- do.call(argfunctionStrMod, c(argumentsStrMod))
         
-        strMod$best[1:ng+(ng-1)] = mean(strMod$best[1:ng+(ng-1)])# pourquoi?? tous les intercepts a la meme valeur. A revoir
+#        strMod$best[1:ng+(ng-1)] <- mean(strMod$best[1:ng+(ng-1)])# pourquoi?? tous les intercepts a la meme valeur. A revoir
         
     }
     
@@ -671,63 +721,63 @@ externVar = function(model,
     if(method == "twoStageJoint"){
         
         ##Common argument in twoStageJoint
-        arguments[["data"]] = data
-        arguments[["ng"]] = ng
-        arguments[["subject"]] = subject
+        arguments[["data"]] <- data
+        arguments[["ng"]] <- ng
+        arguments[["subject"]] <- subject
         ##technical options
-        arguments[["maxiter"]] = maxiter
-        arguments[["verbose"]] = verbose
-        arguments[["nproc"]] = nproc
-        arguments[["convB"]] = convB
-        arguments[["convL"]] = convL
-        arguments[["convG"]] = convG
-        arguments[["partialH"]] = partialH
+        arguments[["maxiter"]] <- maxiter
+        arguments[["verbose"]] <- verbose
+        arguments[["nproc"]] <- nproc
+        arguments[["convB"]] <- convB
+        arguments[["convL"]] <- convL
+        arguments[["convG"]] <- convG
+        arguments[["partialH"]] <- partialH
         ##primary survival
-        arguments[["survival"]] =  argumentsIn[["survival"]]
-        arguments[["hazard"]] =  argumentsIn[["hazard"]]
-        arguments[["hazardtype"]] =  argumentsIn[["hazardtype"]]
-        arguments[["hazardnodes"]] =  argumentsIn[["hazardnodes"]]
-        arguments[["hazardrange"]] =  argumentsIn[["hazardrange"]]
-        arguments[["TimeDepVar"]] =  argumentsIn[["TimeDepVar"]]
-        arguments[["logscale"]] =  argumentsIn[["logscale"]]
+        arguments[["survival"]] <-  argumentsIn[["survival"]]
+        arguments[["hazard"]] <-  argumentsIn[["hazard"]]
+        arguments[["hazardtype"]] <-  argumentsIn[["hazardtype"]]
+        arguments[["hazardnodes"]] <-  argumentsIn[["hazardnodes"]]
+        arguments[["hazardrange"]] <-  argumentsIn[["hazardrange"]]
+        arguments[["TimeDepVar"]] <-  argumentsIn[["TimeDepVar"]]
+        arguments[["logscale"]] <-  argumentsIn[["logscale"]]
         
         
         ##Primary Jointlcmm needs transformation into lcmm to be put into longitudinal.
         if(funIn == "Jointlcmm"){
             
             if(is.null(argumentsIn[["link"]])){
-                argfunJoint = "hlme"
+                argfunJoint <- "hlme"
             } else {
-                argfunJoint = "lcmm"
+                argfunJoint <- "lcmm"
             }
             
-            argumentsJoint = argumentsIn
-            argumentsJoint[["survival"]] = NULL
-            argumentsJoint[["hazard"]] = NULL
-            argumentsJoint[["hazardtype"]] = NULL
-            argumentsJoint[["hazardnodes"]] = NULL
-            argumentsJoint[["hazardrange"]] = NULL
-            argumentsJoint[["TimeDepVar"]] = NULL
-            argumentsJoint[["logscale"]] = NULL
+            argumentsJoint <- argumentsIn
+            argumentsJoint[["survival"]] <- NULL
+            argumentsJoint[["hazard"]] <- NULL
+            argumentsJoint[["hazardtype"]] <- NULL
+            argumentsJoint[["hazardnodes"]] <- NULL
+            argumentsJoint[["hazardrange"]] <- NULL
+            argumentsJoint[["TimeDepVar"]] <- NULL
+            argumentsJoint[["logscale"]] <- NULL
             
-            argumentsJoint[["maxiter"]] = 0
-            argumentsJoint[["mixture"]] = NULL
-            argumentsJoint[["classmb"]] = NULL
-            argumentsJoint[["ng"]] = 1
-            argumentsJoint[["nwg"]] = FALSE
-            argumentsJoint[["B"]] = NULL
-            argumentsJoint[["verbose"]] = FALSE
-            argumentsJoint[["data"]] = data
+            argumentsJoint[["maxiter"]] <- 0
+            argumentsJoint[["mixture"]] <- NULL
+            argumentsJoint[["classmb"]] <- NULL
+            argumentsJoint[["ng"]] <- 1
+            argumentsJoint[["nwg"]] <- FALSE
+            argumentsJoint[["B"]] <- NULL
+            argumentsJoint[["verbose"]] <- FALSE
+            argumentsJoint[["data"]] <- data
             
-            modNoSurv = do.call(argfunJoint, argumentsJoint)
+            modNoSurv <- do.call(argfunJoint, argumentsJoint)
             
-            argumentsJoint[["mixture"]] = argumentsIn[["mixture"]]
-            argumentsJoint[["classmb"]]= ~1
-            argumentsJoint[["ng"]] = argumentsIn[["ng"]]
-            argumentsJoint[["nwg"]] = argumentsIn[["nwg"]]
-            argumentsJoint[["B"]] = modNoSurv
+            argumentsJoint[["mixture"]] <- argumentsIn[["mixture"]]
+            argumentsJoint[["classmb"]] <- ~1
+            argumentsJoint[["ng"]] <- argumentsIn[["ng"]]
+            argumentsJoint[["nwg"]] <- argumentsIn[["nwg"]]
+            argumentsJoint[["B"]] <- modNoSurv
             
-            modNoSurv = do.call(argfunJoint, argumentsJoint)
+            modNoSurv <- do.call(argfunJoint, argumentsJoint)
         }
         
         
@@ -736,101 +786,101 @@ externVar = function(model,
             ##manage inputs
             if(!is.null(argumentsIn[["survival"]])) stop('secondary survival model is not supported with "twoStageJoint" method if primary model already includes survival')
             
-            funOut = "mpjlcmm"
+            funOut <- "mpjlcmm"
             
             ##nOut : nuber of total final parameters
-            nOut = nIn + nEst
+            nOut <- nIn + nEst
             
             ##index
-            iKeepOut = c(1:nInMB, nInMB+nEst+1:(nIn-nInMB))
-            iKeepIn = 1:nIn
-            iEst = nInMB+1:nEst
+            iKeepOut <- c(1:nInMB, nInMB+nEst+1:(nIn-nInMB))
+            iKeepIn <- 1:nIn
+            iEst <- nInMB+1:nEst
             
             ##input VC, only for keep betaa (iKeepIn)
-            iVCKeep = iVCIn
+            iVCKeep <- iVCIn
             
             ##Id of varcov estimates
-            iVCOut = c()
+            iVCOut <- c()
             
             ##list of arguments
-            arguments[["survival"]] =  survival
-            arguments[["hazard"]] =  hazard
-            arguments[["hazardtype"]] =  hazardtype
-            arguments[["hazardnodes"]] =  hazardnodes
-            arguments[["TimeDepVar"]] =  TimeDepVar
-            arguments[["logscale"]] =  logscale
-            arguments[["posfix"]] = unique(c(iKeepOut, posfix))
+            arguments[["survival"]] <-  survival
+            arguments[["hazard"]] <-  hazard
+            arguments[["hazardtype"]] <-  hazardtype
+            arguments[["hazardnodes"]] <-  hazardnodes
+            arguments[["TimeDepVar"]] <-  TimeDepVar
+            arguments[["logscale"]] <-  logscale
+            arguments[["posfix"]] <- unique(c(iKeepOut, posfix))
             ##what is in longitudinal ?
             if(funIn == "mpjlcmm"){
-                arguments[["longitudinal"]] = longitudinal
+                arguments[["longitudinal"]] <- longitudinal
             } else {
-                arguments[["longitudinal"]] = list(model)
+                arguments[["longitudinal"]] <- list(model)
             }
             ##initial values
             if(missing(B)){
-                arguments[["B"]][iEst] = rep(0.1, nEst)
+                arguments[["B"]][iEst] <- rep(0.1, nEst)
             } else {
                 if(length(B) != length(iEst)) stop("B should be of length ", length(iEst))
-                arguments[["B"]][iEst] = B
+                arguments[["B"]][iEst] <- B
             }
         }
         
         ##Yextern longitudinal
         if(!missing(fixed)){
             
-            funOut = "mpjlcmm"
+            funOut <- "mpjlcmm"
             
             ##Let's change strMod's saved call
-            strMod$call$data = substitute(data)
+            strMod$call$data <- substitute(data)
             
             ## Now join the primary and secondary model
             
             ##Informations about secondary outcome model
             ##number of classmb parameters to remove
-            nMB = ng-1
+            nMB <- ng-1
             ##number of remaining parameters to estimate
-            nStr = length(strMod$best)
-            nEst = nStr - nMB
+            nStr <- length(strMod$best)
+            nEst <- nStr - nMB
             ##nOut : nuber of total final parameters
-            nOut = nIn + nEst
+            nOut <- nIn + nEst
             
             ##index
-            iKeepOut = 1:nIn
-            iKeepIn = iKeepOut
-            iEst = nIn+1:nEst
+            iKeepOut <- 1:nIn
+            iKeepIn <- iKeepOut
+            iEst <- nIn+1:nEst
             
             ##input VC, only for keep betaa (iKeepIn)
-            iVCKeep = iVCIn
+            iVCKeep <- iVCIn
             
             ##Id of varcov estimates
             if(inherits(strMod, "multlcmm")){
-                nVCStr = strMod$N[4]
-                iVCStr = sum(strMod$N[3]) + 1:nVCStr
+                nVCStr <- strMod$N[4]
+                iVCStr <- sum(strMod$N[3]) + 1:nVCStr
             } else {
-                nVCStr = strMod$N[3]
-                iVCStr = sum(strMod$N[1:2]) + 1:nVCStr
+                nVCStr <- strMod$N[3]
+                iVCStr <- sum(strMod$N[1:2]) + 1:nVCStr
             }
-            iVCOut = nIn + iVCStr - nMB
+            iVCOut <- nIn + iVCStr - nMB
             
             ##Liste des arguments
             ##on fixe nos parametres
-            arguments[["posfix"]] = unique(c(iKeepOut, posfix))
+            arguments[["posfix"]] <- unique(c(iKeepOut, posfix))
             
             ##On donne les modeles
             if(funIn == "mpjlcmm"){
-                arguments[["longitudinal"]] = c(longitudinal, list(strMod))
+                arguments[["longitudinal"]] <- c(longitudinal, list(strMod))
             } else if(funIn == "Jointlcmm"){
-                arguments[["longitudinal"]] = list(modNoSurv, strMod)
+                arguments[["longitudinal"]] <- list(modNoSurv, strMod)
             } else {
-                arguments[["longitudinal"]] = list(model, strMod)
+                arguments[["longitudinal"]] <- list(model, strMod)
             } ## ici : B= prm modele entre puis prm modele ajoute
             
             ##initial values
             if(missing(B)){
-                arguments[["B"]][iEst] = strMod$best[(nMB+1):nStr]
+                arguments[["B"]][iEst] <- strMod$best[(nMB+1):nStr]
             } else {
                 if(length(B) != length(iEst)) stop("B should be of length ", length(iEst))
-                arguments[["B"]][iEst] = B
+                arguments[["B"]][iEst] <- B
             }
         }
         
@@ -839,47 +889,47 @@ externVar = function(model,
             
             if(!inherits(classmb,"formula")) stop("The argument classmb must be a formula")
             
-            funOut = "mpjlcmm"
+            funOut <- "mpjlcmm"
             
             ##nEst : number of MB parameters in output model
-            nEst1G = ncol(model.matrix(classmb, data))
-            nEst = nEst1G*(ng-1)
+            nEst1G <- ncol(model.matrix(classmb, data))
+            nEst <- nEst1G*(ng-1)
             
             ##nOut : nuber of total final parameters
-            nOut = nIn - nInMB + nEst
+            nOut <- nIn - nInMB + nEst
             
             ##index
-            iKeepOut = (nEst+1):nOut
-            iKeepIn = (nInMB+1):nIn
-            iEst = 1:nEst
+            iKeepOut <- (nEst+1):nOut
+            iKeepIn <- (nInMB+1):nIn
+            iEst <- 1:nEst
             
             ##input VC, only for keep betas (iKeepIn)
-            iVCKeep = iVCIn-nInMB
+            iVCKeep <- iVCIn-nInMB
             
             ##Id of varcov estimates (none)
-            iVCOut = c()
+            iVCOut <- c()
             
             ##On recree tous nos arguments
             if(funIn == "mpjlcmm"){
-                arguments[["longitudinal"]] = longitudinal
+                arguments[["longitudinal"]] <- longitudinal
             } else if(funIn == "Jointlcmm"){
-                arguments[["longitudinal"]] = list(modNoSurv)
+                arguments[["longitudinal"]] <- list(modNoSurv)
             } else {
-                arguments[["longitudinal"]] = list(model)
+                arguments[["longitudinal"]] <- list(model)
             }
-            arguments[["classmb"]] = classmb
+            arguments[["classmb"]] <- classmb
             ##on ajoute des valeurs de base pour nos nouveaux estimateurs
-            arguments[["B"]] = rep(0, nOut)
+            arguments[["B"]] <- rep(0, nOut)
             ##initial values
             if(missing(B)){
-                arguments[["B"]][1:ng-1] = model$best[1:ng-1]
+                arguments[["B"]][1:ng-1] <- model$best[1:ng-1]
             } else {
                 if(length(B) != length(iEst)) stop("B should be of length ", length(iEst))
-                arguments[["B"]][iEst] = B
+                arguments[["B"]][iEst] <- B
             }
             
             ##on fixe nos parametres
-            arguments[["posfix"]] = unique(c(posfix, iKeepOut)) 
+            arguments[["posfix"]] <- unique(c(posfix, iKeepOut)) 
         }
     }
     
@@ -887,25 +937,26 @@ externVar = function(model,
         
         ##Yextern survival
         if(!missing(survival)){
-            ## we need it all in a function in order to be able to use parametric bootstrap later on
+            ## we need it all in a function in order to be able to use 
+            ## parametric bootstrap later on
             
             ##remaining parameters to estimate
-            iEst = 1:nEst
+            iEst <- 1:nEst
             
-            iKeepIn = 1:nIn
-            iKeepOut = 1:nIn+nEst+2
+            iKeepIn <- 1:nIn
+            iKeepOut <- 1:nIn+nEst+2
             
-            nOut = nEst+2
+            nOut <- nEst+2
             
             ##Id of varcov estimates to keep in bootstrap
-            iVCKeep = iVCIn
-            iVCOut = c()
-            nVCIn = 0
+            iVCKeep <- iVCIn
+            iVCOut <- c()
+            nVCIn <- 0
             
             ##We need what is inside of longitudinal to still exist in the worker
-            argumentsIn[["longitudinal"]] = eval(argumentsIn[["longitudinal"]])
+            argumentsIn[["longitudinal"]] <- eval(argumentsIn[["longitudinal"]])
             
-            conditionalS = function(model,
+            conditionalS <- function(model,
                                     data,
                                     survival,
                                     hazard,
@@ -926,110 +977,110 @@ externVar = function(model,
                                     convB,
                                     convL,
                                     convG){
-                argumentsInEdit = argumentsIn
-                argumentsInEdit[["B"]] = B[iKeepOut]
-                argumentsInEdit[["maxiter"]] = 0
-                argumentsInEdit[["verbose"]] = F
-                argumentsInEdit[["nproc"]] = nproc
-                argumentsInEdit[["data"]] = data
-                model = do.call(funIn, argumentsInEdit)
+                argumentsInEdit <- argumentsIn
+                argumentsInEdit[["B"]] <- B[iKeepOut]
+                argumentsInEdit[["maxiter"]] <- 0
+                argumentsInEdit[["verbose"]] <- F
+                argumentsInEdit[["nproc"]] <- nproc
+                argumentsInEdit[["data"]] <- data
+                model <- do.call(funIn, argumentsInEdit)
                 
-                B = B[iEst]
+                B <- B[iEst]
                 
-                predCl = predictClass(model, data)
+                predCl <- predictClass(model, data)
                 
                 ##First : let's compute P(C|\tilde C) (\tilde C : A)
-                pAlY = sapply(1:ng, function(g){
+                pAlY <- sapply(1:ng, function(g){
                     return(as.numeric(predCl[,2] == g))
                 })
-                pClY = as.matrix(predCl[,3:(2+ng)])
+                pClY <- as.matrix(predCl[,3:(2+ng)])
                 if(any(is.nan(pClY))) stop("NaN in posterior classification probability")
                 
-                pA = apply(pAlY, 2, mean)
-                pClA = t(pAlY)%*%pClY/(model$ns*pA)
+                pA <- apply(pAlY, 2, mean)
+                pClA <- t(pAlY)%*%pClY/(model$ns*pA)
                 
                 if(det(pClA) == 0 | is.na(det(pClA))) stop("Computed error matrix is singular. One class might be empty")
                 
                 ##Then : let's add it to dataset for each individual
-                indivProb = pAlY%*%pClA
-                indivProb = cbind(predCl[,1], indivProb)
-                colnames(indivProb)[1] = subject
-                data = merge(data, indivProb, by = subject)
+                indivProb <- pAlY%*%pClA
+                indivProb <- cbind(predCl[,1], indivProb)
+                colnames(indivProb)[1] <- subject
+                data <- merge(data, indivProb, by = subject)
                 
                 ##We need dummy Y for the model to run
-                data$dummyY = 1
+                data$dummyY <- 1
                 
                 ##With some type of input model, prob does not have the same name
                 if(!"prob1" %in% colnames(data)){
                     for(i in 1:ng){
-                        data[[paste0("prob", i)]] = data[[paste0("probYT", i)]]
+                        data[[paste0("prob", i)]] <- data[[paste0("probYT", i)]]
                     }
                 }
                 
                 ##Finally : we need to build the model for ppriors !
-                arguments = list()
+                arguments <- list()
                 
-                arguments[["data"]] = data
-                arguments[["fixed"]] = dummyY~1 
-                arguments[["mixture"]] =  ~-1
-                arguments[["survival"]] =  survival
-                arguments[["hazard"]] =  hazard
-                arguments[["hazardtype"]] =  hazardtype
-                arguments[["hazardnodes"]] =  hazardnodes
-                arguments[["TimeDepVar"]] =  TimeDepVar
-                arguments[["logscale"]] =  logscale
-                arguments[["subject"]] = subject
-                arguments[["classmb"]] = ~-1
-                arguments[["ng"]] = ng
-                arguments[["pprior"]] = paste("prob", 1:ng, sep="")
-                arguments[["posfix"]] = 1:2+length(iEst)
+                arguments[["data"]] <- data
+                arguments[["fixed"]] <- dummyY~1 
+                arguments[["mixture"]] <-  ~-1
+                arguments[["survival"]] <-  survival
+                arguments[["hazard"]] <-  hazard
+                arguments[["hazardtype"]] <-  hazardtype
+                arguments[["hazardnodes"]] <-  hazardnodes
+                arguments[["TimeDepVar"]] <-  TimeDepVar
+                arguments[["logscale"]] <-  logscale
+                arguments[["subject"]] <- subject
+                arguments[["classmb"]] <- ~-1
+                arguments[["ng"]] <- ng
+                arguments[["pprior"]] <- paste("prob", 1:ng, sep="")
+                arguments[["posfix"]] <- 1:2+length(iEst)
                 ##technical options
-                arguments[["maxiter"]] = maxiter
-                arguments[["verbose"]] = verbose
-                arguments[["nproc"]] = nproc
-                arguments[["convB"]] = convB
-                arguments[["convL"]] = convL
-                arguments[["convG"]] = convG
+                arguments[["maxiter"]] <- maxiter
+                arguments[["verbose"]] <- verbose
+                arguments[["nproc"]] <- nproc
+                arguments[["convB"]] <- convB
+                arguments[["convL"]] <- convL
+                arguments[["convG"]] <- convG
                 
-                arguments[["B"]] = c(B[iEst], 1, 0.000001)
+                arguments[["B"]] <- c(B[iEst], 1, 0.000001)
                 
-                res = do.call("Jointlcmm", arguments)
-                res$call = match.call()
+                res <- do.call("Jointlcmm", arguments)
+                res$call <- match.call()
                 return(res)
             }
             
             ##we need to build the model
-            arguments[["data"]] = data
-            arguments[["survival"]] =  survival
-            arguments[["hazard"]] =  hazard
-            arguments[["hazardtype"]] =  hazardtype
-            arguments[["hazardnodes"]] =  hazardnodes
-            arguments[["TimeDepVar"]] =  TimeDepVar
-            arguments[["logscale"]] =  logscale
-            arguments[["model"]] = model
-            arguments[["subject"]] = subject
-            arguments[["ng"]] = ng
-            arguments[["link"]] = link
-            arguments[["iEst"]] = iEst
+            arguments[["data"]] <- data
+            arguments[["survival"]] <-  survival
+            arguments[["hazard"]] <-  hazard
+            arguments[["hazardtype"]] <-  hazardtype
+            arguments[["hazardnodes"]] <-  hazardnodes
+            arguments[["TimeDepVar"]] <-  TimeDepVar
+            arguments[["logscale"]] <-  logscale
+            arguments[["model"]] <- model
+            arguments[["subject"]] <- subject
+            arguments[["ng"]] <- ng
+            arguments[["link"]] <- link
+            arguments[["iEst"]] <- iEst
             ##technical options
-            arguments[["maxiter"]] = maxiter
-            arguments[["verbose"]] = verbose
-            arguments[["argumentsIn"]] = argumentsIn
-            arguments[["funIn"]] = funIn
-            arguments[["nproc"]] = nproc
-            arguments[["convB"]] = convB
-            arguments[["convL"]] = convL
-            arguments[["convG"]] = convG
+            arguments[["maxiter"]] <- maxiter
+            arguments[["verbose"]] <- verbose
+            arguments[["argumentsIn"]] <- argumentsIn
+            arguments[["funIn"]] <- funIn
+            arguments[["nproc"]] <- nproc
+            arguments[["convB"]] <- convB
+            arguments[["convL"]] <- convL
+            arguments[["convG"]] <- convG
             
             ##on ajoute des valeurs de base pour nos nouveaux estimateurs
-            arguments[["B"]] = rep(0.1, nIn+nOut)
+            arguments[["B"]] <- rep(0.1, nIn+nOut)
             ##initial values
             if(!missing(B)){
                 if(length(B) != length(iEst)) stop("B should be of length ", length(iEst))
-                arguments[["B"]][iEst] = B
+                arguments[["B"]][iEst] <- B
             }
             
-            funOut = "conditionalS"
+            funOut <- "conditionalS"
         }
         
         ##Yextern longitudinal
@@ -1037,34 +1088,34 @@ externVar = function(model,
             ## we need it all in a function in order to be able to use parametric bootstrap later on
             
             ##number of classmb parameters to remove
-            nMB = ng-1
+            nMB <- ng-1
             ##number of remaining parameters to estimate
-            nStr = length(strMod$best)
-            nEst = nStr - nMB
-            iEst = 1:nEst
+            nStr <- length(strMod$best)
+            nEst <- nStr - nMB
+            iEst <- 1:nEst
             
-            iKeepIn = 1:nIn 
-            iKeepOut = 1:nIn+nEst 
-            nOut = nEst
+            iKeepIn <- 1:nIn 
+            iKeepOut <- 1:nIn+nEst 
+            nOut <- nEst
             
             ##Id of varcov estimates to keep in bootstrap
-            iVCKeep = iVCIn
+            iVCKeep <- iVCIn
             ##Id of varcov estimates
             if(inherits(strMod, "multlcmm")){
-                nVCStr = strMod$N[4]
-                iVCStr = sum(strMod$N[3]) + 1:nVCStr
+                nVCStr <- strMod$N[4]
+                iVCStr <- sum(strMod$N[3]) + 1:nVCStr
             } else {
-                nVCStr = strMod$N[3]
-                iVCStr = sum(strMod$N[1:2]) + 1:nVCStr
+                nVCStr <- strMod$N[3]
+                iVCStr <- sum(strMod$N[1:2]) + 1:nVCStr
             }
-            iVCOut = iVCStr - nMB
+            iVCOut <- iVCStr - nMB
             
-            nVCIn = 0
+            nVCIn <- 0
             
             ##We need what is inside of longitudinal to still exist in the worker
-            argumentsIn[["longitudinal"]] = eval(argumentsIn[["longitudinal"]])
+            argumentsIn[["longitudinal"]] <- eval(argumentsIn[["longitudinal"]])
             
-            conditional = function(model,
+            conditional <- function(model,
                                    data,
                                    fixed,
                                    random,
@@ -1090,129 +1141,129 @@ externVar = function(model,
                                    convB,
                                    convL,
                                    convG){
-                argumentsInEdit = argumentsIn
-                argumentsInEdit[["B"]] = B[iKeepOut] ## B : prm model a estimer, prm model entree
-                argumentsInEdit[["maxiter"]] = 0
-                argumentsInEdit[["verbose"]] = F
-                argumentsInEdit[["nproc"]] = nproc
-                argumentsInEdit[["data"]] = data
-                model = do.call(funIn, argumentsInEdit)
+                argumentsInEdit <- argumentsIn
+                argumentsInEdit[["B"]] <- B[iKeepOut] ## B : prm model a estimer, prm model entree
+                argumentsInEdit[["maxiter"]] <- 0
+                argumentsInEdit[["verbose"]] <- F
+                argumentsInEdit[["nproc"]] <- nproc
+                argumentsInEdit[["data"]] <- data
+                model <- do.call(funIn, argumentsInEdit)
                 
-                B = B[iEst]
-                ##predCl = predictClass(model, data) # pas utile # chgmt Viviane
+                B <- B[iEst]
+                ##predCl <- predictClass(model, data) # pas utile # chgmt Viviane
                 predCl <- model$pprob 
 
                 ##First : let's compute P(C|\tilde C) (\tilde C : A)
-                pAlY = sapply(1:ng, function(g){
+                pAlY <- sapply(1:ng, function(g){
                     return(as.numeric(predCl[,2] == g))
                 })
-                pClY = as.matrix(predCl[,3:(2+ng)])
+                pClY <- as.matrix(predCl[,3:(2+ng)])
                 if(any(is.nan(pClY))) stop("NaN in posterior classification probability")
                 
-                pA = apply(pAlY, 2, mean)
-                pClA = t(pAlY)%*%pClY/(model$ns*pA)
+                pA <- apply(pAlY, 2, mean)
+                pClA <- t(pAlY)%*%pClY/(model$ns*pA)
                 
                 if(det(pClA) == 0 | is.na(det(pClA))) stop("Computed error matrix is singular. One class might be empty")
                 
                 ##Then : let's add it to dataset for each individual
-                indivProb = pAlY%*%pClA
-                indivProb = cbind(predCl[,1], indivProb)
-                colnames(indivProb)[1] = subject
-                data = merge(data, indivProb, by = subject)
+                indivProb <- pAlY%*%pClA
+                indivProb <- cbind(predCl[,1], indivProb)
+                colnames(indivProb)[1] <- subject
+                data <- merge(data, indivProb, by = subject)
                 
                 ##Finally : we need to build the model for ppriors !
-                arguments = list()
+                arguments <- list()
                 
                 if(length(fixed[[2]]) != 1){
-                    funOut = "multlcmm"
-                    arguments[["link"]] = link
-                    arguments[["intnodes"]] = intnodes
+                    funOut <- "multlcmm"
+                    arguments[["link"]] <- link
+                    arguments[["intnodes"]] <- intnodes
                 } else if(missing(link)){
-                    funOut = "hlme"
-                    arguments[["link"]] = NULL
+                    funOut <- "hlme"
+                    arguments[["link"]] <- NULL
                 } else {
-                    funOut = "lcmm"
-                    arguments[["link"]] = link
-                    arguments[["intnodes"]] = intnodes
+                    funOut <- "lcmm"
+                    arguments[["link"]] <- link
+                    arguments[["intnodes"]] <- intnodes
                 }
                 
                 ##With some type of input model, prob does not have the same name
                 if(!"prob1" %in% colnames(data)){
                     for(i in 1:ng){
-                        data[[paste0("prob", i)]] = data[[paste0("probYT", i)]]
+                        data[[paste0("prob", i)]] <- data[[paste0("probYT", i)]]
                     }
                 }
                 
-                arguments[["data"]] = data
-                arguments[["fixed"]] = fixed
-                arguments[["random"]] = random
-                arguments[["idiag"]] = idiag
-                arguments[["nwg"]] = nwg
-                arguments[["randomY"]] = randomY
-                arguments[["epsY"]] = epsY
-                arguments[["cor"]] = substitute(cor)
-                arguments[["nsim"]] = nsim
-                arguments[["range"]] = range
-                arguments[["subject"]] = subject
-                arguments[["mixture"]] = mixture
-                arguments[["classmb"]] = ~-1
-                arguments[["ng"]] = ng
-                arguments[["pprior"]] =  paste("prob", 1:ng, sep="")
+                arguments[["data"]] <- data
+                arguments[["fixed"]] <- fixed
+                arguments[["random"]] <- random
+                arguments[["idiag"]] <- idiag
+                arguments[["nwg"]] <- nwg
+                arguments[["randomY"]] <- randomY
+                arguments[["epsY"]] <- epsY
+                arguments[["cor"]] <- substitute(cor)
+                arguments[["nsim"]] <- nsim
+                arguments[["range"]] <- range
+                arguments[["subject"]] <- subject
+                arguments[["mixture"]] <- mixture
+                arguments[["classmb"]] <- ~-1
+                arguments[["ng"]] <- ng
+                arguments[["pprior"]] <-  paste("prob", 1:ng, sep="")
                 ##technical options
-                arguments[["maxiter"]] = maxiter
-                arguments[["verbose"]] = verbose
-                arguments[["nproc"]] = nproc
-                arguments[["convB"]] = convB
-                arguments[["convL"]] = convL
-                arguments[["convG"]] = convG
+                arguments[["maxiter"]] <- maxiter
+                arguments[["verbose"]] <- verbose
+                arguments[["nproc"]] <- nproc
+                arguments[["convB"]] <- convB
+                arguments[["convL"]] <- convL
+                arguments[["convG"]] <- convG
                 
-                arguments[["B"]] = B ## ici B = vi du modele secondaire
+                arguments[["B"]] <- B ## ici B = vi du modele secondaire
                 
-                res = do.call(funOut, arguments)
-                res$call = match.call()
+                res <- do.call(funOut, arguments)
+                res$call <- match.call()
                 return(res)
             }
             
             ##we need to build the model
-            arguments[["data"]] = data
-            arguments[["model"]] = model
-            arguments[["fixed"]] = fixed
-            arguments[["random"]] = random
-            arguments[["idiag"]] = idiag
-            arguments[["nwg"]] = nwg
-            arguments[["randomY"]] = randomY
-            arguments[["link"]] = link
-            arguments[["intnodes"]] = intnodes
-            arguments[["epsY"]] = epsY
-            arguments[["cor"]] = substitute(cor)
-            arguments[["nsim"]] = nsim
-            arguments[["range"]] = range
-            arguments[["subject"]] = subject
-            arguments[["mixture"]] = mixture
-            arguments[["ng"]] = ng
-            arguments[["iEst"]] = iEst
+            arguments[["data"]] <- data
+            arguments[["model"]] <- model
+            arguments[["fixed"]] <- fixed
+            arguments[["random"]] <- random
+            arguments[["idiag"]] <- idiag
+            arguments[["nwg"]] <- nwg
+            arguments[["randomY"]] <- randomY
+            arguments[["link"]] <- link
+            arguments[["intnodes"]] <- intnodes
+            arguments[["epsY"]] <- epsY
+            arguments[["cor"]] <- substitute(cor)
+            arguments[["nsim"]] <- nsim
+            arguments[["range"]] <- range
+            arguments[["subject"]] <- subject
+            arguments[["mixture"]] <- mixture
+            arguments[["ng"]] <- ng
+            arguments[["iEst"]] <- iEst
             ##technical options
-            arguments[["maxiter"]] = maxiter
-            arguments[["verbose"]] = verbose
-            arguments[["argumentsIn"]] = argumentsIn
-            arguments[["funIn"]] = funIn
-            arguments[["nproc"]] = nproc
-            arguments[["convB"]] = convB
-            arguments[["convL"]] = convL
-            arguments[["convG"]] = convG
+            arguments[["maxiter"]] <- maxiter
+            arguments[["verbose"]] <- verbose
+            arguments[["argumentsIn"]] <- argumentsIn
+            arguments[["funIn"]] <- funIn
+            arguments[["nproc"]] <- nproc
+            arguments[["convB"]] <- convB
+            arguments[["convL"]] <- convL
+            arguments[["convG"]] <- convG
             
             
             ##on ajoute des valeurs de base pour nos nouveaux estimateurs
-            arguments[["B"]] = rep(0, nIn+nOut) ## ici B = valeurs pour les 2 modeles
+            arguments[["B"]] <- rep(0, nIn+nOut) ## ici B <- valeurs pour les 2 modeles
             ##initial values
             if(missing(B)){
-                arguments[["B"]][iEst] = strMod$best[(nMB+1):nStr]
+                arguments[["B"]][iEst] <- strMod$best[(nMB+1):nStr]
             } else {
                 if(length(B) != length(iEst)) stop("B should be of length ", length(iEst))
-                arguments[["B"]][iEst] = B
+                arguments[["B"]][iEst] <- B
             }
             
-            funOut = "conditional"
+            funOut <- "conditional"
         }
         
         ##Xextern
@@ -1220,25 +1271,25 @@ externVar = function(model,
             ##we need it all in a function in order to be able to use parametric bootstrap later
             
             ##nEst : number of MB parameters in output model
-            nEst1G = ncol(model.matrix(classmb, data))
-            nEst = nEst1G*(ng-1)
-            iEst = 1:nEst
+            nEst1G <- ncol(model.matrix(classmb, data))
+            nEst <- nEst1G*(ng-1)
+            iEst <- 1:nEst
             
-            iKeepIn = 1:nIn
-            iKeepOut = 1:nIn+nEst
+            iKeepIn <- 1:nIn
+            iKeepOut <- 1:nIn+nEst
             
-            nOut = nEst
+            nOut <- nEst
             
             ##Id of varcov estimates to keep in bootstrap
-            iVCKeep = iVCIn
+            iVCKeep <- iVCIn
             ##Id of varcov estimates (none)
-            iVCOut = c()
-            nVCIn = 0
+            iVCOut <- c()
+            nVCIn <- 0
 
             ##We need what is inside of longitudinal to still exist in the worker
-            argumentsIn[["longitudinal"]] = eval(argumentsIn[["longitudinal"]])
+            argumentsIn[["longitudinal"]] <- eval(argumentsIn[["longitudinal"]])
             
-            conditionalX = function(classmb,
+            conditionalX <- function(classmb,
                                     data,
                                     ng,
                                     B,
@@ -1249,48 +1300,48 @@ externVar = function(model,
                                     nproc,
                                     maxiter,
                                     verbose){
-                argumentsInEdit = argumentsIn
-                argumentsInEdit[["B"]] = B[iKeepOut]
-                argumentsInEdit[["maxiter"]] = 0
-                argumentsInEdit[["verbose"]] = F
-                argumentsInEdit[["nproc"]] = nproc
-                argumentsInEdit[["data"]] = data
-                model = do.call(funIn, argumentsInEdit)
+                argumentsInEdit <- argumentsIn
+                argumentsInEdit[["B"]] <- B[iKeepOut]
+                argumentsInEdit[["maxiter"]] <- 0
+                argumentsInEdit[["verbose"]] <- F
+                argumentsInEdit[["nproc"]] <- nproc
+                argumentsInEdit[["data"]] <- data
+                model <- do.call(funIn, argumentsInEdit)
                 
-                B = B[iEst]
+                B <- B[iEst]
                 
-                predCl = predictClass(model, data)
+                predCl <- predictClass(model, data)
                 
                 ##First : let's compute P(\tilde C|C) (\tilde C : A)
-                pAlY = sapply(1:ng, function(g){
+                pAlY <- sapply(1:ng, function(g){
                     return(as.numeric(predCl[,2] == g))
                 })
-                pClY = as.matrix(predCl[,3:(2+ng)])
+                pClY <- as.matrix(predCl[,3:(2+ng)])
                 if(any(is.nan(pClY))) stop("NaN in posterior classification probability")
                 
-                betas = c(model$best[1:(ng-1)], 0)
-                pC = sapply(betas, function(b, betas){
+                betas <- c(model$best[1:(ng-1)], 0)
+                pC <- sapply(betas, function(b, betas){
                     exp(b)/sum(exp(betas))
                 }, betas=betas)
                 
-                pAlC = t(pClY)%*%pAlY/(model$ns*pC)
+                pAlC <- t(pClY)%*%pAlY/(model$ns*pC)
                 
                 if(det(pAlC) == 0 | is.na(det(pAlC))) stop("Computed error matrix is singular. One class might be empty")
                 
                 
                 ##Then : let's add the classification to the dataset for each individual
-                indivProb = pAlY%*%t(pAlC)
-                indivProb = cbind(predCl[,1], indivProb)
-                colnames(indivProb) = c(subject, paste0("class", 1:ng))
-                data = merge(data, indivProb, by = subject)
+                indivProb <- pAlY%*%t(pAlC)
+                indivProb <- cbind(predCl[,1], indivProb)
+                colnames(indivProb) <- c(subject, paste0("class", 1:ng))
+                data <- merge(data, indivProb, by = subject)
                 
                 for(id in unique(data[[subject]])){
-                    if(sum(data[[subject]] == id) > 1) data = data[-which(data[[subject]] == id)[-1],]
+                    if(sum(data[[subject]] == id) > 1) data <- data[-which(data[[subject]] == id)[-1],]
                 }
                 
                 ##negative log likelihood function
-                nLL = function(beta, y, X) {
-                    beta = matrix(ncol = ncol(y)-1, byrow = T, beta)
+                nLL <- function(beta, y, X) {
+                    beta <- matrix(ncol = ncol(y)-1, byrow = T, beta)
                     denom <- apply(exp(X%*%beta),1,sum) + 1
                     num_mat <- y*cbind(exp(X%*%beta), 1)
                     num <- apply(num_mat,1,sum)
@@ -1299,32 +1350,32 @@ externVar = function(model,
                 }
                 
                 ##frame
-                argmf = list(
-                    formula = classmb,
-                    data = data
+                argmf <- list(
+                    formula <- classmb,
+                    data <- data
                 )
-                mf = do.call(model.frame, argmf)
-                ns = nrow(mf)
+                mf <- do.call(model.frame, argmf)
+                ns <- nrow(mf)
                 
-                y = data[, paste0("class", 1:ng)]
-                y = as.matrix(sapply(y, as.numeric))
-                nBy = ncol(y)-1
+                y <- data[, paste0("class", 1:ng)]
+                y <- as.matrix(sapply(y, as.numeric))
+                nBy <- ncol(y)-1
                 
-                X = model.matrix(classmb, data)
-                nEst = ncol(X)*nBy
+                X <- model.matrix(classmb, data)
+                nEst <- ncol(X)*nBy
                 
-                opt = mla(b=B, fn=nLL, y=y, X=X, print.info = verbose, nproc = nproc, maxiter = maxiter)
+                opt <- mla(b=B, fn=nLL, y=y, X=X, print.info = verbose, nproc = nproc, maxiter = maxiter)
                 
-                namesX = c("intercept", colnames(X)[colnames(X) != "(Intercept)"])
-                names(opt$b) = c(sapply(namesX, FUN = function(i){
+                namesX <- c("intercept", colnames(X)[colnames(X) != "(Intercept)"])
+                names(opt$b) <- c(sapply(namesX, FUN = function(i){
                     return(paste0(i, " ", colnames(y)[-ng]))
                 }))
-                Names = list(Xnsnames = namesX,
+                Names <- list(Xnsnames = namesX,
                              ID = subject)
                 
-                N = c(nEst)
+                N <- c(nEst)
                 
-                res = list(best = opt$b,
+                res <- list(best = opt$b,
                            V = opt$v,
                            conv = opt$istop,
                            loglik = -opt$fn.value,
@@ -1342,23 +1393,23 @@ externVar = function(model,
             }
             
             ##Finally : we need to build the model arguments
-            arguments[["classmb"]] = classmb
-            arguments[["data"]] = data
-            arguments[["ng"]] = ng
-            arguments[["iKeepIn"]] = iKeepIn
-            arguments[["iEst"]] = iEst
-            arguments[["argumentsIn"]] = argumentsIn
-            arguments[["funIn"]] = funIn
-            arguments[["nproc"]] = nproc
-            arguments[["maxiter"]] = maxiter
-            arguments[["verbose"]] = verbose
+            arguments[["classmb"]] <- classmb
+            arguments[["data"]] <- data
+            arguments[["ng"]] <- ng
+            arguments[["iKeepIn"]] <- iKeepIn
+            arguments[["iEst"]] <- iEst
+            arguments[["argumentsIn"]] <- argumentsIn
+            arguments[["funIn"]] <- funIn
+            arguments[["nproc"]] <- nproc
+            arguments[["maxiter"]] <- maxiter
+            arguments[["verbose"]] <- verbose
             
             ##on ajoute des valeurs de base pour nos nouveaux estimateurs
-            arguments[["B"]] = rep(0, nIn+nOut)
+            arguments[["B"]] <- rep(0, nIn+nOut)
             ##initial values
             if(!missing(B)){
                 if(length(B) != length(iEst)) stop("B should be of length ", length(iEst))
-                arguments[["B"]][iEst] = B
+                arguments[["B"]][iEst] <- B
             }
             
             funOut = "conditionalX"
@@ -1369,126 +1420,126 @@ externVar = function(model,
     }
 
     if(varest != "paramBoot"){
-        arguments[["B"]][iKeepOut] = model$best[iKeepIn]
+        arguments[["B"]][iKeepOut] <- model$best[iKeepIn]
         if(verbose){cat("Model estimation...\n\n")}
         ##Model Estimation
-        modOut = do.call(funOut, c(arguments))
+        modOut <- do.call(funOut, c(arguments))
     }
     
     if(varest == "Hessian"){
         if(method != "twoStageJoint") stop("Hessian variance estimation method only avaliable for 'twoStageJoint' method")
         
         if(verbose){cat("Variance estimation...\n\n")}
-        nb11 = length(model$best)
-        V11 = matrix(0, nb11, nb11)
-        V11[upper.tri(V11, diag=T)] = model$V
-        V11[lower.tri(V11, diag=F)] = t(V11)[lower.tri(V11, diag=F)]
-        n1 = model$ns
-        V11 = V11[iKeepIn, iKeepIn]
+        nb11 <- length(model$best)
+        V11 <- matrix(0, nb11, nb11)
+        V11[upper.tri(V11, diag=T)] <- model$V
+        V11[lower.tri(V11, diag=F)] <- t(V11)[lower.tri(V11, diag=F)]
+        n1 <- model$ns
+        V11 <- V11[iKeepIn, iKeepIn]
         
-        nb22 = length(modOut$best)
-        V22 = matrix(0, nb22, nb22)
-        V22[upper.tri(V22, diag=T)] = modOut$V
-        V22[lower.tri(V22, diag=F)] = t(V22)[lower.tri(V22, diag=F)]
-        saveV22 = V22
-        V22 = V22[iEst, iEst]
-        n2 = modOut$ns
+        nb22 <- length(modOut$best)
+        V22 <- matrix(0, nb22, nb22)
+        V22[upper.tri(V22, diag=T)] <- modOut$V
+        V22[lower.tri(V22, diag=F)] <- t(V22)[lower.tri(V22, diag=F)]
+        saveV22 <- V22
+        V22 <- V22[iEst, iEst]
+        n2 <- modOut$ns
         
         ##modOut
         if(nproc == 1){
-            I12 = -hessienne(modOut)
+            I12 <- -hessienne(modOut)
         } else {
-            I12 = -hessienne(modOut, method = "deriva", nproc = nproc)
+            I12 <- -hessienne(modOut, method = "deriva", nproc = nproc)
         }
-        I12 = I12[iEst, iKeepOut]
+        I12 <- I12[iEst, iKeepOut]
         
-        V = V22*n2 + (V22*n2) %*% (I12/n2) %*% ((n2/n1)*(V11*n1)) %*% t(I12/n2) %*% (V22*n2)
-        V = V/n2
-        saveV22[iEst, iEst] = V
-        V = saveV22
+        V <- V22*n2 + (V22*n2) %*% (I12/n2) %*% ((n2/n1)*(V11*n1)) %*% t(I12/n2) %*% (V22*n2)
+        V <- V/n2
+        saveV22[iEst, iEst] <- V
+        V <- saveV22
         
-        modOut$V = V[upper.tri(V, diag = TRUE)]
+        modOut$V <- V[upper.tri(V, diag = TRUE)]
     }
     
     ##Get Bootstrap Models
     if(varest == "paramBoot"){
         if(verbose){cat("Bootstrap estimation...\n\n")}
-        est = estimates(model)
+        est <- estimates(model)
         #browser()
-        Vin = matrix(0, length(est), length(est))
-        Vin[upper.tri(Vin, diag = T)] = model$V
-        Vin[lower.tri(Vin, diag = F)] = t(Vin)[lower.tri(t(Vin), diag=F)]
+        Vin <- matrix(0, length(est), length(est))
+        Vin[upper.tri(Vin, diag = T)] <- model$V
+        Vin[lower.tri(Vin, diag = F)] <- t(Vin)[lower.tri(t(Vin), diag=F)]
         
-        est = est[iKeepIn]
-        Vin = Vin[iKeepIn,iKeepIn]
+        est <- est[iKeepIn]
+        Vin <- Vin[iKeepIn,iKeepIn]
         
-        coefss = rmvnorm(M, est, Vin)
-        coefss = as.data.frame(coefss)
-        colnames(coefss) = names(model$best)[iKeepIn]
+        coefss <- rmvnorm(M, est, Vin)
+        coefss <- as.data.frame(coefss)
+        colnames(coefss) <- names(model$best)[iKeepIn]
         ##we just need to build back varcov into the coefs instead of cholesky matrix
         ff <- function(coefs, model, data, iVCKeep){
             if(funIn == "mpjlcmm"){
-                varcovMods = longitudinal
+                varcovMods <- longitudinal
             } else {
-                varcovMods = list(model)
+                varcovMods <- list(model)
             }
             
-            chols = coefs[iVCKeep]
-            model$cholesky = chols
+            chols <- coefs[iVCKeep]
+            model$cholesky <- chols
             
-            varcov = c()
-            countChol = 0
+            varcov <- c()
+            countChol <- 0
             for(varcovMod in varcovMods){
-                ncolRandMod = ncol(model.matrix(formula(varcovMod$call$random), data))
+                ncolRandMod <- ncol(model.matrix(formula(varcovMod$call$random), data))
 
                 ismult <- as.integer(inherits(varcovMod, "multlcmm"))
                 if(varcovMod$idiag){
-                    nChol = ncolRandMod-ismult
+                    nChol <- ncolRandMod-ismult
                     
-                    vc = chols[1:nChol+countChol]
+                    vc <- chols[1:nChol+countChol]
                     
-                    varcov = c(varcov, (vc^2))
+                    varcov <- c(varcov, (vc^2))
                 } else {
-                    nChol = ncolRandMod*(ncolRandMod+1)/2-ismult
+                    nChol <- ncolRandMod*(ncolRandMod+1)/2-ismult
                     
                     ##cholMatrix
-                    cholMatrix = matrix(0, ncolRandMod, ncolRandMod)
-                    cholsToMatrix = chols[1:nChol+countChol]
-                    if(ismult) cholsToMatrix = c(1, as.numeric(cholsToMatrix))
-                    cholMatrix[upper.tri(cholMatrix, diag = T)] = cholsToMatrix
+                    cholMatrix <- matrix(0, ncolRandMod, ncolRandMod)
+                    cholsToMatrix <- chols[1:nChol+countChol]
+                    if(ismult) cholsToMatrix <- c(1, as.numeric(cholsToMatrix))
+                    cholMatrix[upper.tri(cholMatrix, diag = T)] <- cholsToMatrix
                     
-                    vc = t(cholMatrix)%*%cholMatrix
-                    varcov = c(varcov, vc[upper.tri(vc, diag = T)])
-                    if(ismult) varcov = varcov[-1]
+                    vc <- t(cholMatrix)%*%cholMatrix
+                    varcov <- c(varcov, vc[upper.tri(vc, diag = T)])
+                    if(ismult) varcov <- varcov[-1]
                 }
                 
-                countChol = countChol + nChol
+                countChol <- countChol + nChol
             }
-            coefs[iVCKeep] = varcov
+            coefs[iVCKeep] <- varcov
             
             return(coefs)
         }
-      coefss = apply(coefss, 1, ff, model = model, data = data, iVCKeep = iVCKeep)
+      coefss <- apply(coefss, 1, ff, model = model, data = data, iVCKeep = iVCKeep)
         
         if(nproc > 1)
         {
             clust <- parallel::makeCluster(nproc)
             
             ##load all loaded packages
-            packages = loadedNamespaces()
+            packages <- loadedNamespaces()
             for(pack in packages){
                 clusterExport(clust, "pack", environment())
                 clusterEvalQ(clust, require(pack, character.only = T))
             }
             
-            survivalMissing = missing(survival)
-            fixedMissing = missing(fixed)
+            survivalMissing <- missing(survival)
+            fixedMissing <- missing(fixed)
             modOuts <- parApply(clust, coefss, 2, function(coefs, arguments, iKeepOut, funOut, iEst, survivalMissing, fixedMissing, logscale){
-                arguments[["B"]][iKeepOut] = coefs
-                arguments[["nproc"]] = 1
+                arguments[["B"]][iKeepOut] <- coefs
+                arguments[["nproc"]] <- 1
                 
                 ##Model Estimation
-                modOut = do.call(funOut, c(arguments))
+                modOut <- do.call(funOut, c(arguments))
 
 
 ######## chgmt Viviane ########
@@ -1614,37 +1665,37 @@ externVar = function(model,
       parallel::stopCluster(clust)
       
       ##format output
-      bests = as.data.frame(matrix(NA, nrow = nEst, ncol = M))
-      Vs = list()
-      conv = c()
+      bests <- as.data.frame(matrix(NA, nrow = nEst, ncol = M))
+      Vs <- list()
+      conv <- c()
       
-      modOut = modOuts[[M]]
+      modOut <- modOuts[[M]]
       for (i in 1:M){
         ##output V and betas
-        bests[,i] = modOut$best[iEst]
+        bests[,i] <- modOut$best[iEst]
         
-        V = matrix(NA, nOut, nOut)
-        V[upper.tri(V, diag = T)] = modOut$V
-        V[lower.tri(V, diag = F)] = t(V)[lower.tri(t(V), diag = F)]
-        Vs = c(Vs, list(V[iEst, iEst]))
+        V <- matrix(NA, nOut, nOut)
+        V[upper.tri(V, diag = T)] <- modOut$V
+        V[lower.tri(V, diag = F)] <- t(V)[lower.tri(t(V), diag = F)]
+        Vs <- c(Vs, list(V[iEst, iEst]))
         
-        conv = c(conv, modOut$conv)
+        conv <- c(conv, modOut$conv)
       }
     } else {
       ##estimate final models, extract usefull information
-      bests = as.data.frame(matrix(NA, nrow = nEst, ncol = M))
-      Vs = list()
-      conv = c()
+      bests <- as.data.frame(matrix(NA, nrow = nEst, ncol = M))
+      Vs <- list()
+      conv <- c()
       for(i in 1:M){
         if(verbose) cat("==================== Bootstrap Iteration", i, "====================\n")
         
-        arguments[["B"]][iKeepOut] = coefss[,i]
+        arguments[["B"]][iKeepOut] <- coefss[,i]
         
         ##Model Estimation
         if(verbose){
-          modOut = do.call(funOut, c(arguments))
+          modOut <- do.call(funOut, c(arguments))
         } else {
-          captured_log = capture.output({modOut = do.call(funOut, c(arguments))})
+          captured_log <- capture.output({modOut = do.call(funOut, c(arguments))})
         }
 
 ######## chgmt Viviane ########
@@ -1771,129 +1822,133 @@ externVar = function(model,
         ## si model multinomial, pas besoin de valeur absolue dans les prm
         
         ##output V and betas
-        bests[,i] = modOut$best[iEst]
+        bests[,i] <- modOut$best[iEst]
         
-        V = matrix(NA, nOut, nOut)
-        V[upper.tri(V, diag = T)] = modOut$V
-        V[lower.tri(V, diag = F)] = t(V)[lower.tri(t(V), diag = F)]
-        Vs = c(Vs, list(V[iEst, iEst]))
+        V <- matrix(NA, nOut, nOut)
+        V[upper.tri(V, diag = T)] <- modOut$V
+        V[lower.tri(V, diag = F)] <- t(V)[lower.tri(t(V), diag = F)]
+        Vs <- c(Vs, list(V[iEst, iEst]))
         
-        conv = c(conv, modOut$conv)
+        conv <- c(conv, modOut$conv)
       }
     }
     
-    Mconv = sum(conv %in% c(1,3))
+    Mconv <- sum(conv %in% c(1,3))
     if(Mconv <= 1){
       stop("No parametric boostrap iteration could converge.")
     }
     
     ##compute variance
-    bests = bests[,conv %in% c(1,3)]
-    mb = apply(bests, 1, mean, na.rm = T)
+    bests <- bests[,conv %in% c(1,3)]
+    mb <- apply(bests, 1, mean, na.rm = T)
     
-    Vs = Vs[conv %in% c(1,3)]
-    V2 = Reduce("+", Vs)/Mconv
-    V1 = (Mconv+1)/((Mconv-1)*Mconv) * Reduce("+", lapply(bests, function(best){
+    Vs <- Vs[conv %in% c(1,3)]
+    V2 <- Reduce("+", Vs)/Mconv
+    V1 <- (Mconv+1)/((Mconv-1)*Mconv) * Reduce("+", lapply(bests, function(best){
       (best-mb)%*%t(best-mb)
     }))
-    covar = V2 + V1
-    V = matrix(0, nOut, nOut)
-    V[iEst, iEst] = covar
+    covar <- V2 + V1
+    V <- matrix(0, nOut, nOut)
+    V[iEst, iEst] <- covar
     
     ##Create output model, based on last estimated bootstrap model structure
-    modOut$best[iKeepOut] = model$best[iKeepIn]
-    modOut$best[iEst] = mb
-    modOut$V = V[upper.tri(V, diag = T)]
-    modOut$Mconv = Mconv
+    modOut$best[iKeepOut] <- model$best[iKeepIn]
+    modOut$best[iEst] <- mb
+    modOut$V <- V[upper.tri(V, diag = T)]
+    modOut$Mconv <- Mconv
+    
+    
     
     ##replace chol for varcov in best
     if(!missing(fixed)){
-      modOut$cholesky[-(1:sum(nVCIn))*(nVCIn != 0)] = modOut$best[iVCOut]
+      
+#      browser()
+      modOut$cholesky[-(1:sum(nVCIn))*(nVCIn != 0)] <- modOut$best[iVCOut]
       if(idiag & inherits(modOut, "mpjlcmm")){ #idiag but not multlcmm because diff $chol structure
         if(sum(nVCIn) == 0){
-          modOut$best[iVCOut] = modOut$cholesky^2
+          modOut$best[iVCOut] <- modOut$cholesky^2
         } else {
-          modOut$best[iVCOut] = modOut$cholesky[-(1:sum(nVCIn))]^2
+          modOut$best[iVCOut] <- modOut$cholesky[-(1:sum(nVCIn))]^2
         }
       } else if(inherits(modOut, "mpjlcmm")) { #only mpj (twoStage), because $contrainte is used to get multlcmm
-        isMult = as.integer(modOut$contrainte[modOut$K] == 2)
-        NVC = sqrt(2*(length(modOut$cholesky)+isMult-sum(nVCIn))+1/4)-1/2
-        cholMatrix = matrix(0, NVC, NVC)
-        chols = modOut$best[iVCOut]
-        if(modOut$contrainte[modOut$K] == 2) chols = c(1, chols) #mpjlcmm & mult : no 1 in $chol
-        cholMatrix[upper.tri(cholMatrix, diag = T)] = chols
-        vc = t(cholMatrix)%*%cholMatrix
-        vc = vc[upper.tri(vc, diag = T)]
-        if(modOut$contrainte[modOut$K] == 2) vc = vc[-1]
-        modOut$best[iVCOut] = vc
+        isMult <- as.integer(modOut$contrainte[modOut$K] == 2)
+        NVC <- sqrt(2*(length(modOut$cholesky)+isMult-sum(nVCIn))+1/4)-1/2
+        cholMatrix <- matrix(0, NVC, NVC)
+        chols <- modOut$best[iVCOut]
+        if(modOut$contrainte[modOut$K] == 2) chols <- c(1, chols) #mpjlcmm & mult : no 1 in $chol
+        cholMatrix[upper.tri(cholMatrix, diag = T)] <- chols
+        vc <- t(cholMatrix)%*%cholMatrix
+        vc <- vc[upper.tri(vc, diag = T)]
+        if(modOut$contrainte[modOut$K] == 2) vc <- vc[-1]
+        modOut$best[iVCOut] <- vc
       } else { #for conditional, but mult can be idiag. Because $chol structure is full for mult even with idiag
-        NVC = sqrt(2*(length(modOut$cholesky)-nVCIn)+1/4)-1/2
-        cholMatrix = matrix(0, NVC, NVC)
-        chols = modOut$best[iVCOut]
-        if(inherits(modOut, "multlcmm")) chols = c(1, chols)
+        NVC <- sqrt(2*(length(modOut$cholesky)-nVCIn)+1/4)-1/2
+        cholMatrix <- matrix(0, NVC, NVC)
+        chols <- modOut$best[iVCOut]
+        if(inherits(modOut, "multlcmm")) chols <- c(1, chols)
         if(idiag){
-          chols_idiag = c()
+          chols_idiag <- c()
           for(i in 1:NVC){
-            chols_idiag = c(chols_idiag, rep(0, i-1), chols[i])
+            chols_idiag <- c(chols_idiag, rep(0, i-1), chols[i])
           }
-          chols = chols_idiag
+          chols <- chols_idiag
         }
-        cholMatrix[upper.tri(cholMatrix, diag = T)] = chols
-        vc = t(cholMatrix)%*%cholMatrix
+        cholMatrix[upper.tri(cholMatrix, diag = T)] <- chols
+        vc <- t(cholMatrix)%*%cholMatrix
         if(idiag){
-          vc = diag(vc)
+          vc <- diag(vc)
         } else {
-          vc = vc[upper.tri(vc, diag = T)]
+          vc <- vc[upper.tri(vc, diag = T)]
         }
-        if(inherits(modOut, "multlcmm")) vc = vc[-1]
-        modOut$best[iVCOut] = vc
+        if(inherits(modOut, "multlcmm")) vc <- vc[-1]
+        modOut$best[iVCOut] <- vc
       }
     }
     
     ##Computations on final model
-    z = modOut$call
-    z$posfix = NULL
-    z$B = modOut$best
-    z$maxiter = 0
-    z$verbose = FALSE
-    modelEdit = eval(z)
-    if(method == "twoStageJoint") modOut$pprob = modelEdit$pprob
-    if(!missing(survival)) modOut$predSurv = modelEdit$predSurv
-    modOut$loglik = modelEdit$loglik
-    if(method == "conditional") modOut$best = modOut$best[iEst]
+    z <- modOut$call
+    z$posfix <- NULL
+    z$B <- modOut$best
+    z$maxiter <- 0
+    z$verbose <- FALSE
+    modelEdit <- eval(z)
+    if(method == "twoStageJoint") modOut$pprob <- modelEdit$pprob
+    if(!missing(survival)) modOut$predSurv <- modelEdit$predSurv
+    modOut$loglik <- modelEdit$loglik
+    if(method == "conditional") modOut$best <- modOut$best[iEst]
   }
   
-  modOut$call$data = substitute(data)
+  modOut$call$data <- substitute(data)
   
   
   ##On remet longicall comme considere dans environnement present, pas dans celui de mpjlcmm
   if(inherits(modOut, "mpjlcmm")){
-    longicall = vector("list", modOut$K)
+    longicall <- vector("list", modOut$K)
     for(k in 1:modOut$K){
-      longicall[[k]] = eval(modOut$call$longitudinal)[[k]]$call
+      longicall[[k]] <- eval(modOut$call$longitudinal)[[k]]$call
     }
-    modOut$longicall = longicall
+    modOut$longicall <- longicall
   }
   
-  cost = proc.time()-ptm
+  cost <- proc.time()-ptm
   
   ##Object Class Creation and transformation from mpjlcmm
   if(!missing(survival)){
     if(method == "twoStageJoint"){
-      best = modOut$best[iEst]
-      V = matrix(NA, nOut, nOut)
-      V[upper.tri(V, diag = T)] = modOut$V
-      V = V[iEst, iEst]
-      V = V[upper.tri(V, diag = T)]
+      best <- modOut$best[iEst]
+      V <- matrix(NA, nOut, nOut)
+      V[upper.tri(V, diag = T)] <- modOut$V
+      V <- V[iEst, iEst]
+      V <- V[upper.tri(V, diag = T)]
       
       ##select output
-      N = modOut$N[c(2:3, 11+modOut$K+modOut$nbevt)]
-      Nprm = modOut$Nprm[2:(2+modOut$nbevt)]
-      Names = modOut$Names[c("Xnsnames", "ID", "Tnames", "TimeDepVar.name")]
-      Names[["Xnsnames"]] = Names[["Xnsnames"]][as.logical(modOut$idspecif)]
-      levels = modOut$levels[c("levelsdata", "levelssurv")]
+      N <- modOut$N[c(2:3, 11+modOut$K+modOut$nbevt)]
+      Nprm <- modOut$Nprm[2:(2+modOut$nbevt)]
+      Names <- modOut$Names[c("Xnsnames", "ID", "Tnames", "TimeDepVar.name")]
+      Names[["Xnsnames"]] <- Names[["Xnsnames"]][as.logical(modOut$idspecif)]
+      levels <- modOut$levels[c("levelsdata", "levelssurv")]
       
-      modOut = list(nbevt = modOut$nbevt, ng = modOut$ng, ns = modOut$ns, idcom = modOut$idcom,
+      modOut <- list(nbevt = modOut$nbevt, ng = modOut$ng, ns = modOut$ns, idcom = modOut$idcom,
                     idspecif = modOut$idspecif, idtdv = modOut$idtdv, loglik = modOut$loglik,
                     best = best, V = V, gconv = modOut$gconv, conv = modOut$conv, call = cl,
                     niter = modOut$niter, N = N, Nprm = Nprm, pprob = pprob, Names = Names,
@@ -1904,33 +1959,33 @@ externVar = function(model,
                     BIC = (length(best)-length(posfix))*log(modOut$ns)-2*modOut$loglik,
                     varest = varest, runtime = cost[3])
       if(varest == "paramBoot"){
-        modOut$Mconv = round(Mconv/M*100, 1)
-        modOut$conv = as.integer(modOut$Mconv > 90)
+        modOut$Mconv <- round(Mconv/M*100, 1)
+        modOut$conv <- as.integer(modOut$Mconv > 90)
       }
     }
     if(method == "conditional"){
-      data$dummyY = 1
-      subLoglik = hlme(dummyY~1,
+      data$dummyY <- 1
+      subLoglik <- hlme(dummyY~1,
                        data = data,
                        subject = subject,
                        maxiter = 0,
                        B = c(1, 0.000001))$loglik
-      loglik = modOut$loglik - subLoglik
+      loglik <- modOut$loglik - subLoglik
       
-      best = modOut$best[iEst]
-      V = matrix(NA, nOut, nOut)
-      V[upper.tri(V, diag = T)] = modOut$V
-      V = V[iEst, iEst]
-      V = V[upper.tri(V, diag = T)]
+      best <- modOut$best[iEst]
+      V <- matrix(NA, nOut, nOut)
+      V[upper.tri(V, diag = T)] <- modOut$V
+      V <- V[iEst, iEst]
+      V <- V[upper.tri(V, diag = T)]
       
-      N = modOut$N[c(2:3, 10)]
-      Nprm = modOut$N[2:3]
-      Names = modOut$Names[c("Xnames2", "ID", "Tnames", "TimeDepVar.name")]
-      names(Names)[names(Names) == "Xnames2"] = "Xnsnames"
-      levels = modOut$levels[c("levelsdata", "levelssurv")]
+      N <- modOut$N[c(2:3, 10)]
+      Nprm <- modOut$N[2:3]
+      Names <- modOut$Names[c("Xnames2", "ID", "Tnames", "TimeDepVar.name")]
+      names(Names)[names(Names) == "Xnames2"] <- "Xnsnames"
+      levels <- modOut$levels[c("levelsdata", "levelssurv")]
       
       
-      modOut = list(nbevt = 1, ng = modOut$ng, ns = modOut$ns, idcom = modOut$idcom,
+      modOut <- list(nbevt = 1, ng = modOut$ng, ns = modOut$ns, idcom = modOut$idcom,
                     idspecif = modOut$idspecif, idtdv = modOut$idtdv, loglik = loglik,
                     best = best, V = V, gconv = modOut$gconv, conv = modOut$conv, call = cl,
                     niter = modOut$niter, N = N, Nprm = Nprm, pprob = pprob, Names = Names,
@@ -1941,82 +1996,82 @@ externVar = function(model,
                     BIC = (length(best)-length(posfix))*log(modOut$ns)-2*loglik,
                     varest = varest, runtime = cost[3])
       if(varest == "paramBoot"){
-        modOut$Mconv = round(Mconv/M*100, 1)
-        modOut$conv = as.integer(modOut$Mconv > 90)
+        modOut$Mconv <- round(Mconv/M*100, 1)
+        modOut$conv <- as.integer(modOut$Mconv > 90)
       }
     }
 
-    class(modOut) = c("externSurv", "externVar")
+    class(modOut) <- c("externSurv", "externVar")
     
   }
   if(!missing(fixed)){
     if(method == "twoStageJoint"){
       
       ##Get info
-      gconv = modOut$gconv
-      conv = modOut$conv
-      niter = modOut$niter
+      gconv <- modOut$gconv
+      conv <- modOut$conv
+      niter <- modOut$niter
       
       ##With exclusively longitudinal external outcome
-      modUpdate = update(modOut)
-      modOut = modUpdate[[length(modUpdate)]]
+      modUpdate <- update(modOut)
+      modOut <- modUpdate[[length(modUpdate)]]
       
-      modOut$gconv = gconv
-      modOut$conv = conv
-      modOut$niter = niter
-      modOut$pprob = pprob
-      if(inherits(modOut, "multlcmm")) modOut$N[3] = modOut$N[3]-modOut$N[1]
-      modOut$N[1] = 0
-      modOut$idprob0 = rep(0, length(modOut$idprob0))
-      modOut$call = cl
-      modOut$varest = varest
-      modOut$runtime = cost[3]
+      modOut$gconv <- gconv
+      modOut$conv <- conv
+      modOut$niter <- niter
+      modOut$pprob <- pprob
+      if(inherits(modOut, "multlcmm")) modOut$N[3] <- modOut$N[3]-modOut$N[1]
+      modOut$N[1] <- 0
+      modOut$idprob0 <- rep(0, length(modOut$idprob0))
+      modOut$call <- cl
+      modOut$varest <- varest
+      modOut$runtime <- cost[3]
       
-      V = matrix(NA, length(modOut$best), length(modOut$best))
-      V[upper.tri(V, diag = T)] = modOut$V
-      V[lower.tri(V, diag = F)] = t(V)[lower.tri(t(V), diag = F)]
-      V = V[-c(1:(modOut$ng-1)), -c(1:(modOut$ng-1))]
-      V = V[upper.tri(V, diag = T)]
+      V <- matrix(NA, length(modOut$best), length(modOut$best))
+      V[upper.tri(V, diag = T)] <- modOut$V
+      V[lower.tri(V, diag = F)] <- t(V)[lower.tri(t(V), diag = F)]
+      V <- V[-c(1:(modOut$ng-1)), -c(1:(modOut$ng-1))]
+      V <- V[upper.tri(V, diag = T)]
       
-      modOut$V = V
-      modOut$best = modOut$best[-c(1:nMB)]
+      modOut$V <- V
+      modOut$best <- modOut$best[-c(1:nMB)]
       if(varest == "paramBoot"){
-        modOut$Mconv = round(Mconv/M*100, 1)
-        modOut$conv = as.integer(modOut$Mconv > 90)
+        modOut$Mconv <- round(Mconv/M*100, 1)
+        modOut$conv <- as.integer(modOut$Mconv > 90)
       }
       
-      class(modOut) = c(class(modOut), "externVar")
+      class(modOut) <- c(class(modOut), "externVar")
     }
     if(method == "conditional"){
       ##Get info
-      modOut$pprob = pprob
-      if(inherits(modOut, "multlcmm")) modOut$N[3] = modOut$N[3]-modOut$N[1]
-      modOut$call = cl
-      modOut$varest = varest
-      modOut$runtime = cost[3]
+      modOut$pprob <- pprob
+      if(inherits(modOut, "multlcmm")) modOut$N[3] <- modOut$N[3]-modOut$N[1]
+      modOut$call <- cl
+      modOut$varest <- varest
+      modOut$runtime <- cost[3]
       if(varest == "paramBoot"){
-        modOut$Mconv = round(Mconv/M*100, 1)
-        modOut$conv = as.integer(modOut$Mconv > 90)
+        modOut$Mconv <- round(Mconv/M*100, 1)
+        modOut$conv <- as.integer(modOut$Mconv > 90)
       }
       
-      class(modOut) = c(class(modOut), "externVar")
+      class(modOut) <- c(class(modOut), "externVar")
     }
   }
   if(!missing(classmb)){
-    V = matrix(NA, nOut, nOut)
-    V[upper.tri(V, diag = T)] = modOut$V
-    V[lower.tri(V, diag = F)] = t(V)[lower.tri(t(V), diag = F)]
-    V = V[iEst, iEst]
-    V = V[upper.tri(V, diag = T)]
+    V <- matrix(NA, nOut, nOut)
+    V[upper.tri(V, diag = T)] <- modOut$V
+    V[lower.tri(V, diag = F)] <- t(V)[lower.tri(t(V), diag = F)]
+    V <- V[iEst, iEst]
+    V <- V[upper.tri(V, diag = T)]
     
-    best = modOut$best[iEst]
+    best <- modOut$best[iEst]
     
     ##Select output
-    N = modOut$N[1]
-    Names = modOut$Names[c("Xnsnames", "ID")]
-    levels = modOut$levels[c("levelsdata", "levelsclassmb")]
+    N <- modOut$N[1]
+    Names <- modOut$Names[c("Xnsnames", "ID")]
+    levels <- modOut$levels[c("levelsdata", "levelsclassmb")]
     
-    modOut = list(ng = modOut$ng, ns = modOut$ns, idprob = modOut$idprob, nv2 = modOut$nv2,
+    modOut <- list(ng = modOut$ng, ns = modOut$ns, idprob = modOut$idprob, nv2 = modOut$nv2,
                   loglik = modOut$loglik, best = best, V = V, gconv = modOut$gconv,
                   conv = modOut$conv, call = cl, niter = modOut$niter, N = N,
                   pprob = modOut$pprob, Names = Names, na.action = modOut$na.action,
@@ -2024,11 +2079,11 @@ externVar = function(model,
                   BIC = (length(best)-length(posfix))*log(modOut$ns)-2*modOut$loglik,
                   varest = varest, method = method, runtime = cost[3])
     if(varest == "paramBoot"){
-      modOut$Mconv = round(Mconv/M*100, 1)
-      modOut$conv = as.integer(modOut$Mconv > 90)
+      modOut$Mconv <- round(Mconv/M*100, 1)
+      modOut$conv <- as.integer(modOut$Mconv > 90)
     }
     
-    class(modOut) = c("externX", "externVar")
+    class(modOut) <- c("externX", "externVar")
   }
     modOut$pprob <- NA
   

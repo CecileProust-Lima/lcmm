@@ -47,87 +47,107 @@ externVar(
 \code{Jointlcmm}, \code{multlcmm} or \code{mpjlcmm} giving the primary latent
  class model.}
 
-\item{fixed}{optional two sided linear formula object for specifying the
-fixed-effects in the secondary model with an external outcome variable.
+\item{fixed}{optional, for secondary analyses on an external outcome variable: 
+two-sided linear formula object for specifying the outcome and fixed-effect 
+part in the secondary model.
 The response outcome is on the left of \code{~} and the covariates are separated
 by \code{+} on the right of the \code{~}. The right side should be \code{~1} to
-describe the outcome by the latent classes only.}
+model the outcome according to the latent classes only.}
 
-\item{mixture}{optional one-sided formula object for the class-specific fixed effects
-in the model for the external outcome. Among the list of covariates included in fixed,
+\item{mixture}{optional, for secondary analyses on an external outcome variable: 
+one-sided formula object for the class-specific fixed effects in the model 
+for the external outcome. Among the list of covariates included in fixed,
 the covariates with class-specific regression parameters are entered in
 mixture separated by \code{+}. By default, an intercept is included.
 If no intercept, \code{-1} should be the first term included.}
 
-\item{random}{optional one-sided linear formula object for specifying the
-random-effects on external outcome in the secondary model, if appropriate. 
+\item{random}{optional, for secondary analyses on an external outcome variable: 
+one-sided linear formula object for specifying the
+random effects in the secondary model, if appropriate. 
 By default, no random effect is included.}
 
 \item{subject}{name of the covariate representing the grouping structure.
 Even in the absence of a hierarchical structure.}
 
-\item{classmb}{optional one-sided formula specifying the external predictors of 
-latent class membership to be modelled in the secondary class-membership multinomial 
+\item{classmb}{optional, for secondary analyses on latent class membership 
+according to external covariates: 
+optional one-sided formula specifying the external predictors of 
+latent class membership to be modeled in the secondary class-membership multinomial 
 logistic model. Covariates are separated by \code{+} on the right of the \code{~}.}
 
-\item{survival}{optional two-sided formula specifying the external survival part
+\item{survival}{optional, for secondary analyses on an external survival outcome:
+ two-sided formula specifying the external survival part
 of the model. The right side should be \code{~1} to get the survival associated to
 each latent class without any other covariate.}
 
-\item{hazard}{optional family of hazard function assumed for the survival model
+\item{hazard}{optional, for secondary analyses on an external survival outcome:
+ family of hazard function assumed for the survival model
 (Weibull, piecewise or splines)}
 
-\item{hazardtype}{optional indicator for the type of baseline risk function
+\item{hazardtype}{optional, for secondary analyses on an external survival outcome:
+ indicator for the type of baseline risk function
 (Specific, PH or Common)}
 
-\item{hazardnodes}{optional vector containing interior nodes if \code{splines} or
+\item{hazardnodes}{optional, for secondary analyses on an external survival outcome:
+  vector containing interior nodes if \code{splines} or
 \code{piecewise} is specified for the baseline hazard function in \code{hazard}}
 
-\item{TimeDepVar}{optional vector specifying the name of the time-depending covariate
-in the survival model}
+\item{TimeDepVar}{optional, for secondary analyses on an external survival outcome:
+  vector specifying the name of the time-dependent covariate
+in the survival model (only a irreversible event time in allowed)}
 
-\item{logscale}{optional boolean indicating whether an exponential (logscale=TRUE) or
+\item{logscale}{optional, for secondary analyses on an external survival outcome:
+  boolean indicating whether an exponential (logscale=TRUE) or
 a square (logscale=FALSE -by default) transformation is used to
 ensure positivity of parameters in the baseline risk functions}
 
-\item{idiag}{if appropriate, optional logical for the structure of the variance-covariance
+\item{idiag}{optional, for secondary analyses on an external outcome:
+  if appropriate, logical for the structure of the variance-covariance
 matrix of the random-effects in the secondary model. 
 If \code{FALSE}, a non structured matrix of
 variance-covariance is considered (by default). If \code{TRUE} a diagonal
 matrix of variance-covariance is considered.}
 
-\item{nwg}{if appropriate, optional logical indicating if the variance-covariance of the
+\item{nwg}{optional, for secondary analyses on an external outcome:
+  if appropriate, logical indicating if the variance-covariance of the
 random-effects in the secondary model is class-specific. If \code{FALSE} the
 variance-covariance matrix is common over latent classes (by default). If \code{TRUE} a
 class-specific proportional parameter multiplies the variance-covariance
 matrix in each class (the proportional parameter in the last latent class
 equals 1 to ensure identifiability).}
 
-\item{randomY}{optional logical for including an outcome-specific random intercept.
+\item{randomY}{optional, for secondary analyses on an external outcome:
+  if appropriate, logical for including an outcome-specific random intercept.
 If FALSE no outcome-specific random intercept is added (default). If TRUE independent
 outcome-specific random intercept with parameterized variance are included}
 
-\item{link}{optional family of parameterized link functions for the external outcome
+\item{link}{optional, for secondary analyses on an external outcome:
+  if appropriate, family of parameterized link functions for the external outcome
 if appropriate. Defaults to NULL, corresponding to continuous Gaussian distribution
 (hlme function).}
 
-\item{intnodes}{optional vector of interior nodes. This argument is only
+\item{intnodes}{optional, for secondary analyses on an external outcome:
+  if appropriate, vector of interior nodes. This argument is only
 required for a I-splines link function with nodes entered manually.}
 
-\item{epsY}{optional definite positive real used to rescale the marker in (0,1)
+\item{epsY}{optional, for secondary analyses on an external outcome:
+  if appropriate, definite positive real used to rescale the marker in (0,1)
 when the beta link function is used. By default, epsY=0.5.}
 
-\item{cor}{optional indicator for inclusion of an auto correlated Gaussian process
+\item{cor}{optional, for secondary analyses on an external outcome:
+  if appropriate, indicator for inclusion of an auto correlated Gaussian process
 in the latent process linear (latent process) mixed model. Option "BM" indicates
 a brownian motion with parameterized variance. Option "AR" specifies an
 autoregressive process of order 1 with parameterized variance and correlation
 intensity. Each option should be followed by the time variable in brackets as
 code{cor=BM(time)}. By default, no autocorrelated Gaussian process is added.}
 
-\item{nsim}{number of points to be used in the estimated link function. By default,
+\item{nsim}{optional, for secondary analyses on an external outcome:
+  if appropriate, number of points to be used in the estimated link function. By default,
 nsom=100.}
 
-\item{range}{optional vector indicating the range of the outcomes (that is the
+\item{range}{optional, for secondary analyses on an external outcome:
+  if appropriate, vector indicating the range of the outcomes (that is the
 minimum and maximum). By default, the range is defined according to the minimum
 and maximum observed values of the outcome. The option should be used
 only for Beta and Splines transformations.}
@@ -143,12 +163,13 @@ method: mandatory list containing the longitudinal submodels used in the primary
 latent class model.}
 
 \item{method}{character indicating the inference technique to be used:
-\code{"twoStageJoint"} corresponds to 2-stage estimation. \code{"conditional"}
-corresponds to the method based on the distribution of Y conditionally to the
-true latent class membership.}
+\code{"twoStageJoint"} corresponds to 2-stage estimation using the 
+joint log-likelihood. \code{"conditional"} corresponds to the conditional 
+regression using the underlying true latent class membership.}
 
 \item{varest}{optional character indicating the method to be used to compute the
-variance of the regression estimates. \code{"none"} does not account for the
+variance of the regression estimates in the secondary regression. 
+\code{"none"} does not account for the
 uncertainty in the primary latent class model, \code{"paramBoot"} computes the
 total variance using a parametric bootstrap technique, \code{"Hessian"} computes
 the total Hessian of the joint likelihood (implemented for \code{"twoStageJoint"}
@@ -159,10 +180,11 @@ method only). Default to \code{"Hessian"} for \code{"twoStageJoint"} method and
 when \code{varest="paramBoot"}. Default to 200.}
 
 \item{B}{optional vector of initial parameter values for the secondary model. 
-If external outcome, the vector has the same structure as a latent class model
+With an external outcome, the vector has the same structure as a latent class model
 estimated in the other functions of \code{lcmm} package for the same type of 
-outcome. If external class predictors (of size p), the vector is of length 
-(ng-1)*(1+p). If \code{B=NULL} (by default), internal initial values are selected.}
+outcome except that no parameters should be included for the latent class membership. 
+With external class predictors (of size p), the vector is of length 
+(ng-1)*(1+p). If \code{B=NULL} (by default), internal initial values are considered}
 
 \item{convB}{optional threshold for the convergence criterion based on the
 parameter stability. By default, convB=0.0001.}
@@ -200,36 +222,45 @@ an object of class \code{externVar} and
 This function fits regression models to relate a latent class structure (stemmed 
 from a latent class model estimated within \code{lcmm} package) with either an external
  outcome or external class predictors. 
- Two inference techniques are implemented to account for the classification error: 
+ Two inference techniques are implemented. They both account for the 
+ classification error in the posterior class assignment: 
  
  - a 2-stage estimation of the joint likelihood of the primary latent class model 
  and the secondary/ external regression;
  
- - a regression between the posterior latent class assignment and the external variable 
- which internally corrects for the assignment misclassification. 
+ - a conditional regression of the external outcome given the underlying 
+ latent class structure, or of the underlying class structure given external
+  covariates. 
  
-It returns an object from one of the \code{lcmm} package classes.
+It returns an object of one of the \code{lcmm} package classes.
 }
 \details{
 A. DATA STRUCTURE
 
-The \code{data} argument must follow specific structure for individual variables,
-i.e. variables with a unique constant value for each subject. For an individual variable
-given as external outcome, data value must be present only once per subject,
-independently of any time variable used in the primary latent class.
-For an individual variable given as external class predictor,
-data values must be given for every row of every individual (as usual)
+The \code{data} argument must follow specific structure. It must include all
+the data necessary to compute the posterior classification probabilities
+ (so a longitudinal format usually) as well as the information for the 
+ secondary analysis. 
+For time-invariant variables in the secondary analyses: 
+- if used as an external outcome: the information should not be duplicated 
+at each row of the subject. It should appear once for each individual. 
+- if used as an external covariate: the information can be duplicated at 
+each row of the subject (as usual)
 
 B. VARIANCE ESTIMATION
 
-Not taking into account first stage variance with specifing \code{"none"} may lead to
-underestimation of the final variance. When possible, Method \code{"Hessian"} 
-which relies on the combination of Hessians from the primary and secondary
-model is recommended. However, it may become numerically intensive in the event 
-of very high number of parameters in the primary latent class model. As an 
-alternative, especially in situations with a complex primary model but rather 
-parcimonious secondary model, method \code{"paramBoot"} which implements a 
-parametric bootstrap can be used.
+The two techniques rely on a sequential analysis (two-stage analysis) so the
+variance calculation should account for both the uncertainty in the first and 
+the second stage. 
+Not taking into account the first-stage uncertainty by specifying 
+\code{varest="none"} may lead to the underestimation of the final variance. 
+When possible, Method \code{varest="Hessian"} which relies on the 
+combination of Hessians from the primary and secondary models is recommended. 
+However, it may become numerically intensive when the primary latent class 
+model includes a high number of parameters. As an alternative, especially 
+when the primary model is complex and the second model includes a limited
+number of parameters, the parametric Bootstrap method
+\code{varest="paramBoot"} can be favored.
 }
 \examples{
 
