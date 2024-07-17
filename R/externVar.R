@@ -862,6 +862,11 @@ externVar = function(model,
             }
             iVCOut <- nIn + iVCStr - nMB
             
+            # CHGT CPL - no random effect
+            if (nVCStr==0) iVCOut <- NULL
+            # END CHGT CPL
+            
+            
             ##Liste des arguments
             ##on fixe nos parametres
             arguments[["posfix"]] <- unique(c(iKeepOut, posfix))
@@ -1109,7 +1114,9 @@ externVar = function(model,
                 iVCStr <- sum(strMod$N[1:2]) + 1:nVCStr
             }
             iVCOut <- iVCStr - nMB
-            
+            # CHGT CPL - no random effect
+            if (nVCStr==0) iVCOut <- NULL
+            # end CHGT CPL
             nVCIn <- 0
             
             ##We need what is inside of longitudinal to still exist in the worker
@@ -1861,9 +1868,8 @@ externVar = function(model,
     
     ##replace chol for varcov in best
     if(!missing(fixed)){
-      
 #      browser()
-      modOut$cholesky[-(1:sum(nVCIn))*(nVCIn != 0)] <- modOut$best[iVCOut]
+        modOut$cholesky[-(1:sum(nVCIn))*(nVCIn != 0)] <- modOut$best[iVCOut]
       if(idiag & inherits(modOut, "mpjlcmm")){ #idiag but not multlcmm because diff $chol structure
         if(sum(nVCIn) == 0){
           modOut$best[iVCOut] <- modOut$cholesky^2
