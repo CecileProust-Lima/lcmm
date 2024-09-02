@@ -15,8 +15,7 @@
 #' @param var.time A character string containing the name of the variable that
 #' corresponds to time in the data frame (x axis in the plot).
 #' @param methInteg optional integer specifying the type of numerical
-#' integration. Required only for predictions with splines or Beta link
-#' functions. Value 0 (by default) specifies a Gauss-Hermite integration which
+#' integration. Value 0 (by default) specifies a Gauss-Hermite integration which
 #' is very rapid but neglects the correlation between the predicted values (in
 #' presence of random-effects). Value 1 refers to a Monte-Carlo integration
 #' which is slower but correctly accounts for the correlation between the
