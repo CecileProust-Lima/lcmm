@@ -2091,7 +2091,7 @@ externVar = function(model,
     
     class(modOut) <- c("externX", "externVar")
   }
-    modOut$pprob <- NA
+    modOut$pprob <- matrix(NA, nrow = modOut$ns, ncol = 2 + modOut$ng)
   
   if(verbose){cat(paste("The externVar program took", round(cost[3],2), "seconds\n"))}
   
