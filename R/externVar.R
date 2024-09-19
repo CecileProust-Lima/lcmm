@@ -1526,7 +1526,11 @@ externVar = function(model,
             
             return(coefs)
         }
-      coefss <- apply(coefss, 1, ff, model = model, data = data, iVCKeep = iVCKeep)
+        if(nVCIn > 0) {
+            coefss <- apply(coefss, 1, ff, model = model, data = data, iVCKeep = iVCKeep)
+        } else {
+            coefss <- t(coefss) # car le apply transpose la matrice
+        }
         
         if(nproc > 1)
         {
