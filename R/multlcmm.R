@@ -1875,6 +1875,12 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                    levelsrandom=levelsrandom,
                    levelsmixture=levelsmixture,
                    levelsclassmb=levelsclassmb)
+
+    ## substitution in call (issue 273)
+    getformals <- mget(names(formals()))
+    tochange <- setdiff(names(cl)[-1], c("data", "B", "cor"))
+    for(k in tochange)
+        cl[[k]] <- getformals[[k]]
     
     cost <- proc.time()-ptm
     
