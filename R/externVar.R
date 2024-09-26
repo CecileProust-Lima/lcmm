@@ -1,4 +1,4 @@
-#' Estimation of secondary regression models after the estimation of a primary latent class model
+#' Estimation of a secondary regression model after the estimation of a primary latent class model
 #' 
 #' This function fits regression models to relate a latent class structure (stemmed 
 #' from a latent class model estimated within \code{lcmm} package) with either an external
@@ -6,8 +6,8 @@
 #'  Two inference techniques are implemented. They both account for the 
 #'  classification error in the posterior class assignment: 
 #'  
-#'  - a 2-stage estimation of the joint likelihood of the primary latent class model 
-#'  and the secondary/ external regression;
+#'  - a 2-stage estimation using the joint likelihood of the primary latent 
+#'  class model and of the secondary/ external regression;
 #'  
 #'  - a conditional regression of the external outcome given the underlying 
 #'  latent class structure, or of the underlying class structure given external

@@ -1,6 +1,6 @@
 ---
 title: "Accounting for latent class assignment uncertainty in subsequent analyses"
-author: "Cecile Proust-Lima, Maris Dussartre, Viviane Philipps"
+author: "Maris Dussartre, Viviane Philipps, Cecile Proust-Lima"
 output:
   rmarkdown::html_vignette:
     toc: true # table of content true
@@ -172,7 +172,7 @@ CESDCond = externVar(PrimModel,
 
 ```
 
-<p align="justify">To limit the computation time, starting values close to the optimum can be rapidly obtained by estimating the model with the uncorrected variance varest="none", and then use these estimates as initial values when running the parametric bootstrap: </p>
+To limit the computation time, starting values close to the optimum can be rapidly obtained by estimating the model with the uncorrected variance varest="none", and then use these estimates as initial values when running the parametric bootstrap: </p>
 
 ```{r, eval=FALSE}
 CESDCondNone <- externVar(PrimModel,

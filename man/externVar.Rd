@@ -2,7 +2,7 @@
 % Please edit documentation in R/externVar.R
 \name{externVar}
 \alias{externVar}
-\title{Estimation of secondary regression models after the estimation of a primary latent class model}
+\title{Estimation of a secondary regression model after the estimation of a primary latent class model}
 \usage{
 externVar(
   model,
@@ -225,8 +225,8 @@ from a latent class model estimated within \code{lcmm} package) with either an e
  Two inference techniques are implemented. They both account for the 
  classification error in the posterior class assignment: 
  
- - a 2-stage estimation of the joint likelihood of the primary latent class model 
- and the secondary/ external regression;
+ - a 2-stage estimation using the joint likelihood of the primary latent 
+ class model and of the secondary/ external regression;
  
  - a conditional regression of the external outcome given the underlying 
  latent class structure, or of the underlying class structure given external
@@ -268,14 +268,18 @@ number of parameters, the parametric Bootstrap method
 
 
 ###### Estimation of the primary latent class model                   ######
+# this is a linear latent class mixed model for Ydep1
+# with 2 classes and a linear trajectory
 
 set.seed(1234)
 PrimMod <- hlme(Ydep1~Time,random=~Time,subject='ID',ng=1,data=data_lcmm)
 PrimMod2 <- hlme(Ydep1~Time,mixture=~Time,random=~Time,subject='ID',
                  ng=2,data=data_lcmm,B=random(PrimMod))
 
-###### Example 1: Relationship between a latent class structure and         #
+###### Example 1: Relationship between the latent class structure and       #
 #                   external class predictors                          ######
+      
+# We consider here 4 external predictors X1-X4.       
                   
 # estimation of the secondary multinomial logistic model with total variance
 # computed with the Hessian
@@ -288,11 +292,12 @@ XextHess <- externVar(PrimMod2,
 summary(XextHess)
 
 # estimation of a secondary multinomial logistic model with total variance
-# computed with parametric Bootstrap (much longer). When using the bootstrap 
-# estimator, we recommend running first the analysis with option varest = "none" 
-# which is faster but which underestimates the variance. And then use these values
-# as initial values when running the model with varest = "paramBoot" to obtain 
-# a valid variance of the parameters. 
+# computed with parametric Bootstrap (much longer). When planning to use
+# the bootstrap estimator, we recommend running first the analysis 
+# with option varest = "none" which is faster but which underestimates 
+# the variance. And then use these values as plausible initial values when 
+# running the estimation with varest = "paramBoot" to obtain  a valid 
+# variance of the parameters. 
 
 XextNone <- externVar(PrimMod2,
                       classmb = ~X1 + X2 + X3 + X4, 
@@ -313,7 +318,11 @@ summary(XextBoot)
  
 ###### Example 2: Relationship between a latent class structure and         #
 #                external outcome (repeatedly measured over time)     ######
-                  
+                
+                
+# We want to estimate a linear mixed model for Ydep2 with a linear trajectory
+# adjusted on X1. 
+  
 # estimation of the secondary linear mixed model with total variance
 # computed with the Hessian
 
@@ -327,11 +336,12 @@ YextHess = externVar(PrimMod2,   #primary model
                      
 
 # estimation of a secondary linear mixed model with total variance
-# computed with parametric Bootstrap (much longer). When using the bootstrap 
-# estimator, we recommend running first the analysis with option varest = "none" 
-# which is faster but which underestimates the variance. And then use these values
-# as initial values when running the model with varest = "paramBoot" to obtain 
-# a valid variance of the parameters. 
+# computed with parametric Bootstrap (much longer). When planning to use
+# the bootstrap estimator, we recommend running first the analysis 
+# with option varest = "none" which is faster but which underestimates 
+# the variance. And then use these values as plausible initial values when 
+# running the estimation with varest = "paramBoot" to obtain  a valid 
+# variance of the parameters. 
 
 YextNone = externVar(PrimMod2,   #primary model
                      fixed = Ydep2 ~ Time*X1,  #secondary model
@@ -358,6 +368,10 @@ summary(YextBoot)
 ###### Example 3: Relationship between a latent class structure and         #
 #                      external outcome (survival)                     ######
 
+# We want to estimate a proportional hazard model (with proportional hazard 
+# across classes) for time to event Tevent (indicator Event) and assuming 
+# a splines baseline risk with 3 knots.
+
 # estimation of the secondary survival model with total variance
 # computed with the Hessian
 
@@ -372,11 +386,12 @@ summary(YextHess)
 
 
 # estimation of a secondary survival model with total variance
-# computed with parametric Bootstrap (much longer). When using the bootstrap
-# estimator, we recommend running first the analysis with option varest = "none"
-# which is faster but which underestimates the variance. And then use these values
-# as initial values when running the model with varest = "paramBoot" to obtain
-# a valid variance of the parameters.
+# computed with parametric Bootstrap (much longer). When planning to use
+# the bootstrap estimator, we recommend running first the analysis 
+# with option varest = "none" which is faster but which underestimates 
+# the variance. And then use these values as plausible initial values when 
+# running the estimation with varest = "paramBoot" to obtain  a valid 
+# variance of the parameters. 
 
 YextNone = externVar(PrimMod2,   #primary model
                      survival = Surv(Tevent,Event)~ X1+mixture(X2), #secondary model
