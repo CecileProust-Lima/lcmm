@@ -240,6 +240,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         
         if(!inherits(classmb,"formula")) stop("The argument classmb must be a formula")
         if(missing(data)){ stop("The argument data should be specified and defined as a data.frame")}
+        data <- as.data.frame(data)
         if(nrow(data)==0) stop("Data should not be empty")
         if(missing(subject)){ stop("The argument subject must be specified in any model")}
         
