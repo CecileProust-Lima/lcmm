@@ -1502,27 +1502,31 @@ externVar = function(model,
                 ismult <- as.integer(inherits(varcovMod, "multlcmm"))
                 if(varcovMod$idiag){
                     nChol <- ncolRandMod-ismult
-                    
-                    vc <- chols[1:nChol+countChol]
-                    
-                    varcov <- c(varcov, (vc^2))
+
+                    if(nChol > 0){
+                        vc <- chols[1:nChol+countChol]
+                        
+                        varcov <- c(varcov, (vc^2))
+                    }
                 } else {
                     nChol <- ncolRandMod*(ncolRandMod+1)/2-ismult
-                    
-                    ##cholMatrix
-                    cholMatrix <- matrix(0, ncolRandMod, ncolRandMod)
-                    cholsToMatrix <- chols[1:nChol+countChol]
-                    if(ismult) cholsToMatrix <- c(1, as.numeric(cholsToMatrix))
-                    cholMatrix[upper.tri(cholMatrix, diag = T)] <- cholsToMatrix
-                    
-                    vc <- t(cholMatrix)%*%cholMatrix
-                    varcov <- c(varcov, vc[upper.tri(vc, diag = T)])
-                    if(ismult) varcov <- varcov[-1]
+
+                    if(nChol > 0){
+                        ##cholMatrix
+                        cholMatrix <- matrix(0, ncolRandMod, ncolRandMod)
+                        cholsToMatrix <- chols[1:nChol+countChol]
+                        if(ismult) cholsToMatrix <- c(1, as.numeric(cholsToMatrix))
+                        cholMatrix[upper.tri(cholMatrix, diag = T)] <- cholsToMatrix
+                        
+                        vc <- t(cholMatrix)%*%cholMatrix
+                        varcov <- c(varcov, vc[upper.tri(vc, diag = T)])
+                        if(ismult) varcov <- varcov[-1]
+                    }
                 }
                 
                 countChol <- countChol + nChol
             }
-            coefs[iVCKeep] <- varcov
+            if(length(varcov)) coefs[iVCKeep] <- varcov
             
             return(coefs)
         }
