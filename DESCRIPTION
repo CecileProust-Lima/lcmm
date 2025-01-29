@@ -10,7 +10,7 @@ Authors@R: c(person("Cecile", "Proust-Lima", role=c("aut", "cre"), email="cecile
 Description: Estimation of various extensions of the mixed models including latent class mixed models, joint latent class mixed models, mixed models for curvilinear outcomes, mixed models for multivariate longitudinal outcomes using a maximum likelihood estimation method (Proust-Lima, Philipps, Liquet (2017) <doi:10.18637/jss.v078.i02>).
 License: GPL (>= 2.0)
 Depends: R (>= 3.5.0)
-Imports: nlme, survival (>= 2.37-2), parallel, mvtnorm, randtoolbox, marqLevAlg (> 2.0), doParallel, numDeriv
+Imports: nlme, survival (>= 2.37-2), parallel, mvtnorm, spacefillr, marqLevAlg (> 2.0), doParallel, numDeriv
 Suggests: knitr,rmarkdown,lattice,NormPsy
 URL: https://cecileproust-lima.github.io/lcmm/
 BugReports: https://github.com/CecileProust-Lima/lcmm/issues
