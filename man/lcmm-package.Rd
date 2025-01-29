@@ -91,10 +91,17 @@ Verbeke and Lesaffre (1996). A linear mixed-effects model with heterogeneity
 in the random-effects population. Journal of the American Statistical
 Association 91, 217-21
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://cecileproust-lima.github.io/lcmm/}
+  \item Report bugs at \url{https://github.com/CecileProust-Lima/lcmm/issues}
+}
+
+}
 \author{
 Cecile Proust-Lima, Viviane Philipps, Amadou Diakite and Benoit
 Liquet
 
 \email{cecile.proust-lima@inserm.fr}
 }
-\keyword{package}

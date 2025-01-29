@@ -151,10 +151,9 @@ The list returned is:
 \item{ns}{number of grouping units in the dataset}
 \item{ng}{number of latent classes}
 \item{loglik}{log-likelihood of the model}
-\item{best}{vector of parameter estimates in the same order as
-specified in \code{B} and detailed in section \code{details}}
+\item{best}{vector of parameter estimates in the same order as specified in \code{B} and detailed in section \code{Details}}
 \item{V}{if the model converged (conv=1 or 3), vector containing the upper triangle
-matrix of variance-covariance estimates of \code{Best} with exception for
+matrix of variance-covariance estimates of \code{best} with exception for
 variance-covariance parameters of the random-effects for which \code{V} contains
 the variance-covariance estimates of the Cholesky transformed parameters displayed in
 \code{cholesky}.

@@ -15,8 +15,8 @@
 #' considered. Be careful, parametrisations changed in lcmm_V1.5:
 #' 
 #' 1. With the "Weibull" function: 2 parameters are necessary w_1 and w_2 so
-#' that the baseline risk function a_0(t) = w_1^2*w_2^2*(w_1^2*t)^(w_2^2-1) if
-#' logscale=FALSE and a_0(t) = exp(w_1)*exp(w_2)(t)^(exp(w_2)-1) if
+#' that the baseline risk function a_0(t) = w_1^2 * w_2^2 * (w_1^2 * t)^(w_2^2 - 1) if
+#' logscale=FALSE and a_0(t) = exp(w_1) * exp(w_2) * (t)^(exp(w_2) - 1) if
 #' logscale=TRUE.
 #' 
 #' 2. with the "piecewise" step function and nz nodes (y_1,...y_nz), nz-1
@@ -27,7 +27,7 @@
 #' 3. with the "splines" function and nz nodes (y_1,...y_nz), nz+2 parameters
 #' are necessary s_1,...s_nz+2 so that the baseline risk function a_0(t) =
 #' sum_j s_j^2 M_j(t) if logscale=FALSE and a_0(t) = sum_j exp(s_j) M_j(t) if
-#' logscale=TRUE where {M_j} is the basis of cubic M-splines.
+#' logscale=TRUE where M_j is the basis of cubic M-splines.
 #' 
 #' Two parametrizations of the baseline risk function are proposed
 #' (logscale=TRUE or FALSE) because in some cases, especially when the

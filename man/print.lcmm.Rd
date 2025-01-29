@@ -17,7 +17,7 @@
 }
 \arguments{
 \item{x}{an object inheriting from classes \code{hlme}, \code{lcmm}, \code{multlcmm}
-for fitted latent class mixed-effects, or class \code{Jointlcmm}, code{mpjclmm} for
+for fitted latent class mixed-effects, or class \code{Jointlcmm}, \code{mpjclmm} for
 a Joint latent class mixed model or \code{epoce} for predictive accuracy
 computations or \code{externSurv}, \code{externX} for secondary regression models.}
 

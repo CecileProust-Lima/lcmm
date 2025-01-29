@@ -37,7 +37,7 @@
 #' future updates VIA GITHUB ONLY.
 #' 
 #' @name lcmm-package
-#' @docType package
+#####@docType package
 #' @author Cecile Proust-Lima, Viviane Philipps, Amadou Diakite and Benoit
 #' Liquet
 #' 
@@ -96,6 +96,8 @@
 #' Verbeke and Lesaffre (1996). A linear mixed-effects model with heterogeneity
 #' in the random-effects population. Journal of the American Statistical
 #' Association 91, 217-21
+"_PACKAGE"
+
 #' 
 #' @keywords package
 #' @importFrom graphics axis hist lines matlines matplot mtext par plot points segments polygon

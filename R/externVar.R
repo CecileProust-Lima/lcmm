@@ -121,7 +121,7 @@
 #' a brownian motion with parameterized variance. Option "AR" specifies an
 #' autoregressive process of order 1 with parameterized variance and correlation
 #' intensity. Each option should be followed by the time variable in brackets as
-#' code{cor=BM(time)}. By default, no autocorrelated Gaussian process is added.
+#' \code{cor=BM(time)}. By default, no autocorrelated Gaussian process is added.
 #' @param nsim optional, for secondary analyses on an external outcome:
 #'   if appropriate, number of points to be used in the estimated link function. By default,
 #' nsom=100.

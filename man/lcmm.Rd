@@ -266,23 +266,23 @@ is the rescaled outcome i.e. Y(t)'= [ Y(t) - min(Y(t)) + epsY ] / [
 max(Y(t)) - min(Y(t)) +2*epsY ].
 
 3. With the "splines" link function, n+2 parameters are required for the
-following transformation b_1 + b_2*I_1(Y(t)) + ... + b_{n+2} I_{n+1}(Y(t)),
-where I_1,...,I_{n+1} is the basis of quadratic I-splines. To constraint the
+following transformation b_1 + b_2*I_1(Y(t)) + ... + b_(n+2) I_(n+1)(Y(t)),
+where I_1,...,I_(n+1) is the basis of quadratic I-splines. To constraint the
 parameters to be positive, except for b_1, the program estimates b_k^* (for
 k=2,...,n+2) so that b_k=(b_k^*)^2.
 
 4. With the "thresholds" link function for an ordinal outcome in levels
 0,...,C. A maximumn of C parameters are required for the following
-transformation: Y(t)=c <=> b_c < L(t) <= b_{c+1} with b_0 = - infinity and
-b_{C+1}=+infinity. The number of parameters is reduced if some levels do not
+transformation: Y(t)=c <=> b_c < L(t) <= b_(c+1) with b_0 = - infinity and
+b_(C+1)=+infinity. The number of parameters is reduced if some levels do not
 have any information. For example, if a level c is not observed in the
-dataset, the corresponding threshold b_{c+1} is constrained to be the same
-as the previous one b_{c}. The number of parameters in the link function is
+dataset, the corresponding threshold b_(c+1) is constrained to be the same
+as the previous one b_c. The number of parameters in the link function is
 reduced by 1.
 
 To constraint the parameters to be increasing, except for the first
 parameter b_1, the program estimates b_k^* (for k=2,...C) so that
-b_{k}=b_{k-1}+(b_k^*)^2.
+b_k=b_(k-1)+(b_k^*)^2.
 
 Details of these parameterized link functions can be found in the referred
 papers.
