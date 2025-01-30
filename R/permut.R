@@ -283,6 +283,38 @@ permut <- function(m,order,estim=TRUE)
             {
                 mnew <- m
                 mnew$best <- bnew
+
+                ## remove V
+                mnew$V <- rep(NA, length(m$V))
+
+                ## permut pprob
+                newc <- sapply(1:ng, function(g) {sapply(m$pprob[, 2], function(x) ifelse(x == g, which(order == g), 0))})
+                mnew$pprob[, 2] <- apply(newc, 1, sum)
+                mnew$pprob[, 2 + 1:ng] <- m$pprob[, 2 + order]
+
+                ## permut pred
+                avt <- 6
+                if(inherits(m, c("mpjlcmm", "multlcmm"))) avt <- 7
+                mnew$pred[, avt + 1:ng] <- m$pred[, avt + order]
+                mnew$pred[, avt + ng + 1:ng] <- m$pred[, avt + ng + order]
+
+                ## permut predSurv
+                if(!is.null(mnew$predSurv))
+                {
+                    for(ke in 1:m$nbevt)
+                    {
+                        mnew$predSurv[, 1 + (ke - 1) * ng + 1:ng] <- m$predSurv[, 1 + (ke - 1) * ng + order] # RiskFct
+                        mnew$predSurv[, 1 + m$nbevt * ng + (ke - 1) * ng + 1:ng] <- m$predSurv[, 1 + m$nbevt * ng + (ke - 1) * ng + order] # CumRiskFct
+                    }
+                }
+
+                ## permut pprobY
+                if(!is.null(m$pprobY))
+                {
+                    newc <- sapply(1:ng, function(g) {sapply(m$pprobY[, 2], function(x) ifelse(x == g, which(order == g), 0))})
+                    mnew$pprobY[, 2] <- apply(newc, 1, sum)
+                    mnew$pprobY[, 2 + 1:ng] <- m$pprobY[, 2 + order]
+                }
             }
         
         return(mnew)
