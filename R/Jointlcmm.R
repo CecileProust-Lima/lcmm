@@ -2686,7 +2686,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         
         cost<-proc.time()-ptm
         
-        res <-list(ns=ns0,ng=ng0,idprob=idprob0,idcom=idcom,
+        res <-list(ns=ns0,ng=ng0,nbevt=nbevt,idprob=idprob0,idcom=idcom,
                    idspecif=idspecif,idtdv=idtdv,idg=idg0,idea=idea0,
                    idcor=idcor0,loglik=out$loglik,best=out$best,V=V,
                    gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,
