@@ -41,3 +41,5 @@ statistical papers of the authors.
 Issues and questions about the use of the lcmm package are reported on the github issue page <https://github.com/CecileProust-Lima/lcmm/issues>.
 Please check both opened and closed issues to make sure that the topic has not already been treated before creating a new issue. To report a bug, please provide a reproducible example.
 
+We try to answer once a week and take requests into account as far as possible,
+but that's not our main job. Not all issues will be systematically solved.

@@ -1,0 +1,3 @@
+The alnorm subroutine (in file compute.f90) is written by John Burkardt and derived from the article "Algorithm AS 66: The Normal Integral" by David Hill
+
+The hrmsym, hermit, and hrmtrl subroutines (in file compute.f90) are from Alan Genz (Fully Symmetric Interpolation Rules for Multiple Integrals over Infinite Regions with Gaussian Weight).

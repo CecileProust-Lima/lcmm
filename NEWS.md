@@ -1,3 +1,10 @@
+# Changes in Version 2.2.0 (2025-01-29) :
+
+* new function predictYback to compute predictions in the natural scale of a pre-transformed outcome
+* package spacefillr is used instead of randtoolbox
+* bug fixed in externVar
+* small improvement of the help pages
+
 # Changes in Version 2.1.0 (2023-10-06) :
 
 * new function `externVar` to perform a secondary regression analysis after the estimation of a primary latent class model
