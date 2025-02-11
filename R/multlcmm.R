@@ -965,7 +965,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
         dimMC <- nea0+nalea0
         if(ncor0>0) dimMC <- dimMC+maxmes
         # dimMC <- max(nea0, nalea0, maxmes) #?? !**
-        if(dimMC>0)
+        if((dimMC>0) & (nMC>0))
         {
             seqUnif <- spacefillr::generate_sobol_owen_set(nMC, dimMC)
             seqMC <- apply(seqUnif, 2, qnorm)
