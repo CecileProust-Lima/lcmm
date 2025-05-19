@@ -1,7 +1,7 @@
 #' @rdname predictY
 #' @export
 #'
-predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, marg=TRUE, subject=NULL, ...){
+predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, predRE = NULL, ...){
 
     if(missing(newdata)) stop("The argument newdata should be specified")
     if(missing(x)) stop("The argument x should be specified")
@@ -14,17 +14,26 @@ predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, marg=T
     if (!inherits(newdata, "data.frame")) stop("newdata should be a data.frame object")
                                         #if(missing(var.time)) stop("missing argument 'var.time'")
                                         #if(!(var.time %in% colnames(newdata))) stop("'var.time' should be included in newdata")
-    if(!marg)
+    if(!is.null(predRE))
     {
         if(draws==TRUE) stop("No confidence intervals are provided for subject-specific prediction")
         
-        Yname <- as.character(x$call$fixed[[2]])
-        subj <- subject
-        if(is.null(subj)) subj <- as.character(x$call$subject)
-
-        if(!(Yname %in% colnames(newdata))) stop(paste("newdata should include the outcome", Yname))
-
-        if(!(subj %in% colnames(newdata))) stop(paste("newdata should include the grouping structure", subj))
+        if(!inherits(predRE, "data.frame")) stop("predRE should be a data.frame")
+        if(nrow(predRE) != x$ng) warning("predRE should contain as many rows as latent classes")
+        
+        if(!("class" %in% colnames(predRE)))
+        {
+            predRE <- data.frame(predRE, class = 1:x$ng)
+        }
+        else
+        {
+            predRE <- predRE[order(predRE$class),]
+        }
+        
+        namesRE <- colnames(x$predRE)[-1]
+        if(!all(namesRE %in% colnames(predRE))) stop(paste("predRE requires the following columns : ", paste(namesRE, collapse = " ")))
+        
+        predRE <- t(as.matrix(predRE[, namesRE, drop = FALSE]))
     }
 
     call_fixed <- x$call$fixed[3]
@@ -249,8 +258,6 @@ predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, marg=T
             times <- times[-na.action,,drop=FALSE]
         }
 
-        if(marg)
-        {
             
             ## create one data frame for each formula (useful with factors)
             newdata1fixed <- newdata1
@@ -431,11 +438,13 @@ predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, marg=T
                 if(length(b2) != 0){
                     Y[,g] <- Y[,g] + X2 %*% b2[,g]
                 }
-            }
+            } # fixed effects OK
             
 
 
 
+        if(is.null(predRE)) # marginal prediction 
+        {
             if(draws==TRUE)
             {
                 ##extraction de Var(beta)
@@ -510,39 +519,31 @@ predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, marg=T
         }
         else
         {
-            ##if(draws==FALSE)
-            ##{
-                arguments <- as.list(x$call)
-                argfunction <- as.character(arguments[[1]]) 
-                arguments[[1]] <- NULL
-                arguments[["data"]] <- newdata
-                arguments[["B"]] <- x$best 
-                arguments[["maxiter"]] <- 0
-                arguments[["verbose"]] <- FALSE
-                if(!is.null(subject)){
-                    arguments[['subject']] <- subject
-                }
-                newmodel <- do.call(argfunction, c(arguments))
+            ## add subject-specific part to Y :
+            Z <- newdata1[, which(x$idea0 == 1), drop = FALSE]
+
+            if(ncol(predRE) == 1)
+            {
+                Zu <- Z %*% as.numeric(predRE)
                 
-                res.list$pred <- newmodel$pred[,c(1,4,6+x$ng+1:x$ng)]
-                res.list$times <- NA #times
-            ##}
-            ##else
-            ##{
-            ##     doone <- function(bdraw)
-            ##     {
+                Y <- sweep(Y, 1, Zu, "+")
+            }
+            else
+            {
+                Zu <- Z %*% predRE
 
-            ##     }
+                Y <- Y + Zu
+            }
 
-            ##     npm <- length(x$best)
-            ##     bdraw <- replicate(ndraws, rnorm(npm))
-
-            ##     res <- apply(bdraw, 2, doone)
-
-            ##     res.list$pred <- apply(res,1, quantile, prob=c(0.5, 0.025, 0.975))
-            ##     res.list$times <- times
-            ##}
-
+            ## result
+            if (x$ng==1){
+                colnames(Y) <- c("Ypred")
+            }
+            if (x$ng>1){
+                colnames(Y) <- c(paste("Ypred_class", 1:x$ng, sep = ""))
+            }
+            res.list$pred <- Y
+            res.list$times <- times
         }
 
     }

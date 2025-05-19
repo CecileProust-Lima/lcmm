@@ -4,7 +4,7 @@
 \alias{predictRE}
 \title{Predictions of the random-effects}
 \usage{
-predictRE(model, newdata, subject = NULL)
+predictRE(model, newdata, subject = NULL, classpredRE = FALSE)
 }
 \arguments{
 \item{model}{an object inheriting from class \code{hlme}, \code{lcmm}, 
@@ -18,9 +18,12 @@ of the variables in the model.}
 
 \item{subject}{character specifying the name of the grouping structure.
 If NULL (the default), the same as in the model will be used.}
+
+\item{classpredRE}{logical indicating if class specific random effects should be returned.
+By default, classpredRE is FALSE, so that the random effects are aggregated over the classes.}
 }
 \value{
-a matrix containing the grouping structure and the predicted random-effects.
+a data frame containing the grouping structure and the predicted random-effects.
 }
 \description{
 The function computes the predicted values of the random effects given observed data

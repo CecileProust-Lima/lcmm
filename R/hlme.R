@@ -789,7 +789,7 @@ hlme <-
         pred_m_g <- rep(0,nobs0*ng0)
         pred_ss_g <- rep(0,nobs0*ng0)
         nea0 <- sum(idea0==1)
-        predRE <- rep(0,nea0*ns0)
+        predRE <- rep(0,nea0*ns0*(1+ng0))
         varRE <- rep(0,nea0*(nea0+1)/2*ns0)
 
         ##---------------------------------------------------------------------------
@@ -1189,7 +1189,7 @@ hlme <-
             
             out <- list(conv=2, V=rep(NA, NPM*(NPM+1)/2), best=b,
                         ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
-                        varRE=rep(NA,ns0*nea0*(nea0+1)/2),
+                        classpredRE=rep(NA,ns0*ng0*nea0),varRE=rep(NA,ns0*nea0*(nea0+1)/2),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
                         gconv=rep(NA,3), niter=0, loglik=vrais)
@@ -1209,7 +1209,7 @@ hlme <-
             
             out <- list(conv=res$istop, V=res$v, best=res$b,
                         ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
-                        varRE=rep(NA,ns0*nea0*(nea0+1)/2),
+                        classpredRE=rep(NA,ns0*ng0*nea0),varRE=rep(NA,ns0*nea0*(nea0+1)/2),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
                         gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,
@@ -1225,7 +1225,7 @@ hlme <-
             resid_ss <- rep(0,nobs0)
             pred_m_g <- rep(0,nobs0*ng0)
             pred_ss_g <- rep(0,nobs0*ng0)
-            predRE <- rep(0,ns0*nea0)
+            predRE <- rep(0,ns0*nea0*(1+ng0))
             varRE <- rep(0,ns0*nea0*(nea0+1)/2)
             
             post <- .Fortran(C_loglikhlme,
@@ -1348,10 +1348,17 @@ hlme <-
         } 
 
 ####################################################
+        predRE <- NULL
+        classpredRE <- NULL
         if (nea0>0) {
-            predRE <- matrix(out$predRE,ncol=nea0,byrow=TRUE)
+            namesRE <- nom.X0[idea0!=0]
+            predRE <- matrix(out$predRE[1:(ns0*nea0)],ncol=nea0,byrow=TRUE)
             predRE <- data.frame(INDuniq,predRE)
-            colnames(predRE) <- c(nom.subject,nom.X0[idea0!=0])
+            colnames(predRE) <- c(nom.subject,namesRE)
+            
+            classpredRE <- matrix(out$predRE[-c(1:(ns0*nea0))], ncol = nea0, byrow = TRUE)
+            classpredRE <- data.frame(rep(INDuniq, each = ng0), rep(1:ng0, ns0), classpredRE)
+            colnames(classpredRE) <- c(nom.subject, "class", namesRE)
         }
 
 
@@ -1455,7 +1462,7 @@ hlme <-
         
         cost<-proc.time()-ptm
         
-        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,varRE=out$varRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random, levels=levels, var.time=var.time, runtime=cost[3])
+        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,classpredRE=classpredRE,varRE=out$varRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random, levels=levels, var.time=var.time, runtime=cost[3])
         class(res) <-c("hlme") 
 
         if(verbose==TRUE) cat("The program took", round(cost[3],2), "seconds \n")

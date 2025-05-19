@@ -30,8 +30,7 @@ individual data (subject specific in case of \code{hlme}).}
   var.time,
   draws = FALSE,
   na.action = 1,
-  marg = TRUE,
-  subject = NULL,
+  predRE = NULL,
   ...
 )
 
@@ -112,13 +111,13 @@ Only the argument 'median' will be used, other are ignored. 'median' should
 be a logical indicating whether the median should be computed. By 
 default, the mean value is computed.}
 
-\item{marg}{Optional boolean specifying whether the
-predictions are marginal (the default) or subject-specific (marg=FALSE). marge=FALSE 
-only works with \code{hlme} objects.}
-
-\item{subject}{For a \code{hlme} object with marg=FALSE only, character specifying
-the name of the grouping strucuture. If NULL (the default), the same as in the model
-(argument x) will be used.}
+\item{predRE}{option only available for \code{hlme} models.
+If \code{predRE} is specified, the predictY function returns subject-specific predictions.
+If NULL, marginal predictions are computed.
+For subject-specific predictions, \code{predRE} should be a data frame
+with as many rows as latent classes
+containing the predicted random effects in each latent class.
+In particular, predRE can be the result of a predictRE call with classpredRE = TRUE.}
 }
 \value{
 An object of class \code{predictY} with values :

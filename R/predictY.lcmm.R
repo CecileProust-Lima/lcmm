@@ -1028,12 +1028,13 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 #' only; if draws=TRUE, ndraws specifies the number of draws that should be
 #' generated to approximate the posterior distribution of the predicted values.
 #' By default, ndraws=2000.
-#' @param marg Optional boolean specifying whether the      
-#' predictions are marginal (the default) or subject-specific (marg=FALSE). marge=FALSE 
-#' only works with \code{hlme} objects.
-#' @param subject For a \code{hlme} object with marg=FALSE only, character specifying
-#' the name of the grouping strucuture. If NULL (the default), the same as in the model
-#' (argument x) will be used.
+#' @param predRE option only available for \code{hlme} models.
+#' If \code{predRE} is specified, the predictY function returns subject-specific predictions.
+#' If NULL, marginal predictions are computed.
+#' For subject-specific predictions, \code{predRE} should be a data frame
+#' with as many rows as latent classes
+#' containing the predicted random effects in each latent class.
+#' In particular, predRE can be the result of a predictRE call with classpredRE = TRUE.
 #' @param na.action Integer indicating how NAs are managed. The default is 1
 #' for 'na.omit'. The alternative is 2 for 'na.fail'. Other options such as
 #' 'na.pass' or 'na.exclude' are not implemented in the current version.

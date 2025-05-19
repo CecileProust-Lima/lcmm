@@ -13,7 +13,9 @@
 #' of the variables in the model.
 #' @param subject character specifying the name of the grouping structure.
 #' If NULL (the default), the same as in the model will be used.
-#' @return a matrix containing the grouping structure and the predicted random-effects.
+#' @param classpredRE logical indicating if class specific random effects should be returned.
+#' By default, classpredRE is FALSE, so that the random effects are aggregated over the classes.
+#' @return a data frame containing the grouping structure and the predicted random-effects.
 #' @author Sasha Cuau, Viviane Philipps, Cecile Proust-Lima 
 #' @export 
 #' @examples
@@ -28,7 +30,7 @@
 #' }
 
 
-predictRE <- function(model, newdata, subject=NULL){
+predictRE <- function(model, newdata, subject=NULL, classpredRE=FALSE){
   arguments <- as.list(model$call)
   argfunction <- as.character(arguments[[1]]) 
   arguments[[1]] <- NULL
@@ -60,6 +62,14 @@ predictRE <- function(model, newdata, subject=NULL){
   options(warn=-1)
   on.exit(options(warn=w))
   newmodel <- do.call(argfunction, c(arguments))
-  return(newmodel$predRE)
+
+  if((classpredRE != FALSE) & (!inherits(model, "hlme"))) stop("classpredRE can only be used for hlme models")
+  
+  if(!classpredRE)
+      res <- newmodel$predRE
+  else
+      res <- newmodel$classpredRE
+
+  return(res)
 } 
 
