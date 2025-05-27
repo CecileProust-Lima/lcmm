@@ -1009,7 +1009,7 @@
       double precision,dimension(nobs)::resid_m,resid_ss,Yobs
       double precision,dimension(nobs*ng)::pred_m_g,pred_ss_g
       double precision,dimension(ns,ng) ::PPI
-      double precision,dimension(ns*nea)::pred_RE
+      double precision,dimension(ns*nea*(1+ng))::pred_RE
       double precision,dimension(-1:(ntrtot-3))::splaa
       double precision::aa1,bb1,dd1,aa,bb,betai,ytemp,som,cc1
 
@@ -1285,6 +1285,7 @@
 
             do k=1,nea
                pred_RE((i-1)*nea+k)=err2(k)
+               pred_RE(ns*nea + (i-1)*nea + k)=err2(k)
             end do
 
 
@@ -1462,6 +1463,7 @@
                   end do
                do k=1,nea
                   pred_RE((i-1)*nea+k)=9999.d0
+                  pred_RE(ns*nea + (i-1)*ng*nea + (g-1)*nea + k) = 9999.d0
                end do
                   goto 654
                end if
@@ -1498,6 +1500,7 @@
                end do
                do k=1,nea
                   pred_RE((i-1)*nea+k)=pred_RE((i-1)*nea+k)+ppi(i,g)*err2(k)
+                  pred_RE(ns*nea + (i-1)*ng*nea + (g-1)*nea + k) = err2(k)
                end do
 
             end do
@@ -3177,7 +3180,7 @@
       double precision,dimension(nobs0),intent(out)::resid_m,resid_ss,Yobs
       double precision,dimension(nobs0*ng0),intent(out)::pred_m_g
       double precision,dimension(nobs0*ng0),intent(out)::pred_ss_g
-      double precision,dimension(ns0*nea0),intent(out)::pred_RE
+      double precision,dimension(ns0*nea0*(1+ng0)),intent(out)::pred_RE
       double precision,dimension(nsim0),intent(out)::marker,transfY
         !Variables locales
       integer::jtemp,i,g,j,ij,ier,k,ktemp,ig,nmestot,it,nbfix

@@ -1434,7 +1434,7 @@ subroutine logliklcmmord(Y0,X0,Prior0,pprior0,idprob0,idea0,idg0,ns0,ng0,nv0,nob
   double precision,dimension(nobs0),intent(out)::resid_m,resid_ss
   double precision,dimension(nobs0*ng0),intent(out)::pred_m_g
   double precision,dimension(nobs0*ng0),intent(out)::pred_ss_g
-  double precision,dimension(ns0*nea0),intent(out)::pred_RE
+  double precision,dimension(ns0*nea0*(1+ng0)),intent(out)::pred_RE
   double precision,dimension(2*(maxY0-minY0+1)),intent(out)::marker,transfY
   double precision,dimension(ns0),intent(out)::rlindiv
   !Variables locales

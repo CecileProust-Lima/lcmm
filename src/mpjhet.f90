@@ -2426,7 +2426,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
   double precision,dimension(maxmes) :: mu,Y2,pred1,err1,tcor
   double precision,dimension(ng) :: pi
   double precision,dimension(nobs)::resid_m,resid_ss
-  double precision,dimension(ns*sum(nea(:)))::pred_RE
+  double precision,dimension(ns*sum(nea(:))*(1+ng))::pred_RE
   double precision,dimension(ns*sum(nalea(:)))::pred_RE_Y
   double precision,dimension(nobs*ng)::pred_m_g,pred_ss_g
   double precision,dimension(ns,ng) ::PPI
@@ -2454,7 +2454,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
   pred_ss_g=0.d0
   pred_RE=0.d0
   Yobs=0.d0
-  pred_RE=0.d0
+  pred_RE_Y=0.d0
   it=0
   iea=0
   ialea=0
@@ -2836,6 +2836,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
            !pred_RE
            do kk=1,nea(k)
               pred_RE(iea+sumea+kk)=err2(kk)
+              pred_RE(ns*sum(nea) + (i-1)*sum(nea) + sumea + kk) = err2(kk)
            end do
 
            !pred_RE_Y 
@@ -3068,6 +3069,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
                  end do
                  do kk=1,nea(k)
                     pred_RE(iea+sumea+kk)=9999.d0
+                    pred_RE(ns*sum(nea) + (i-1)*ng*sum(nea) + (g-1)*sum(nea) + sumea + kk) = 9999.d0
                  end do
                  do kk=1,nalea(k)
                     pred_RE_Y(ialea+sumalea+kk)=9999.d0
@@ -3184,6 +3186,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
               !pred_RE
               do kk=1,nea(k)
                  pred_RE(iea+sumea+kk)=pred_RE(iea+sumea+kk)+ppi(i,g)*err2(kk)
+                 pred_RE(ns*sum(nea) + (i-1)*ng*sum(nea) + (g-1)*sum(nea) + sumea + kk) = err2(kk)
               end do
 
               !pred_RE_Y 
@@ -3642,7 +3645,7 @@ subroutine loglikmpjlcmm(K0,ny0,nbevt0,ng0,ns0,Y0,nobs0,X0,nv0,Xns0,nv20, &
   double precision,dimension(nobs0),intent(out)::resid_m,resid_ss,Yobs
   double precision,dimension(nobs0*ng0),intent(out)::pred_m_g
   double precision,dimension(nobs0*ng0),intent(out)::pred_ss_g
-  double precision,dimension(ns0*sum(nea0(:))),intent(out)::pred_RE
+  double precision,dimension(ns0*sum(nea0(:))*(1+ng0)),intent(out)::pred_RE
   double precision,dimension(ns0*sum(nalea0(:))),intent(out)::pred_RE_Y
   double precision,dimension(nsim*sum(ny0)),intent(out)::marker,transfY
   double precision,dimension(nsim),intent(out)::time

@@ -355,7 +355,7 @@
     pred_m_g <- rep(0,nobs0*ng0)
     pred_ss_g <- rep(0,nobs0*ng0)
     nea0 <- sum(idea0==1)
-    predRE <- rep(0,nea0*ns0)
+    predRE <- rep(0,nea0*ns0*(1+ng0))
 
     ntrtot0 <- sum(ide==1) 
     minY <- zitr[1]
@@ -743,7 +743,8 @@
                             fix0,nfix,bfix)
         
         out <- list(conv=2, V=rep(0, length(b)), best=b,
-                    ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0), Yobs=rep(NA,nobs0),
+                    ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
+                    classpredRE=rep(NA,ns0*ng0*nea0), Yobs=rep(NA,nobs0),
                     resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                     marker=rep(NA,nsim), transfY=rep(NA,nsim),
                     pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
@@ -766,7 +767,8 @@
                    fix0=fix0,nfix0=nfix,bfix0=bfix)
         
         out <- list(conv=res$istop, V=res$v, best=res$b,
-                    ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0), Yobs=rep(NA,nobs0),
+                    ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0), 
+                    classpredRE=rep(NA,ns0*ng0*nea0), Yobs=rep(NA,nobs0),
                     resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                     marker=rep(NA,nsim), transfY=rep(NA,nsim),
                     pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
@@ -784,7 +786,7 @@
         resid_ss <- rep(0,nobs0)
         pred_m_g <- rep(0,nobs0*ng0)
         pred_ss_g <- rep(0,nobs0*ng0)
-        predRE <- rep(0,ns0*nea0)
+        predRE <- rep(0,ns0*nea0*(1+ng0))
         marker <- rep(0,nsim)
         transfY <- rep(0,nsim)
         Yobs <- rep(0,nobs0)

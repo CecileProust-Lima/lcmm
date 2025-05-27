@@ -1444,7 +1444,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
               
         #nea <- apply(idea0,1,sum)
         nea <- q
-        predRE <- rep(0,ns*sum(nea))
+        predRE <- rep(0,ns*sum(nea)*(1+ng))
         predRE_Y <- rep(0,ns*sum(nalea))
 
         nef <- rep(NA,K)
@@ -2041,8 +2041,8 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             
             out <- list(conv=2, V=rep(NA, length(b)*(length(b)+1)/2), best=b,
                         ppi=rep(NA,ns*ng), ppitest=rep(NA,ns*ng),
-                        predRE=rep(NA,ns*sum(nea)), predRE_Y=rep(NA,ns*sum(nalea)),
-                        Yobs=rep(NA,nobs0),
+                        predRE=rep(NA,ns*sum(nea)), classpredRE = rep(NA, ns*sum(nea)*ng),
+                        predRE_Y=rep(NA,ns*sum(nalea)), Yobs=rep(NA,nobs0),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         marker=rep(NA,nsim*sum(ny)), transfY=rep(NA,nsim*sum(ny)),
                         pred_m_g=rep(NA,nobs0*ng), pred_ss_g=rep(NA,nobs0*ng),
@@ -2069,8 +2069,8 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             
             out <- list(conv=res$istop, V=res$v, best=res$b,
                         ppi=rep(NA,ns*ng), ppitest=rep(NA,ns*ng),
-                        predRE=rep(NA,ns*sum(nea)), predRE_Y=rep(NA,ns*sum(nalea)),
-                        Yobs=rep(NA,nobs0),
+                        predRE=rep(NA,ns*sum(nea)), classpredRE = rep(NA, ns*sum(nea)*ng),
+                        predRE_Y=rep(NA,ns*sum(nalea)), Yobs=rep(NA,nobs0),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         marker=rep(NA,nsim*sum(ny)), transfY=rep(NA,nsim*sum(ny)),
                         pred_m_g=rep(NA,nobs0*ng), pred_ss_g=rep(NA,nobs0*ng),
@@ -2090,7 +2090,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             resid_ss <- rep(0,nobs0)
             pred_m_g <- rep(0,nobs0*ng)
             pred_ss_g <- rep(0,nobs0*ng)
-            predRE <- rep(0,ns*sum(nea))
+            predRE <- rep(0,ns*sum(nea)*(1+ng))
             predRE_Y <- rep(0,ns*sum(nalea))
             marker <- rep(0,nsim*sum(ny))
             transfY <- rep(0,nsim*sum(ny))
@@ -2291,12 +2291,17 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         ## predictions des effets aleatoires
         if (sum(nea)>0)
         {
-            predRE <- data.frame(unique(IND),matrix(out$predRE,nrow=ns,ncol=sum(nea),byrow=TRUE))
+            predRE <- data.frame(unique(IND),matrix(out$predRE[1:(ns*sum(nea))],nrow=ns,ncol=sum(nea),byrow=TRUE))
             colnames(predRE) <- c(subject,nom.X0[idea!=0])
+            
+            classpredRE <- matrix(out$predRE[-c(1:(ns*sum(nea)))], ncol = sum(nea), byrow = TRUE)
+            classpredRE <- data.frame(rep(unique(IND), each = ng), rep(1:ng, ns), classpredRE)
+            colnames(classpredRE) <- c(nom.subject, "class", nom.X0[idea!=0])
         }
         else
         {
             predRE <- NA
+            classpredRE <- NA
         }
 
         if (sum(nalea)>0)
@@ -2490,7 +2495,8 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
                    idcor=idcor0,nv=nv,nv2=nv2,loglik=out$loglik,best=out$best,V=V,
                    gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,
                    N=N,Nprm=Nprm,npmK=npmtot,idiag=idiag,pred=pred,pprob=ppi,
-                   pprobY=ppitest,predRE=predRE,predRE_Y=predRE_Y,Names=Names,
+                   pprobY=ppitest,predRE=predRE,classpredRE=classpredRE,
+                   predRE_Y=predRE_Y,Names=Names,
                    cholesky=Cholesky,logspecif=logspecif,estimlink=estimlink,
                    epsY=epsY,linktype=idlink,nbzitr=nbzitr,linknodes=zitr,
                    predSurv=predSurv,typrisq=typrisq,hazardtype=hazardtype,

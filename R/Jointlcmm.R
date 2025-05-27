@@ -1370,7 +1370,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         
         
         nea0 <- sum(idea0)
-        predRE <- rep(0,ns0*nea0)
+        predRE <- rep(0,ns0*nea0*(1+ng0))
 
         ## nb coef pr survie
         nvarxevt <- 0
@@ -2275,7 +2275,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
             
             out <- list(conv=2, V=rep(NA, length(b)), best=b,
                         ppi=rep(NA,ns0*ng0), ppitest=rep(NA,ns0*ng0),
-                        predRE=rep(NA,ns0*nea0), Yobs=rep(NA,nobs0),
+                        predRE=rep(NA,ns0*nea0), classpredRE=rep(NA,ns0*ng0*nea0), Yobs=rep(NA,nobs0),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         marker=rep(NA,nsim), transfY=rep(NA,nsim),
                         pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
@@ -2304,7 +2304,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
             
             out <- list(conv=res$istop, V=res$v, best=res$b,
                         ppi=rep(NA,ns0*ng0), ppitest=rep(NA,ns0*ng0),
-                        predRE=rep(NA,ns0*nea0), Yobs=rep(NA,nobs0),
+                        predRE=rep(NA,ns0*nea0), classpredRE=rep(NA,ns0*ng0*nea0), Yobs=rep(NA,nobs0),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         marker=rep(NA,nsim), transfY=rep(NA,nsim),
                         pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
@@ -2325,7 +2325,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
             resid_ss <- rep(0,nobs0)
             pred_m_g <- rep(0,nobs0*ng0)
             pred_ss_g <- rep(0,nobs0*ng0)
-            predRE <- rep(0,ns0*nea0)
+            predRE <- rep(0,ns0*nea0*(1+ng0))
             marker <- rep(0,nsim)
             transfY <- rep(0,nsim)
             Yobs <- rep(0,nobs0)
@@ -2498,11 +2498,17 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         nom.unique[which(nom.unique=="(Intercept)")] <- "intercept"
 
 ### predictions des effets aleatoires
+        predRE <- NULL
+        classpredRE <- NULL
         if (nea0>0)
             {
-                predRE <- matrix(out$predRE,ncol=nea0,byrow=TRUE)
+                predRE <- matrix(out$predRE[1:(ns0*nea0)],ncol=nea0,byrow=TRUE)
                 predRE <- data.frame(unique(IND),predRE)
                 colnames(predRE) <- c(subject,nom.unique[idea0!=0])
+                
+                classpredRE <- matrix(out$predRE[-c(1:(ns0*nea0))], ncol = nea0, byrow = TRUE)
+                classpredRE <- data.frame(rep(unique(IND), each = ng0), rep(1:ng0, ns0), classpredRE)
+                colnames(classpredRE) <- c(nom.subject, "class", nom.unique[idea0!=0])
             }
 
 ### proba des classes a posteroiri et classification
@@ -2691,7 +2697,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                    idcor=idcor0,loglik=out$loglik,best=out$best,V=V,
                    gconv=out$gconv,conv=out$conv,call=cl,niter=out$niter,
                    N=N,idiag=idiag0,pred=pred,pprob=ppi,pprobY=ppitest,
-                   predRE=predRE,Names=Names,cholesky=ch,logspecif=logspecif,
+                   predRE=predRE,classpredRE=classpredRE,Names=Names,cholesky=ch,logspecif=logspecif,
                    estimlink=estimlink,epsY=epsY,linktype=idlink,linknodes=zitr0,
                    predSurv=predSurv,hazard=list(typrisq,hazardtype,zi,nz),
                    scoretest=stats,na.action=linesNA,

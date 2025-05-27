@@ -2364,7 +2364,7 @@
       double precision,dimension(maxmes) :: mu,Y1,Y2,pred1,err1,tcor
       double precision,dimension(ng) :: pi
       double precision,dimension(nobs)::resid_m,resid_ss
-      double precision,dimension(ns*nea)::pred_RE
+      double precision,dimension(ns*nea*(1+ng))::pred_RE
       double precision,dimension(nobs*ng)::pred_m_g,pred_ss_g
       double precision,dimension(ns,ng) ::PPI
       double precision,dimension(nobs)::Yobs
@@ -2424,7 +2424,6 @@
       pred_ss_g=0.d0
       pred_RE=0.d0
       Yobs=0.d0
-      pred_RE=0.d0
       it=0
       kk=0
       do i=1,ns
@@ -2565,6 +2564,7 @@
                end do
                do k=1,nea
                     pred_RE((i-1)*nea+k)=9999.d0
+                    pred_RE(ns*nea + (i-1)*nea + k)=9999.d0
                 end do
                goto 654
                end if
@@ -2631,6 +2631,7 @@
                end do
                do k=1,nea
                   pred_RE((i-1)*nea+k)=9999.d0
+                  pred_RE(ns*nea + (i-1)*nea + k)=9999.d0
                end do
                goto 654
             end if
@@ -2687,6 +2688,7 @@
 
             do k=1,nea
                pred_RE((i-1)*nea+k)=err2(k)
+               pred_RE(ns*nea + (i-1)*nea + k)=err2(k)
             end do
 
 
@@ -2829,6 +2831,7 @@
                   end do
                   do k=1,nea
                      pred_RE((i-1)*nea+k)=9999.d0
+                     pred_RE(ns*nea + (i-1)*ng*nea + (g-1)*nea + k) = 9999.d0
                   end do
                   goto 654
                end if
@@ -2866,6 +2869,7 @@
                end do
                do k=1,nea
                   pred_RE((i-1)*nea+k)=pred_RE((i-1)*nea+k)+ppi(i,g)*err2(k)
+                  pred_RE(ns*nea + (i-1)*ng*nea + (g-1)*nea + k) = err2(k)
                end do
 
             end do
@@ -3674,7 +3678,7 @@
       double precision,dimension(nobs0),intent(out)::resid_m,resid_ss,Yobs
       double precision,dimension(nobs0*ng0),intent(out)::pred_m_g
       double precision,dimension(nobs0*ng0),intent(out)::pred_ss_g
-      double precision,dimension(ns0*nea0),intent(out)::pred_RE
+      double precision,dimension(ns0*nea0*(1+ng0)),intent(out)::pred_RE
       double precision,dimension(nsim),intent(out)::marker,transfY,time
       double precision,dimension(nsim*ng0,nbevt0),intent(out)::risq_est,risqcum_est
       double precision,intent(out)::statglob

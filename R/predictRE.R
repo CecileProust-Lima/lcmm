@@ -31,6 +31,7 @@
 
 
 predictRE <- function(model, newdata, subject=NULL, classpredRE=FALSE){
+    if(all(model$linktype == 3)) stop("No random effect prediction available for thresholds models")
   arguments <- as.list(model$call)
   argfunction <- as.character(arguments[[1]]) 
   arguments[[1]] <- NULL
@@ -62,8 +63,6 @@ predictRE <- function(model, newdata, subject=NULL, classpredRE=FALSE){
   options(warn=-1)
   on.exit(options(warn=w))
   newmodel <- do.call(argfunction, c(arguments))
-
-  if((classpredRE != FALSE) & (!inherits(model, "hlme"))) stop("classpredRE can only be used for hlme models")
   
   if(!classpredRE)
       res <- newmodel$predRE

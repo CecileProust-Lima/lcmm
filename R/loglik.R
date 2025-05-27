@@ -105,7 +105,7 @@ logliklcmm <- function(b,Y0,X0,prior0,pprior0,idprob0,idea0,idg0,idcor0,ns0,ng0,
     resid_ss <- rep(0,nobs0)
     pred_m_g <- rep(0,nobs0*ng0)
     pred_ss_g <- rep(0,nobs0*ng0)
-    predRE <- rep(0,ns0*nea0)
+    predRE <- rep(0,ns0*nea0*(1+ng0))
     Yobs <- rep(0,nobs0)
     Ydiscret <- 0
     vraisdiscret <- 0
@@ -148,7 +148,7 @@ loglikmultlcmm <- function(b,Y0,X0,prior0,pprior0,idprob0,idea0,idg0,idcor0,idco
     resid_ss <- rep(0,nobs0)
     pred_m_g <- rep(0,nobs0*ng0)
     pred_ss_g <- rep(0,nobs0*ng0)
-    predRE <- rep(0,ns0*nea0)
+    predRE <- rep(0,ns0*nea0*(1+ng0))
     predRE_Y <- rep(0,ns0*nalea0)
     nsim0 <- 0
     marker <- rep(0,nsim0*ny0)
@@ -175,7 +175,7 @@ loglikJointlcmm <- function(b,Y0,X0,prior0,pprior0,tentr0,tevt0,devt0,ind_survin
     resid_ss <- rep(0,nobs0)
     pred_m_g <- rep(0,nobs0*ng0)
     pred_ss_g <- rep(0,nobs0*ng0)
-    predRE <- rep(0,ns0*nea0)
+    predRE <- rep(0,ns0*nea0*(1+ng0))
     nsim0 <- 0
     marker <- rep(0,nsim0)
     transfY <- rep(0,nsim0)
@@ -268,7 +268,7 @@ loglikmpjlcmm <- function(b,K0,ny0,nbevt0,ng0,ns0,Y0,nobs0,X0,nv0,Xns0,nv20,prio
     resid_ss <- rep(0,nobs0)
     pred_m_g <- rep(0,nobs0*ng0)
     pred_ss_g <- rep(0,nobs0*ng0)
-    predRE <- rep(0,ns0*sum(nea0))
+    predRE <- rep(0,ns0*sum(nea0)*(1+ng0))
     predRE_Y <- rep(0,ns0*sum(nalea0))
     nsim0 <- 0
     time <- rep(0,nsim0)

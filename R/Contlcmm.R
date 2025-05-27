@@ -403,7 +403,7 @@
         pred_m_g <- rep(0,nobs0*ng0)
         pred_ss_g <- rep(0,nobs0*ng0)
         nea0 <- sum(idea0==1)
-        predRE <- rep(0,nea0*ns0)
+        predRE <- rep(0,nea0*ns0*(1+ng0))
 
         ##---------------------------------------------------------------------------
         ##definition du vecteur de parametre + initialisation
@@ -855,6 +855,7 @@
             
             out <- list(conv=2, V=rep(0, length(b)), best=b,
                         ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
+                        classpredRE=rep(NA,ns0*ng0*nea0),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         marker=rep(NA,nsim), transfY=rep(NA,nsim),
                         Yobs=rep(NA,nobs0), 
@@ -879,6 +880,7 @@
             
             out <- list(conv=res$istop, V=res$v, best=res$b,
                         ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
+                        classpredRE=rep(NA,ns0*ng0*nea0),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         marker=rep(NA,nsim), transfY=rep(NA,nsim),
                         Yobs=rep(NA,nobs0), 
@@ -897,7 +899,7 @@
             resid_ss <- rep(0,nobs0)
             pred_m_g <- rep(0,nobs0*ng0)
             pred_ss_g <- rep(0,nobs0*ng0)
-            predRE <- rep(0,ns0*nea0)
+            predRE <- rep(0,ns0*nea0*(1+ng0))
             marker <- rep(0,nsim)
             transfY <- rep(0,nsim)
             Yobs <- rep(0,nobs0)
@@ -1041,10 +1043,16 @@
 
 ####################################################
 
+        predRE <- NULL
+        classpredRE <- NULL
         if (nea0>0) {
-            predRE <- matrix(out$predRE,ncol=nea0,byrow=T)
+            predRE <- matrix(out$predRE[1:(ns0*nea0)],ncol=nea0,byrow=TRUE)
             predRE <- data.frame(INDuniq,predRE)
             colnames(predRE) <- c(nom.subject,nom.X0[idea0!=0])
+
+            classpredRE <- matrix(out$predRE[-c(1:(ns0*nea0))], ncol = nea0, byrow = TRUE)
+            classpredRE <- data.frame(rep(INDuniq, each = ng0), rep(1:ng0, ns0), classpredRE)
+            colnames(classpredRE) <- c(nom.subject, "class", nom.X0[idea0!=0])
         }
 
 
@@ -1133,7 +1141,7 @@
 
         cost <- proc.time()-ptm
         
-        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=call,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,Ydiscrete=Ydiscrete,discrete_loglik=out$vraisdiscret,UACV=out$UACV,IndivContrib=out$rlindiv,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random, levels=levels, var.time=var.time, runtime=cost[3])
+        res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,call=call,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,classpredRE=classpredRE,Xnames=nom.X0,Xnames2=X0.names2,cholesky=Cholesky,estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,Ydiscrete=Ydiscrete,discrete_loglik=out$vraisdiscret,UACV=out$UACV,IndivContrib=out$rlindiv,na.action=na.action,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,wRandom=wRandom,b0Random=b0Random, levels=levels, var.time=var.time, runtime=cost[3])
         class(res) <- c("lcmm") 
 
         if(verbose==TRUE) cat("The program took", round(cost[3],2), "seconds \n") 

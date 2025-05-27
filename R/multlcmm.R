@@ -953,7 +953,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 
 
     nea0 <- sum(idea0)
-    predRE <- rep(0,ns0*nea0)
+    predRE <- rep(0,ns0*nea0*(1+ng0))
 
     ## parametres MC
     if(is.null(nMC)) nMC <- ifelse(all(idlink0 != 3), 0, 1000)
@@ -1487,6 +1487,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
         
         out <- list(conv=2, V=rep(NA, length(b)), best=b,
                     ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
+                    classpredRE=rep(NA,ns0*ng0*nea0),
                     predRE_Y=rep(NA,ns0*nalea0), Yobs=rep(NA,nobs0),
                     resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                     marker=rep(NA,nsim*ny0), transfY=rep(NA,nsim*ny0),
@@ -1511,6 +1512,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
         
         out <- list(conv=res$istop, V=res$v, best=res$b,
                     ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
+                    classpredRE=rep(NA,ns0*ng0*nea0),
                     predRE_Y=rep(NA,ns0*nalea0), Yobs=rep(NA,nobs0),
                     resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                     marker=rep(NA,nsim), transfY=rep(NA,nsim),
@@ -1528,7 +1530,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
         resid_ss <- rep(0,nobs0)
         pred_m_g <- rep(0,nobs0*ng0)
         pred_ss_g <- rep(0,nobs0*ng0)
-        predRE <- rep(0,ns0*nea0)
+        predRE <- rep(0,ns0*nea0*(1+ng0))
         predRE_Y <- rep(0,ns0*nalea0)
         marker <- rep(0,nsim*ny0)
         transfY <- rep(0,nsim*ny0)
@@ -1720,12 +1722,18 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 
     
     ##predictions
-    predRE <- matrix(out$predRE,ncol=nea0,byrow=T)
+    predRE <- matrix(out$predRE[1:(ns0*nea0)],ncol=nea0,byrow=TRUE)
     predRE <- data.frame(unique(IND),predRE)
     colnames(predRE) <- c(nom.subject,nom.X0[idea0!=0])
+    
+    classpredRE <- matrix(out$predRE[-c(1:(ns0*nea0))], ncol = nea0, byrow = TRUE)
+    classpredRE <- data.frame(rep(unique(IND), each = ng0), rep(1:ng0, ns0), classpredRE)
+    colnames(classpredRE) <- c(nom.subject, "class", nom.X0[idea0!=0])
+    
     if(any(idlink0==3) & nea0>0)
     {
         predRE[,1+1:nea0] <- NA
+        classpredRE[,1+1:nea0] <- NA
     }
 
     if (nalea0!=0)
@@ -1890,7 +1898,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     
     res <-list(ns=ns0,ng=ng0,idea0=idea0,idprob0=idprob0,idg0=idg0,idcontr0=idcontr0,
                idcor0=idcor0,loglik=out$loglik,best=out$best,V=V,gconv=out$gconv,conv=out$conv,
-               call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,
+               call=cl,niter=out$niter,N=N,idiag=idiag0,pred=pred,pprob=ppi,predRE=predRE,classpredRE=classpredRE,
                predRE_Y=predRE_Y,Ynames=nomsY,Xnames=nom.X0,Xnames2=ttesLesVar,cholesky=Cholesky,
                estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,nbnodes=nbnodes,nbmod=nbmod,modalites=modalites,
                na.action=nayk,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,
