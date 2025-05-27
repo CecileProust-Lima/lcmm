@@ -23,7 +23,9 @@ predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, predRE
         
         if(!("class" %in% colnames(predRE)))
         {
+            oldnames <- colnames(predRE)
             predRE <- data.frame(predRE, class = 1:x$ng)
+            colnames(predRE) <- c(oldnames, "class")
         }
         else
         {
