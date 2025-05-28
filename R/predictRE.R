@@ -31,7 +31,9 @@
 
 
 predictRE <- function(model, newdata, subject=NULL, classpredRE=FALSE){
-    if(all(model$linktype == 3)) stop("No random effect prediction available for thresholds models")
+    if(inherits(model, c("lcmm", "multlcmm"))){
+        if(all(model$linktype == 3)) stop("No random effect prediction available for thresholds models")
+    }
   arguments <- as.list(model$call)
   argfunction <- as.character(arguments[[1]]) 
   arguments[[1]] <- NULL

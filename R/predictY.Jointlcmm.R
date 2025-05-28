@@ -14,14 +14,14 @@ predictY.Jointlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALS
     if ((methInteg==0)&(!(nsim %in% c(5,7,9,15,20,30,40,50)))) stop("For Gauss-Hermite integration method, 'nsim' should be either 5,7,9,15,20,30,40 or 50")
 #    if(missing(var.time)) stop("missing argument 'var.time'")
 #    if(!(var.time %in% colnames(newdata))) stop("'var.time' should be included in newdata")
-
+    
     if(!is.null(predRE))
     {
         if(x$linktype != -1) stop("Subject-specific predictions are not available for models including a link function")
+        if(!inherits(predRE, "data.frame")) stop("predRE should be a data.frame")
+        if(nrow(predRE) != x$ng) stop("predRE should contain as many rows as latent classes")
         if(draws==TRUE) stop("No confidence intervals are provided for subject-specific prediction")
         
-        if(!inherits(predRE, "data.frame")) stop("predRE should be a data.frame")
-        if(nrow(predRE) != x$ng) warning("predRE should contain as many rows as latent classes")
         
         if(!("class" %in% colnames(predRE)))
         {

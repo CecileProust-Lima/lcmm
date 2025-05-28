@@ -17,7 +17,7 @@ if(!is.null(predRE))
     if(confint == TRUE) stop("No confidence intervals are provided for subject-specific prediction")
         
     if(!inherits(predRE, "data.frame")) stop("predRE should be a data.frame")
-    if(nrow(predRE) != x$ng) warning("predRE should contain as many rows as latent classes")
+    if(nrow(predRE) != x$ng) stop("predRE should contain as many rows as latent classes")
         
     if(!("class" %in% colnames(predRE)))
     {
