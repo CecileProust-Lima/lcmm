@@ -2,7 +2,7 @@
 #' @rdname predictY
 #' @export
 #'
-predictY.Jointlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndraws=2000,na.action=1,...)
+predictY.Jointlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndraws=2000,na.action=1, predRE = NULL, ...)
 {
     if(missing(newdata)) stop("The argument newdata should be specified")
     if(missing(x)) stop("The argument x should be specified")
@@ -15,7 +15,32 @@ predictY.Jointlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALS
 #    if(missing(var.time)) stop("missing argument 'var.time'")
 #    if(!(var.time %in% colnames(newdata))) stop("'var.time' should be included in newdata")
 
+    if(!is.null(predRE))
+    {
+        if(x$linktype != -1) stop("Subject-specific predictions are not available for models including a link function")
+        if(draws==TRUE) stop("No confidence intervals are provided for subject-specific prediction")
+        
+        if(!inherits(predRE, "data.frame")) stop("predRE should be a data.frame")
+        if(nrow(predRE) != x$ng) warning("predRE should contain as many rows as latent classes")
+        
+        if(!("class" %in% colnames(predRE)))
+        {
+            oldnames <- colnames(predRE)
+            predRE <- data.frame(predRE, class = 1:x$ng)
+            colnames(predRE) <- c(oldnames, "class")
+        }
+        else
+        {
+            predRE <- predRE[order(predRE$class),]
+        }
+        
+        namesRE <- colnames(x$predRE)[-1]
+        if(!all(namesRE %in% colnames(predRE))) stop(paste("predRE requires the following columns : ", paste(namesRE, collapse = " ")))
+        
+        predRE <- t(as.matrix(predRE[, namesRE, drop = FALSE]))
+    }
 
+    
     if(x$conv==1 | x$conv==2 | x$conv==3)
         {
 
@@ -548,10 +573,29 @@ call_survival <- formula(paste("~",call_survival,sep=""))
                                 }
                         }
 
+                    if(!is.null(predRE))
+                    {
+                        ## add subject-specific part to Y :
+                        Z <- newdata1[, which(x$idea == 1), drop = FALSE]
+                        
+                        if(ncol(predRE) == 1)
+                        {
+                            Zu <- Z %*% as.numeric(predRE)
+                            
+                            Ypred <- sweep(Ypred, 1, Zu, "+")
+                        }
+                        else
+                        {
+                            Zu <- Z %*% predRE
+                            
+                            Ypred <- Ypred + Zu
+                        }
+                    }
 
                     colnames(Ypred) <- paste("Ypred_class",1:x$ng,sep="")
                     if (x$ng==1) colnames(Ypred) <- "Ypred"
                     res <- Ypred
+
 
                     if(isTRUE(draws))
                         {
