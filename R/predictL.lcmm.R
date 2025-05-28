@@ -585,15 +585,14 @@ cat("Output can not be produced since the program stopped abnormally.")
 
 
 
-#' Class-specific marginal predictions in the latent process scale for
+#' Class-specific marginal or subject-specific predictions in the latent process scale for
 #' \code{lcmm}, \code{Jointlcmm} and \code{multlcmm} objects
 #' 
 #' This function provides a matrix containing the class-specific predicted
 #' trajectories computed in the latent process scale, that is the latent
 #' process underlying the curvilinear outcome(s), for a profile of covariates
-#' specified by the user. This function applies only to \code{lcmm} and
-#' \code{multlcmm} objects. The function \code{plot.predict} provides directly
-#' the plot of these class-specific predicted trajectories. The function
+#' specified by the user. This function applies only to \code{lcmm}, \code{multlcmm} and
+#' \code{Jointlcmm} objects.  The function
 #' \code{predictY} provides the class-specific predicted trajectories computed
 #' in the natural scale of the outcome(s).
 #' 
@@ -613,6 +612,10 @@ cat("Output can not be produced since the program stopped abnormally.")
 #' 'na.pass' or 'na.exclude' are not implemented in the current version.
 #' @param confint logical indicating if confidence should be provided. Default
 #' to FALSE.
+#' @param predRE optional data frame containing the predicted random effects
+#' in each latent class. If NULL (the default), marginal prediction are
+#' computed.If predRE is specified, subject-specific predictions
+#' are computed. 
 #' @param \dots further arguments to be passed to or from other methods.  They
 #' are ignored in this function.
 #' @return An object of class \code{predictL} with values :
@@ -623,8 +626,7 @@ cat("Output can not be produced since the program stopped abnormally.")
 #' 
 #' - \code{times} : the \code{var.time} variable from \code{newdata}
 #' @author Cecile Proust-Lima, Viviane Philipps
-#' @seealso \code{\link{plot.predict}}, \code{\link{predictY}},
-#' \code{\link{lcmm}}
+#' @seealso \code{\link{predictY}},\code{\link{predictRE}},\code{\link{predictYcond}}
 #' @examples
 #' 
 #' #### Prediction from a 2-class model with a Splines link function
@@ -649,4 +651,4 @@ cat("Output can not be produced since the program stopped abnormally.")
 #' 
 #' @export
 #' 
-predictL <- function(x,newdata,var.time,na.action=1,confint=FALSE,...) UseMethod("predictL")
+predictL <- function(x,newdata,var.time,na.action=1,confint=FALSE,predRE=NULL,...) UseMethod("predictL")

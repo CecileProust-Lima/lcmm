@@ -1188,8 +1188,8 @@ hlme <-
                                 NPM,fix0,nfix,bfix)
             
             out <- list(conv=2, V=rep(NA, NPM*(NPM+1)/2), best=b,
-                        ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
-                        classpredRE=rep(NA,ns0*ng0*nea0),varRE=rep(NA,ns0*nea0*(nea0+1)/2),
+                        ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0*(1+ng0)),
+                        varRE=rep(NA,ns0*nea0*(nea0+1)/2),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
                         gconv=rep(NA,3), niter=0, loglik=vrais)
@@ -1208,8 +1208,8 @@ hlme <-
                        npm0=NPM,fix0=fix0,nfix0=nfix,bfix0=bfix)
             
             out <- list(conv=res$istop, V=res$v, best=res$b,
-                        ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
-                        classpredRE=rep(NA,ns0*ng0*nea0),varRE=rep(NA,ns0*nea0*(nea0+1)/2),
+                        ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0*(1+ng0)),
+                        varRE=rep(NA,ns0*nea0*(nea0+1)/2),
                         resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                         pred_m_g=rep(NA,nobs0*ng0), pred_ss_g=rep(NA,nobs0*ng0),
                         gconv=c(res$ca, res$cb, res$rdm), niter=res$ni,

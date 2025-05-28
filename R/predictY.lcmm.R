@@ -979,13 +979,14 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 
 #' Predictions (marginal and possibly subject-specific in some cases) of a \code{hlme},
 #' \code{lcmm}, \code{multlcmm} or \code{Jointlcmm} object in the natural scale
-#' of the longitudinal outcome(s) computed from a profile of covariates (marginal) or
-#' individual data (subject specific in case of \code{hlme}).
+#' of the longitudinal outcome(s) computed from a profile of covariates.
 #' 
 #' For \code{hlme} and \code{Jointlcmm} objects, the function computes the
 #' predicted values of the longitudinal marker (in each latent class of ng>1) for a
-#' specified profile of covariates.  For \code{lcmm} and \code{multlcmm}
-#' objects, the function computes predicted values in the natural scale of the
+#' specified profile of covariates.
+#' Marginal or subject-specific predictions can be obtained.
+#' For \code{lcmm} and \code{multlcmm} objects, only marginal prediction are 
+#' available, and the function computes predicted values in the natural scale of the
 #' outcomes for a specified profile of covariates. For linear and threshold
 #' links, the predicted values are computed analytically. For splines and Beta
 #' links, a Gauss-Hermite or Monte-Carlo integration are used to numerically
@@ -1028,7 +1029,7 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 #' only; if draws=TRUE, ndraws specifies the number of draws that should be
 #' generated to approximate the posterior distribution of the predicted values.
 #' By default, ndraws=2000.
-#' @param predRE option only available for \code{hlme} models.
+#' @param predRE option only available for \code{hlme} or \code{Jointlcmm} models.
 #' If \code{predRE} is specified, the predictY function returns subject-specific predictions.
 #' If NULL, marginal predictions are computed.
 #' For subject-specific predictions, \code{predRE} should be a data frame
@@ -1074,8 +1075,7 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 #' 
 #' - \code{times} : the \code{var.time} variable from \code{newdata}
 #' @author Cecile Proust-Lima, Viviane Philipps, Sasha Cuau
-#' @seealso \code{\link{lcmm}}, \code{\link{multlcmm}}, \code{\link{hlme}},
-#' \code{\link{Jointlcmm}}
+#' @seealso \code{\link{predictYback}}
 #' @examples
 #' 
 #' 

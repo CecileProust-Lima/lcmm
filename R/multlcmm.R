@@ -1486,8 +1486,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                                 dimMC,seqMC,chol)
         
         out <- list(conv=2, V=rep(NA, length(b)), best=b,
-                    ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
-                    classpredRE=rep(NA,ns0*ng0*nea0),
+                    ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0*(1+ng0)),
                     predRE_Y=rep(NA,ns0*nalea0), Yobs=rep(NA,nobs0),
                     resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                     marker=rep(NA,nsim*ny0), transfY=rep(NA,nsim*ny0),
@@ -1511,8 +1510,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                    methInteg0=methInteg,nMC0=nMC,dimMC0=dimMC,seqMC0=seqMC,chol0=chol)
         
         out <- list(conv=res$istop, V=res$v, best=res$b,
-                    ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0),
-                    classpredRE=rep(NA,ns0*ng0*nea0),
+                    ppi2=rep(NA,ns0*ng0), predRE=rep(NA,ns0*nea0*(1+ng0)),
                     predRE_Y=rep(NA,ns0*nalea0), Yobs=rep(NA,nobs0),
                     resid_m=rep(NA,nobs0), resid_ss=rep(NA,nobs0),
                     marker=rep(NA,nsim), transfY=rep(NA,nsim),
