@@ -1,6 +1,6 @@
 #' @export
 #'
-predictL.lcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE,...)
+predictL.lcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE, predRE = NULL, ...)
 {
 if(missing(newdata)) stop("The argument newdata should be specified")
 if(missing(x)) stop("The argument x should be specified")
@@ -9,6 +9,31 @@ if (!inherits(x, "lcmm")) stop("use only with \"lcmm\" objects")
 if (!all(x$Xnames2 %in% c(colnames(newdata),"intercept"))) {
 stop(paste(c("newdata should at least include the following covariates: ","\n",x$Xnames2[-1]),collapse=" "))}
 if (!inherits(newdata, "data.frame")) stop("newdata should be a data.frame object")
+
+if(!is.null(predRE))
+{
+    if(confint == TRUE) stop("No confidence intervals are provided for subject-specific prediction")
+        
+    if(!inherits(predRE, "data.frame")) stop("predRE should be a data.frame")
+    if(nrow(predRE) != x$ng) warning("predRE should contain as many rows as latent classes")
+        
+    if(!("class" %in% colnames(predRE)))
+    {
+        oldnames <- colnames(predRE)
+        predRE <- data.frame(predRE, class = 1:x$ng)
+        colnames(predRE) <- c(oldnames, "class")
+    }
+    else
+    {
+        predRE <- predRE[order(predRE$class),]
+    }
+    
+    namesRE <- x$Xnames[which(x$idea0 == 1)] #colnames(x$predRE)[-1] n'existe pas si thresholds
+    if(!all(namesRE %in% colnames(predRE))) stop(paste("predRE requires the following columns : ", paste(namesRE, collapse = " ")))
+    
+    predRE <- t(as.matrix(predRE[, namesRE, drop = FALSE]))
+}
+
 #if(missing(var.time)) stop("missing argument 'var.time'")
 #if(!(var.time %in% colnames(newdata))) stop("'var.time' should be included in newdata")
 
@@ -416,7 +441,7 @@ if(x$N[6]>0)
    }
   }
   
-  
+  ## marginal prediction :
   Y<-matrix(0,length(newdata1[,1]),x$ng)
   colnames(Y) <- paste("class",1:x$ng,sep="") 
   for(g in 1:x$ng){
@@ -428,6 +453,38 @@ if(x$N[6]>0)
   }
   }
 
+    if(!is.null(predRE))
+    {
+        ## add subject-specific part to Y :
+        Z <- newdata1[, which(x$idea0 == 1), drop = FALSE]
+
+        if(ncol(predRE) == 1)
+        {
+            Zu <- Z %*% as.numeric(predRE)
+            
+            Y <- sweep(Y, 1, Zu, "+")
+        }
+        else
+        {
+            Zu <- Z %*% predRE
+            
+            Y <- Y + Zu
+        }
+        
+        ## result
+        if (x$ng==1){
+            colnames(Y) <- c("pred")
+        }
+        if (x$ng>1){
+            colnames(Y) <- c(paste("pred_class", 1:x$ng, sep = ""))
+        }
+        
+        res.list <- list(pred = Y, times = times)
+    }
+    else
+    {
+
+    
   #extraction de Var(beta)
   Vbeta <- matrix(0,x$N[2],x$N[2])
   npm <- length(x$best)
@@ -513,7 +570,7 @@ if(x$N[6]>0)
           res.list$pred <- Y
           res.list$times <- times
       }
-
+}
 }
 else{
 cat("Output can not be produced since the program stopped abnormally.")

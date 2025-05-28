@@ -1,6 +1,6 @@
 #' @export
 #'
-predictL.Jointlcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE,...)
+predictL.Jointlcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE, predRE = NULL, ...)
 {
 if(missing(newdata)) stop("The argument newdata should be specified")
 if(missing(x)) stop("The argument x should be specified")
@@ -13,6 +13,30 @@ stop(paste(c("newdata should at least include the following covariates: ","\n",x
 if (!inherits(newdata, "data.frame")) stop("newdata should be a data.frame object")
 #if(missing(var.time)) stop("missing argument 'var.time'")
 #if(!(var.time %in% colnames(newdata))) stop("'var.time' should be included in newdata")
+
+if(!is.null(predRE))
+{
+    if(confint == TRUE) stop("No confidence intervals are provided for subject-specific prediction")
+        
+    if(!inherits(predRE, "data.frame")) stop("predRE should be a data.frame")
+    if(nrow(predRE) != x$ng) warning("predRE should contain as many rows as latent classes")
+        
+    if(!("class" %in% colnames(predRE)))
+    {
+        oldnames <- colnames(predRE)
+        predRE <- data.frame(predRE, class = 1:x$ng)
+        colnames(predRE) <- c(oldnames, "class")
+    }
+    else
+    {
+        predRE <- predRE[order(predRE$class),]
+    }
+    
+    namesRE <- colnames(x$predRE)[-1]
+    if(!all(namesRE %in% colnames(predRE))) stop(paste("predRE requires the following columns : ", paste(namesRE, collapse = " ")))
+    
+    predRE <- t(as.matrix(predRE[, namesRE, drop = FALSE]))
+}
 
 call_fixed <- x$call$fixed[3]
 if(is.null(x$call$random)) {call_random <- -1} else call_random <- x$call$random[2]
@@ -322,7 +346,7 @@ if(id.X_mixture == 1)
 		if((colnames(X_mixture)[i] %in% colnames(newdata1))==FALSE)
                     {
 			newdata1 <- cbind(newdata1,X_mixture[,i])
-                        newnames <-- c(newnames,colnames(X_mixture)[i])
+                        newnames <- c(newnames,colnames(X_mixture)[i])
                         colnames(newdata1) <- newnames
 		}
 	}
@@ -331,7 +355,7 @@ if(id.X_random == 1){
 	for(i in 1:length(colnames(X_random))){
 		if((colnames(X_random)[i] %in% colnames(newdata1))==FALSE){
 			newdata1 <- cbind(newdata1,X_random[,i])
-                        newnames <-- c(newnames,colnames(X_random)[i])
+                        newnames <- c(newnames,colnames(X_random)[i])
                         colnames(newdata1) <- newnames
 		}	 
 	}
@@ -340,7 +364,7 @@ if(id.X_classmb == 1){
 	for(i in 1:length(colnames(X_classmb))){
 		if((colnames(X_classmb)[i] %in% colnames(newdata1))==FALSE){
 			newdata1 <- cbind(newdata1,X_classmb[,i])
-                        newnames <-- c(newnames,colnames(X_classmb)[i])
+                        newnames <- c(newnames,colnames(X_classmb)[i])
                         colnames(newdata1) <- newnames	 
 		}	
 	}
@@ -411,6 +435,7 @@ if(x$N[7]>0)
                 }
             
             
+        ## marginal prediction :
             Y<-matrix(0,length(newdata1[,1]),x$ng)
             for(g in 1:x$ng)
                 {
@@ -423,6 +448,38 @@ if(x$N[7]>0)
                             Y[,g]<- Y[,g] + X2 %*% b2[,g]
                         }
                 }
+
+
+    if(!is.null(predRE))
+    {
+        ## add subject-specific part to Y :
+        Z <- newdata1[, which(x$idea == 1), drop = FALSE]
+
+        if(ncol(predRE) == 1)
+        {
+            Zu <- Z %*% as.numeric(predRE)
+            
+            Y <- sweep(Y, 1, Zu, "+")
+        }
+        else
+        {
+            Zu <- Z %*% predRE
+            
+            Y <- Y + Zu
+        }
+        
+        ## result
+        if (x$ng==1){
+            colnames(Y) <- c("pred")
+        }
+        if (x$ng>1){
+            colnames(Y) <- c(paste("pred_class", 1:x$ng, sep = ""))
+        }
+        
+        res.list <- list(pred = Y, times = times)
+    }
+        else
+        {        
 
            ##extraction de Var(beta)
             Vbeta <- matrix(0,x$N[4],x$N[4])
@@ -517,7 +574,7 @@ if(confint==TRUE)
           res.list$pred <- Y
           res.list$times <- times
       }
-
+}
 }
 else
 {
