@@ -5,10 +5,18 @@
 \alias{predictL.lcmm}
 \alias{predictL.multlcmm}
 \alias{predictL.Jointlcmm}
-\title{Class-specific marginal predictions in the latent process scale for
+\title{Class-specific marginal or subject-specific predictions in the latent process scale for
 \code{lcmm}, \code{Jointlcmm} and \code{multlcmm} objects}
 \usage{
-predictL(x, newdata, var.time, na.action = 1, confint = FALSE, ...)
+predictL(
+  x,
+  newdata,
+  var.time,
+  na.action = 1,
+  confint = FALSE,
+  predRE = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{an object inheriting from class \code{lcmm},\code{multlcmm} or
@@ -30,6 +38,11 @@ for 'na.omit'. The alternative is 2 for 'na.fail'. Other options such as
 \item{confint}{logical indicating if confidence should be provided. Default
 to FALSE.}
 
+\item{predRE}{optional data frame containing the predicted random effects
+in each latent class. If NULL (the default), marginal prediction are
+computed.If predRE is specified, subject-specific predictions
+are computed.}
+
 \item{\dots}{further arguments to be passed to or from other methods.  They
 are ignored in this function.}
 }
@@ -46,9 +59,8 @@ intervals (if calculated).
 This function provides a matrix containing the class-specific predicted
 trajectories computed in the latent process scale, that is the latent
 process underlying the curvilinear outcome(s), for a profile of covariates
-specified by the user. This function applies only to \code{lcmm} and
-\code{multlcmm} objects. The function \code{plot.predict} provides directly
-the plot of these class-specific predicted trajectories. The function
+specified by the user. This function applies only to \code{lcmm}, \code{multlcmm} and
+\code{Jointlcmm} objects.  The function
 \code{predictY} provides the class-specific predicted trajectories computed
 in the natural scale of the outcome(s).
 }
@@ -76,8 +88,7 @@ predictY(m,newdata,var.time="Time")
 
 }
 \seealso{
-\code{\link{plot.predict}}, \code{\link{predictY}},
-\code{\link{lcmm}}
+\code{\link{predictY}},\code{\link{predictRE}},\code{\link{predictYcond}}
 }
 \author{
 Cecile Proust-Lima, Viviane Philipps

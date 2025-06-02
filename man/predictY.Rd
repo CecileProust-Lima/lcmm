@@ -9,8 +9,7 @@
 \alias{predictY.multlcmm}
 \title{Predictions (marginal and possibly subject-specific in some cases) of a \code{hlme},
 \code{lcmm}, \code{multlcmm} or \code{Jointlcmm} object in the natural scale
-of the longitudinal outcome(s) computed from a profile of covariates (marginal) or
-individual data (subject specific in case of \code{hlme}).}
+of the longitudinal outcome(s) computed from a profile of covariates.}
 \usage{
 \method{predictY}{Jointlcmm}(
   x,
@@ -21,6 +20,7 @@ individual data (subject specific in case of \code{hlme}).}
   draws = FALSE,
   ndraws = 2000,
   na.action = 1,
+  predRE = NULL,
   ...
 )
 
@@ -106,18 +106,18 @@ By default, ndraws=2000.}
 for 'na.omit'. The alternative is 2 for 'na.fail'. Other options such as
 'na.pass' or 'na.exclude' are not implemented in the current version.}
 
-\item{\dots}{further arguments to be passed to or from other methods. 
-Only the argument 'median' will be used, other are ignored. 'median' should
-be a logical indicating whether the median should be computed. By 
-default, the mean value is computed.}
-
-\item{predRE}{option only available for \code{hlme} models.
+\item{predRE}{option only available for \code{hlme} or \code{Jointlcmm} models.
 If \code{predRE} is specified, the predictY function returns subject-specific predictions.
 If NULL, marginal predictions are computed.
 For subject-specific predictions, \code{predRE} should be a data frame
 with as many rows as latent classes
 containing the predicted random effects in each latent class.
 In particular, predRE can be the result of a predictRE call with classpredRE = TRUE.}
+
+\item{\dots}{further arguments to be passed to or from other methods. 
+Only the argument 'median' will be used, other are ignored. 'median' should
+be a logical indicating whether the median should be computed. By 
+default, the mean value is computed.}
 }
 \value{
 An object of class \code{predictY} with values :
@@ -155,8 +155,10 @@ number of the latent class: pred_ss_1,pred_ss_2,...)
 \description{
 For \code{hlme} and \code{Jointlcmm} objects, the function computes the
 predicted values of the longitudinal marker (in each latent class of ng>1) for a
-specified profile of covariates.  For \code{lcmm} and \code{multlcmm}
-objects, the function computes predicted values in the natural scale of the
+specified profile of covariates.
+Marginal or subject-specific predictions can be obtained.
+For \code{lcmm} and \code{multlcmm} objects, only marginal prediction are 
+available, and the function computes predicted values in the natural scale of the
 outcomes for a specified profile of covariates. For linear and threshold
 links, the predicted values are computed analytically. For splines and Beta
 links, a Gauss-Hermite or Monte-Carlo integration are used to numerically
@@ -202,8 +204,7 @@ pred1MC <- predictY(m,newdata,draws=TRUE,var.time="Time")
 
 }
 \seealso{
-\code{\link{lcmm}}, \code{\link{multlcmm}}, \code{\link{hlme}},
-\code{\link{Jointlcmm}}
+\code{\link{predictYback}}
 }
 \author{
 Cecile Proust-Lima, Viviane Philipps, Sasha Cuau
