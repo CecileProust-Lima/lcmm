@@ -155,20 +155,35 @@ predictRE function computes the predicted random-effects of any model estimated 
 predictRE(mhlme2, newdata=paquid[2:6,])
 ```
 
-&nbsp;
+By default, the random-effects are aggregated over the latent classes (by a weighted sum using the posterior probabilities). The argument classpredRE = TRUE can be used to get class-specific random-effects:
 
-### Predictions of outcomes in their natural scale using predictY and predictYcond
-
-predictY function provides by default the mean outcome value predicted for a profile of covariates (provided in newdata). This prediction (with marg=TRUE by default) is a marginal prediction. 
-
-Subject-specific predictions can be obtained only for hlme right now. In that case, it should be indicated option marg=FALSE and newdata should include the outcome data so that the predicted random-effects can be included. 
-
-```{r, comment=''}
-predss <- predictY(mhlme2, paquid[2:6,], marg=FALSE)
-predss$pred
+```{r, comment='',message = FALSE}
+predictRE(mhlme2, newdata=paquid[2:6,], classpredRE = TRUE)
 ```
 
-Predictions of the outcomes can also be directly computed for a latent process value. This is useful when nonlinear link functions are used in the models. This is obtained with function predictYcond. 
+&nbsp;
 
+### Subject-specific predictions using predictY or predictL
 
+For hlme models and Jointlcmm models without link function, subject-specific predictions can be obtained using predictY. This requires a first call to predictRE with classpredRE = TRUE to get the individual random-effects, which can then be passed to the predictY function using option predRE.
+
+```{r, comment='', include=TRUE, eval=FALSE}
+predRE_ID2 <- predictRE(mhlme2, paquid[2:6,], classpredRE = TRUE)
+predictY(mhlme2, newdata = data.frame(age = seq(70, 85, by = 0.25), age_init = 70, CEP = 0), predRE = predRE_ID2)
+```
+
+For model defining a latent process (lcmm, multlcmm, Jointlcmm with a link function), subject-specific predictions can be obtained in latent process scale using predictL.
+
+```{r, comment='', include=TRUE, eval=FALSE}
+mlcmm <- lcmm(CESD ~ I(age - age_init), random = ~ I(age - age_init), subject = 'ID', data = paquid, link = '5-quant-splines')
+
+predRE_ID3 <- predictRE(mlcmm, paquid[7:8,], classpredRE = TRUE)
+predictL(mlcmm, newdata = data.frame(age = seq(70, 85, by = 0.25), age_init = 70), predRE = predRE_ID3)
+```
+
+### Predictions of outcomes in their natural scale using predictYcond and predictYback
+
+Predictions of the outcomes can be directly computed for a latent process value. This is useful when nonlinear link functions are used in the models. This is obtained with function predictYcond. 
+
+When an outcome is transformed and the transformed values are then included in a hlme model, predictions in the natural scale of the outcome can be obtained using the predictYback function. Only marginal predictions can be obtained in this setting.
 

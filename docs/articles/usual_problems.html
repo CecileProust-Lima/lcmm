@@ -5,83 +5,67 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="lcmm">
 <title>Usual problems encountered when using lcmm package • lcmm</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Usual problems encountered when using lcmm package">
-<meta property="og:description" content="lcmm">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Usual problems encountered when using lcmm package">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-primary"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">lcmm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../articles/lcmm.html">GET STARTED</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../articles/lcmm.html">GET STARTED</a></li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-vignettes">VIGNETTES</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-vignettes">
-    <a class="dropdown-item" href="../articles/latent_class_model_with_hlme.html">How to estimate a latent class mixed model using hlme function</a>
-    <a class="dropdown-item" href="../articles/latent_process_model_with_lcmm.html">How to estimate a latent process mixed model using lcmm function</a>
-    <a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm.html">How to estimate a latent process mixed model for multivariate markers using multlcmm function</a>
-    <a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm_IRT.html">Continuous-time longitudinal IRT model</a>
-    <a class="dropdown-item" href="../articles/joint_latent_class_model_with_Jointlcmm.html">How to estimate a joint latent class mixed model using Jointlcmm function</a>
-    <a class="dropdown-item" href="../articles/multivariate_latent_class_model_with_mpjlcmm.html">How to estimate a multivariate latent class mixed model using mpjlcmm function</a>
-    <a class="dropdown-item" href="../articles/secondary_model_with_externVar.html">Accounting for latent class assignment uncertainty in subsequent analyses</a>
-    <a class="dropdown-item" href="../articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-vignettes" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">VIGNETTES</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-vignettes">
+<li><a class="dropdown-item" href="../articles/latent_class_model_with_hlme.html">How to estimate a latent class mixed model using hlme function</a></li>
+    <li><a class="dropdown-item" href="../articles/latent_process_model_with_lcmm.html">How to estimate a latent process mixed model using lcmm function</a></li>
+    <li><a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm.html">How to estimate a latent process mixed model for multivariate markers using multlcmm function</a></li>
+    <li><a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm_IRT.html">Continuous-time longitudinal IRT model</a></li>
+    <li><a class="dropdown-item" href="../articles/joint_latent_class_model_with_Jointlcmm.html">How to estimate a joint latent class mixed model using Jointlcmm function</a></li>
+    <li><a class="dropdown-item" href="../articles/multivariate_latent_class_model_with_mpjlcmm.html">How to estimate a multivariate latent class mixed model using mpjlcmm function</a></li>
+    <li><a class="dropdown-item" href="../articles/secondary_model_with_externVar.html">Accounting for latent class assignment uncertainty in subsequent analyses</a></li>
+    <li><a class="dropdown-item" href="../articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a></li>
+  </ul>
 </li>
-<li class="active nav-item">
-  <a class="nav-link" href="../articles/usual_problems.html">FAQ</a>
-</li>
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">REFERENCE</a>
-</li>
-<li class="nav-item">
-  <a class="nav-link" href="../news/index.html">CHANGELOG</a>
-</li>
+<li class="active nav-item"><a class="nav-link" href="../articles/usual_problems.html">FAQ</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">REFERENCE</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">CHANGELOG</a></li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/CecileProust-Lima/lcmm/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/CecileProust-Lima/lcmm/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
+
+
+
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Usual problems encountered when using lcmm package</h1>
+
+      <h1>Usual problems encountered when using lcmm package</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/CecileProust-Lima/lcmm/blob/HEAD/vignettes/usual_problems.Rmd" class="external-link"><code>vignettes/usual_problems.Rmd</code></a></small>
@@ -91,21 +75,49 @@
     
     
 <p> </p>
-<p>We list here some recurrent problems reported by users. Other issues, questions, concerns may have been reported in github: <a href="https://github.com/CecileProust-Lima/lcmm/issues/" class="external-link uri">https://github.com/CecileProust-Lima/lcmm/issues/</a> .</p>
-<p><strong>Please refer to github, both closed and opened issues, before sending any question. And please ask the questions via github only.</strong></p>
+<p>We list here some recurrent problems reported by users. Other issues,
+questions, concerns may have been reported in github: <a href="https://github.com/CecileProust-Lima/lcmm/issues/" class="external-link uri">https://github.com/CecileProust-Lima/lcmm/issues/</a> .</p>
+<p><strong>Please refer to github, both closed and opened issues, before
+sending any question. And please ask the questions via github
+only.</strong></p>
 <p> </p>
 <div class="section level2">
 <h2 id="why-my-model-did-not-converge">Why my model did not converge?<a class="anchor" aria-label="anchor" href="#why-my-model-did-not-converge"></a>
 </h2>
-<p>It sometimes happens that a model does not converge correctly. This is due most of the time to the very stringent criterion based on the “derivatives”. This criterion uses both the first derivatives and the inverse of the matrix of the second derivatives (Hessian). It ensures that the program converges at a maximum. When it can’t be computed correctly (most of the time because the Hessian is not definite positive), the program reports “second derivatives = 1”.</p>
-<p><strong>There are several reasons that may induce a non convergence, e.g.:</strong></p>
+<p>It sometimes happens that a model does not converge correctly. This
+is due most of the time to the very stringent criterion based on the
+“derivatives”. This criterion uses both the first derivatives and the
+inverse of the matrix of the second derivatives (Hessian). It ensures
+that the program converges at a maximum. When it can’t be computed
+correctly (most of the time because the Hessian is not definite
+positive), the program reports “second derivatives = 1”.</p>
+<p><strong>There are several reasons that may induce a non convergence,
+e.g.:</strong></p>
 <ol style="list-style-type: decimal">
-<li><p>When the time variable (or more generally a variable with random effects) is in a unit which induces too small associated parameters (for very small changes per day). In that case, changing the scale (for instance with months or years) may solve the problem.</p></li>
-<li><p>In models with splines in the link function (lcmm, multlcmm, Jointlcmm, mpjlcmm) or with splines in the baseline risk function (Jointlcmm, mpjlcmm), a parameter associated with splines very close to zero may prevent for correct convergence as it is at the border of the parameter space. In that case, this parameter can be fixed to 0 and convergence should be reached immediately.</p></li>
-<li>When the data are not rich enough and/or the model is too complicated. In that case, this is a problem of numerical non identifiability. There are not many solutions (other than simplifying the model) but some directions may be :
+<li><p>When the time variable (or more generally a variable with random
+effects) is in a unit which induces too small associated parameters (for
+very small changes per day). In that case, changing the scale (for
+instance with months or years) may solve the problem.</p></li>
+<li><p>In models with splines in the link function (lcmm, multlcmm,
+Jointlcmm, mpjlcmm) or with splines in the baseline risk function
+(Jointlcmm, mpjlcmm), a parameter associated with splines very close to
+zero may prevent for correct convergence as it is at the border of the
+parameter space. In that case, this parameter can be fixed to 0 and
+convergence should be reached immediately.</p></li>
+<li>
+<p>When the data are not rich enough and/or the model is too
+complicated. In that case, this is a problem of numerical non
+identifiability. There are not many solutions (other than simplifying
+the model) but some directions may be :</p>
 <ul>
-<li>Be patient, it happens that after some iterations the derivatives might be invertible and the model converges (you can change maxiter or rerun the program from the estimates at the non convergence point). But this is usually no necessary to specify more than 100 or 200 iterations. The iterative algorithm is used to converge in a few dozen of iterations.</li>
-<li>You can try to assume a less stringent threshold (e.g., 0.01) but be careful, convergence might be of lower quality.<br>
+<li>Be patient, it happens that after some iterations the derivatives
+might be invertible and the model converges (you can change maxiter or
+rerun the program from the estimates at the non convergence point). But
+this is usually no necessary to specify more than 100 or 200 iterations.
+The iterative algorithm is used to converge in a few dozen of
+iterations.</li>
+<li>You can try to assume a less stringent threshold (e.g., 0.01) but be
+careful, convergence might be of lower quality.<br>
 </li>
 <li>Run the model from different initial values.</li>
 </ul>
@@ -116,229 +128,283 @@
 <div class="section level2">
 <h2 id="how-to-choose-the-number-of-latent-classes">How to choose the number of latent classes?<a class="anchor" aria-label="anchor" href="#how-to-choose-the-number-of-latent-classes"></a>
 </h2>
-<p>Selection of the number of latent classes is a complex question. In some cases, the number is known. When not, different tools can be used to guide the decision:</p>
+<p>Selection of the number of latent classes is a complex question. In
+some cases, the number is known. When not, different tools can be used
+to guide the decision:</p>
 <ul>
 <li>Several statistical criteria such as BIC, SABIC, ICL or Entropy</li>
-<li>Statistical tests when available: score test for conditional independence in joint models</li>
-<li>Discrimination power as described by the classification table using the command postprob</li>
-<li>Size of the classes (we can consider that classes should be larger than 1% or 5% depending on the context)</li>
-<li>Clinical aspects and interpretation should also be taken into account</li>
+<li>Statistical tests when available: score test for conditional
+independence in joint models</li>
+<li>Discrimination power as described by the classification table using
+the command postprob</li>
+<li>Size of the classes (we can consider that classes should be larger
+than 1% or 5% depending on the context)</li>
+<li>Clinical aspects and interpretation should also be taken into
+account</li>
 </ul>
-<p>Finally, it can be useful to present and contrast models with different numbers of latent classes.</p>
-<p>The complexity of the selection of the optimal number of latent classes is illustrated in the <a href="latent_class_model_with_hlme.html">hlme vignette</a>. Indeed, all the criteria may not be concordant in practice.</p>
+<p>Finally, it can be useful to present and contrast models with
+different numbers of latent classes.</p>
+<p>The complexity of the selection of the optimal number of latent
+classes is illustrated in the <a href="latent_class_model_with_hlme.html">hlme vignette</a>. Indeed, all
+the criteria may not be concordant in practice.</p>
 <p> </p>
 </div>
 <div class="section level2">
 <h2 id="how-to-evaluate-the-quality-of-a-classification">How to evaluate the quality of a classification?<a class="anchor" aria-label="anchor" href="#how-to-evaluate-the-quality-of-a-classification"></a>
 </h2>
-<p>Good discrimination of classes is usually sought when fitting latent class mixed models. Discriminatory power can be assessed using the entropy criterion (provided in summarytable) but also using the classification table (with command postprob). The description of the classes may also help comprehend the latent class structure.</p>
-<p>(see <a href="latent_class_model_with_hlme.html">hlme vignette</a> for further details)</p>
+<p>Good discrimination of classes is usually sought when fitting latent
+class mixed models. Discriminatory power can be assessed using the
+entropy criterion (provided in summarytable) but also using the
+classification table (with command postprob). The description of the
+classes may also help comprehend the latent class structure.</p>
+<p>(see <a href="latent_class_model_with_hlme.html">hlme vignette</a>
+for further details)</p>
 <p> </p>
 </div>
 <div class="section level2">
 <h2 id="how-to-evaluate-the-fit-of-a-model">How to evaluate the fit of a model?<a class="anchor" aria-label="anchor" href="#how-to-evaluate-the-fit-of-a-model"></a>
 </h2>
-<p>Different techniques can be used in this package to evaluate the goodness of fit. As in mixed models, one can compare the subject-specific predictions with the observations or plot the subject-specific residuals.</p>
-<p>The comparison with more flexible models can also be useful (more flexible link functions, more flexible baseline risk functions, more flexible functions of time, etc.)</p>
+<p>Different techniques can be used in this package to evaluate the
+goodness of fit. As in mixed models, one can compare the
+subject-specific predictions with the observations or plot the
+subject-specific residuals.</p>
+<p>The comparison with more flexible models can also be useful (more
+flexible link functions, more flexible baseline risk functions, more
+flexible functions of time, etc.)</p>
 <p>Each vignette includes a section on the evaluation of the model.</p>
 <p> </p>
 </div>
 <div class="section level2">
 <h2 id="how-to-pre-normalize-a-variable-using-lcmm">How to pre-normalize a variable using lcmm?<a class="anchor" aria-label="anchor" href="#how-to-pre-normalize-a-variable-using-lcmm"></a>
 </h2>
-<p>This is detailed in <a href="pre_normalizing.html">vignette on pre-normalizing</a>.</p>
+<p>This is detailed in <a href="pre_normalizing.html">vignette on
+pre-normalizing</a>.</p>
 <p> </p>
 </div>
 <div class="section level2">
 <h2 id="how-to-change-the-latent-class-in-reference">How to change the latent class in reference?<a class="anchor" aria-label="anchor" href="#how-to-change-the-latent-class-in-reference"></a>
 </h2>
-<p>The order of the latent classes can be changed in any function (hlme, lcmm, Jointlcmm, mpjlcmm) using the permut function. Here is an example with the estimation of a two class linear mixed model:</p>
+<p>The order of the latent classes can be changed in any function (hlme,
+lcmm, Jointlcmm, mpjlcmm) using the permut function. Here is an example
+with the estimation of a two class linear mixed model:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mhlme</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hlme.html">hlme</a></span><span class="op">(</span><span class="va">IST</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age</span><span class="op">-</span><span class="va">age_init</span><span class="op">)</span>,random<span class="op">=</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age</span><span class="op">-</span><span class="va">age_init</span><span class="op">)</span>,subject<span class="op">=</span><span class="st">"ID"</span>,data<span class="op">=</span><span class="va">paquid</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span><span class="va">mhlme2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hlme.html">hlme</a></span><span class="op">(</span><span class="va">IST</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age</span><span class="op">-</span><span class="va">age_init</span><span class="op">)</span>,random<span class="op">=</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age</span><span class="op">-</span><span class="va">age_init</span><span class="op">)</span>,subject<span class="op">=</span><span class="st">"ID"</span>,data<span class="op">=</span><span class="va">paquid</span>,ng<span class="op">=</span><span class="fl">2</span>,</span>
 <span>               mixture<span class="op">=</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age</span><span class="op">-</span><span class="va">age_init</span><span class="op">)</span>,classmb <span class="op">=</span><span class="op">~</span> <span class="va">CEP</span> , B<span class="op">=</span><span class="fu">random</span><span class="op">(</span><span class="va">mhlme</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">summary</span>(mhlme2)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">Heterogenous linear mixed model </a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">     fitted by maximum likelihood method </a>
-<a class="sourceLine" id="cb2-4" data-line-number="4"> </a>
-<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="kw">hlme</span>(<span class="dt">fixed =</span> IST <span class="op">~</span><span class="st"> </span><span class="kw">I</span>(age <span class="op">-</span><span class="st"> </span>age_init), <span class="dt">mixture =</span> <span class="op">~</span><span class="kw">I</span>(age <span class="op">-</span><span class="st"> </span>age_init), </a>
-<a class="sourceLine" id="cb2-6" data-line-number="6">    <span class="dt">random =</span> <span class="op">~</span><span class="kw">I</span>(age <span class="op">-</span><span class="st"> </span>age_init), <span class="dt">subject =</span> <span class="st">"ID"</span>, <span class="dt">classmb =</span> <span class="op">~</span>CEP, </a>
-<a class="sourceLine" id="cb2-7" data-line-number="7">    <span class="dt">ng =</span> <span class="dv">2</span>, <span class="dt">data =</span> paquid)</a>
-<a class="sourceLine" id="cb2-8" data-line-number="8"> </a>
-<a class="sourceLine" id="cb2-9" data-line-number="9">Statistical Model<span class="op">:</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="st">     </span>Dataset<span class="op">:</span><span class="st"> </span>paquid </a>
-<a class="sourceLine" id="cb2-11" data-line-number="11">     Number of subjects<span class="op">:</span><span class="st"> </span><span class="dv">494</span> </a>
-<a class="sourceLine" id="cb2-12" data-line-number="12">     Number of observations<span class="op">:</span><span class="st"> </span><span class="dv">2052</span> </a>
-<a class="sourceLine" id="cb2-13" data-line-number="13">     Number of observations deleted<span class="op">:</span><span class="st"> </span><span class="dv">198</span> </a>
-<a class="sourceLine" id="cb2-14" data-line-number="14">     Number of latent classes<span class="op">:</span><span class="st"> </span><span class="dv">2</span> </a>
-<a class="sourceLine" id="cb2-15" data-line-number="15">     Number of parameters<span class="op">:</span><span class="st"> </span><span class="dv">10</span>  </a>
-<a class="sourceLine" id="cb2-16" data-line-number="16"> </a>
-<a class="sourceLine" id="cb2-17" data-line-number="17">Iteration process<span class="op">:</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="st">     </span>Convergence criteria satisfied </a>
-<a class="sourceLine" id="cb2-19" data-line-number="19">     Number of iterations<span class="op">:</span><span class="st">  </span><span class="dv">14</span> </a>
-<a class="sourceLine" id="cb2-20" data-line-number="20">     Convergence criteria<span class="op">:</span><span class="st"> </span>parameters=<span class="st"> </span><span class="fl">1.3e-07</span> </a>
-<a class="sourceLine" id="cb2-21" data-line-number="21">                         <span class="op">:</span><span class="st"> </span>likelihood=<span class="st"> </span><span class="fl">3.8e-08</span> </a>
-<a class="sourceLine" id="cb2-22" data-line-number="22">                         <span class="op">:</span><span class="st"> </span>second derivatives=<span class="st"> </span><span class="fl">1.1e-14</span> </a>
-<a class="sourceLine" id="cb2-23" data-line-number="23"> </a>
-<a class="sourceLine" id="cb2-24" data-line-number="24">Goodness<span class="op">-</span>of<span class="op">-</span>fit statistics<span class="op">:</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-25" data-line-number="25"><span class="st">     </span>maximum log<span class="op">-</span>likelihood<span class="op">:</span><span class="st"> </span><span class="fl">-6010.69</span>  </a>
-<a class="sourceLine" id="cb2-26" data-line-number="26">     AIC<span class="op">:</span><span class="st"> </span><span class="fl">12041.38</span>  </a>
-<a class="sourceLine" id="cb2-27" data-line-number="27">     BIC<span class="op">:</span><span class="st"> </span><span class="fl">12083.4</span>  </a>
-<a class="sourceLine" id="cb2-28" data-line-number="28"> </a>
-<a class="sourceLine" id="cb2-29" data-line-number="29"> </a>
-<a class="sourceLine" id="cb2-30" data-line-number="30">Maximum Likelihood Estimates<span class="op">:</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-31" data-line-number="31"><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-32" data-line-number="32">Fixed effects <span class="cf">in</span> the class<span class="op">-</span>membership model<span class="op">:</span></a>
-<a class="sourceLine" id="cb2-33" data-line-number="33">(the class of reference is the last class) </a>
-<a class="sourceLine" id="cb2-34" data-line-number="34"></a>
-<a class="sourceLine" id="cb2-35" data-line-number="35">                     coef      Se    Wald p<span class="op">-</span>value</a>
-<a class="sourceLine" id="cb2-36" data-line-number="36">intercept class1  <span class="fl">2.82685</span> <span class="fl">1.02219</span>   <span class="fl">2.765</span> <span class="fl">0.00568</span></a>
-<a class="sourceLine" id="cb2-37" data-line-number="37">CEP class1       <span class="fl">-3.37139</span> <span class="fl">1.00100</span>  <span class="fl">-3.368</span> <span class="fl">0.00076</span></a>
-<a class="sourceLine" id="cb2-38" data-line-number="38"></a>
-<a class="sourceLine" id="cb2-39" data-line-number="39">Fixed effects <span class="cf">in</span> the longitudinal model<span class="op">:</span></a>
-<a class="sourceLine" id="cb2-40" data-line-number="40"></a>
-<a class="sourceLine" id="cb2-41" data-line-number="41"><span class="st">                     </span>coef      Se    Wald p<span class="op">-</span>value</a>
-<a class="sourceLine" id="cb2-42" data-line-number="42">intercept class1 <span class="fl">25.54344</span> <span class="fl">0.49564</span>  <span class="fl">51.537</span> <span class="fl">0.00000</span></a>
-<a class="sourceLine" id="cb2-43" data-line-number="43">intercept class2 <span class="fl">32.93897</span> <span class="fl">0.54910</span>  <span class="fl">59.987</span> <span class="fl">0.00000</span></a>
-<a class="sourceLine" id="cb2-44" data-line-number="44"><span class="kw">I</span>(...) class1    <span class="fl">-0.51254</span> <span class="fl">0.05030</span> <span class="fl">-10.189</span> <span class="fl">0.00000</span></a>
-<a class="sourceLine" id="cb2-45" data-line-number="45"><span class="kw">I</span>(...) class2    <span class="fl">-0.57198</span> <span class="fl">0.04928</span> <span class="fl">-11.606</span> <span class="fl">0.00000</span></a>
-<a class="sourceLine" id="cb2-46" data-line-number="46"></a>
-<a class="sourceLine" id="cb2-47" data-line-number="47"></a>
-<a class="sourceLine" id="cb2-48" data-line-number="48">Variance<span class="op">-</span>covariance matrix of the random<span class="op">-</span>effects<span class="op">:</span></a>
-<a class="sourceLine" id="cb2-49" data-line-number="49"><span class="st">                  </span>intercept <span class="kw">I</span>(age <span class="op">-</span><span class="st"> </span>age_init)</a>
-<a class="sourceLine" id="cb2-50" data-line-number="50">intercept          <span class="fl">10.89147</span>                  </a>
-<a class="sourceLine" id="cb2-51" data-line-number="51"><span class="kw">I</span>(age <span class="op">-</span><span class="st"> </span>age_init)   <span class="fl">0.03929</span>           <span class="fl">0.09386</span></a>
-<a class="sourceLine" id="cb2-52" data-line-number="52"></a>
-<a class="sourceLine" id="cb2-53" data-line-number="53">                             coef      Se</a>
-<a class="sourceLine" id="cb2-54" data-line-number="54">Residual standard error<span class="op">:</span><span class="st">  </span><span class="fl">3.36817</span> <span class="fl">0.06757</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">summary</span>(mhlme2)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>Heterogenous linear mixed model </span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>     fitted by maximum likelihood method </span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a> </span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">hlme</span>(<span class="at">fixed =</span> IST <span class="sc">~</span> <span class="fu">I</span>(age <span class="sc">-</span> age_init), <span class="at">mixture =</span> <span class="sc">~</span><span class="fu">I</span>(age <span class="sc">-</span> age_init), </span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>    <span class="at">random =</span> <span class="sc">~</span><span class="fu">I</span>(age <span class="sc">-</span> age_init), <span class="at">subject =</span> <span class="st">"ID"</span>, <span class="at">classmb =</span> <span class="sc">~</span>CEP, </span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    <span class="at">ng =</span> <span class="dv">2</span>, <span class="at">data =</span> paquid)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a> </span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>Statistical Model<span class="sc">:</span> </span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>     Dataset<span class="sc">:</span> paquid </span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>     Number of subjects<span class="sc">:</span> <span class="dv">494</span> </span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>     Number of observations<span class="sc">:</span> <span class="dv">2052</span> </span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>     Number of observations deleted<span class="sc">:</span> <span class="dv">198</span> </span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>     Number of latent classes<span class="sc">:</span> <span class="dv">2</span> </span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>     Number of parameters<span class="sc">:</span> <span class="dv">10</span>  </span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a> </span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>Iteration process<span class="sc">:</span> </span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>     Convergence criteria satisfied </span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>     Number of iterations<span class="sc">:</span>  <span class="dv">14</span> </span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>     Convergence criteria<span class="sc">:</span> parameters<span class="ot">=</span> <span class="fl">2.3e-07</span> </span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>                         <span class="sc">:</span> likelihood<span class="ot">=</span> <span class="fl">5.5e-08</span> </span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>                         <span class="sc">:</span> second derivatives<span class="ot">=</span> <span class="fl">5.4e-14</span> </span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a> </span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>Goodness<span class="sc">-</span>of<span class="sc">-</span>fit statistics<span class="sc">:</span> </span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>     maximum log<span class="sc">-</span>likelihood<span class="sc">:</span> <span class="sc">-</span><span class="fl">6010.69</span>  </span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>     AIC<span class="sc">:</span> <span class="fl">12041.38</span>  </span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>     BIC<span class="sc">:</span> <span class="fl">12083.4</span>  </span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a> </span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a> </span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a>Maximum Likelihood Estimates<span class="sc">:</span> </span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a> </span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a>Fixed effects <span class="cf">in</span> the class<span class="sc">-</span>membership model<span class="sc">:</span></span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a>(the class of reference is the last class) </span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a>                     coef      Se    Wald p<span class="sc">-</span>value</span>
+<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a>intercept class1  <span class="fl">2.82685</span> <span class="fl">1.02234</span>   <span class="fl">2.765</span> <span class="fl">0.00569</span></span>
+<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a>CEP class1       <span class="sc">-</span><span class="fl">3.37139</span> <span class="fl">1.00111</span>  <span class="sc">-</span><span class="fl">3.368</span> <span class="fl">0.00076</span></span>
+<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a></span>
+<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a>Fixed effects <span class="cf">in</span> the longitudinal model<span class="sc">:</span></span>
+<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a></span>
+<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a>                     coef      Se    Wald p<span class="sc">-</span>value</span>
+<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a>intercept class1 <span class="fl">25.54344</span> <span class="fl">0.49563</span>  <span class="fl">51.537</span> <span class="fl">0.00000</span></span>
+<span id="cb2-43"><a href="#cb2-43" tabindex="-1"></a>intercept class2 <span class="fl">32.93897</span> <span class="fl">0.54896</span>  <span class="fl">60.003</span> <span class="fl">0.00000</span></span>
+<span id="cb2-44"><a href="#cb2-44" tabindex="-1"></a><span class="fu">I</span>(...) class1    <span class="sc">-</span><span class="fl">0.51254</span> <span class="fl">0.05028</span> <span class="sc">-</span><span class="fl">10.193</span> <span class="fl">0.00000</span></span>
+<span id="cb2-45"><a href="#cb2-45" tabindex="-1"></a><span class="fu">I</span>(...) class2    <span class="sc">-</span><span class="fl">0.57198</span> <span class="fl">0.04923</span> <span class="sc">-</span><span class="fl">11.618</span> <span class="fl">0.00000</span></span>
+<span id="cb2-46"><a href="#cb2-46" tabindex="-1"></a></span>
+<span id="cb2-47"><a href="#cb2-47" tabindex="-1"></a></span>
+<span id="cb2-48"><a href="#cb2-48" tabindex="-1"></a>Variance<span class="sc">-</span>covariance matrix of the random<span class="sc">-</span>effects<span class="sc">:</span></span>
+<span id="cb2-49"><a href="#cb2-49" tabindex="-1"></a>                  intercept <span class="fu">I</span>(age <span class="sc">-</span> age_init)</span>
+<span id="cb2-50"><a href="#cb2-50" tabindex="-1"></a>intercept          <span class="fl">10.89147</span>                  </span>
+<span id="cb2-51"><a href="#cb2-51" tabindex="-1"></a><span class="fu">I</span>(age <span class="sc">-</span> age_init)   <span class="fl">0.03929</span>           <span class="fl">0.09386</span></span>
+<span id="cb2-52"><a href="#cb2-52" tabindex="-1"></a></span>
+<span id="cb2-53"><a href="#cb2-53" tabindex="-1"></a>                             coef      Se</span>
+<span id="cb2-54"><a href="#cb2-54" tabindex="-1"></a>Residual standard error<span class="sc">:</span>  <span class="fl">3.36817</span> <span class="fl">0.06757</span></span></code></pre></div>
 <p>The order of the latent classes can be changed by running:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mhlme2perm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/permut.html">permut</a></span><span class="op">(</span><span class="va">mhlme2</span>, order<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">summary</span>(mhlme2)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">Heterogenous linear mixed model </a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">     fitted by maximum likelihood method </a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"> </a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="kw">hlme</span>(<span class="dt">fixed =</span> IST <span class="op">~</span><span class="st"> </span><span class="kw">I</span>(age <span class="op">-</span><span class="st"> </span>age_init), <span class="dt">mixture =</span> <span class="op">~</span><span class="kw">I</span>(age <span class="op">-</span><span class="st"> </span>age_init), </a>
-<a class="sourceLine" id="cb4-6" data-line-number="6">    <span class="dt">random =</span> <span class="op">~</span><span class="kw">I</span>(age <span class="op">-</span><span class="st"> </span>age_init), <span class="dt">subject =</span> <span class="st">"ID"</span>, <span class="dt">classmb =</span> <span class="op">~</span>CEP, </a>
-<a class="sourceLine" id="cb4-7" data-line-number="7">    <span class="dt">ng =</span> <span class="dv">2</span>, <span class="dt">data =</span> paquid)</a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"> </a>
-<a class="sourceLine" id="cb4-9" data-line-number="9">Statistical Model<span class="op">:</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="st">     </span>Dataset<span class="op">:</span><span class="st"> </span>paquid </a>
-<a class="sourceLine" id="cb4-11" data-line-number="11">     Number of subjects<span class="op">:</span><span class="st"> </span><span class="dv">494</span> </a>
-<a class="sourceLine" id="cb4-12" data-line-number="12">     Number of observations<span class="op">:</span><span class="st"> </span><span class="dv">2052</span> </a>
-<a class="sourceLine" id="cb4-13" data-line-number="13">     Number of observations deleted<span class="op">:</span><span class="st"> </span><span class="dv">198</span> </a>
-<a class="sourceLine" id="cb4-14" data-line-number="14">     Number of latent classes<span class="op">:</span><span class="st"> </span><span class="dv">2</span> </a>
-<a class="sourceLine" id="cb4-15" data-line-number="15">     Number of parameters<span class="op">:</span><span class="st"> </span><span class="dv">10</span>  </a>
-<a class="sourceLine" id="cb4-16" data-line-number="16"> </a>
-<a class="sourceLine" id="cb4-17" data-line-number="17">Iteration process<span class="op">:</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="st">     </span>Convergence criteria satisfied </a>
-<a class="sourceLine" id="cb4-19" data-line-number="19">     Number of iterations<span class="op">:</span><span class="st">  </span><span class="dv">14</span> </a>
-<a class="sourceLine" id="cb4-20" data-line-number="20">     Convergence criteria<span class="op">:</span><span class="st"> </span>parameters=<span class="st"> </span><span class="fl">1.3e-07</span> </a>
-<a class="sourceLine" id="cb4-21" data-line-number="21">                         <span class="op">:</span><span class="st"> </span>likelihood=<span class="st"> </span><span class="fl">3.8e-08</span> </a>
-<a class="sourceLine" id="cb4-22" data-line-number="22">                         <span class="op">:</span><span class="st"> </span>second derivatives=<span class="st"> </span><span class="fl">1.1e-14</span> </a>
-<a class="sourceLine" id="cb4-23" data-line-number="23"> </a>
-<a class="sourceLine" id="cb4-24" data-line-number="24">Goodness<span class="op">-</span>of<span class="op">-</span>fit statistics<span class="op">:</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-25" data-line-number="25"><span class="st">     </span>maximum log<span class="op">-</span>likelihood<span class="op">:</span><span class="st"> </span><span class="fl">-6010.69</span>  </a>
-<a class="sourceLine" id="cb4-26" data-line-number="26">     AIC<span class="op">:</span><span class="st"> </span><span class="fl">12041.38</span>  </a>
-<a class="sourceLine" id="cb4-27" data-line-number="27">     BIC<span class="op">:</span><span class="st"> </span><span class="fl">12083.4</span>  </a>
-<a class="sourceLine" id="cb4-28" data-line-number="28"> </a>
-<a class="sourceLine" id="cb4-29" data-line-number="29"> </a>
-<a class="sourceLine" id="cb4-30" data-line-number="30">Maximum Likelihood Estimates<span class="op">:</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-31" data-line-number="31"><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-32" data-line-number="32">Fixed effects <span class="cf">in</span> the class<span class="op">-</span>membership model<span class="op">:</span></a>
-<a class="sourceLine" id="cb4-33" data-line-number="33">(the class of reference is the last class) </a>
-<a class="sourceLine" id="cb4-34" data-line-number="34"></a>
-<a class="sourceLine" id="cb4-35" data-line-number="35">                     coef      Se    Wald p<span class="op">-</span>value</a>
-<a class="sourceLine" id="cb4-36" data-line-number="36">intercept class1  <span class="fl">2.82685</span> <span class="fl">1.02219</span>   <span class="fl">2.765</span> <span class="fl">0.00568</span></a>
-<a class="sourceLine" id="cb4-37" data-line-number="37">CEP class1       <span class="fl">-3.37139</span> <span class="fl">1.00100</span>  <span class="fl">-3.368</span> <span class="fl">0.00076</span></a>
-<a class="sourceLine" id="cb4-38" data-line-number="38"></a>
-<a class="sourceLine" id="cb4-39" data-line-number="39">Fixed effects <span class="cf">in</span> the longitudinal model<span class="op">:</span></a>
-<a class="sourceLine" id="cb4-40" data-line-number="40"></a>
-<a class="sourceLine" id="cb4-41" data-line-number="41"><span class="st">                     </span>coef      Se    Wald p<span class="op">-</span>value</a>
-<a class="sourceLine" id="cb4-42" data-line-number="42">intercept class1 <span class="fl">25.54344</span> <span class="fl">0.49564</span>  <span class="fl">51.537</span> <span class="fl">0.00000</span></a>
-<a class="sourceLine" id="cb4-43" data-line-number="43">intercept class2 <span class="fl">32.93897</span> <span class="fl">0.54910</span>  <span class="fl">59.987</span> <span class="fl">0.00000</span></a>
-<a class="sourceLine" id="cb4-44" data-line-number="44"><span class="kw">I</span>(...) class1    <span class="fl">-0.51254</span> <span class="fl">0.05030</span> <span class="fl">-10.189</span> <span class="fl">0.00000</span></a>
-<a class="sourceLine" id="cb4-45" data-line-number="45"><span class="kw">I</span>(...) class2    <span class="fl">-0.57198</span> <span class="fl">0.04928</span> <span class="fl">-11.606</span> <span class="fl">0.00000</span></a>
-<a class="sourceLine" id="cb4-46" data-line-number="46"></a>
-<a class="sourceLine" id="cb4-47" data-line-number="47"></a>
-<a class="sourceLine" id="cb4-48" data-line-number="48">Variance<span class="op">-</span>covariance matrix of the random<span class="op">-</span>effects<span class="op">:</span></a>
-<a class="sourceLine" id="cb4-49" data-line-number="49"><span class="st">                  </span>intercept <span class="kw">I</span>(age <span class="op">-</span><span class="st"> </span>age_init)</a>
-<a class="sourceLine" id="cb4-50" data-line-number="50">intercept          <span class="fl">10.89147</span>                  </a>
-<a class="sourceLine" id="cb4-51" data-line-number="51"><span class="kw">I</span>(age <span class="op">-</span><span class="st"> </span>age_init)   <span class="fl">0.03929</span>           <span class="fl">0.09386</span></a>
-<a class="sourceLine" id="cb4-52" data-line-number="52"></a>
-<a class="sourceLine" id="cb4-53" data-line-number="53">                             coef      Se</a>
-<a class="sourceLine" id="cb4-54" data-line-number="54">Residual standard error<span class="op">:</span><span class="st">  </span><span class="fl">3.36817</span> <span class="fl">0.06757</span></a></code></pre></div>
-<p>The models in objects mhlme2 and mhlme2perm are the same except for the permutation of the classes as shown with the cross-table:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">xclass</span>(mhlme2perm,mhlme2)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">   </a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">      <span class="dv">1</span>   <span class="dv">2</span></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4">  <span class="dv">1</span>   <span class="dv">0</span> <span class="dv">232</span></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5">  <span class="dv">2</span> <span class="dv">262</span>   <span class="dv">0</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">summary</span>(mhlme2)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>Heterogenous linear mixed model </span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>     fitted by maximum likelihood method </span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a> </span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="fu">hlme</span>(<span class="at">fixed =</span> IST <span class="sc">~</span> <span class="fu">I</span>(age <span class="sc">-</span> age_init), <span class="at">mixture =</span> <span class="sc">~</span><span class="fu">I</span>(age <span class="sc">-</span> age_init), </span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>    <span class="at">random =</span> <span class="sc">~</span><span class="fu">I</span>(age <span class="sc">-</span> age_init), <span class="at">subject =</span> <span class="st">"ID"</span>, <span class="at">classmb =</span> <span class="sc">~</span>CEP, </span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>    <span class="at">ng =</span> <span class="dv">2</span>, <span class="at">data =</span> paquid)</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a> </span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>Statistical Model<span class="sc">:</span> </span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>     Dataset<span class="sc">:</span> paquid </span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>     Number of subjects<span class="sc">:</span> <span class="dv">494</span> </span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>     Number of observations<span class="sc">:</span> <span class="dv">2052</span> </span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>     Number of observations deleted<span class="sc">:</span> <span class="dv">198</span> </span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>     Number of latent classes<span class="sc">:</span> <span class="dv">2</span> </span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>     Number of parameters<span class="sc">:</span> <span class="dv">10</span>  </span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a> </span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>Iteration process<span class="sc">:</span> </span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>     Convergence criteria satisfied </span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>     Number of iterations<span class="sc">:</span>  <span class="dv">14</span> </span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>     Convergence criteria<span class="sc">:</span> parameters<span class="ot">=</span> <span class="fl">2.3e-07</span> </span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>                         <span class="sc">:</span> likelihood<span class="ot">=</span> <span class="fl">5.5e-08</span> </span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>                         <span class="sc">:</span> second derivatives<span class="ot">=</span> <span class="fl">5.4e-14</span> </span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a> </span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>Goodness<span class="sc">-</span>of<span class="sc">-</span>fit statistics<span class="sc">:</span> </span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>     maximum log<span class="sc">-</span>likelihood<span class="sc">:</span> <span class="sc">-</span><span class="fl">6010.69</span>  </span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>     AIC<span class="sc">:</span> <span class="fl">12041.38</span>  </span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a>     BIC<span class="sc">:</span> <span class="fl">12083.4</span>  </span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a> </span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a> </span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a>Maximum Likelihood Estimates<span class="sc">:</span> </span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a> </span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a>Fixed effects <span class="cf">in</span> the class<span class="sc">-</span>membership model<span class="sc">:</span></span>
+<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a>(the class of reference is the last class) </span>
+<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a>                     coef      Se    Wald p<span class="sc">-</span>value</span>
+<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a>intercept class1  <span class="fl">2.82685</span> <span class="fl">1.02234</span>   <span class="fl">2.765</span> <span class="fl">0.00569</span></span>
+<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a>CEP class1       <span class="sc">-</span><span class="fl">3.37139</span> <span class="fl">1.00111</span>  <span class="sc">-</span><span class="fl">3.368</span> <span class="fl">0.00076</span></span>
+<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a></span>
+<span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a>Fixed effects <span class="cf">in</span> the longitudinal model<span class="sc">:</span></span>
+<span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a></span>
+<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a>                     coef      Se    Wald p<span class="sc">-</span>value</span>
+<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a>intercept class1 <span class="fl">25.54344</span> <span class="fl">0.49563</span>  <span class="fl">51.537</span> <span class="fl">0.00000</span></span>
+<span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a>intercept class2 <span class="fl">32.93897</span> <span class="fl">0.54896</span>  <span class="fl">60.003</span> <span class="fl">0.00000</span></span>
+<span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a><span class="fu">I</span>(...) class1    <span class="sc">-</span><span class="fl">0.51254</span> <span class="fl">0.05028</span> <span class="sc">-</span><span class="fl">10.193</span> <span class="fl">0.00000</span></span>
+<span id="cb4-45"><a href="#cb4-45" tabindex="-1"></a><span class="fu">I</span>(...) class2    <span class="sc">-</span><span class="fl">0.57198</span> <span class="fl">0.04923</span> <span class="sc">-</span><span class="fl">11.618</span> <span class="fl">0.00000</span></span>
+<span id="cb4-46"><a href="#cb4-46" tabindex="-1"></a></span>
+<span id="cb4-47"><a href="#cb4-47" tabindex="-1"></a></span>
+<span id="cb4-48"><a href="#cb4-48" tabindex="-1"></a>Variance<span class="sc">-</span>covariance matrix of the random<span class="sc">-</span>effects<span class="sc">:</span></span>
+<span id="cb4-49"><a href="#cb4-49" tabindex="-1"></a>                  intercept <span class="fu">I</span>(age <span class="sc">-</span> age_init)</span>
+<span id="cb4-50"><a href="#cb4-50" tabindex="-1"></a>intercept          <span class="fl">10.89147</span>                  </span>
+<span id="cb4-51"><a href="#cb4-51" tabindex="-1"></a><span class="fu">I</span>(age <span class="sc">-</span> age_init)   <span class="fl">0.03929</span>           <span class="fl">0.09386</span></span>
+<span id="cb4-52"><a href="#cb4-52" tabindex="-1"></a></span>
+<span id="cb4-53"><a href="#cb4-53" tabindex="-1"></a>                             coef      Se</span>
+<span id="cb4-54"><a href="#cb4-54" tabindex="-1"></a>Residual standard error<span class="sc">:</span>  <span class="fl">3.36817</span> <span class="fl">0.06757</span></span></code></pre></div>
+<p>The models in objects mhlme2 and mhlme2perm are the same except for
+the permutation of the classes as shown with the cross-table:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">xclass</span>(mhlme2perm,mhlme2)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>   </span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>      <span class="dv">1</span>   <span class="dv">2</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="dv">1</span>   <span class="dv">0</span> <span class="dv">232</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="dv">2</span> <span class="dv">262</span>   <span class="dv">0</span></span></code></pre></div>
 <p> </p>
 </div>
 <div class="section level2">
 <h2 id="how-to-make-predictions-on-external-data">How to make predictions on external data?<a class="anchor" aria-label="anchor" href="#how-to-make-predictions-on-external-data"></a>
 </h2>
-<p>An object stemmed from a estimation function of lcmm package (hlme, lcmm, Jointlcmm, mpjlcmm) provides predictions on the data on which the model was estimated.</p>
-<p>Different functions allows the same type of computations but on external data:</p>
+<p>An object stemmed from a estimation function of lcmm package (hlme,
+lcmm, Jointlcmm, mpjlcmm) provides predictions on the data on which the
+model was estimated.</p>
+<p>Different functions allows the same type of computations but on
+external data:</p>
 <div class="section level4">
 <h4 id="classification-with-predictclass">Classification with PredictClass<a class="anchor" aria-label="anchor" href="#classification-with-predictclass"></a>
 </h4>
-<p>predictClass function computes the posterior classification and the posterior class-membership probabilities from any latent class model estimated in package lcmm.</p>
-<p>For instance, using the 2-class model estimated above, the posterior probabilities and classification can be computed for the newdata, here the data of the second subject of paquid dataset:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">predictClass</span>(mhlme2, <span class="dt">newdata=</span>paquid[<span class="dv">2</span><span class="op">:</span><span class="dv">6</span>,])</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">  ID class     prob1     prob2</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="dv">1</span>  <span class="dv">2</span>     <span class="dv">1</span> <span class="fl">0.5508846</span> <span class="fl">0.4491154</span></a></code></pre></div>
+<p>predictClass function computes the posterior classification and the
+posterior class-membership probabilities from any latent class model
+estimated in package lcmm.</p>
+<p>For instance, using the 2-class model estimated above, the posterior
+probabilities and classification can be computed for the newdata, here
+the data of the second subject of paquid dataset:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">predictClass</span>(mhlme2, <span class="at">newdata=</span>paquid[<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>,])</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  ID class     prob1     prob2</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="dv">1</span>  <span class="dv">2</span>     <span class="dv">1</span> <span class="fl">0.5508846</span> <span class="fl">0.4491154</span></span></code></pre></div>
 <p> </p>
 </div>
 <div class="section level4">
 <h4 id="random-effects-with-predictre">Random-effects with predictRE<a class="anchor" aria-label="anchor" href="#random-effects-with-predictre"></a>
 </h4>
-<p>predictRE function computes the predicted random-effects of any model estimated within lcmm package for a new subject whose data (i.e., covariates and outcomes) are provided in newdata:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">predictRE</span>(mhlme2, <span class="dt">newdata=</span>paquid[<span class="dv">2</span><span class="op">:</span><span class="dv">6</span>,])</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">  ID  intercept <span class="kw">I</span>(age <span class="op">-</span><span class="st"> </span>age_init)</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="dv">6</span>  <span class="dv">2</span> <span class="fl">-0.9514829</span>       <span class="fl">-0.07391964</span></a></code></pre></div>
+<p>predictRE function computes the predicted random-effects of any model
+estimated within lcmm package for a new subject whose data (i.e.,
+covariates and outcomes) are provided in newdata:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">predictRE</span>(mhlme2, <span class="at">newdata=</span>paquid[<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>,])</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  ID  intercept <span class="fu">I</span>(age <span class="sc">-</span> age_init)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="dv">6</span>  <span class="dv">2</span> <span class="sc">-</span><span class="fl">0.9514829</span>       <span class="sc">-</span><span class="fl">0.07391964</span></span></code></pre></div>
+<p>By default, the random-effects are aggregated over the latent classes
+(by a weighted sum using the posterior probabilities). The argument
+classpredRE = TRUE can be used to get class-specific random-effects:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">predictRE</span>(mhlme2, <span class="at">newdata=</span>paquid[<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>,], <span class="at">classpredRE =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  ID class intercept <span class="fu">I</span>(age <span class="sc">-</span> age_init)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="dv">1</span>  <span class="dv">2</span>     <span class="dv">1</span>  <span class="fl">1.263606</span>        <span class="sc">-</span><span class="fl">0.0378250</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="dv">2</span>  <span class="dv">2</span>     <span class="dv">2</span> <span class="sc">-</span><span class="fl">3.668510</span>        <span class="sc">-</span><span class="fl">0.1181933</span></span></code></pre></div>
 <p> </p>
 </div>
 <div class="section level4">
-<h4 id="predictions-of-outcomes-in-their-natural-scale-using-predicty-and-predictycond">Predictions of outcomes in their natural scale using predictY and predictYcond<a class="anchor" aria-label="anchor" href="#predictions-of-outcomes-in-their-natural-scale-using-predicty-and-predictycond"></a>
+<h4 id="subject-specific-predictions-using-predicty-or-predictl">Subject-specific predictions using predictY or predictL<a class="anchor" aria-label="anchor" href="#subject-specific-predictions-using-predicty-or-predictl"></a>
 </h4>
-<p>predictY function provides by default the mean outcome value predicted for a profile of covariates (provided in newdata). This prediction (with marg=TRUE by default) is a marginal prediction.</p>
-<p>Subject-specific predictions can be obtained only for hlme right now. In that case, it should be indicated option marg=FALSE and newdata should include the outcome data so that the predicted random-effects can be included.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">predss &lt;-<span class="st"> </span><span class="kw">predictY</span>(mhlme2, paquid[<span class="dv">2</span><span class="op">:</span><span class="dv">6</span>,], <span class="dt">marg=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2">predss<span class="op">$</span>pred</a>
-<a class="sourceLine" id="cb8-3" data-line-number="3">  ID  pred_ss pred_ss1 pred_ss2</a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="dv">2</span>  <span class="dv">2</span> <span class="fl">27.25200</span> <span class="fl">26.21337</span> <span class="fl">28.52597</span></a>
-<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="dv">3</span>  <span class="dv">2</span> <span class="fl">25.96443</span> <span class="fl">25.05767</span> <span class="fl">27.07667</span></a>
-<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="dv">4</span>  <span class="dv">2</span> <span class="fl">23.07531</span> <span class="fl">22.46442</span> <span class="fl">23.82463</span></a>
-<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="dv">5</span>  <span class="dv">2</span> <span class="fl">16.73827</span> <span class="fl">16.77635</span> <span class="fl">16.69156</span></a>
-<a class="sourceLine" id="cb8-8" data-line-number="8"><span class="dv">6</span>  <span class="dv">2</span> <span class="fl">14.93028</span> <span class="fl">15.15351</span> <span class="fl">14.65646</span></a></code></pre></div>
-<p>Predictions of the outcomes can also be directly computed for a latent process value. This is useful when nonlinear link functions are used in the models. This is obtained with function predictYcond.</p>
+<p>For hlme models and Jointlcmm models without link function,
+subject-specific predictions can be obtained using predictY. This
+requires a first call to predictRE with classpredRE = TRUE to get the
+individual random-effects, which can then be passed to the predictY
+function using option predRE.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">predRE_ID2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predictRE.html">predictRE</a></span><span class="op">(</span><span class="va">mhlme2</span>, <span class="va">paquid</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">6</span>,<span class="op">]</span>, classpredRE <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/predictY.html">predictY</a></span><span class="op">(</span><span class="va">mhlme2</span>, newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">70</span>, <span class="fl">85</span>, by <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span>, age_init <span class="op">=</span> <span class="fl">70</span>, CEP <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>, predRE <span class="op">=</span> <span class="va">predRE_ID2</span><span class="op">)</span></span></code></pre></div>
+<p>For model defining a latent process (lcmm, multlcmm, Jointlcmm with a
+link function), subject-specific predictions can be obtained in latent
+process scale using predictL.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mlcmm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lcmm.html">lcmm</a></span><span class="op">(</span><span class="va">CESD</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age</span> <span class="op">-</span> <span class="va">age_init</span><span class="op">)</span>, random <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age</span> <span class="op">-</span> <span class="va">age_init</span><span class="op">)</span>, subject <span class="op">=</span> <span class="st">'ID'</span>, data <span class="op">=</span> <span class="va">paquid</span>, link <span class="op">=</span> <span class="st">'5-quant-splines'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">predRE_ID3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predictRE.html">predictRE</a></span><span class="op">(</span><span class="va">mlcmm</span>, <span class="va">paquid</span><span class="op">[</span><span class="fl">7</span><span class="op">:</span><span class="fl">8</span>,<span class="op">]</span>, classpredRE <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/predictL.html">predictL</a></span><span class="op">(</span><span class="va">mlcmm</span>, newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">70</span>, <span class="fl">85</span>, by <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span>, age_init <span class="op">=</span> <span class="fl">70</span><span class="op">)</span>, predRE <span class="op">=</span> <span class="va">predRE_ID3</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="predictions-of-outcomes-in-their-natural-scale-using-predictycond-and-predictyback">Predictions of outcomes in their natural scale using predictYcond
+and predictYback<a class="anchor" aria-label="anchor" href="#predictions-of-outcomes-in-their-natural-scale-using-predictycond-and-predictyback"></a>
+</h4>
+<p>Predictions of the outcomes can be directly computed for a latent
+process value. This is useful when nonlinear link functions are used in
+the models. This is obtained with function predictYcond.</p>
+<p>When an outcome is transformed and the transformed values are then
+included in a hlme model, predictions in the natural scale of the
+outcome can be obtained using the predictYback function. Only marginal
+predictions can be obtained in this setting.</p>
 </div>
 </div>
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p>
-<p>Developed by Cecile Proust-Lima, Viviane Philipps.</p>
+  <p>Developed by Cecile Proust-Lima, Viviane Philipps.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.9000.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>

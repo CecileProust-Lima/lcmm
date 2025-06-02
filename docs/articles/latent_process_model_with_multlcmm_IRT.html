@@ -5,83 +5,67 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="lcmm">
 <title>Continuous-time longitudinal IRT model • lcmm</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Continuous-time longitudinal IRT model">
-<meta property="og:description" content="lcmm">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Continuous-time longitudinal IRT model">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-primary"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">lcmm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../articles/lcmm.html">GET STARTED</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../articles/lcmm.html">GET STARTED</a></li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-vignettes">VIGNETTES</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-vignettes">
-    <a class="dropdown-item" href="../articles/latent_class_model_with_hlme.html">How to estimate a latent class mixed model using hlme function</a>
-    <a class="dropdown-item" href="../articles/latent_process_model_with_lcmm.html">How to estimate a latent process mixed model using lcmm function</a>
-    <a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm.html">How to estimate a latent process mixed model for multivariate markers using multlcmm function</a>
-    <a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm_IRT.html">Continuous-time longitudinal IRT model</a>
-    <a class="dropdown-item" href="../articles/joint_latent_class_model_with_Jointlcmm.html">How to estimate a joint latent class mixed model using Jointlcmm function</a>
-    <a class="dropdown-item" href="../articles/multivariate_latent_class_model_with_mpjlcmm.html">How to estimate a multivariate latent class mixed model using mpjlcmm function</a>
-    <a class="dropdown-item" href="../articles/secondary_model_with_externVar.html">Accounting for latent class assignment uncertainty in subsequent analyses</a>
-    <a class="dropdown-item" href="../articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-vignettes" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">VIGNETTES</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-vignettes">
+<li><a class="dropdown-item" href="../articles/latent_class_model_with_hlme.html">How to estimate a latent class mixed model using hlme function</a></li>
+    <li><a class="dropdown-item" href="../articles/latent_process_model_with_lcmm.html">How to estimate a latent process mixed model using lcmm function</a></li>
+    <li><a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm.html">How to estimate a latent process mixed model for multivariate markers using multlcmm function</a></li>
+    <li><a class="dropdown-item" href="../articles/latent_process_model_with_multlcmm_IRT.html">Continuous-time longitudinal IRT model</a></li>
+    <li><a class="dropdown-item" href="../articles/joint_latent_class_model_with_Jointlcmm.html">How to estimate a joint latent class mixed model using Jointlcmm function</a></li>
+    <li><a class="dropdown-item" href="../articles/multivariate_latent_class_model_with_mpjlcmm.html">How to estimate a multivariate latent class mixed model using mpjlcmm function</a></li>
+    <li><a class="dropdown-item" href="../articles/secondary_model_with_externVar.html">Accounting for latent class assignment uncertainty in subsequent analyses</a></li>
+    <li><a class="dropdown-item" href="../articles/pre_normalizing.html">Pre-normalizing a dependent variable using lcmm</a></li>
+  </ul>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../articles/usual_problems.html">FAQ</a>
-</li>
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">REFERENCE</a>
-</li>
-<li class="nav-item">
-  <a class="nav-link" href="../news/index.html">CHANGELOG</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../articles/usual_problems.html">FAQ</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">REFERENCE</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">CHANGELOG</a></li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/CecileProust-Lima/lcmm/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/CecileProust-Lima/lcmm/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
+
+
+
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Continuous-time longitudinal IRT model</h1>
+
+      <h1>Continuous-time longitudinal IRT model</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/CecileProust-Lima/lcmm/blob/HEAD/vignettes/latent_process_model_with_multlcmm_IRT.Rmd" class="external-link"><code>vignettes/latent_process_model_with_multlcmm_IRT.Rmd</code></a></small>
@@ -90,11 +74,18 @@
 
     
     
-<p>This vignette illustrates how to estimate a longitudinal IRT following the methodology described in Proust-Lima et al. (2022 - <a href="https://doi.org/10.1016/j.ymeth.2022.01.005" class="external-link uri">https://doi.org/10.1016/j.ymeth.2022.01.005</a>). The model combines a graded response measurement model to link a series of binary or ordinal items measured repeatedly over time with their underlying latent process. Simultaneously, a linear mixed model describes the trajectory of the underlying latent process over time.</p>
+<p>This vignette illustrates how to estimate a longitudinal IRT
+following the methodology described in Proust-Lima et al. (2022 - <a href="https://doi.org/10.1016/j.ymeth.2022.01.005" class="external-link uri">https://doi.org/10.1016/j.ymeth.2022.01.005</a>). The model
+combines a graded response measurement model to link a series of binary
+or ordinal items measured repeatedly over time with their underlying
+latent process. Simultaneously, a linear mixed model describes the
+trajectory of the underlying latent process over time.</p>
 <div class="section level2">
 <h2 id="importation">Importation<a class="anchor" aria-label="anchor" href="#importation"></a>
 </h2>
-<p>The longitudinal IRT model is estimated via multlcmm function of lcmm R package (Proust-Lima et al. 2017). The following libraries are used in this vignette:</p>
+<p>The longitudinal IRT model is estimated via multlcmm function of lcmm
+R package (Proust-Lima et al. 2017). The following libraries are used in
+this vignette:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cecileproust-lima.github.io/lcmm/" class="external-link">lcmm</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
@@ -106,15 +97,19 @@
 <div class="section level2">
 <h2 id="dataset">Dataset<a class="anchor" aria-label="anchor" href="#dataset"></a>
 </h2>
-<p>The illustration is on a simulated dataset that mimics the PREDIALA study described and analyzed in Proust-Lima et al. (2021). The dataset is called simdataIRT. It contains the following information:</p>
+<p>The illustration is on a simulated dataset that mimics the PREDIALA
+study described and analyzed in Proust-Lima et al. (2021). The dataset
+is called simdataIRT. It contains the following information:</p>
 <ul>
 <li>grp: group with 0=dialyzed and 1=preemptive</li>
 <li>sex: sex with 0=woman and 1=man</li>
 <li>age: age at entry in the cohort</li>
 <li>hads_2 … hads_14 : 7 items of HADS measuring depression</li>
 <li>ID: identification number of the patient</li>
-<li>time: time of measurement (months since entry on the waiting list)</li>
-<li>time_entry: time on the waiting list at entry in the cohort (in months)</li>
+<li>time: time of measurement (months since entry on the waiting
+list)</li>
+<li>time_entry: time on the waiting list at entry in the cohort (in
+months)</li>
 </ul>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">simdataHADS</span><span class="op">)</span></span>
@@ -171,25 +166,36 @@
 <div class="section level3">
 <h3 id="timescale-of-interest-time-on-the-waiting-list">Timescale of interest: time on the waiting list<a class="anchor" aria-label="anchor" href="#timescale-of-interest-time-on-the-waiting-list"></a>
 </h3>
-<p>The timescale of interest is the time in months spent on the waiting list: time. This timescale poses two problems:</p>
+<p>The timescale of interest is the time in months spent on the waiting
+list: time. This timescale poses two problems:</p>
 <ul>
-<li><p>As in many studies, entry in the study occurs for each individual at different timings in the progression of the disease. this is called delayed entry. It differs from the usual time in the study where entry corresponds to time 0. Here entry (variable time_entry) corresponds to the duration on the waiting list at inclusion, and time 0 is unlikely observed (i.e., entry in the cohort does not occur as the same time as entry on waiting list).</p></li>
-<li><p>The timescale is continuous per se, with as many values as the number of total observations. This prevents the use of methods considering discrete timescales with measurements at the same times for all the individuals, such as classical longitudinal latent variable models.</p></li>
+<li><p>As in many studies, entry in the study occurs for each individual
+at different timings in the progression of the disease. this is called
+delayed entry. It differs from the usual time in the study where entry
+corresponds to time 0. Here entry (variable time_entry) corresponds to
+the duration on the waiting list at inclusion, and time 0 is unlikely
+observed (i.e., entry in the cohort does not occur as the same time as
+entry on waiting list).</p></li>
+<li><p>The timescale is continuous per se, with as many values as the
+number of total observations. This prevents the use of methods
+considering discrete timescales with measurements at the same times for
+all the individuals, such as classical longitudinal latent variable
+models.</p></li>
 </ul>
 <p>Distribution of the time at entry and time at follow_ups</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">tempSim &lt;-<span class="st"> </span>simdataHADS <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(ID) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">arrange</span>(time) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">Visit=</span><span class="kw">ifelse</span>(time<span class="op">==</span>time_entry,<span class="st">"Entry"</span>,<span class="st">"Follow-up"</span>))</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(tempSim, <span class="kw">aes</span>(<span class="dt">x=</span>time,<span class="dt">fill=</span>Visit,<span class="dt">color=</span>Visit)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">binwidth=</span><span class="dv">1</span>,<span class="kw">aes</span>(<span class="dt">y=</span>..density..)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x=</span><span class="st">"Months on the waiting list"</span>)</a>
-<a class="sourceLine" id="cb4-5" data-line-number="5">p <span class="op">+</span><span class="st"> </span><span class="kw">scale_color_grey</span>(<span class="dt">start =</span> <span class="fl">0.1</span>,</a>
-<a class="sourceLine" id="cb4-6" data-line-number="6">  <span class="dt">end =</span> <span class="fl">0.5</span>)<span class="op">+</span><span class="kw">scale_fill_grey</span>(<span class="dt">start =</span> <span class="fl">0.1</span>,</a>
-<a class="sourceLine" id="cb4-7" data-line-number="7">  <span class="dt">end =</span> <span class="fl">0.5</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="st">  </span><span class="kw">theme_classic</span>()</a>
-<a class="sourceLine" id="cb4-9" data-line-number="9">Warning<span class="op">:</span><span class="st"> </span> [1m [22mThe dot<span class="op">-</span>dot <span class="kw">notation</span> (<span class="st">`</span><span class="dt">..density..</span><span class="st">`</span>) was deprecated <span class="cf">in</span> ggplot2 <span class="dv">3</span>.<span class="dv">4</span>.<span class="fl">0.</span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"> [36mℹ [39m Please use <span class="st">`</span><span class="dt">after_stat(density)</span><span class="st">`</span> instead.</a>
-<a class="sourceLine" id="cb4-11" data-line-number="11"> [90mThis warning is displayed once every <span class="dv">8</span> hours. [39m</a>
-<a class="sourceLine" id="cb4-12" data-line-number="12"> [90mCall <span class="st">`</span><span class="dt">lifecycle::last_lifecycle_warnings()</span><span class="st">`</span> to see where this warning was [39m</a>
-<a class="sourceLine" id="cb4-13" data-line-number="13"> [90mgenerated. [39m</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>tempSim <span class="ot">&lt;-</span> simdataHADS <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(ID) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(time) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Visit=</span><span class="fu">ifelse</span>(time<span class="sc">==</span>time_entry,<span class="st">"Entry"</span>,<span class="st">"Follow-up"</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(tempSim, <span class="fu">aes</span>(<span class="at">x=</span>time,<span class="at">fill=</span>Visit,<span class="at">color=</span>Visit)) <span class="sc">+</span> <span class="fu">geom_histogram</span>(<span class="at">binwidth=</span><span class="dv">1</span>,<span class="fu">aes</span>(<span class="at">y=</span>..density..)) <span class="sc">+</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Months on the waiting list"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">scale_color_grey</span>(<span class="at">start =</span> <span class="fl">0.1</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="at">end =</span> <span class="fl">0.5</span>)<span class="sc">+</span><span class="fu">scale_fill_grey</span>(<span class="at">start =</span> <span class="fl">0.1</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="at">end =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>Warning<span class="sc">:</span>  [<span class="dv">1</span>m [<span class="dv">22</span>mThe dot<span class="sc">-</span>dot <span class="fu">notation</span> (<span class="st">`</span><span class="at">..density..</span><span class="st">`</span>) was deprecated <span class="cf">in</span> ggplot2 <span class="dv">3</span>.<span class="dv">4</span>.<span class="fl">0.</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a> [<span class="dv">36</span>mℹ [<span class="dv">39</span>m Please use <span class="st">`</span><span class="at">after_stat(density)</span><span class="st">`</span> instead.</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a> [<span class="dv">90</span>mThis warning is displayed once every <span class="dv">8</span> hours. [<span class="dv">39</span>m</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a> [<span class="dv">90</span>mCall <span class="st">`</span><span class="at">lifecycle::last_lifecycle_warnings()</span><span class="st">`</span> to see where this warning was [<span class="dv">39</span>m</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a> [<span class="dv">90</span>mgenerated. [<span class="dv">39</span>m</span></code></pre></div>
 <p><img src="latent_process_model_with_multlcmm_IRT_files/figure-html/unnamed-chunk-5-1.png" width="576"></p>
 <p>Quantiles of the distribution of measurement times</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -203,11 +209,23 @@
 <div class="section level2">
 <h2 id="continuous-time-longitudinal-irt-model-estimation">Continuous-time longitudinal IRT model estimation<a class="anchor" aria-label="anchor" href="#continuous-time-longitudinal-irt-model-estimation"></a>
 </h2>
-<p>We consider here a longitudinal IRT model with natural cubic splines on time on the waiting list to account for a possible nonlinear trajectory over time, and we adjust the trajectory for the group. We consider 2 internal knots placed at 7 and 15, and shift the right boundary at 60 due to the long tail of the distribution. In the main analysis, we estimate a model with no differential item functioning (DIF) on the group and no response shift (RS) on time.</p>
+<p>We consider here a longitudinal IRT model with natural cubic splines
+on time on the waiting list to account for a possible nonlinear
+trajectory over time, and we adjust the trajectory for the group. We
+consider 2 internal knots placed at 7 and 15, and shift the right
+boundary at 60 due to the long tail of the distribution. In the main
+analysis, we estimate a model with no differential item functioning
+(DIF) on the group and no response shift (RS) on time.</p>
 <div class="section level3">
 <h3 id="estimation-of-the-model-with-no-difrs">Estimation of the model with no DIF/RS<a class="anchor" aria-label="anchor" href="#estimation-of-the-model-with-no-difrs"></a>
 </h3>
-<p>To reduce the computation time, we first estimate a model with only 1 random-effect, a random intercept. And then, we use the estimates as initial values for the estimation of the model that also includes random-effects on the time functions. Estimation involves a numerical integration approximated by quasi Monte-Carlo (QMC) with 1000 points. This induces very intensive and long computations but was shown to give accurate results in simulations.</p>
+<p>To reduce the computation time, we first estimate a model with only 1
+random-effect, a random intercept. And then, we use the estimates as
+initial values for the estimation of the model that also includes
+random-effects on the time functions. Estimation involves a numerical
+integration approximated by quasi Monte-Carlo (QMC) with 1000 points.
+This induces very intensive and long computations but was shown to give
+accurate results in simulations.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modIRT_i</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multlcmm.html">multlcmm</a></span><span class="op">(</span><span class="va">hads_2</span> <span class="op">+</span> <span class="va">hads_4</span> <span class="op">+</span><span class="va">hads_6</span> <span class="op">+</span> <span class="va">hads_8</span> <span class="op">+</span><span class="va">hads_10</span><span class="op">+</span><span class="va">hads_12</span> <span class="op">+</span> <span class="va">hads_14</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/splines/ns.html" class="external-link">ns</a></span><span class="op">(</span><span class="va">time</span>,knots<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>,<span class="fl">15</span><span class="op">)</span>,Boundary.knots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">60</span><span class="op">)</span><span class="op">)</span><span class="op">*</span><span class="va">grp</span>,random<span class="op">=</span><span class="op">~</span><span class="fl">1</span>,data<span class="op">=</span><span class="va">simdataHADS</span>,subject<span class="op">=</span><span class="st">"ID"</span>,link<span class="op">=</span><span class="st">"thresholds"</span>,methInteg<span class="op">=</span><span class="st">"QMC"</span>,nMC<span class="op">=</span><span class="fl">1000</span><span class="op">)</span></span>
 <span><span class="co"># use the estimates as initial values - the vector c(0,1,0,0,1,0,0,0,1) initializes the cholesky matrix of the random-effects</span></span>
@@ -311,7 +329,8 @@
 <div class="section level4">
 <h4 id="plot-of-predicted-mean-trajectories">plot of predicted mean trajectories<a class="anchor" aria-label="anchor" href="#plot-of-predicted-mean-trajectories"></a>
 </h4>
-<p>The predicted trajectory of the underlying process can be obtained with predictL function and the associated plot function.</p>
+<p>The predicted trajectory of the underlying process can be obtained
+with predictL function and the associated plot function.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">datnew</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">75</span>,by<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">datnew</span><span class="op">$</span><span class="va">grp</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
@@ -326,35 +345,39 @@
 <div class="section level4">
 <h4 id="posteriori-distribution">Posteriori distribution<a class="anchor" aria-label="anchor" href="#posteriori-distribution"></a>
 </h4>
-<p>To better appreciate the range of the underlying depressive symptomatology, the empirical posterior distribution can be computed</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">beta &lt;-<span class="st"> </span>modIRT<span class="op">$</span>best</a>
-<a class="sourceLine" id="cb9-2" data-line-number="2">t &lt;-<span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">72</span></a>
-<a class="sourceLine" id="cb9-3" data-line-number="3">Z &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="kw">rep</span>(<span class="dv">1</span>,<span class="kw">length</span>(t)),<span class="kw">ns</span>(t,<span class="dt">knots=</span><span class="kw">c</span>(<span class="dv">7</span>,<span class="dv">15</span>),<span class="dt">Boundary.knots =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">60</span>)))</a>
-<a class="sourceLine" id="cb9-4" data-line-number="4">chol &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">0</span>,<span class="dt">ncol=</span><span class="dv">4</span>,<span class="dt">nrow=</span><span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb9-5" data-line-number="5">chol[<span class="kw">upper.tri</span>(chol, <span class="dt">diag =</span> T)] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>,beta[<span class="dv">7</span><span class="op">:</span><span class="dv">15</span>])</a>
-<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="kw">library</span>(mvtnorm)</a>
-<a class="sourceLine" id="cb9-7" data-line-number="7">Lambda0 &lt;-<span class="st"> </span><span class="kw">rmvnorm</span>(<span class="dv">10000</span>,<span class="dt">mean =</span> Z<span class="op">%*%</span><span class="kw">c</span>(<span class="dv">0</span>,beta[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]),Z<span class="op">%*%</span><span class="kw">t</span>(chol)<span class="op">%*%</span>chol<span class="op">%*%</span><span class="kw">t</span>(Z))</a>
-<a class="sourceLine" id="cb9-8" data-line-number="8">Lambda1 &lt;-<span class="st"> </span><span class="kw">rmvnorm</span>(<span class="dv">10000</span>,<span class="dt">mean =</span> Z<span class="op">%*%</span>beta[<span class="dv">4</span><span class="op">:</span><span class="dv">7</span>],Z<span class="op">%*%</span><span class="kw">t</span>(chol)<span class="op">%*%</span>chol<span class="op">%*%</span><span class="kw">t</span>(Z))</a>
-<a class="sourceLine" id="cb9-9" data-line-number="9">Lambda &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Lambda =</span> <span class="kw">as.vector</span>(<span class="kw">rbind</span>(Lambda0,Lambda1)))</a>
-<a class="sourceLine" id="cb9-10" data-line-number="10">phist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(Lambda,<span class="kw">aes</span>(<span class="dt">x=</span>Lambda))<span class="op">+</span><span class="st"> </span><span class="kw">geom_density</span>(<span class="dt">color=</span><span class="st">"grey"</span>, <span class="dt">fill=</span><span class="st">"grey"</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">"underlying depressive symptomatology"</span>) <span class="op">+</span><span class="kw">xlim</span>(<span class="op">-</span><span class="dv">7</span>,<span class="dv">7</span>)</a>
-<a class="sourceLine" id="cb9-12" data-line-number="12">phist</a>
-<a class="sourceLine" id="cb9-13" data-line-number="13">Warning<span class="op">:</span><span class="st"> </span> [1m [22mRemoved <span class="dv">32176</span> rows containing non<span class="op">-</span>finite values</a>
-<a class="sourceLine" id="cb9-14" data-line-number="14">(<span class="st">`</span><span class="dt">stat_density()</span><span class="st">`</span>).</a></code></pre></div>
+<p>To better appreciate the range of the underlying depressive
+symptomatology, the empirical posterior distribution can be computed</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>beta <span class="ot">&lt;-</span> modIRT<span class="sc">$</span>best</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>t <span class="ot">&lt;-</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">72</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>Z <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">rep</span>(<span class="dv">1</span>,<span class="fu">length</span>(t)),<span class="fu">ns</span>(t,<span class="at">knots=</span><span class="fu">c</span>(<span class="dv">7</span>,<span class="dv">15</span>),<span class="at">Boundary.knots =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">60</span>)))</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>chol <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>,<span class="at">ncol=</span><span class="dv">4</span>,<span class="at">nrow=</span><span class="dv">4</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>chol[<span class="fu">upper.tri</span>(chol, <span class="at">diag =</span> T)] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>,beta[<span class="dv">7</span><span class="sc">:</span><span class="dv">15</span>])</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="fu">library</span>(mvtnorm)</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>Lambda0 <span class="ot">&lt;-</span> <span class="fu">rmvnorm</span>(<span class="dv">10000</span>,<span class="at">mean =</span> Z<span class="sc">%*%</span><span class="fu">c</span>(<span class="dv">0</span>,beta[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]),Z<span class="sc">%*%</span><span class="fu">t</span>(chol)<span class="sc">%*%</span>chol<span class="sc">%*%</span><span class="fu">t</span>(Z))</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>Lambda1 <span class="ot">&lt;-</span> <span class="fu">rmvnorm</span>(<span class="dv">10000</span>,<span class="at">mean =</span> Z<span class="sc">%*%</span>beta[<span class="dv">4</span><span class="sc">:</span><span class="dv">7</span>],Z<span class="sc">%*%</span><span class="fu">t</span>(chol)<span class="sc">%*%</span>chol<span class="sc">%*%</span><span class="fu">t</span>(Z))</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>Lambda <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Lambda =</span> <span class="fu">as.vector</span>(<span class="fu">rbind</span>(Lambda0,Lambda1)))</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>phist <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(Lambda,<span class="fu">aes</span>(<span class="at">x=</span>Lambda))<span class="sc">+</span> <span class="fu">geom_density</span>(<span class="at">color=</span><span class="st">"grey"</span>, <span class="at">fill=</span><span class="st">"grey"</span>) <span class="sc">+</span> <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"underlying depressive symptomatology"</span>) <span class="sc">+</span><span class="fu">xlim</span>(<span class="sc">-</span><span class="dv">7</span>,<span class="dv">7</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>phist</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>Warning<span class="sc">:</span>  [<span class="dv">1</span>m [<span class="dv">22</span>mRemoved <span class="dv">31365</span> rows containing non<span class="sc">-</span>finite values</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>(<span class="st">`</span><span class="at">stat_density()</span><span class="st">`</span>).</span></code></pre></div>
 <p><img src="latent_process_model_with_multlcmm_IRT_files/figure-html/unnamed-chunk-10-1.png" width="576"></p>
 <p>The 95% range of the underlying distribution is approximately:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">Lambda</span><span class="op">$</span><span class="va">Lambda</span>,p<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>,<span class="fl">0.975</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      2.5%     97.5% </span></span>
-<span><span class="co">#&gt; -5.466189  5.483094</span></span></code></pre></div>
+<span><span class="co">#&gt; -5.436176  5.526873</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
-<h3 id="location-and-discrimination-of-the-items-with-se-by-delta-method">Location and discrimination of the items (with SE by Delta-Method)<a class="anchor" aria-label="anchor" href="#location-and-discrimination-of-the-items-with-se-by-delta-method"></a>
+<h3 id="location-and-discrimination-of-the-items-with-se-by-delta-method">Location and discrimination of the items (with SE by
+Delta-Method)<a class="anchor" aria-label="anchor" href="#location-and-discrimination-of-the-items-with-se-by-delta-method"></a>
 </h3>
-<p>The location and discrimination parameters are transformations of the estimated parameters. They are retrieved with the following code:</p>
+<p>The location and discrimination parameters are transformations of the
+estimated parameters. They are retrieved with the following code:</p>
 <ul>
-<li>isolate the corresponding parameters within the vector of estimated parameters (and the corresponding variance covariance matrix)</li>
+<li>isolate the corresponding parameters within the vector of estimated
+parameters (and the corresponding variance covariance matrix)</li>
 </ul>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Parameters</span></span>
@@ -380,7 +403,9 @@
 <span><span class="va">Vseuils</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/VarCov.html">VarCov</a></span><span class="op">(</span><span class="va">modIRT</span><span class="op">)</span><span class="op">[</span><span class="op">(</span><span class="va">npm</span><span class="op">-</span><span class="op">(</span><span class="va">nlevel</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="va">nitems</span><span class="op">)</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">npm</span><span class="op">)</span>,<span class="op">(</span><span class="va">npm</span><span class="op">-</span><span class="op">(</span><span class="va">nlevel</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="va">nitems</span><span class="op">)</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">npm</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="va">Verr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/VarCov.html">VarCov</a></span><span class="op">(</span><span class="va">modIRT</span><span class="op">)</span><span class="op">[</span><span class="op">(</span><span class="va">npm</span><span class="op">-</span><span class="op">(</span><span class="va">nlevel</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="va">nitems</span><span class="op">)</span><span class="op">-</span><span class="op">(</span><span class="va">nitems</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">npm</span><span class="op">-</span><span class="op">(</span><span class="va">nlevel</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="va">nitems</span><span class="op">)</span><span class="op">)</span>,<span class="op">(</span><span class="va">npm</span><span class="op">-</span><span class="op">(</span><span class="va">nlevel</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="va">nitems</span><span class="op">)</span><span class="op">-</span><span class="op">(</span><span class="va">nitems</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">npm</span><span class="op">-</span><span class="op">(</span><span class="va">nlevel</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="va">nitems</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <ul>
-<li>retransform these parameters to obtain the locations and the discrimination of each item with corresponding standard deviation (computed via Delta-method)</li>
+<li>retransform these parameters to obtain the locations and the
+discrimination of each item with corresponding standard deviation
+(computed via Delta-method)</li>
 </ul>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># generic function</span></span>
@@ -428,7 +453,9 @@
 <div class="section level3">
 <h3 id="item-category-probability-curve">item category probability curve<a class="anchor" aria-label="anchor" href="#item-category-probability-curve"></a>
 </h3>
-<p>The curve of each item category probability according to the underlying level of depressive symptomatology can be obtain usinf the ItemInfo function.</p>
+<p>The curve of each item category probability according to the
+underlying level of depressive symptomatology can be obtain usinf the
+ItemInfo function.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## computations</span></span>
 <span><span class="va">info_modIRT</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ItemInfo.html">ItemInfo</a></span><span class="op">(</span><span class="va">modIRT</span>, lprocess<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">6</span>,<span class="fl">6</span>,<span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span>
@@ -446,36 +473,39 @@
 <span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="fl">0</span>,axes<span class="op">=</span><span class="cn">FALSE</span>, xlab<span class="op">=</span><span class="st">""</span>, ylab<span class="op">=</span><span class="st">""</span>, col<span class="op">=</span><span class="st">"white"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"center"</span>, legend<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Level"</span>,<span class="fl">0</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>, col<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, lwd<span class="op">=</span><span class="fl">2</span>, box.lty<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="latent_process_model_with_multlcmm_IRT_files/figure-html/unnamed-chunk-15-1.png" width="672"></p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="co">## graph with ggplot</span></a>
-<a class="sourceLine" id="cb15-2" data-line-number="2">p &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>){</a>
-<a class="sourceLine" id="cb15-4" data-line-number="4">ICC  &lt;-<span class="st"> </span>info_modIRT<span class="op">$</span>LevelInfo[<span class="kw">which</span>(info_modIRT<span class="op">$</span>LevelInfo[,<span class="dv">1</span>]<span class="op">==</span>items[k]),]</a>
-<a class="sourceLine" id="cb15-5" data-line-number="5">p[[k]] &lt;-<span class="st"> </span>(<span class="kw">ggplot</span>(ICC)</a>
-<a class="sourceLine" id="cb15-6" data-line-number="6">      <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Lprocess, <span class="dt">y =</span> Prob, <span class="dt">group =</span> Level,<span class="dt">color=</span>Level), <span class="dt">show.legend =</span> F,<span class="dt">alpha =</span> <span class="dv">1</span>,<span class="dt">size=</span><span class="fl">1.2</span>)</a>
-<a class="sourceLine" id="cb15-7" data-line-number="7">      <span class="co"># + stat_smooth(aes(x = time, y = hads_scorea), method = "loess", size = 0.75)</span></a>
-<a class="sourceLine" id="cb15-8" data-line-number="8">      <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>()</a>
-<a class="sourceLine" id="cb15-9" data-line-number="9">      <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="kw">paste</span>(<span class="st">"Item"</span>,<span class="dv">2</span><span class="op">*</span>k,<span class="st">"-"</span>,meaning[k]))</a>
-<a class="sourceLine" id="cb15-10" data-line-number="10">      <span class="op">+</span><span class="st"> </span><span class="kw">xlab</span>(<span class="st">"construct"</span>)</a>
-<a class="sourceLine" id="cb15-11" data-line-number="11">      <span class="op">+</span><span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb15-12" data-line-number="12">      <span class="op">+</span><span class="st"> </span><span class="kw">ylab</span>(<span class="st">"Probability of item level"</span>))</a>
-<a class="sourceLine" id="cb15-13" data-line-number="13">}</a>
-<a class="sourceLine" id="cb15-14" data-line-number="14">Warning<span class="op">:</span><span class="st"> </span> [1m [22mUsing <span class="st">`</span><span class="dt">size</span><span class="st">`</span> aesthetic <span class="cf">for</span> lines was deprecated <span class="cf">in</span> ggplot2 <span class="dv">3</span>.<span class="dv">4</span>.<span class="fl">0.</span></a>
-<a class="sourceLine" id="cb15-15" data-line-number="15"> [36mℹ [39m Please use <span class="st">`</span><span class="dt">linewidth</span><span class="st">`</span> instead.</a>
-<a class="sourceLine" id="cb15-16" data-line-number="16"> [90mThis warning is displayed once every <span class="dv">8</span> hours. [39m</a>
-<a class="sourceLine" id="cb15-17" data-line-number="17"> [90mCall <span class="st">`</span><span class="dt">lifecycle::last_lifecycle_warnings()</span><span class="st">`</span> to see where this warning was [39m</a>
-<a class="sourceLine" id="cb15-18" data-line-number="18"> [90mgenerated. [39m</a>
-<a class="sourceLine" id="cb15-19" data-line-number="19">p[[<span class="dv">8</span>]] &lt;-<span class="st"> </span>(<span class="kw">ggplot</span>(ICC)</a>
-<a class="sourceLine" id="cb15-20" data-line-number="20">      <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Lprocess, <span class="dt">y =</span> Prob, <span class="dt">group =</span> Level,<span class="dt">color=</span>Level),<span class="dt">alpha =</span> <span class="dv">1</span>,<span class="dt">size=</span><span class="fl">1.2</span>)</a>
-<a class="sourceLine" id="cb15-21" data-line-number="21">      <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>()</a>
-<a class="sourceLine" id="cb15-22" data-line-number="22">)</a>
-<a class="sourceLine" id="cb15-23" data-line-number="23">legend &lt;-<span class="st"> </span><span class="kw">get_legend</span>(p[[<span class="dv">8</span>]])</a>
-<a class="sourceLine" id="cb15-24" data-line-number="24"><span class="kw">grid.arrange</span>(p[[<span class="dv">1</span>]],p[[<span class="dv">2</span>]],p[[<span class="dv">3</span>]],p[[<span class="dv">4</span>]],p[[<span class="dv">5</span>]],p[[<span class="dv">6</span>]],p[[<span class="dv">7</span>]],<span class="kw">as_ggplot</span>(legend),<span class="dt">ncol=</span><span class="dv">4</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="do">## graph with ggplot</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>){</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>ICC  <span class="ot">&lt;-</span> info_modIRT<span class="sc">$</span>LevelInfo[<span class="fu">which</span>(info_modIRT<span class="sc">$</span>LevelInfo[,<span class="dv">1</span>]<span class="sc">==</span>items[k]),]</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>p[[k]] <span class="ot">&lt;-</span> (<span class="fu">ggplot</span>(ICC)</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>      <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> Lprocess, <span class="at">y =</span> Prob, <span class="at">group =</span> Level,<span class="at">color=</span>Level), <span class="at">show.legend =</span> F,<span class="at">alpha =</span> <span class="dv">1</span>,<span class="at">size=</span><span class="fl">1.2</span>)</span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>      <span class="co"># + stat_smooth(aes(x = time, y = hads_scorea), method = "loess", size = 0.75)</span></span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>      <span class="sc">+</span> <span class="fu">theme_bw</span>()</span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>      <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title=</span><span class="fu">paste</span>(<span class="st">"Item"</span>,<span class="dv">2</span><span class="sc">*</span>k,<span class="st">"-"</span>,meaning[k]))</span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a>      <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">"construct"</span>)</span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>      <span class="sc">+</span> <span class="fu">ylim</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>      <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Probability of item level"</span>))</span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a>}</span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a>Warning<span class="sc">:</span>  [<span class="dv">1</span>m [<span class="dv">22</span>mUsing <span class="st">`</span><span class="at">size</span><span class="st">`</span> aesthetic <span class="cf">for</span> lines was deprecated <span class="cf">in</span> ggplot2 <span class="dv">3</span>.<span class="dv">4</span>.<span class="fl">0.</span></span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a> [<span class="dv">36</span>mℹ [<span class="dv">39</span>m Please use <span class="st">`</span><span class="at">linewidth</span><span class="st">`</span> instead.</span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a> [<span class="dv">90</span>mThis warning is displayed once every <span class="dv">8</span> hours. [<span class="dv">39</span>m</span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a> [<span class="dv">90</span>mCall <span class="st">`</span><span class="at">lifecycle::last_lifecycle_warnings()</span><span class="st">`</span> to see where this warning was [<span class="dv">39</span>m</span>
+<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a> [<span class="dv">90</span>mgenerated. [<span class="dv">39</span>m</span>
+<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a>p[[<span class="dv">8</span>]] <span class="ot">&lt;-</span> (<span class="fu">ggplot</span>(ICC)</span>
+<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a>      <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> Lprocess, <span class="at">y =</span> Prob, <span class="at">group =</span> Level,<span class="at">color=</span>Level),<span class="at">alpha =</span> <span class="dv">1</span>,<span class="at">size=</span><span class="fl">1.2</span>)</span>
+<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a>      <span class="sc">+</span> <span class="fu">theme_bw</span>()</span>
+<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a>)</span>
+<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a>legend <span class="ot">&lt;-</span> <span class="fu">get_legend</span>(p[[<span class="dv">8</span>]])</span>
+<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a><span class="fu">grid.arrange</span>(p[[<span class="dv">1</span>]],p[[<span class="dv">2</span>]],p[[<span class="dv">3</span>]],p[[<span class="dv">4</span>]],p[[<span class="dv">5</span>]],p[[<span class="dv">6</span>]],p[[<span class="dv">7</span>]],<span class="fu">as_ggplot</span>(legend),<span class="at">ncol=</span><span class="dv">4</span>)</span></code></pre></div>
 <p><img src="latent_process_model_with_multlcmm_IRT_files/figure-html/unnamed-chunk-16-1.png" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="item-characteristic-curves">Item characteristic curves<a class="anchor" aria-label="anchor" href="#item-characteristic-curves"></a>
 </h3>
-<p>The following code computes the expectation of each item according to the underlying level of depressive symptomatology. This is achieved with predictYcond function with two plot possibilities: direct plot function or ggplot</p>
+<p>The following code computes the expectation of each item according to
+the underlying level of depressive symptomatology. This is achieved with
+predictYcond function with two plot possibilities: direct plot function
+or ggplot</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">expe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predictYcond.html">predictYcond</a></span><span class="op">(</span><span class="va">modIRT</span>,lprocess <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">6</span>,<span class="fl">6</span>,by<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># via the internal plot function </span></span>
@@ -498,7 +528,10 @@
 <div class="section level3">
 <h3 id="item-information-function">Item Information Function<a class="anchor" aria-label="anchor" href="#item-information-function"></a>
 </h3>
-<p>The level of information brought by each item category (information share) and brought in total by each item is also computed by the ItemInfo function. The curves can be again plotted directly with options which=“LevelInfo” and which=“ItemInfo” respectively.</p>
+<p>The level of information brought by each item category (information
+share) and brought in total by each item is also computed by the
+ItemInfo function. The curves can be again plotted directly with options
+which=“LevelInfo” and which=“ItemInfo” respectively.</p>
 <div class="section level4">
 <h4 id="by-category">by Category<a class="anchor" aria-label="anchor" href="#by-category"></a>
 </h4>
@@ -524,7 +557,8 @@
 <div class="section level3">
 <h3 id="predicted-item-trajectory-according-to-time">Predicted item trajectory according to time<a class="anchor" aria-label="anchor" href="#predicted-item-trajectory-according-to-time"></a>
 </h3>
-<p>Item predicted trajectories according to a specific profile of covariates can be computed using predictY function:</p>
+<p>Item predicted trajectories according to a specific profile of
+covariates can be computed using predictY function:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">datnew</span><span class="op">)</span></span>
 <span><span class="va">datnew</span><span class="op">$</span><span class="va">grp</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
@@ -546,7 +580,8 @@
 <div class="section level3">
 <h3 id="estimation-of-the-irt-model-with-a-dif-on-group">Estimation of the IRT model with a DIF on group<a class="anchor" aria-label="anchor" href="#estimation-of-the-irt-model-with-a-dif-on-group"></a>
 </h3>
-<p>DIF is programmed using contrasts (item-specific departure around the mean effect on the underlying latent process)</p>
+<p>DIF is programmed using contrasts (item-specific departure around the
+mean effect on the underlying latent process)</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># initialization of the parameter vector for faster convergence</span></span>
 <span><span class="va">npm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">modIRT</span><span class="op">$</span><span class="va">best</span><span class="op">)</span></span>
@@ -670,7 +705,11 @@
 <span><span class="co">#&gt;                      0.06495                      0.07381 </span></span>
 <span><span class="co">#&gt;                      hads_12                    hads_14** </span></span>
 <span><span class="co">#&gt;                      0.05455                      0.11256</span></span></code></pre></div>
-<p>To be done again …. L’item 2 est le seul item qui semble être différent entre les groupes (p=0.0071) avec un niveau plus faible chez les preemptive par rapport aux autres items. Au global, la différence de groupe entre les 7 items ne semble pas significative (p=0.2665 au global (Chi2 à 6 degrés de liberté)).</p>
+<p>To be done again …. L’item 2 est le seul item qui semble être
+différent entre les groupes (p=0.0071) avec un niveau plus faible chez
+les preemptive par rapport aux autres items. Au global, la différence de
+groupe entre les 7 items ne semble pas significative (p=0.2665 au global
+(Chi2 à 6 degrés de liberté)).</p>
 <p>Global test for contrasts</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/WaldMult.html">WaldMult</a></span><span class="op">(</span><span class="va">modIRT_DIFg</span>,pos<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span><span class="op">:</span><span class="fl">13</span><span class="op">)</span><span class="op">)</span></span>
@@ -678,7 +717,8 @@
 <span><span class="co">#&gt; contrast11 = contrast12 = contrast13 = contrast14 = contrast15 = contrast16 = 0   7.31339</span></span>
 <span><span class="co">#&gt;                                                                                 p_value</span></span>
 <span><span class="co">#&gt; contrast11 = contrast12 = contrast13 = contrast14 = contrast15 = contrast16 = 0 0.29283</span></span></code></pre></div>
-<p>95% confidence interval of the difference between groups for item 2:</p>
+<p>95% confidence interval of the difference between groups for item
+2:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sum</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">modIRT_DIFg</span><span class="op">)</span><span class="op">[</span><span class="fl">10</span>,<span class="op">]</span></span>
 <span><span class="co">#&gt; General latent class mixed model </span></span>
@@ -786,7 +826,8 @@
 <div class="section level3">
 <h3 id="c--estimation-of-the-irt-model-with-a-response-shift-over-time">C. Estimation of the IRT model with a Response Shift over time<a class="anchor" aria-label="anchor" href="#c--estimation-of-the-irt-model-with-a-response-shift-over-time"></a>
 </h3>
-<p>Response Shift is modelled by adding contrasts on the functions of time</p>
+<p>Response Shift is modelled by adding contrasts on the functions of
+time</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># initialization of the parameter vector for faster convergence</span></span>
 <span><span class="va">npm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">modIRT</span><span class="op">$</span><span class="va">best</span><span class="op">)</span></span>
@@ -910,7 +951,13 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  ** coefficient not estimated but obtained from the others as minus the sum of them </span></span>
 <span><span class="co">#&gt; </span></span></code></pre></div>
-<p>There does not seem to be any difference in item trajectories over time (see global p-values for each function of time in the summary). We can seek whether there are some difference item by item using Wald Test. This can be done with the WaldMult function of lcmm except for the last item since this parameter is a combination of the others. Next code details how to obtain this item-specific test of invariance over time.</p>
+<p>There does not seem to be any difference in item trajectories over
+time (see global p-values for each function of time in the summary). We
+can seek whether there are some difference item by item using Wald Test.
+This can be done with the WaldMult function of lcmm except for the last
+item since this parameter is a combination of the others. Next code
+details how to obtain this item-specific test of invariance over
+time.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Pvalue for the last contrast</span></span>
 <span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">modIRT_DIFt</span><span class="op">)</span></span>
@@ -935,7 +982,8 @@
 <span><span class="co">#&gt; [7,]   14 0.5168641</span></span></code></pre></div>
 <p>Interpretation.</p>
 <div class="section level4">
-<h4 id="prediction-in-the-item-scale-to-compare-the-model-with-rs-and-without-rs">Prediction in the item scale to compare the model with RS and without RS<a class="anchor" aria-label="anchor" href="#prediction-in-the-item-scale-to-compare-the-model-with-rs-and-without-rs"></a>
+<h4 id="prediction-in-the-item-scale-to-compare-the-model-with-rs-and-without-rs">Prediction in the item scale to compare the model with RS and
+without RS<a class="anchor" aria-label="anchor" href="#prediction-in-the-item-scale-to-compare-the-model-with-rs-and-without-rs"></a>
 </h4>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">datnew</span><span class="op">)</span></span>
@@ -959,28 +1007,26 @@
 </div>
 </div>
 </div>
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p>
-<p>Developed by Cecile Proust-Lima, Viviane Philipps.</p>
+  <p>Developed by Cecile Proust-Lima, Viviane Philipps.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.9000.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>

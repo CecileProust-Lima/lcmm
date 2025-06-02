@@ -1,192 +1,68 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/joint_latent_class_model_with_Jointlcmm.html</loc>
-  </url>
-  <url>
-    <loc>/articles/latent_class_model_with_hlme.html</loc>
-  </url>
-  <url>
-    <loc>/articles/latent_process_model_with_lcmm.html</loc>
-  </url>
-  <url>
-    <loc>/articles/latent_process_model_with_multlcmm.html</loc>
-  </url>
-  <url>
-    <loc>/articles/latent_process_model_with_multlcmm_IRT.html</loc>
-  </url>
-  <url>
-    <loc>/articles/lcmm.html</loc>
-  </url>
-  <url>
-    <loc>/articles/multivariate_latent_class_model_with_mpjlcmm.html</loc>
-  </url>
-  <url>
-    <loc>/articles/pre_normalizing.html</loc>
-  </url>
-  <url>
-    <loc>/articles/secondary_model_with_externVar.html</loc>
-  </url>
-  <url>
-    <loc>/articles/usual_problems.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/news/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/Diffepoce.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ForInternalUse.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ItemInfo.html</loc>
-  </url>
-  <url>
-    <loc>/reference/Jointlcmm.html</loc>
-  </url>
-  <url>
-    <loc>/reference/StandardMethods.html</loc>
-  </url>
-  <url>
-    <loc>/reference/VarCov.html</loc>
-  </url>
-  <url>
-    <loc>/reference/VarCovRE.html</loc>
-  </url>
-  <url>
-    <loc>/reference/VarExpl.html</loc>
-  </url>
-  <url>
-    <loc>/reference/WaldMult.html</loc>
-  </url>
-  <url>
-    <loc>/reference/cuminc.html</loc>
-  </url>
-  <url>
-    <loc>/reference/data_hlme.html</loc>
-  </url>
-  <url>
-    <loc>/reference/data_lcmm.html</loc>
-  </url>
-  <url>
-    <loc>/reference/dynpred.html</loc>
-  </url>
-  <url>
-    <loc>/reference/epoce.html</loc>
-  </url>
-  <url>
-    <loc>/reference/estimates.html</loc>
-  </url>
-  <url>
-    <loc>/reference/externVar.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fitY.html</loc>
-  </url>
-  <url>
-    <loc>/reference/gridsearch.html</loc>
-  </url>
-  <url>
-    <loc>/reference/hlme.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/lcmm-package.html</loc>
-  </url>
-  <url>
-    <loc>/reference/lcmm.html</loc>
-  </url>
-  <url>
-    <loc>/reference/loglik.html</loc>
-  </url>
-  <url>
-    <loc>/reference/mpjlcmm.html</loc>
-  </url>
-  <url>
-    <loc>/reference/multlcmm.html</loc>
-  </url>
-  <url>
-    <loc>/reference/paquid.html</loc>
-  </url>
-  <url>
-    <loc>/reference/permut.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot.ItemInfo.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot.cuminc.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot.dynpred.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot.pred.accuracy.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot.predict.html</loc>
-  </url>
-  <url>
-    <loc>/reference/postprob.html</loc>
-  </url>
-  <url>
-    <loc>/reference/predictClass.html</loc>
-  </url>
-  <url>
-    <loc>/reference/predictL.html</loc>
-  </url>
-  <url>
-    <loc>/reference/predictRE.html</loc>
-  </url>
-  <url>
-    <loc>/reference/predictY.html</loc>
-  </url>
-  <url>
-    <loc>/reference/predictYcond.html</loc>
-  </url>
-  <url>
-    <loc>/reference/predictlink.html</loc>
-  </url>
-  <url>
-    <loc>/reference/print.lcmm.html</loc>
-  </url>
-  <url>
-    <loc>/reference/simdataHADS.html</loc>
-  </url>
-  <url>
-    <loc>/reference/simulate.lcmm.html</loc>
-  </url>
-  <url>
-    <loc>/reference/summary.lcmm.html</loc>
-  </url>
-  <url>
-    <loc>/reference/summaryplot.html</loc>
-  </url>
-  <url>
-    <loc>/reference/summarytable.html</loc>
-  </url>
-  <url>
-    <loc>/reference/update.mpjlcmm.html</loc>
-  </url>
-  <url>
-    <loc>/reference/xclass.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
+<url><loc>/articles/joint_latent_class_model_with_Jointlcmm.html</loc></url>
+<url><loc>/articles/latent_class_model_with_hlme.html</loc></url>
+<url><loc>/articles/latent_process_model_with_lcmm.html</loc></url>
+<url><loc>/articles/latent_process_model_with_multlcmm.html</loc></url>
+<url><loc>/articles/latent_process_model_with_multlcmm_IRT.html</loc></url>
+<url><loc>/articles/lcmm.html</loc></url>
+<url><loc>/articles/multivariate_latent_class_model_with_mpjlcmm.html</loc></url>
+<url><loc>/articles/pre_normalizing.html</loc></url>
+<url><loc>/articles/secondary_model_with_externVar.html</loc></url>
+<url><loc>/articles/usual_problems.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/news/index.html</loc></url>
+<url><loc>/reference/Diffepoce.html</loc></url>
+<url><loc>/reference/ForInternalUse.html</loc></url>
+<url><loc>/reference/ItemInfo.html</loc></url>
+<url><loc>/reference/Jointlcmm.html</loc></url>
+<url><loc>/reference/StandardMethods.html</loc></url>
+<url><loc>/reference/VarCov.html</loc></url>
+<url><loc>/reference/VarCovRE.html</loc></url>
+<url><loc>/reference/VarExpl.html</loc></url>
+<url><loc>/reference/WaldMult.html</loc></url>
+<url><loc>/reference/cuminc.html</loc></url>
+<url><loc>/reference/data_hlme.html</loc></url>
+<url><loc>/reference/data_lcmm.html</loc></url>
+<url><loc>/reference/dynpred.html</loc></url>
+<url><loc>/reference/epoce.html</loc></url>
+<url><loc>/reference/estimates.html</loc></url>
+<url><loc>/reference/externVar.html</loc></url>
+<url><loc>/reference/fitY.html</loc></url>
+<url><loc>/reference/gridsearch.html</loc></url>
+<url><loc>/reference/hlme.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/lcmm-package.html</loc></url>
+<url><loc>/reference/lcmm.html</loc></url>
+<url><loc>/reference/loglik.html</loc></url>
+<url><loc>/reference/mpjlcmm.html</loc></url>
+<url><loc>/reference/multlcmm.html</loc></url>
+<url><loc>/reference/paquid.html</loc></url>
+<url><loc>/reference/permut.html</loc></url>
+<url><loc>/reference/plot.ItemInfo.html</loc></url>
+<url><loc>/reference/plot.cuminc.html</loc></url>
+<url><loc>/reference/plot.dynpred.html</loc></url>
+<url><loc>/reference/plot.html</loc></url>
+<url><loc>/reference/plot.pred.accuracy.html</loc></url>
+<url><loc>/reference/plot.predict.html</loc></url>
+<url><loc>/reference/postprob.html</loc></url>
+<url><loc>/reference/predictClass.html</loc></url>
+<url><loc>/reference/predictL.html</loc></url>
+<url><loc>/reference/predictRE.html</loc></url>
+<url><loc>/reference/predictY.html</loc></url>
+<url><loc>/reference/predictYback.html</loc></url>
+<url><loc>/reference/predictYcond.html</loc></url>
+<url><loc>/reference/predictlink.html</loc></url>
+<url><loc>/reference/print.lcmm.html</loc></url>
+<url><loc>/reference/sampleParameters.html</loc></url>
+<url><loc>/reference/simdataHADS.html</loc></url>
+<url><loc>/reference/simulate.lcmm.html</loc></url>
+<url><loc>/reference/summary.lcmm.html</loc></url>
+<url><loc>/reference/summaryplot.html</loc></url>
+<url><loc>/reference/summarytable.html</loc></url>
+<url><loc>/reference/update.mpjlcmm.html</loc></url>
+<url><loc>/reference/xclass.html</loc></url>
 </urlset>
+
