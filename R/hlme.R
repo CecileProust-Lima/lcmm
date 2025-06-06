@@ -141,6 +141,8 @@
 #' values in 0,1,...,ng. Value 0 indicates no prior for the subject while a
 #' value in 1,...,ng indicates that the subject belongs to the corresponding
 #' latent class.
+#' @param weight optional name of a covariate containing an individual 
+#' sampling weight (same values for all the observations of an individual). 
 #' @param pprior optional vector specifying the names of the covariates containing the
 #' prior probabilities to belong to each latent class. These probabilities should be
 #' between 0 and 1 and should sum up to 1 for each subject. 
@@ -292,7 +294,7 @@
 #' 
 #' 
 hlme <-
-    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,pprior=NULL,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=FALSE,returndata=FALSE,var.time=NULL,partialH=FALSE,nproc=1,clustertype=NULL){
+    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,pprior=NULL,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=FALSE,returndata=FALSE,var.time=NULL,partialH=FALSE,nproc=1,clustertype=NULL,weight=NULL){
 
         ptm<-proc.time()
 
@@ -302,6 +304,8 @@ hlme <-
         nom.subject <- as.character(subject)
 #### INCLUSION PRIOR
         nom.prior <- as.character(args$prior)
+#### INCLUSION WEIGHT
+        nom.weight <- as.character(args$weight)
 ####
         if(!missing(mixture) & ng==1) stop("No mixture can be specified with ng=1")
         if(missing(mixture) & ng>1) stop("The argument mixture has to be specified for ng > 1")
@@ -671,7 +675,16 @@ hlme <-
             PRIOR[(is.na(PRIOR))] <- 0
         }
 ####
-
+#### INCLUSION WEIGHT 
+        #if(missing(prior)){ PRIOR <- seq(0,length=length(IDnum))} 
+        if(missing(weight)){ WEIGHT <- seq(1,length=length(IND))} 
+        if(!missing(weight)){ 
+          WEIGHT <- newdata[,nom.weight]
+          WEIGHT[(is.na(WEIGHT))] <- 0
+        }
+        ####
+        
+        
         ##pprior : proba d'appartenance a chaque classe
         if(is.null(pprior))
         {
@@ -726,10 +739,10 @@ hlme <-
         #IDnum <- matYXord[,1]
         #IND <- matYXord[,2]
 
-        matYX <- cbind(IND,timeobs,PRIOR,pprior0,Y0,X0)
+        matYX <- cbind(IND,timeobs,PRIOR,WEIGHT,pprior0,Y0,X0)
         matYXord <- matYX[sort.list(matYX[,1]),]
-        Y0 <- as.numeric(matYXord[,4+ng])
-        X0 <- apply(matYXord[,-c(1:(4+ng)),drop=FALSE],2,as.numeric)
+        Y0 <- as.numeric(matYXord[,5+ng])
+        X0 <- apply(matYXord[,-c(1:(5+ng)),drop=FALSE],2,as.numeric)
         IND <- matYXord[,1]
         timeobs <- matYXord[,2]
 
@@ -738,6 +751,9 @@ hlme <-
         PRIOR <- as.numeric(matYXord[,3])
         PRIOR <-as.integer(as.vector(PRIOR))
 ####
+        
+        #### INCLUSION PRIOR 
+        WEIGHT <- as.numeric(matYXord[,4])
 
         X0 <- as.numeric(as.matrix(X0))
         Y0 <- as.numeric(as.matrix(Y0))
@@ -775,7 +791,16 @@ hlme <-
         }
         pprior0 <- t(pprior0)       
         
-
+##### INCLUSION WEIGHT 
+        # definition de prior a 0 pour l'analyse G=1
+        weight2 <- as.integer(rep(1,ns0))
+        weight0 <- weight2 
+        # si prior pas missing alors mettre dedans la classe a priori. Attention tester q les valeurs sont dans 0, G
+        if(!missing(weight)){ 
+          weight0 <- WEIGHT[cumsum(nmes0)]
+        }
+        
+        
 
         loglik <- as.double(0)
         ni <- 0
@@ -1183,7 +1208,7 @@ hlme <-
         
         if(maxiter==0)
         {
-            vrais <- loglikhlme(b,Y0,X0,prior0,pprior0,idprob0,idea0,idg0,idcor0,
+            vrais <- loglikhlme(b,Y0,X0,weight0,prior0,pprior0,idprob0,idea0,idg0,idcor0,
                                 ns0,ng0,nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0,
                                 NPM,fix0,nfix,bfix)
             
@@ -1202,7 +1227,7 @@ hlme <-
                        digits=8,print.info=verbose,blinding=FALSE,
                        multipleTry=25,file="",
                        nproc=nproc,maxiter=maxiter,minimize=FALSE,
-                       Y0=Y0,X0=X0,prior0=prior0,pprior0=pprior0,idprob0=idprob0,idea0=idea0,
+                       Y0=Y0,X0=X0,weight0=weight0,prior0=prior0,pprior0=pprior0,idprob0=idprob0,idea0=idea0,
                        idg0=idg0,idcor0=idcor0,ns0=ns0,ng0=ng0,nv0=nv0,nobs=nobs0,
                        nea0=nea0,nmes0=nmes0,idiag=idiag0,nwg0=nwg0,ncor0=ncor0,
                        npm0=NPM,fix0=fix0,nfix0=nfix,bfix0=bfix)
@@ -1231,6 +1256,7 @@ hlme <-
             post <- .Fortran(C_loglikhlme,
                              as.double(Y0),
                              as.double(X0),
+                             as.double(weight0),
                              as.integer(prior0),
                              as.double(pprior0),
                              as.integer(idprob0),

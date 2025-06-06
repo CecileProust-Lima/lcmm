@@ -30,7 +30,8 @@ hlme(
   var.time = NULL,
   partialH = FALSE,
   nproc = 1,
-  clustertype = NULL
+  clustertype = NULL,
+  weight = NULL
 )
 }
 \arguments{
@@ -145,6 +146,9 @@ Hessian matrix to define convergence criteria.}
 Default to 1 (sequential mode).}
 
 \item{clustertype}{optional character indicating the type of cluster for parallel computation.}
+
+\item{weight}{optional name of a covariate containing an individual 
+sampling weight (same values for all the observations of an individual).}
 }
 \value{
 The list returned is:

@@ -13,6 +13,7 @@ loglikhlme(
   b,
   Y0,
   X0,
+  weight0,
   prior0,
   pprior0,
   idprob0,
@@ -205,6 +206,8 @@ loglikmpjlcmm(
 \item{Y0}{the observed values of the outcome(s) (length nobs0)}
 
 \item{X0}{the observed values of all covariates included in the model (dim nob0 * nv0)}
+
+\item{weight0}{the optional individual sampling weights (dim ns0)}
 
 \item{prior0}{the prior latent class (length ns0)}
 

@@ -44,6 +44,8 @@
 !
 ! maxiter : number of iteration
 !
+! weight: individual weights
+!
 !
 !c --------- REMARKS ---------------------------------------
 !
@@ -75,7 +77,7 @@
       implicit none
       integer,save ::ns,ng,nv,idiag,ncssg,nvc,nea,ncg,nwg,ncor
       integer,save ::nprob,nvarprob,maxmes,nobs,npmtot
-      double precision,dimension(:),allocatable,save::Y
+      double precision,dimension(:),allocatable,save::Y,weight
       double precision,dimension(:,:),allocatable,save ::X
       integer,dimension(:),allocatable,save ::idea,idg,idprob,idcor
       integer,dimension(:),allocatable,save :: nmes,prior
@@ -263,7 +265,7 @@
          end if
 !     debut du calcul de la vraisemblance
 
-       vrais=vrais-nmes(i)*dlog(dble(2*3.14159265))
+       vrais=vrais- weight(i)*(nmes(i)*dlog(dble(2*3.14159265)))
 
 
 ! contribution individuelle a la vraisemblance
@@ -272,7 +274,7 @@
 
        if (ng.eq.1) then
 
-            vrais=vrais-det
+            vrais=vrais-det*weight(i)
             b0=0.d0
             l=0
             X00=0.d0
@@ -296,7 +298,7 @@
             Y4=DOT_PRODUCT(Y2,Y3)
 
 
-            vrais=vrais-Y4
+            vrais=vrais-Y4*weight(i)
 
 ! cas 2 :  ng>1  composantes
          else
@@ -450,7 +452,7 @@
                 funcpa=-1.d9
                 goto 654
             end if
-            vrais=vrais+2*log(expo)
+            vrais=vrais+2*log(expo)*weight(i)
          end if
          it=it+nmes(i)
       end do
@@ -1265,8 +1267,8 @@
 
 
 
-      subroutine loglikhlme(Y0,X0,Prior0,pprior0,idprob0,idea0,idg0,idcor0  &
-          ,ns0,ng0,nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0   &
+      subroutine loglikhlme(Y0,X0,weight0,Prior0,pprior0,idprob0,idea0,idg0  &
+          ,idcor0,ns0,ng0,nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0   &
           ,npm0,b0,ppi0,resid_m0,resid_ss0 &
           ,pred_m_g0,pred_ss_g0,pred_RE,var_RE,fix0,nfix0,bfix0,estim0,loglik)
 
@@ -1280,6 +1282,7 @@
       integer, intent(in) :: ns0, ng0, nobs0, idiag0, nwg0, npm0,ncor0
       integer, dimension(nv0), intent(in) :: idea0,idg0,idprob0,idcor0
       integer, dimension(ns0), intent(in) :: nmes0,Prior0
+      double precision, dimension(ns0), intent(in) :: weight0
       double precision, dimension(ns0*ng0), intent(in) :: pprior0
       double precision, dimension(nobs0), intent(in) :: Y0
       double precision, dimension(nobs0*nv0), intent(in) :: X0
@@ -1322,7 +1325,8 @@
       ! pas de H restreint pr hlme
          
       allocate(Y(ns0*maxmes),idprob(nv0),X(ns0*maxmes,nv0)    &
-     ,idea(nv0),idg(nv0),nmes(ns0),prior(ns0),pprior(ns0,ng0),idcor(nv0))
+     ,idea(nv0),idg(nv0),nmes(ns0),prior(ns0),pprior(ns0,ng0)     &
+     ,idcor(nv0),weight(ns0))
 
 
 
@@ -1352,6 +1356,7 @@
       nmes=0
       Y=0.d0
       X=0.d0
+      weight=0.d0
       idprob=0
       idea=0
       idg=0
@@ -1369,6 +1374,7 @@
             if (k.eq.1) then
                nmes(i)=nmes0(i)
                prior(i)=prior0(i)
+               weight(i)=weight0(i)
                do j=1,nmes(i)
                   nmestot=nmestot+1
                   jtemp=jtemp+1
@@ -1497,7 +1503,7 @@
 
  1589 continue
 
-      deallocate(Y,X,idprob,idea,idg,nmes,prior,pprior,idcor)
+      deallocate(Y,X,idprob,idea,idg,nmes,prior,pprior,idcor,weight)
       deallocate(fix,bfix)
 
       return
