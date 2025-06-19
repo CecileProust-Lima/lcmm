@@ -472,7 +472,8 @@ void F77_SUB(logliklcmmord)(double * Y0,
 			    double * loglik);
 
 void F77_SUB(loglikhlme)(double * Y0,
-			 double * X0, 
+			 double * X0,
+			 double * weight0,
 			 int * Prior0, 
 			 double * pprior0, 
 			 int * idprob0,

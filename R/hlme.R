@@ -294,7 +294,7 @@
 #' 
 #' 
 hlme <-
-    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,pprior=NULL,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=FALSE,returndata=FALSE,var.time=NULL,partialH=FALSE,nproc=1,clustertype=NULL,weight=NULL){
+    function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=FALSE,cor=NULL,data,B,convB=0.0001,convL=0.0001,convG=0.0001,prior,pprior=NULL,maxiter=500,subset=NULL,na.action=1,posfix=NULL,verbose=FALSE,returndata=FALSE,var.time=NULL,partialH=FALSE,nproc=1,clustertype=NULL,weight){
 
         ptm<-proc.time()
 
@@ -681,6 +681,7 @@ hlme <-
         if(!missing(weight)){ 
           WEIGHT <- newdata[,nom.weight]
           WEIGHT[(is.na(WEIGHT))] <- 0
+          if(!length(WEIGHT)) stop("weight is not correct")
         }
         ####
         
