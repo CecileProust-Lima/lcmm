@@ -95,18 +95,28 @@ ItemInfo <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,
             nerr <- ny
             Ynames <- x$Ynames
             if(nalea==0) condRE_Y <- 1
-            modalites <- unlist(x$modalites)
+            modalites <- x$modalites
             nbmod <- x$nbmod
+            best <- x$best
         }
         else
         {
-            debut <- sum(x$N[1:4])-1 # nprob+nef+nvc+nw-1
+            debut <- sum(x$N[1:4])-1 + x$N[6] # nprob+nef+nvc+nw-1+ncor
             nalea <- 0
             ny <- 1
             nerr <- 0 # variance erreur fixee a 1
             Ynames <- as.character(x$call$fixed[2])
-            modalites <- seq(x$linknodes[1],x$linknodes[2])[x$ide==1]
+            condRE_Y <- 1
+            modalites <- list(seq(x$linknodes[1],x$linknodes[2])[c(x$ide==1, TRUE)])
             nbmod <- sum(x$ide)+1
+            ## mettre les parametres dans le meme ordre que multlcmm :
+            best <- rep(0, length(x$best))
+            best[debut + 1] <- 1 # erreur de mesure
+            best[debut + 1 + 1:(nbmod - 1)] <- x$best[sum(x$N[1:4]) + 1:(nbmod - 1)] # seuils
+
+            x$Ynames <- as.character(x$call$fixed[[2]])
+            x$modalites <- modalites
+            x$nbmod <- length(modalites)
         }
         
         npm <- length(x$best)
@@ -135,11 +145,11 @@ ItemInfo <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,
                             as.integer(ny),
                             as.integer(maxmes),
                             as.integer(npm),
-                            as.double(x$best),
+                            as.double(best),
                             as.integer(debut),
                             as.integer(nbzitr),
                             as.integer(x$linktype),
-                            as.integer(unlist(x$modalites)),
+                            as.integer(unlist(modalites)),
                             as.integer(nbmod),
                             as.integer(nsim),
                             as.integer(2*sum(nbmod)+ny),
@@ -158,7 +168,7 @@ ItemInfo <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,
                 if(x$linktype[k] != 3) next
                 
                 infolevel[jj+1:(nbmod[k]*maxmes),1] <- Ynames[k]
-                infolevel[jj+1:(nbmod[k]*maxmes),2] <- rep(x$modalites[[k]], each=maxmes)
+                infolevel[jj+1:(nbmod[k]*maxmes),2] <- rep(modalites[[k]], each=maxmes)
                 infolevel[jj+1:(nbmod[k]*maxmes),3] <- rep(lambda, nbmod[k])
                 infolevel[jj+1:(nbmod[k]*maxmes),4] <- out$info[j+1:(nbmod[k]*maxmes)]
                 infolevel[jj+1:(nbmod[k]*maxmes),5] <- out$info[j+nbmod[k]*maxmes+1:(nbmod[k]*maxmes)]
@@ -211,6 +221,11 @@ ItemInfo <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,
             {  
                 bdraw <- rnorm(npm)
                 bdraw <- best + Chol %*% bdraw
+
+                if(inherits(x, "lcmm"))
+                {
+                    bdraw <- c(rep(0, npm - nbmod - 2), 1, bdraw[sum(x$N[1:4]) + 1:(nbmod - 1)]) # on utilise slt erreur et seuils
+                }
                 
                 out <- .Fortran(C_iteminfo,
                                 as.double(lambdatot),
@@ -223,7 +238,7 @@ ItemInfo <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,
                                 as.integer(debut),
                                 as.integer(nbzitr),
                                 as.integer(x$linktype),
-                                as.integer(unlist(x$modalites)),
+                                as.integer(unlist(modalites)),
                                 as.integer(nbmod),
                                 as.integer(nsim),
                                 as.integer(2*sum(nbmod)+ny),
@@ -261,7 +276,7 @@ ItemInfo <- function(x,lprocess,condRE_Y=FALSE,nsim=200,draws=FALSE,ndraws=2000,
                 if(x$linktype[k] != 3) next
                 
                 infolevel[jj+1:(nbmod[k]*maxmes),1] <- Ynames[k]
-                infolevel[jj+1:(nbmod[k]*maxmes),2] <- rep(x$modalites[[k]], each=maxmes)
+                infolevel[jj+1:(nbmod[k]*maxmes),2] <- rep(modalites[[k]], each=maxmes)
                 infolevel[jj+1:(nbmod[k]*maxmes),3] <- rep(lambda, nbmod[k])
                 infolevel[jj+1:(nbmod[k]*maxmes),4] <- Ypred_50[j+1:(nbmod[k]*maxmes)]
                 infolevel[jj+1:(nbmod[k]*maxmes),5] <- Ypred_2.5[j+1:(nbmod[k]*maxmes)]

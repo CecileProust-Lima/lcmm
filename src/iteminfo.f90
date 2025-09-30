@@ -47,16 +47,15 @@ subroutine iteminfo(X0,condRE_Y,nalea,ny,maxmes,npm,b1,debut,nbzitr,idlink,&
   ysim=0.d0
 
   info=0.d0  
-
   do l=1,nsim
 
      sumntrtot=0
      sumnbmod = 0
      do yk=1,ny
-
+        
         grandPhi=0.d0
         petitphi=0.d0
-
+        
         if (idlink(yk).eq.3) then ! ordinal
 
            if(condRE_Y.eq.1 .and.l.eq.1) then
