@@ -37,7 +37,11 @@ predictCor <- function(model, newdata, predtimes){
     if(is.na(ncor) | (ncor == 0)) stop("No prediction can be computed")
     
     ## name of the time variable for the correlation 
-    cor.var.time <- model$Xnames[which(model$idcor == 1)]
+    if(!inherits(model, "Jointlcmm"))
+        cor.var.time <- model$Xnames[which(model$idcor == 1)]
+    else
+        cor.var.time <- model$Names$Xnames[which(model$idcor == 1)]
+    
 
     ## remove missing values
     fixed <- model$call$fixed
@@ -69,14 +73,22 @@ predictCor <- function(model, newdata, predtimes){
         Valea <- matrix(0, sum(nmes), sum(nmes))
     
     Verr <- createVarianceMatrix(model, which = "error", nmes = nmes)
+
+    ## link function 
+    linkfunction <- FALSE
+    if(inherits(model, c("lcmm", "multlcmm"))) linkfunction <- TRUE
+    if(inherits(model, "Jointlcmm")) if(model$linktype != -1) linkfunction <- TRUE
     
     ## compute E(Y)
-    EY <- predictY(model, newdata = newdata1)$pred
-
+    if(linkfunction)
+        EY <- predictL(model, newdata = newdata1)$pred
+    else
+        EY <- predictY(model, newdata = newdata1)$pred
+        
     ## Y
-    Y <- newdata1[, "outcome"]
-
-
+    Hy <- applyLink(model, newdata)
+    Y <- Hy[, ncol(Hy)]
+    
     ## compute prediction
     if(!is.list(B)){
         

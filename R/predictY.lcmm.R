@@ -18,6 +18,8 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
                                         #if(missing(var.time)) stop("missing argument 'var.time'")
                                         #if(!(var.time %in% colnames(newdata))) stop("'var.time' should be included in newdata")
 
+    dots <- list(...)
+    if(("predRE" %in% names(dots)) | ("predCor" %in% names(dots))) stop("No subject-specific prediction can be computed with lcmm models")
 
     call_fixed <- x$call$fixed[3]
     if(is.null(x$call$random)) {call_random <- -1} else call_random <- x$call$random[2]
@@ -1036,6 +1038,12 @@ predictY.lcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndr
 #' with as many rows as latent classes
 #' containing the predicted random effects in each latent class.
 #' In particular, predRE can be the result of a predictRE call with classpredRE = TRUE.
+#' @param predCor option only available for \code{hlme} models and
+#' \code{Jointlcmm} models without any link function.
+#' If \code{predCor} is specified, the returned predictions include the
+#' correlation (BM or AR) part of the model. \code{predCor} should be a matrix
+#' with as many columns as latent classes and as many rows as newdata.
+#' In particular, predCor can be the result of a predictCor call.
 #' @param na.action Integer indicating how NAs are managed. The default is 1
 #' for 'na.omit'. The alternative is 2 for 'na.fail'. Other options such as
 #' 'na.pass' or 'na.exclude' are not implemented in the current version.

@@ -2,7 +2,7 @@
 #' @rdname predictY
 #' @export
 #'
-predictY.Jointlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndraws=2000,na.action=1, predRE = NULL, ...)
+predictY.Jointlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALSE,ndraws=2000,na.action=1, predRE = NULL, predCor = NULL, ...)
 {
     if(missing(newdata)) stop("The argument newdata should be specified")
     if(missing(x)) stop("The argument x should be specified")
@@ -18,6 +18,7 @@ predictY.Jointlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALS
     if(!is.null(predRE))
     {
         if(x$linktype != -1) stop("Subject-specific predictions are not available for models including a link function")
+        if(sum(x$idea) == 0) stop("No random effects are defined in the model")
         if(!inherits(predRE, "data.frame")) stop("predRE should be a data.frame")
         if(nrow(predRE) != x$ng) stop("predRE should contain as many rows as latent classes")
         if(draws==TRUE) stop("No confidence intervals are provided for subject-specific prediction")
@@ -38,6 +39,17 @@ predictY.Jointlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALS
         if(!all(namesRE %in% colnames(predRE))) stop(paste("predRE requires the following columns : ", paste(namesRE, collapse = " ")))
         
         predRE <- t(as.matrix(predRE[, namesRE, drop = FALSE]))
+    }
+
+    if(!is.null(predCor))
+    {
+        if(x$linktype != -1) stop("Subject-specific predictions are not available for models including a link function")
+        if(x$N[7] == 0) stop("No correlation is defined in the model")
+        if(draws==TRUE) stop("No confidence intervals are provided for subject-specific prediction")
+
+        if(ncol(predCor) != x$ng) stop("predCor should contain as many columns as latent classes")
+        if(nrow(predCor) != nrow(newdata)) stop("The number of rows in predCor should match the number of rows in newdata")
+
     }
 
     
@@ -591,6 +603,13 @@ call_survival <- formula(paste("~",call_survival,sep=""))
                             Ypred <- Ypred + Zu
                         }
                     }
+                    
+                    if(!is.null(predCor))
+                    {
+                        ## add BM/AR
+                        Ypred <- Ypred + predCor
+                    }
+
 
                     colnames(Ypred) <- paste("Ypred_class",1:x$ng,sep="")
                     if (x$ng==1) colnames(Ypred) <- "Ypred"

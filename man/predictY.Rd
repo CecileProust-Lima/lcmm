@@ -21,6 +21,7 @@ of the longitudinal outcome(s) computed from a profile of covariates.}
   ndraws = 2000,
   na.action = 1,
   predRE = NULL,
+  predCor = NULL,
   ...
 )
 
@@ -31,6 +32,7 @@ of the longitudinal outcome(s) computed from a profile of covariates.}
   draws = FALSE,
   na.action = 1,
   predRE = NULL,
+  predCor = NULL,
   ...
 )
 
@@ -113,6 +115,13 @@ For subject-specific predictions, \code{predRE} should be a data frame
 with as many rows as latent classes
 containing the predicted random effects in each latent class.
 In particular, predRE can be the result of a predictRE call with classpredRE = TRUE.}
+
+\item{predCor}{option only available for \code{hlme} models and
+\code{Jointlcmm} models without any link function.
+If \code{predCor} is specified, the returned predictions include the
+correlation (BM or AR) part of the model. \code{predCor} should be a matrix
+with as many columns as latent classes and as many rows as newdata.
+In particular, predCor can be the result of a predictCor call.}
 
 \item{\dots}{further arguments to be passed to or from other methods. 
 Only the argument 'median' will be used, other are ignored. 'median' should

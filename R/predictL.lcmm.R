@@ -1,6 +1,6 @@
 #' @export
 #'
-predictL.lcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE, predRE = NULL, ...)
+predictL.lcmm <- function(x,newdata,var.time,na.action=1,confint=FALSE, predRE = NULL, predCor = NULL, ...)
 {
 if(missing(newdata)) stop("The argument newdata should be specified")
 if(missing(x)) stop("The argument x should be specified")
@@ -13,7 +13,7 @@ if (!inherits(newdata, "data.frame")) stop("newdata should be a data.frame objec
 if(!is.null(predRE))
 {
     if(confint == TRUE) stop("No confidence intervals are provided for subject-specific prediction")
-        
+    if(sum(x$idea) == 0) stop("No random effects are defined in the model")
     if(!inherits(predRE, "data.frame")) stop("predRE should be a data.frame")
     if(nrow(predRE) != x$ng) stop("predRE should contain as many rows as latent classes")
         
@@ -32,6 +32,14 @@ if(!is.null(predRE))
     if(!all(namesRE %in% colnames(predRE))) stop(paste("predRE requires the following columns : ", paste(namesRE, collapse = " ")))
     
     predRE <- t(as.matrix(predRE[, namesRE, drop = FALSE]))
+}
+
+if(!is.null(predCor))
+{
+    if(confint==TRUE) stop("No confidence intervals are provided for subject-specific prediction")
+    if(x$N[6] == 0) stop("No correlation is defined in the model")
+    if(ncol(predCor) != x$ng) stop("predCor should contain as many columns as latent classes")
+    if(nrow(predCor) != nrow(newdata)) stop("The number of rows in predCor should match the number of rows in newdata")    
 }
 
 #if(missing(var.time)) stop("missing argument 'var.time'")
@@ -453,22 +461,31 @@ if(x$N[6]>0)
   }
   }
 
-    if(!is.null(predRE))
+    if(!is.null(predRE) | !is.null(predCor))
     {
-        ## add subject-specific part to Y :
-        Z <- newdata1[, which(x$idea0 == 1), drop = FALSE]
-
-        if(ncol(predRE) == 1)
+        if(!is.null(predRE))
         {
-            Zu <- Z %*% as.numeric(predRE)
+            ## add subject-specific part to Y :
+            Z <- newdata1[, which(x$idea0 == 1), drop = FALSE]
             
-            Y <- sweep(Y, 1, Zu, "+")
+            if(ncol(predRE) == 1)
+            {
+                Zu <- Z %*% as.numeric(predRE)
+                
+                Y <- sweep(Y, 1, Zu, "+")
+            }
+            else
+            {
+                Zu <- Z %*% predRE
+                
+                Y <- Y + Zu
+            }
         }
-        else
+
+        ## add BM/AR
+        if(!is.null(predCor))
         {
-            Zu <- Z %*% predRE
-            
-            Y <- Y + Zu
+            Y <- Y + predCor
         }
         
         ## result
@@ -616,6 +633,11 @@ cat("Output can not be produced since the program stopped abnormally.")
 #' in each latent class. If NULL (the default), marginal prediction are
 #' computed.If predRE is specified, subject-specific predictions
 #' are computed. 
+#' @param predCor optional matrix.
+#' If \code{predCor} is specified, the returned predictions include the
+#' correlation (BM or AR) part of the model. \code{predCor} should be a matrix
+#' with as many columns as latent classes and as many rows as newdata.
+#' In particular, predCor can be the result of a predictCor call.
 #' @param \dots further arguments to be passed to or from other methods.  They
 #' are ignored in this function.
 #' @return An object of class \code{predictL} with values :

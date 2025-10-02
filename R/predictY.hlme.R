@@ -1,7 +1,7 @@
 #' @rdname predictY
 #' @export
 #'
-predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, predRE = NULL, ...){
+predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, predRE = NULL, predCor = NULL, ...){
 
     if(missing(newdata)) stop("The argument newdata should be specified")
     if(missing(x)) stop("The argument x should be specified")
@@ -17,7 +17,7 @@ predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, predRE
     if(!is.null(predRE))
     {
         if(draws==TRUE) stop("No confidence intervals are provided for subject-specific prediction")
-        
+        if(sum(x$idea) == 0) stop("No random effects are defined in the model")
         if(!inherits(predRE, "data.frame")) stop("predRE should be a data.frame")
         if(nrow(predRE) != x$ng) stop("predRE should contain as many rows as latent classes")
         
@@ -36,6 +36,15 @@ predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, predRE
         if(!all(namesRE %in% colnames(predRE))) stop(paste("predRE requires the following columns : ", paste(namesRE, collapse = " ")))
         
         predRE <- t(as.matrix(predRE[, namesRE, drop = FALSE]))
+    }
+
+    if(!is.null(predCor))
+    {
+        if(draws==TRUE) stop("No confidence intervals are provided for subject-specific prediction")
+        if(x$N[5] == 0) stop("No correlation is defined in the model")
+        if(ncol(predCor) != x$ng) stop("predCor should contain as many columns as latent classes")
+        if(nrow(predCor) != nrow(newdata)) stop("The number of rows in predCor should match the number of rows in newdata")
+
     }
 
     call_fixed <- x$call$fixed[3]
@@ -445,7 +454,7 @@ predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, predRE
 
 
 
-        if(is.null(predRE)) # marginal prediction 
+        if(is.null(predRE) & is.null(predCor)) # marginal prediction 
         {
             if(draws==TRUE)
             {
@@ -521,20 +530,29 @@ predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, predRE
         }
         else
         {
-            ## add subject-specific part to Y :
-            Z <- newdata1[, which(x$idea0 == 1), drop = FALSE]
-
-            if(ncol(predRE) == 1)
+            if(!is.null(predRE))
             {
-                Zu <- Z %*% as.numeric(predRE)
+                ## add subject-specific part to Y :
+                Z <- newdata1[, which(x$idea0 == 1), drop = FALSE]
                 
-                Y <- sweep(Y, 1, Zu, "+")
+                if(ncol(predRE) == 1)
+                {
+                    Zu <- Z %*% as.numeric(predRE)
+                    
+                    Y <- sweep(Y, 1, Zu, "+")
+                }
+                else
+                {
+                    Zu <- Z %*% predRE
+                    
+                    Y <- Y + Zu
+                }
             }
-            else
+            
+            ## add BM/AR
+            if(!is.null(predCor))
             {
-                Zu <- Z %*% predRE
-
-                Y <- Y + Zu
+                Y <- Y + predCor
             }
 
             ## result

@@ -10,6 +10,8 @@ if (!all(x$Xnames2 %in% colnames(newdata))) stop(paste(c("newdata should at leas
 if (!inherits(newdata, "data.frame")) stop("newdata should be a data.frame object")
 #if(missing(var.time)) stop("missing argument 'var.time'")
 #if(!(var.time %in% colnames(newdata))) stop("'var.time' should be included in newdata")
+dots <- list(...)
+if(("predRE" %in% names(dots)) | ("predCor" %in% names(dots))) stop("No subject-specific prediction can be computed with lcmm models")
 
 if(any(x$linktype==3))
 {
