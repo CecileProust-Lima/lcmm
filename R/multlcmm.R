@@ -883,7 +883,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
 ###ordonner les mesures par individu
     #IDnum <- as.numeric(IND)
     matYX <- cbind(IND,timeobs,prior,pprior,Y0,indiceY0,outcome,X0)
-    matYXord <- matYX[order(IND),]
+    matYXord <- matYX[order(IND), , drop = FALSE]
     Y0 <- as.numeric(matYXord[,4+ng])
     X0 <- apply(matYXord[,-c(1:(6+ng)),drop=FALSE],2,as.numeric)
                                         #X0 <- as.matrix(X0)  a remettre si X0 <- as.data.frame(X0) remis l.211

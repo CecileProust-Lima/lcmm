@@ -1022,7 +1022,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         if(is.null(nom.pprior)) pprior <- matrix(1,length(Y0),ng)  
         if(!length(indiceY0)) indiceY0 <- rep(0,length(Y0))  
         matYX <- cbind(IND,timeobs,prior,pprior,Y0,indiceY0,Tentry,Tevent,Event,Tint,X0)
-        matYXord <- matYX[order(IND),]
+        matYXord <- matYX[order(IND), , drop = FALSE]
         Y0 <- as.numeric(matYXord[,4+ng])
         X0 <- apply(matYXord[,-c(1:(9+ng)),drop=FALSE],2,as.numeric)
         #IDnum <- matYXord[,1]

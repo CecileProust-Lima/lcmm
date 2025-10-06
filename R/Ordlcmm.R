@@ -298,7 +298,7 @@
 
     ## on ordonne les donnees suivant la variable IND
     matYX <- cbind(IND,PRIOR,pprior0,Y0,X0)
-    matYXord <- matYX[sort.list(matYX[,1]),]
+    matYXord <- matYX[sort.list(matYX[,1]), , drop = FALSE]
     Y0 <- as.numeric(matYXord[,3+ng] )
     X0 <- apply(matYXord[,-c(1:(3+ng)),drop=FALSE],2,as.numeric)
     #IDnum <- matYXord[,1]

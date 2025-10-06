@@ -1064,7 +1064,7 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         if(!length(indiceY0)) indiceY0 <- rep(0,length(Y0))  
         matYX <- data.frame(IND,processK=dataY$processK,outcomeM=dataY$outcomeM,
                             Y0,indiceY0,X0)
-        matYXord <- matYX[order(IND),]
+        matYXord <- matYX[order(IND), , drop = FALSE]
         Y0 <- as.numeric(matYXord[,4])
         old <- colnames(X0)
         X0 <- apply(matYXord[,-c(1:5),drop=FALSE],2,as.numeric)
