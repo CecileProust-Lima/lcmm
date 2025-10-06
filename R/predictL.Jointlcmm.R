@@ -43,7 +43,6 @@ if(!is.null(predCor))
     if(confint==TRUE) stop("No confidence intervals are provided for subject-specific prediction")
     if(x$N[7] == 0) stop("No correlation is defined in the model")
     if(ncol(predCor) != x$ng) stop("predCor should contain as many columns as latent classes")
-    if(nrow(predCor) != nrow(newdata)) stop("The number of rows in predCor should match the number of rows in newdata")    
 }
 
 call_fixed <- x$call$fixed[3]
@@ -246,6 +245,10 @@ if(!is.null(na.action)){
         times <- times[-na.action]
 }
 
+        if(!is.null(predCor)){
+            if(nrow(predCor) != nrow(newdata1)) stop(paste("predCor should be of length", nrow(newdata1), "(number of available data in newdata)"))
+        }
+        
         ## create one data frame for each formula (useful with factors)
         newdata1fixed <- newdata1
         for(v in colnames(newdata1fixed))

@@ -43,7 +43,6 @@ predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, predRE
         if(draws==TRUE) stop("No confidence intervals are provided for subject-specific prediction")
         if(x$N[5] == 0) stop("No correlation is defined in the model")
         if(ncol(predCor) != x$ng) stop("predCor should contain as many columns as latent classes")
-        if(nrow(predCor) != nrow(newdata)) stop("The number of rows in predCor should match the number of rows in newdata")
 
     }
 
@@ -269,6 +268,9 @@ predictY.hlme <- function(x, newdata, var.time, draws=FALSE, na.action=1, predRE
             times <- times[-na.action,,drop=FALSE]
         }
 
+        if(!is.null(predCor)){
+            if(nrow(predCor) != nrow(newdata1)) stop(paste("predCor should be of length", nrow(newdata1), "(number of available data in newdata)"))
+        }
             
             ## create one data frame for each formula (useful with factors)
             newdata1fixed <- newdata1

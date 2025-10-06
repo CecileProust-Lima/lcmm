@@ -48,8 +48,6 @@ predictY.Jointlcmm <- function(x,newdata,var.time,methInteg=0,nsim=20,draws=FALS
         if(draws==TRUE) stop("No confidence intervals are provided for subject-specific prediction")
 
         if(ncol(predCor) != x$ng) stop("predCor should contain as many columns as latent classes")
-        if(nrow(predCor) != nrow(newdata)) stop("The number of rows in predCor should match the number of rows in newdata")
-
     }
 
     
@@ -343,7 +341,10 @@ call_survival <- formula(paste("~",call_survival,sep=""))
                     times <- times[-na.action,,drop=FALSE]
                 }
             
-
+            if(!is.null(predCor)){
+                if(nrow(predCor) != nrow(newdata1)) stop(paste("predCor should be of length", nrow(newdata1), "(number of available data in newdata)"))
+            }
+            
             ## create one data frame for each formula (useful with factors)
             newdata1fixed <- newdata1
             for(v in colnames(newdata1fixed))
