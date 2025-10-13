@@ -805,7 +805,12 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
 ####
                 
                 xfk <- model.matrix(formula(paste("~",formk)), data=dataY[which(dataY$processK==k),,drop=FALSE])
-                xrk <- model.matrix(formula(paste("~",mod$call$random[2])), data=dataY[which(dataY$processK==k),,drop=FALSE])
+
+                xrk <- NULL
+                if(!is.null(mod$call$random))
+                {
+                    xrk <- model.matrix(formula(paste("~",mod$call$random[2])), data=dataY[which(dataY$processK==k),,drop=FALSE])
+                }
                 
                 ## X0 dans le bon ordre
                 xk <- cbind(xfk, xrk)[,union(colnames(xfk),colnames(xrk)),drop=FALSE]

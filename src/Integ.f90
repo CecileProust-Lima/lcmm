@@ -20,7 +20,7 @@ subroutine Integ(X0, idprob, idea, idg, idcor, ng, ncor, nv, maxmes, idiag, nwg,
 
   ! for computation
   integer :: j, k, l, m, g, l2, m2, jj, npm2, j1, j2
-  integer :: ier, nmoins, kk, nvarprob, ncg, ncssg, nea, nef, nvc, nprob
+  integer :: ier, nmoins, nvarprob, ncg, ncssg, nea, nef, nvc, nprob
   double precision, dimension(nv,nv) :: Ut, Ut1
   double precision, dimension(:,:), allocatable :: VC, Z, P, R, X00, X2
   double precision, dimension(:), allocatable :: Vi, ysim, usim, mu, tcor
