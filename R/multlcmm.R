@@ -893,7 +893,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     prior0 <- as.numeric(unique(matYXord[,c(1,3)])[,2])
     if(length(prior0)!=length(unique(IND))) stop("Please check 'prior' argument. Subjects can not have multiple assigned classes.")
     pprior0 <- t(matYXord[!duplicated(matYXord[,1]), 3+1:ng, drop=FALSE])
-    timeobs <- matYXord[,2]
+    timeobs <- as.numeric(matYXord[,2])
         
 
 ###parametres pour hetmixMult
