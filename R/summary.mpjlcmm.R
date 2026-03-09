@@ -542,11 +542,11 @@ summary.mpjlcmm <- function(object,...)
             {
                 std.err <- NULL
                 nom <- NULL
-                std.err <- rbind(std.err,coefch[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+nvc[k]+nw[k]+ncor[k]+1:nerr[k]])
+                std.err <- rbind(std.err,abs(coefch[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+nvc[k]+nw[k]+ncor[k]+1:nerr[k]]))
                 nom <- c(nom, "Residual standard error:")
                 if(nalea[k]>0)
                 {
-                    std.err <- rbind(std.err,coefch[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+nvc[k]+nw[k]+ncor[k]+nerr[k]+1:nalea[k]])
+                    std.err <- rbind(std.err,abs(coefch[nprob+nrisqtot+nvarxevt+sumnpm+nef[k]+ncontr[k]+nvc[k]+nw[k]+ncor[k]+nerr[k]+1:nalea[k]]))
                     nom <- c(nom, "Standard error of the random effect:")
                 }  
 
