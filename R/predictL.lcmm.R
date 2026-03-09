@@ -675,4 +675,4 @@ cat("Output can not be produced since the program stopped abnormally.")
 #' 
 #' @export
 #' 
-predictL <- function(x,newdata,var.time,na.action=1,confint=FALSE,predRE=NULL,...) UseMethod("predictL")
+predictL <- function(x,newdata,var.time,na.action=1,confint=FALSE,predRE=NULL,predCor=NULL,...) UseMethod("predictL")

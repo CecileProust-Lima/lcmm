@@ -41,7 +41,7 @@
 #' @author Cecile Proust-Lima, Viviane Philipps, Amadou Diakite and Benoit
 #' Liquet
 #' 
-#' \email{cecile.proust-lima@@inserm.fr}
+#' \email{cecile.proust-lima@@u-bordeaux.fr}
 #' @references
 #' 
 #' Proust-Lima C, Philipps V, Liquet B (2017). Estimation of Extended Mixed 

@@ -1,9 +1,9 @@
 Package: lcmm
 Type: Package
 Title: Extended Mixed Models Using Latent Classes and Latent Processes
-Version: 2.2.1
-Date: 2025-02-12
-Authors@R: c(person("Cecile", "Proust-Lima", role=c("aut", "cre"), email="cecile.proust-lima@inserm.fr"),
+Version: 2.2.2
+Date: 2025-11-20
+Authors@R: c(person("Cecile", "Proust-Lima", role=c("aut", "cre"), email="cecile.proust-lima@u-bordeaux.fr"),
              person("Viviane", "Philipps", role="aut"),
 	     person("Amadou", "Diakite", role="ctb"),
 	     person("Benoit", "Liquet", role="ctb"),
@@ -20,4 +20,4 @@ LazyLoad: yes
 LazyData: true
 VignetteBuilder: knitr
 NeedsCompilation: yes
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3

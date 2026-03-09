@@ -103,5 +103,5 @@ Useful links:
 Cecile Proust-Lima, Viviane Philipps, Amadou Diakite and Benoit
 Liquet
 
-\email{cecile.proust-lima@inserm.fr}
+\email{cecile.proust-lima@u-bordeaux.fr}
 }

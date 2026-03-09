@@ -1,3 +1,12 @@
+# Changes in Version 2.2.2 (2025-11-17) :
+
+* the functions predictY (hlme, Jointlcmm) and predictL (lcmm, multlcmm, Jointlcmm) now compute subject-specific predictions
+* new function predictCor to predict the correlations (BM or AR)
+* new function sampleParameters to generate the parameters of a model
+* bug fixed in mpjlcmm without random effects
+* bug fixed in plot(, which = "fit") with negative observation times
+* bug fixed in ItemInfo with lcmm models
+
 # Changes in Version 2.2.0 (2025-01-29) :
 
 * new function predictYback to compute predictions in the natural scale of a pre-transformed outcome

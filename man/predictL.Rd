@@ -15,6 +15,7 @@ predictL(
   na.action = 1,
   confint = FALSE,
   predRE = NULL,
+  predCor = NULL,
   ...
 )
 }
@@ -42,6 +43,12 @@ to FALSE.}
 in each latent class. If NULL (the default), marginal prediction are
 computed.If predRE is specified, subject-specific predictions
 are computed.}
+
+\item{predCor}{optional matrix.
+If \code{predCor} is specified, the returned predictions include the
+correlation (BM or AR) part of the model. \code{predCor} should be a matrix
+with as many columns as latent classes and as many rows as newdata.
+In particular, predCor can be the result of a predictCor call.}
 
 \item{\dots}{further arguments to be passed to or from other methods.  They
 are ignored in this function.}
