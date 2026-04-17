@@ -17,7 +17,7 @@ lcmm."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">lcmm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -683,6 +683,7 @@ in Medical Research 23, 74-90.</p>
 <span class="r-in"><span>hazard<span class="op">=</span><span class="st">"3-quant-splines"</span>,hazardtype<span class="op">=</span><span class="st">"PH"</span>,ng<span class="op">=</span><span class="fl">2</span>,data<span class="op">=</span><span class="va">data_lcmm</span>,</span></span>
 <span class="r-in"><span>B<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.64</span>,<span class="op">-</span><span class="fl">0.62</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0.52</span>,<span class="fl">0.81</span>,<span class="fl">0.41</span>,<span class="fl">0.78</span>,<span class="fl">0.1</span>,<span class="fl">0.77</span>,<span class="op">-</span><span class="fl">0.05</span>,<span class="fl">10.43</span>,<span class="fl">11.3</span>,<span class="op">-</span><span class="fl">2.6</span>,</span></span>
 <span class="r-in"><span><span class="op">-</span><span class="fl">0.52</span>,<span class="fl">1.41</span>,<span class="op">-</span><span class="fl">0.05</span>,<span class="fl">0.91</span>,<span class="fl">0.05</span>,<span class="fl">0.21</span>,<span class="fl">1.5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>type= 'mstate' is deprecated, use a factor variable as status</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Joint latent class model for quantitative outcome and competing risks </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      fitted by maximum likelihood method </span>
@@ -707,15 +708,15 @@ in Medical Research 23, 74-90.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Iteration process: </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Convergence criteria satisfied </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Number of iterations:  2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Convergence criteria: parameters= 1.7e-07 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          : likelihood= 2.9e-05 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          : second derivatives= 1.4e-05 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Convergence criteria: parameters= 2.9e-10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          : likelihood= 2.1e-07 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          : second derivatives= 1.7e-05 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Goodness-of-fit statistics: </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      maximum log-likelihood: -3921.28  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      AIC: 7884.56  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      BIC: 7962.34  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Score test statistic for CI assumption: 4.868 (p-value=0.0877) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Score test statistic for CI assumption: 4.869 (p-value=0.0876) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Maximum Likelihood Estimates: </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
@@ -723,40 +724,40 @@ in Medical Research 23, 74-90.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (the class of reference is the last class) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                      coef      Se    Wald p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class1  0.64179 0.23639   2.715 0.00663</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X3 class1        -0.62135 0.18720  -3.319 0.00090</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class1  0.64178 0.23641   2.715 0.00663</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X3 class1        -0.62134 0.18719  -3.319 0.00090</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameters in the proportional hazard model:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                              coef      Se    Wald p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines1) -0.00007 0.02194  -0.003 0.99752</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines2) -0.00014 0.04412  -0.003 0.99747</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines3)  0.50421 0.10396   4.850 0.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines4)  0.80901 0.15970   5.066 0.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines5)  0.43681 0.39996   1.092 0.27477</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> event1 SurvPH class1      0.78331 0.35394   2.213 0.02689</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1                        0.10318 0.16729   0.617 0.53739</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X2 class1                 0.76963 0.20998   3.665 0.00025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X2 class2                -0.04521 0.57232  -0.079 0.93703</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines1)  0.00000 0.04021   0.000 0.99997</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines2)  0.00002 0.11982   0.000 0.99985</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines3)  0.50439 0.10403   4.849 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines4)  0.80873 0.15974   5.063 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 +/-sqrt(splines5)  0.43690 0.40031   1.091 0.27510</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> event1 SurvPH class1      0.78340 0.35406   2.213 0.02692</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1                        0.10325 0.16742   0.617 0.53742</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X2 class1                 0.76965 0.21001   3.665 0.00025</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X2 class2                -0.04519 0.56855  -0.079 0.93664</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fixed effects in the longitudinal model:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                      coef      Se    Wald p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class1 10.42612 0.19161  54.414 0.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class2 11.29780 0.23627  47.816 0.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Time class1      -2.59556 0.17992 -14.426 0.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Time class2      -0.52342 0.17642  -2.967 0.00301</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1                1.41450 0.22174   6.379 0.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Time:X1          -0.04995 0.20647  -0.242 0.80886</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class1 10.42614 0.19193  54.324 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept class2 11.29782 0.23646  47.778 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time class1      -2.59558 0.18086 -14.351 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time class2      -0.52339 0.17740  -2.950 0.00317</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X1                1.41448 0.22315   6.339 0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time:X1          -0.04994 0.20973  -0.238 0.81179</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Variance-covariance matrix of the random-effects:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           intercept    Time</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> intercept   0.91249        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Time        0.05005 0.21387</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> intercept   0.91247        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time        0.05003 0.21385</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                             coef      Se</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual standard error  1.50271 0.03000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual standard error  1.50267 0.03000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co">#Goodness-of-fit statistics for m2:</span></span></span>
 <span class="r-in"><span><span class="co">#       maximum log-likelihood: -3921.27; AIC: 7884.54; BIC: 7962.32  </span></span></span>
@@ -813,7 +814,7 @@ in Medical Research 23, 74-90.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Cecile Proust-Lima, Viviane Philipps.</p>
+  <p>Developed by Cecile Proust-Lima, Viviane Philipps, Benoit Liquet, Maris Dussartre.</p>
 </div>
 
 <div class="pkgdown-footer-right">

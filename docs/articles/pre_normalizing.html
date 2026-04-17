@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lcmm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -120,13 +120,13 @@ used.</p>
 normalized values of CES-D for all the observations of the dataset:</p>
 <p> </p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">head</span>(mpreH<span class="sc">$</span>pred)</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  ID     pred_m   resid_m   pred_ss   resid_ss      obs    pred_m1  pred_ss1</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="dv">1</span>  <span class="dv">1</span> <span class="fl">0.11087820</span> <span class="fl">1.3084180</span> <span class="fl">0.9342108</span>  <span class="fl">0.4850854</span> <span class="fl">1.419296</span> <span class="fl">0.11087820</span> <span class="fl">0.9342108</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="dv">2</span>  <span class="dv">2</span> <span class="fl">0.06084667</span> <span class="fl">1.2129368</span> <span class="fl">1.4361553</span> <span class="sc">-</span><span class="fl">0.1623719</span> <span class="fl">1.273783</span> <span class="fl">0.06084667</span> <span class="fl">1.4361553</span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="dv">3</span>  <span class="dv">2</span> <span class="fl">0.13130647</span> <span class="fl">1.8192134</span> <span class="fl">1.5798637</span>  <span class="fl">0.3706563</span> <span class="fl">1.950520</span> <span class="fl">0.13130647</span> <span class="fl">1.5798637</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="dv">4</span>  <span class="dv">2</span> <span class="fl">0.31339472</span> <span class="fl">1.9993098</span> <span class="fl">1.8557177</span>  <span class="fl">0.4569869</span> <span class="fl">2.312705</span> <span class="fl">0.31339472</span> <span class="fl">1.8557177</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="dv">5</span>  <span class="dv">2</span> <span class="fl">0.82900589</span> <span class="fl">1.9299121</span> <span class="fl">2.2349532</span>  <span class="fl">0.5239648</span> <span class="fl">2.758918</span> <span class="fl">0.82900589</span> <span class="fl">2.2349532</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="dv">7</span>  <span class="dv">3</span> <span class="fl">0.26327484</span> <span class="fl">0.8557632</span> <span class="fl">0.5912825</span>  <span class="fl">0.5277555</span> <span class="fl">1.119038</span> <span class="fl">0.26327484</span> <span class="fl">0.5912825</span></span></code></pre></div>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  ID     pred_m  resid_m   pred_ss   resid_ss      obs    pred_m1  pred_ss1</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="dv">1</span>  <span class="dv">1</span> <span class="fl">0.11087797</span> <span class="fl">1.308418</span> <span class="fl">0.9342094</span>  <span class="fl">0.4850862</span> <span class="fl">1.419296</span> <span class="fl">0.11087797</span> <span class="fl">0.9342094</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="dv">2</span>  <span class="dv">2</span> <span class="fl">0.06084653</span> <span class="fl">1.212936</span> <span class="fl">1.4361555</span> <span class="sc">-</span><span class="fl">0.1623726</span> <span class="fl">1.273783</span> <span class="fl">0.06084653</span> <span class="fl">1.4361555</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="dv">3</span>  <span class="dv">2</span> <span class="fl">0.13130621</span> <span class="fl">1.819213</span> <span class="fl">1.5798634</span>  <span class="fl">0.3706555</span> <span class="fl">1.950519</span> <span class="fl">0.13130621</span> <span class="fl">1.5798634</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="dv">4</span>  <span class="dv">2</span> <span class="fl">0.31339426</span> <span class="fl">1.999309</span> <span class="fl">1.8557169</span>  <span class="fl">0.4569865</span> <span class="fl">2.312703</span> <span class="fl">0.31339426</span> <span class="fl">1.8557169</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="dv">5</span>  <span class="dv">2</span> <span class="fl">0.82900541</span> <span class="fl">1.929911</span> <span class="fl">2.2349520</span>  <span class="fl">0.5239645</span> <span class="fl">2.758917</span> <span class="fl">0.82900541</span> <span class="fl">2.2349520</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="dv">7</span>  <span class="dv">3</span> <span class="fl">0.26327443</span> <span class="fl">0.855763</span> <span class="fl">0.5912821</span>  <span class="fl">0.5277554</span> <span class="fl">1.119037</span> <span class="fl">0.26327443</span> <span class="fl">0.5912821</span></span></code></pre></div>
 <p> </p>
 <p>The normalized variable (to be called for instance “normCESD”) can
 now be added to the dataset</p>
@@ -243,7 +243,7 @@ outcome!</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Cecile Proust-Lima, Viviane Philipps.</p>
+  <p>Developed by Cecile Proust-Lima, Viviane Philipps, Benoit Liquet, Maris Dussartre.</p>
 </div>
 
 <div class="pkgdown-footer-right">

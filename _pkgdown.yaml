@@ -74,6 +74,7 @@ reference:
       - epoce
       - ItemInfo
       - predictClass
+      - predictCor
       - predictlink
       - predictL
       - predictRE
@@ -91,6 +92,7 @@ reference:
       - summaryplot
   - title: Evaluation and tests
     contents:
+      - createVarianceMatrix
       - fitY
       - VarExpl
       - VarCovRE

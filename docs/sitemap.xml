@@ -23,6 +23,7 @@
 <url><loc>/reference/VarCovRE.html</loc></url>
 <url><loc>/reference/VarExpl.html</loc></url>
 <url><loc>/reference/WaldMult.html</loc></url>
+<url><loc>/reference/createVarianceMatrix.html</loc></url>
 <url><loc>/reference/cuminc.html</loc></url>
 <url><loc>/reference/data_hlme.html</loc></url>
 <url><loc>/reference/data_lcmm.html</loc></url>
@@ -49,6 +50,7 @@
 <url><loc>/reference/plot.predict.html</loc></url>
 <url><loc>/reference/postprob.html</loc></url>
 <url><loc>/reference/predictClass.html</loc></url>
+<url><loc>/reference/predictCor.html</loc></url>
 <url><loc>/reference/predictL.html</loc></url>
 <url><loc>/reference/predictRE.html</loc></url>
 <url><loc>/reference/predictY.html</loc></url>

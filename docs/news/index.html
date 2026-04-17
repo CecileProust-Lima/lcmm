@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lcmm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,6 +45,15 @@
       <small>Source: <a href="https://github.com/CecileProust-Lima/lcmm/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.2.2" id="changes-in-version-222-2025-11-17-">Changes in Version 2.2.2 (2025-11-17) :<a class="anchor" aria-label="anchor" href="#changes-in-version-222-2025-11-17-"></a></h2><p class="text-muted">CRAN release: 2025-11-20</p>
+<ul><li>the functions predictY (hlme, Jointlcmm) and predictL (lcmm, multlcmm, Jointlcmm) now compute subject-specific predictions</li>
+<li>new function predictCor to predict the correlations (BM or AR)</li>
+<li>new function sampleParameters to generate the parameters of a model</li>
+<li>bug fixed in mpjlcmm without random effects</li>
+<li>bug fixed in plot(, which = “fit”) with negative observation times</li>
+<li>bug fixed in ItemInfo with lcmm models</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.0" id="changes-in-version-220-2025-01-29-">Changes in Version 2.2.0 (2025-01-29) :<a class="anchor" aria-label="anchor" href="#changes-in-version-220-2025-01-29-"></a></h2><p class="text-muted">CRAN release: 2025-02-03</p>
 <ul><li>new function predictYback to compute predictions in the natural scale of a pre-transformed outcome</li>
@@ -293,7 +302,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Cecile Proust-Lima, Viviane Philipps.</p>
+  <p>Developed by Cecile Proust-Lima, Viviane Philipps, Benoit Liquet, Maris Dussartre.</p>
 </div>
 
 <div class="pkgdown-footer-right">

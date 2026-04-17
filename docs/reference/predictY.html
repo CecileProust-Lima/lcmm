@@ -29,7 +29,7 @@ of the posterior distribution of the predicted values."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">lcmm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,6 +96,7 @@ of the posterior distribution of the predicted values.</p>
 <span>  ndraws <span class="op">=</span> <span class="fl">2000</span>,</span>
 <span>  na.action <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  predRE <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  predCor <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -107,6 +108,7 @@ of the posterior distribution of the predicted values.</p>
 <span>  draws <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  na.action <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  predRE <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  predCor <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -214,6 +216,15 @@ containing the predicted random effects in each latent class.
 In particular, predRE can be the result of a predictRE call with classpredRE = TRUE.</p></dd>
 
 
+<dt id="arg-predcor">predCor<a class="anchor" aria-label="anchor" href="#arg-predcor"></a></dt>
+<dd><p>option only available for <code>hlme</code> models and
+<code>Jointlcmm</code> models without any link function.
+If <code>predCor</code> is specified, the returned predictions include the
+correlation (BM or AR) part of the model. <code>predCor</code> should be a matrix
+with as many columns as latent classes and as many rows as newdata.
+In particular, predCor can be the result of a predictCor call.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>further arguments to be passed to or from other methods.
 Only the argument 'median' will be used, other are ignored. 'median' should
@@ -266,7 +277,7 @@ number of the latent class: pred_ss_1,pred_ss_2,...)</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Cecile Proust-Lima, Viviane Philipps.</p>
+  <p>Developed by Cecile Proust-Lima, Viviane Philipps, Benoit Liquet, Maris Dussartre.</p>
 </div>
 
 <div class="pkgdown-footer-right">

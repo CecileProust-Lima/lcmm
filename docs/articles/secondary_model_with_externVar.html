@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lcmm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -208,6 +208,7 @@ classes).
 </h4>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">NormPsy</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: package 'NormPsy' was built under R version 4.5.2</span></span>
 <span><span class="va">paquid</span><span class="op">$</span><span class="va">normMMSE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/NormPsy/man/normMMSE.html" class="external-link">normMMSE</a></span><span class="op">(</span><span class="va">paquid</span><span class="op">$</span><span class="va">MMSE</span><span class="op">)</span></span>
 <span><span class="va">paquid</span><span class="op">$</span><span class="va">age65</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">paquid</span><span class="op">$</span><span class="va">age</span> <span class="op">-</span> <span class="fl">65</span><span class="op">)</span> <span class="op">/</span> <span class="fl">10</span></span>
 <span><span class="va">PrimModel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hlme.html">hlme</a></span><span class="op">(</span><span class="va">normMMSE</span> <span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="va">CEP</span>,</span>
@@ -546,7 +547,13 @@ class-specific Weibull hazards for the time to dementia.
 <span>                     subject <span class="op">=</span> <span class="st">"ID"</span>,</span>
 <span>                     data <span class="op">=</span> <span class="va">paquid</span>,</span>
 <span>                     method <span class="op">=</span> <span class="st">"twoStageJoint"</span>,</span>
-<span>                     B <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                     B <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(68.5063, 85.61670089, 85.61670089, 85.61670089, :</span></span>
+<span><span class="co">#&gt; type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(68.5063, 85.61670089, 85.61670089, 85.61670089, :</span></span>
+<span><span class="co">#&gt; type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(68.5063, 85.61670089, 85.61670089, 85.61670089, :</span></span>
+<span><span class="co">#&gt; type= 'mstate' is deprecated, use a factor variable as status</span></span></code></pre></div>
 <p align="justify">
 With hazardtype argument, we can also assume a proportional hazard
 across classes with either a Weibull baseline risk function or a splines
@@ -560,6 +567,12 @@ baseline risk function.
 <span>                      subject <span class="op">=</span> <span class="st">"ID"</span>,</span>
 <span>                      data <span class="op">=</span> <span class="va">paquid</span>,</span>
 <span>                      method <span class="op">=</span> <span class="st">"twoStageJoint"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(68.5063, 85.61670089, 85.61670089, 85.61670089, :</span></span>
+<span><span class="co">#&gt; type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(68.5063, 85.61670089, 85.61670089, 85.61670089, :</span></span>
+<span><span class="co">#&gt; type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(68.5063, 85.61670089, 85.61670089, 85.61670089, :</span></span>
+<span><span class="co">#&gt; type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span></span>
 <span><span class="va">Dem2stageSPH</span> <span class="op">=</span> <span class="fu"><a href="../reference/externVar.html">externVar</a></span><span class="op">(</span><span class="va">PrimModel</span>,</span>
 <span>                      survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">age_init</span>, <span class="va">agedem</span>, <span class="va">dem</span><span class="op">)</span> <span class="op">~</span> <span class="va">CEP</span> <span class="op">+</span> <span class="va">male</span>,</span>
@@ -568,6 +581,12 @@ baseline risk function.
 <span>                      subject <span class="op">=</span> <span class="st">"ID"</span>,</span>
 <span>                      data <span class="op">=</span> <span class="va">paquid</span>,</span>
 <span>                      method <span class="op">=</span> <span class="st">"twoStageJoint"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(68.5063, 85.61670089, 85.61670089, 85.61670089, :</span></span>
+<span><span class="co">#&gt; type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(68.5063, 85.61670089, 85.61670089, 85.61670089, :</span></span>
+<span><span class="co">#&gt; type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(68.5063, 85.61670089, 85.61670089, 85.61670089, :</span></span>
+<span><span class="co">#&gt; type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summarytable.html">summarytable</a></span><span class="op">(</span><span class="va">Dem2stage</span>, <span class="va">Dem2stageWPH</span>, <span class="va">Dem2stageSPH</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"npm"</span>,<span class="st">"loglik"</span>,<span class="st">"BIC"</span>,<span class="st">"AIC"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;              npm    loglik      BIC      AIC</span></span>
@@ -605,10 +624,10 @@ predicted survival for the reference category (male=0, CEP=0) are:
 <span><span class="co">#&gt;  </span></span>
 <span><span class="co">#&gt; Iteration process: </span></span>
 <span><span class="co">#&gt;      Convergence criteria satisfied </span></span>
-<span><span class="co">#&gt;      Number of iterations:  59 </span></span>
-<span><span class="co">#&gt;      Convergence criteria: parameters= 3.3e-06 </span></span>
-<span><span class="co">#&gt;                          : likelihood= 9.8e-05 </span></span>
-<span><span class="co">#&gt;                          : second derivatives= 4.1e-09 </span></span>
+<span><span class="co">#&gt;      Number of iterations:  63 </span></span>
+<span><span class="co">#&gt;      Convergence criteria: parameters= 1.9e-06 </span></span>
+<span><span class="co">#&gt;                          : likelihood= 1.2e-05 </span></span>
+<span><span class="co">#&gt;                          : second derivatives= 4.7e-11 </span></span>
 <span><span class="co">#&gt;  </span></span>
 <span><span class="co">#&gt; Goodness-of-fit statistics: </span></span>
 <span><span class="co">#&gt;      maximum log-likelihood: -9359.97  </span></span>
@@ -624,11 +643,11 @@ predicted survival for the reference category (male=0, CEP=0) are:
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                              coef    Se      Wald p-value</span></span>
-<span><span class="co">#&gt; event1 +/-sqrt(Weibull1)  0.10250 0.00055 185.556 0.00000</span></span>
-<span><span class="co">#&gt; event1 +/-sqrt(Weibull2)  4.70212 0.22964  20.476 0.00000</span></span>
-<span><span class="co">#&gt; event1 SurvPH class1      2.99426 0.34645   8.643 0.00000</span></span>
-<span><span class="co">#&gt; CEP                      -0.73976 0.24784  -2.985 0.00284</span></span>
-<span><span class="co">#&gt; male                      0.14359 0.24508   0.586 0.55793</span></span></code></pre></div>
+<span><span class="co">#&gt; event1 +/-sqrt(Weibull1)  0.10250 0.00055 185.558 0.00000</span></span>
+<span><span class="co">#&gt; event1 +/-sqrt(Weibull2)  4.70210 0.22967  20.473 0.00000</span></span>
+<span><span class="co">#&gt; event1 SurvPH class1      2.99426 0.34649   8.642 0.00000</span></span>
+<span><span class="co">#&gt; CEP                      -0.73975 0.24788  -2.984 0.00284</span></span>
+<span><span class="co">#&gt; male                      0.14360 0.24595   0.584 0.55931</span></span></code></pre></div>
 <p align="justify">
 The risk of dementia is much larger in latent class 1 compared to latent
 class 2 with a log hazard ratio of 2.99425 (se=0.34645). For instance,
@@ -678,9 +697,9 @@ with latent class structure.
 <span><span class="co">#&gt; Iteration process: </span></span>
 <span><span class="co">#&gt;      Convergence criteria satisfied </span></span>
 <span><span class="co">#&gt;      Number of iterations:  5 </span></span>
-<span><span class="co">#&gt;      Convergence criteria: parameters= 1.8e-07 </span></span>
-<span><span class="co">#&gt;                          : likelihood= 2.5e-07 </span></span>
-<span><span class="co">#&gt;                          : second derivatives= 8.3e-15 </span></span>
+<span><span class="co">#&gt;      Convergence criteria: parameters= 2.1e-06 </span></span>
+<span><span class="co">#&gt;                          : likelihood= 5.4e-06 </span></span>
+<span><span class="co">#&gt;                          : second derivatives= 2.9e-12 </span></span>
 <span><span class="co">#&gt;  </span></span>
 <span><span class="co">#&gt; Goodness-of-fit statistics: </span></span>
 <span><span class="co">#&gt;      maximum log-likelihood: -8894.28  </span></span>
@@ -695,9 +714,9 @@ with latent class structure.
 <span><span class="co">#&gt; (the class of reference is the last class) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                      coef    Se     Wald p-value</span></span>
-<span><span class="co">#&gt; intercept class1 -1.68614 0.50268 -3.354 0.00080</span></span>
-<span><span class="co">#&gt; male class1      -1.09687 0.44278 -2.477 0.01324</span></span>
-<span><span class="co">#&gt; CEP class1        0.90387 0.50673  1.784 0.07447</span></span></code></pre></div>
+<span><span class="co">#&gt; intercept class1 -1.68614 0.50259 -3.355 0.00079</span></span>
+<span><span class="co">#&gt; male class1      -1.09687 0.44279 -2.477 0.01324</span></span>
+<span><span class="co">#&gt; CEP class1        0.90387 0.50663  1.784 0.07441</span></span></code></pre></div>
 <p align="justify">
 In latent class membership models, the reference class is always the
 last one. Here, using the two-stage approach, both male and CEP are
@@ -755,9 +774,9 @@ estimates.
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">Class2stage</span>,<span class="va">ClassCond</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                      coef      Se   Wald p-value     coef      Se   Wald</span></span>
-<span><span class="co">#&gt; intercept class1 -1.68614 0.50268 -3.354 0.00080 -1.56361 0.60198 -2.597</span></span>
-<span><span class="co">#&gt; male class1      -1.09687 0.44278 -2.477 0.01324 -1.44205 0.57412 -2.512</span></span>
-<span><span class="co">#&gt; CEP class1        0.90387 0.50673  1.784 0.07447  0.88939 0.62425  1.425</span></span>
+<span><span class="co">#&gt; intercept class1 -1.68614 0.50259 -3.355 0.00079 -1.56361 0.60198 -2.597</span></span>
+<span><span class="co">#&gt; male class1      -1.09687 0.44279 -2.477 0.01324 -1.44205 0.57412 -2.512</span></span>
+<span><span class="co">#&gt; CEP class1        0.90387 0.50663  1.784 0.07441  0.88939 0.62425  1.425</span></span>
 <span><span class="co">#&gt;                  p-value</span></span>
 <span><span class="co">#&gt; intercept class1 0.00939</span></span>
 <span><span class="co">#&gt; male class1      0.01201</span></span>
@@ -794,7 +813,7 @@ Biometrics. 58, 110–120 (2002).</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Cecile Proust-Lima, Viviane Philipps.</p>
+  <p>Developed by Cecile Proust-Lima, Viviane Philipps, Benoit Liquet, Maris Dussartre.</p>
 </div>
 
 <div class="pkgdown-footer-right">

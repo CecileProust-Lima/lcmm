@@ -19,7 +19,7 @@ in the natural scale of the outcome(s)."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">lcmm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,6 +77,7 @@ in the natural scale of the outcome(s).</p>
 <span>  na.action <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  confint <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  predRE <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  predCor <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -119,6 +120,14 @@ to FALSE.</p></dd>
 in each latent class. If NULL (the default), marginal prediction are
 computed.If predRE is specified, subject-specific predictions
 are computed.</p></dd>
+
+
+<dt id="arg-predcor">predCor<a class="anchor" aria-label="anchor" href="#arg-predcor"></a></dt>
+<dd><p>optional matrix.
+If <code>predCor</code> is specified, the returned predictions include the
+correlation (BM or AR) part of the model. <code>predCor</code> should be a matrix
+with as many columns as latent classes and as many rows as newdata.
+In particular, predCor can be the result of a predictCor call.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -173,7 +182,7 @@ intervals (if calculated).</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Cecile Proust-Lima, Viviane Philipps.</p>
+  <p>Developed by Cecile Proust-Lima, Viviane Philipps, Benoit Liquet, Maris Dussartre.</p>
 </div>
 
 <div class="pkgdown-footer-right">

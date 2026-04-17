@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lcmm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -190,6 +190,7 @@ here only the subjects at risk of dementia at the begining of the study
 <p>We also create some variables that will be used in the example :</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">NormPsy</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: package 'NormPsy' was built under R version 4.5.2</span></span>
 <span><span class="va">paquidS</span><span class="op">$</span><span class="va">normMMSE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/NormPsy/man/normMMSE.html" class="external-link">normMMSE</a></span><span class="op">(</span><span class="va">paquidS</span><span class="op">$</span><span class="va">MMSE</span><span class="op">)</span></span>
 <span><span class="va">paquidS</span><span class="op">$</span><span class="va">age65</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">paquidS</span><span class="op">$</span><span class="va">age</span><span class="op">-</span><span class="fl">65</span><span class="op">)</span><span class="op">/</span><span class="fl">10</span></span></code></pre></div>
 </div>
@@ -273,31 +274,39 @@ piecewise constant) and we systematically adjust on CEP and male.</p>
 <span><span class="va">mj1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Jointlcmm.html">Jointlcmm</a></span><span class="op">(</span><span class="va">normMMSE</span> <span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="va">CEP</span>, random <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, </span>
 <span>                 survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">age_init</span>, <span class="va">agedem</span>, <span class="va">dem</span><span class="op">)</span> <span class="op">~</span> <span class="va">CEP</span> <span class="op">+</span> <span class="va">male</span>, hazard <span class="op">=</span> <span class="st">"Weibull"</span>,</span>
 <span>                 subject <span class="op">=</span> <span class="st">'ID'</span>, data <span class="op">=</span> <span class="va">paquidS</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span><span class="va">mj1</span><span class="op">$</span><span class="va">best</span></span>
 <span><span class="co">#&gt; event1 +/-sqrt(Weibull1) event1 +/-sqrt(Weibull2)                      CEP </span></span>
-<span><span class="co">#&gt;                0.1038941                3.6270872               -0.2484354 </span></span>
+<span><span class="co">#&gt;                0.1038941                3.6270872               -0.2484355 </span></span>
 <span><span class="co">#&gt;                     male                intercept                    age65 </span></span>
-<span><span class="co">#&gt;               -0.2007211               64.6441641                5.5980977 </span></span>
+<span><span class="co">#&gt;               -0.2007209               64.6441597                5.5981042 </span></span>
 <span><span class="co">#&gt;               I(age65^2)                      CEP                 varcov 1 </span></span>
-<span><span class="co">#&gt;               -6.0965763               13.6507881              212.8020164 </span></span>
+<span><span class="co">#&gt;               -6.0965786               13.6507889              212.8014837 </span></span>
 <span><span class="co">#&gt;                 varcov 2                 varcov 3                 varcov 4 </span></span>
-<span><span class="co">#&gt;             -216.4176788              456.5123512               55.7159127 </span></span>
+<span><span class="co">#&gt;             -216.4167382              456.5108600               55.7155957 </span></span>
 <span><span class="co">#&gt;                 varcov 5                 varcov 6                   stderr </span></span>
-<span><span class="co">#&gt;             -145.7875460               59.3668519               10.0724388</span></span>
+<span><span class="co">#&gt;             -145.7870646               59.3667025               10.0724392</span></span>
 <span><span class="co"># Note that to reduce computation time, we could fix the parameters of the longitudinal </span></span>
 <span><span class="co">#part to those of the linear mixed model </span></span>
 <span><span class="va">binit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="va">lmm</span><span class="op">$</span><span class="va">best</span><span class="op">)</span></span>
 <span><span class="va">mj1bis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Jointlcmm.html">Jointlcmm</a></span><span class="op">(</span><span class="va">normMMSE</span> <span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="va">CEP</span>, random <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,</span>
 <span>                    survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">age_init</span>, <span class="va">agedem</span>, <span class="va">dem</span><span class="op">)</span> <span class="op">~</span> <span class="va">CEP</span> <span class="op">+</span> <span class="va">male</span>, hazard <span class="op">=</span> <span class="st">"Weibull"</span>,</span>
 <span>                    subject <span class="op">=</span> <span class="st">'ID'</span>, data <span class="op">=</span> <span class="va">paquidS</span>,B<span class="op">=</span><span class="va">binit</span>, posfix<span class="op">=</span><span class="fl">5</span><span class="op">:</span><span class="fl">15</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span><span class="co"># Piecewise constant hazard</span></span>
 <span><span class="va">mjP1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Jointlcmm.html">Jointlcmm</a></span><span class="op">(</span><span class="va">normMMSE</span> <span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="va">CEP</span>, random <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,</span>
 <span>                  survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">age_init</span>, <span class="va">agedem</span>, <span class="va">dem</span><span class="op">)</span> <span class="op">~</span> <span class="va">CEP</span> <span class="op">+</span> <span class="va">male</span>, hazard <span class="op">=</span> <span class="st">"piecewise"</span>,</span>
 <span>                  subject <span class="op">=</span> <span class="st">'ID'</span>, data <span class="op">=</span> <span class="va">paquidS</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span><span class="co"># Hazard approximated by cubic splines (3 intern knots located at the quantiles by default</span></span>
 <span><span class="va">mjS1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Jointlcmm.html">Jointlcmm</a></span><span class="op">(</span><span class="va">normMMSE</span> <span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="va">CEP</span>, random <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,</span>
 <span>                  survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">age_init</span>, <span class="va">agedem</span>, <span class="va">dem</span><span class="op">)</span> <span class="op">~</span> <span class="va">CEP</span> <span class="op">+</span> <span class="va">male</span>, hazard <span class="op">=</span> <span class="st">"splines"</span>,</span>
-<span>                  subject <span class="op">=</span> <span class="st">'ID'</span>, data <span class="op">=</span> <span class="va">paquidS</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span>                  subject <span class="op">=</span> <span class="st">'ID'</span>, data <span class="op">=</span> <span class="va">paquidS</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span></code></pre></div>
 <p>The Weibull model gives the best fit.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># From the summary table, we prefer the Weibull model</span></span>
@@ -305,12 +314,12 @@ piecewise constant) and we systematically adjust on CEP and male.</p>
 <span><span class="co">#&gt;      G    loglik npm      BIC %class1</span></span>
 <span><span class="co">#&gt; mj1  1 -9449.079  15 18991.35     100</span></span>
 <span><span class="co">#&gt; mjP1 1 -9452.777  17 19011.17     100</span></span>
-<span><span class="co">#&gt; mjS1 1 -9447.434  20 19019.12     100</span></span>
+<span><span class="co">#&gt; mjS1 1 -9447.433  20 19019.12     100</span></span>
 <span><span class="fu"><a href="../reference/summarytable.html">summarytable</a></span><span class="op">(</span><span class="va">mj1</span>,<span class="va">mjP1</span>,<span class="va">mjS1</span>,which<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"npm"</span>,<span class="st">"loglik"</span>,<span class="st">"AIC"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      npm    loglik      AIC</span></span>
 <span><span class="co">#&gt; mj1   15 -9449.079 18928.16</span></span>
 <span><span class="co">#&gt; mjP1  17 -9452.777 18939.55</span></span>
-<span><span class="co">#&gt; mjS1  20 -9447.434 18934.87</span></span>
+<span><span class="co">#&gt; mjS1  20 -9447.433 18934.87</span></span>
 <span><span class="co"># Summary of the model</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mj1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Joint latent class model for quantitative outcome and competing risks </span></span>
@@ -332,10 +341,10 @@ piecewise constant) and we systematically adjust on CEP and male.</p>
 <span><span class="co">#&gt;  </span></span>
 <span><span class="co">#&gt; Iteration process: </span></span>
 <span><span class="co">#&gt;      Convergence criteria satisfied </span></span>
-<span><span class="co">#&gt;      Number of iterations:  37 </span></span>
-<span><span class="co">#&gt;      Convergence criteria: parameters= 2.6e-06 </span></span>
-<span><span class="co">#&gt;                          : likelihood= 2.3e-07 </span></span>
-<span><span class="co">#&gt;                          : second derivatives= 1.2e-12 </span></span>
+<span><span class="co">#&gt;      Number of iterations:  32 </span></span>
+<span><span class="co">#&gt;      Convergence criteria: parameters= 6.4e-05 </span></span>
+<span><span class="co">#&gt;                          : likelihood= 1.9e-06 </span></span>
+<span><span class="co">#&gt;                          : second derivatives= 3.2e-12 </span></span>
 <span><span class="co">#&gt;  </span></span>
 <span><span class="co">#&gt; Goodness-of-fit statistics: </span></span>
 <span><span class="co">#&gt;      maximum log-likelihood: -9449.08  </span></span>
@@ -348,25 +357,25 @@ piecewise constant) and we systematically adjust on CEP and male.</p>
 <span><span class="co">#&gt; Parameters in the proportional hazard model:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                                coef      Se     Wald p-value</span></span>
-<span><span class="co">#&gt; event1 +/-sqrt(Weibull1)    0.10389 0.00060  174.217 0.00000</span></span>
-<span><span class="co">#&gt; event1 +/-sqrt(Weibull2)    3.62709 0.17427   20.812 0.00000</span></span>
-<span><span class="co">#&gt; CEP                        -0.24844 0.18806   -1.321 0.18650</span></span>
-<span><span class="co">#&gt; male                       -0.20072 0.20399   -0.984 0.32513</span></span>
+<span><span class="co">#&gt; event1 +/-sqrt(Weibull1)    0.10389 0.00060  174.148 0.00000</span></span>
+<span><span class="co">#&gt; event1 +/-sqrt(Weibull2)    3.62709 0.17428   20.812 0.00000</span></span>
+<span><span class="co">#&gt; CEP                        -0.24844 0.18817   -1.320 0.18675</span></span>
+<span><span class="co">#&gt; male                       -0.20072 0.20408   -0.984 0.32534</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Fixed effects in the longitudinal model:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                  coef      Se     Wald p-value</span></span>
-<span><span class="co">#&gt; intercept    64.64416 1.95705   33.031 0.00000</span></span>
-<span><span class="co">#&gt; age65         5.59810 2.30170    2.432 0.01501</span></span>
-<span><span class="co">#&gt; I(age65^2)   -6.09658 0.79069   -7.710 0.00000</span></span>
-<span><span class="co">#&gt; CEP          13.65079 1.35071   10.106 0.00000</span></span>
+<span><span class="co">#&gt; intercept    64.64416 1.95731   33.027 0.00000</span></span>
+<span><span class="co">#&gt; age65         5.59810 2.30202    2.432 0.01502</span></span>
+<span><span class="co">#&gt; I(age65^2)   -6.09658 0.79078   -7.710 0.00000</span></span>
+<span><span class="co">#&gt; CEP          13.65079 1.35073   10.106 0.00000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Variance-covariance matrix of the random-effects:</span></span>
-<span><span class="co">#&gt;             intercept     age65 I(age65^2)</span></span>
-<span><span class="co">#&gt; intercept   212.80202                     </span></span>
-<span><span class="co">#&gt; age65      -216.41768  456.5124           </span></span>
-<span><span class="co">#&gt; I(age65^2)   55.71591 -145.7876   59.36685</span></span>
+<span><span class="co">#&gt;            intercept     age65 I(age65^2)</span></span>
+<span><span class="co">#&gt; intercept   212.8015                     </span></span>
+<span><span class="co">#&gt; age65      -216.4167  456.5109           </span></span>
+<span><span class="co">#&gt; I(age65^2)   55.7156 -145.7871    59.3667</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                               coef      Se</span></span>
 <span><span class="co">#&gt; Residual standard error   10.07244 0.20278</span></span></code></pre></div>
@@ -377,30 +386,8 @@ piecewise constant) and we systematically adjust on CEP and male.</p>
 <span><span class="va">mj1ter</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Jointlcmm.html">Jointlcmm</a></span><span class="op">(</span><span class="va">normMMSE</span> <span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="va">CEP</span>, random <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,</span>
 <span>                    survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">age_init</span>, <span class="va">agedem</span>, <span class="va">dem</span><span class="op">)</span> <span class="op">~</span> <span class="va">CEP</span> <span class="op">+</span> <span class="va">male</span>, hazard <span class="op">=</span> <span class="st">"Weibull"</span>,</span>
 <span>                    subject <span class="op">=</span> <span class="st">'ID'</span>, data <span class="op">=</span> <span class="va">paquidS</span>,B<span class="op">=</span><span class="va">binit</span>, posfix<span class="op">=</span><span class="fl">5</span><span class="op">:</span><span class="fl">15</span>,logscale <span class="op">=</span> <span class="cn">TRUE</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; event1 log(Weibull1) event1 log(Weibull2)                  CEP </span></span>
-<span><span class="co">#&gt;                    1                    1                    1 </span></span>
-<span><span class="co">#&gt;                 male </span></span>
-<span><span class="co">#&gt;                    1 </span></span>
-<span><span class="co">#&gt; event1 log(Weibull1) event1 log(Weibull2)                  CEP </span></span>
-<span><span class="co">#&gt;            0.2372000            0.9902321            0.9056381 </span></span>
-<span><span class="co">#&gt;                 male </span></span>
-<span><span class="co">#&gt;            0.9770275 </span></span>
-<span><span class="co">#&gt; event1 log(Weibull1) event1 log(Weibull2)                  CEP </span></span>
-<span><span class="co">#&gt;           -0.7251690            0.9888428            0.8884781 </span></span>
-<span><span class="co">#&gt;                 male </span></span>
-<span><span class="co">#&gt;            0.9730797 </span></span>
-<span><span class="co">#&gt; event1 log(Weibull1) event1 log(Weibull2)                  CEP </span></span>
-<span><span class="co">#&gt;           -1.7269514            0.9892144            0.8859636 </span></span>
-<span><span class="co">#&gt;                 male </span></span>
-<span><span class="co">#&gt;            0.9725280 </span></span>
-<span><span class="co">#&gt; event1 log(Weibull1) event1 log(Weibull2)                  CEP </span></span>
-<span><span class="co">#&gt;           -2.7335154            0.9898055            0.8852146 </span></span>
-<span><span class="co">#&gt;                 male </span></span>
-<span><span class="co">#&gt;            0.9723791 </span></span>
-<span><span class="co">#&gt; event1 log(Weibull1) event1 log(Weibull2)                  CEP </span></span>
-<span><span class="co">#&gt;           -3.7396381            0.9903824            0.8842992 </span></span>
-<span><span class="co">#&gt;                 male </span></span>
-<span><span class="co">#&gt;            0.9721774</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span><span class="co"># Same loglikelihood, HR, only the parameters of the baseline risk function change.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mj1ter</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Joint latent class model for quantitative outcome and competing risks </span></span>
@@ -440,10 +427,10 @@ piecewise constant) and we systematically adjust on CEP and male.</p>
 <span><span class="co">#&gt; Parameters in the proportional hazard model:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                            coef      Se    Wald p-value</span></span>
-<span><span class="co">#&gt; event1 log(Weibull1)  -59.41437 3.23418 -18.371 0.00000</span></span>
+<span><span class="co">#&gt; event1 log(Weibull1)  -59.41437 3.23417 -18.371 0.00000</span></span>
 <span><span class="co">#&gt; event1 log(Weibull2)    2.57409 0.05404  47.632 0.00000</span></span>
-<span><span class="co">#&gt; CEP                    -0.24874 0.18769  -1.325 0.18508</span></span>
-<span><span class="co">#&gt; male                   -0.20153 0.20258  -0.995 0.31982</span></span>
+<span><span class="co">#&gt; CEP                    -0.24874 0.18780  -1.324 0.18534</span></span>
+<span><span class="co">#&gt; male                   -0.20153 0.20265  -0.995 0.31998</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Fixed effects in the longitudinal model:</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -487,11 +474,15 @@ initial values to avoid the convergence toward a local maximum.</p>
 <span>                 random <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">age_init</span>, <span class="va">agedem</span>, <span class="va">dem</span><span class="op">)</span> </span>
 <span>                 <span class="op">~</span> <span class="va">CEP</span></span>
 <span>                 <span class="op">+</span> <span class="va">male</span>, hazard <span class="op">=</span> <span class="st">"Weibull"</span>, subject <span class="op">=</span> <span class="st">'ID'</span>, data <span class="op">=</span> <span class="va">paquidS</span>, ng<span class="op">=</span><span class="fl">2</span>,B<span class="op">=</span><span class="va">mj1</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span><span class="co"># model with 2 latent classes and proportional hazards in each class</span></span>
 <span><span class="va">mj2_prop</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Jointlcmm.html">Jointlcmm</a></span><span class="op">(</span><span class="va">normMMSE</span> <span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="va">CEP</span>, mixture <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,</span>
 <span>                      random <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">age_init</span>, <span class="va">agedem</span>, <span class="va">dem</span><span class="op">)</span></span>
 <span>                      <span class="op">~</span> <span class="va">CEP</span> <span class="op">+</span> <span class="va">male</span>, hazard <span class="op">=</span> <span class="st">"Weibull"</span>, subject <span class="op">=</span> <span class="st">'ID'</span>, data <span class="op">=</span> <span class="va">paquidS</span>,</span>
 <span>                      ng<span class="op">=</span><span class="fl">2</span>,B<span class="op">=</span><span class="va">mj1</span>, hazardtype<span class="op">=</span><span class="st">'PH'</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span><span class="co"># comparison</span></span>
 <span><span class="fu"><a href="../reference/summarytable.html">summarytable</a></span><span class="op">(</span><span class="va">mj2</span>,<span class="va">mj2_prop</span>,which<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"npm"</span>,<span class="st">"loglik"</span>,<span class="st">"AIC"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          npm    loglik      AIC</span></span>
@@ -505,12 +496,12 @@ classification seem to be very close.</p>
 <code class="sourceCode R"><span><span class="co"># Classification given in</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mj2</span><span class="op">$</span><span class="va">pprob</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   ID class    probYT1    probYT2</span></span>
-<span><span class="co">#&gt; 1  1     2 0.38861735 0.61138265</span></span>
-<span><span class="co">#&gt; 2  2     1 0.94870154 0.05129846</span></span>
-<span><span class="co">#&gt; 3  3     2 0.44381993 0.55618007</span></span>
-<span><span class="co">#&gt; 4  4     2 0.32373146 0.67626854</span></span>
+<span><span class="co">#&gt; 1  1     2 0.38861748 0.61138252</span></span>
+<span><span class="co">#&gt; 2  2     1 0.94870153 0.05129847</span></span>
+<span><span class="co">#&gt; 3  3     2 0.44381989 0.55618011</span></span>
+<span><span class="co">#&gt; 4  4     2 0.32373140 0.67626860</span></span>
 <span><span class="co">#&gt; 5  5     2 0.02164884 0.97835116</span></span>
-<span><span class="co">#&gt; 6  6     1 0.73146956 0.26853044</span></span>
+<span><span class="co">#&gt; 6  6     1 0.73146946 0.26853054</span></span>
 <span><span class="co"># comparison of classifications</span></span>
 <span><span class="fu"><a href="../reference/xclass.html">xclass</a></span><span class="op">(</span><span class="va">mj2</span>,<span class="va">mj2_prop</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    </span></span>
@@ -542,10 +533,10 @@ classification seem to be very close.</p>
 <span><span class="co">#&gt;  </span></span>
 <span><span class="co">#&gt; Iteration process: </span></span>
 <span><span class="co">#&gt;      Convergence criteria satisfied </span></span>
-<span><span class="co">#&gt;      Number of iterations:  26 </span></span>
-<span><span class="co">#&gt;      Convergence criteria: parameters= 2.2e-07 </span></span>
-<span><span class="co">#&gt;                          : likelihood= 2.7e-09 </span></span>
-<span><span class="co">#&gt;                          : second derivatives= 5.1e-13 </span></span>
+<span><span class="co">#&gt;      Number of iterations:  29 </span></span>
+<span><span class="co">#&gt;      Convergence criteria: parameters= 9.9e-07 </span></span>
+<span><span class="co">#&gt;                          : likelihood= 1.2e-08 </span></span>
+<span><span class="co">#&gt;                          : second derivatives= 2.3e-12 </span></span>
 <span><span class="co">#&gt;  </span></span>
 <span><span class="co">#&gt; Goodness-of-fit statistics: </span></span>
 <span><span class="co">#&gt;      maximum log-likelihood: -9337.19  </span></span>
@@ -564,29 +555,29 @@ classification seem to be very close.</p>
 <span><span class="co">#&gt; Parameters in the proportional hazard model:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                                        coef      Se     Wald p-value</span></span>
-<span><span class="co">#&gt; event1 +/-sqrt(Weibull1) class 1    0.10969 0.00061  180.580 0.00000</span></span>
-<span><span class="co">#&gt; event1 +/-sqrt(Weibull2) class 1    4.69547 0.24017   19.550 0.00000</span></span>
-<span><span class="co">#&gt; event1 +/-sqrt(Weibull1) class 2    0.10232 0.00041  251.266 0.00000</span></span>
-<span><span class="co">#&gt; event1 +/-sqrt(Weibull2) class 2    5.32355 0.39054   13.631 0.00000</span></span>
+<span><span class="co">#&gt; event1 +/-sqrt(Weibull1) class 1    0.10969 0.00061  180.596 0.00000</span></span>
+<span><span class="co">#&gt; event1 +/-sqrt(Weibull2) class 1    4.69547 0.24018   19.550 0.00000</span></span>
+<span><span class="co">#&gt; event1 +/-sqrt(Weibull1) class 2    0.10232 0.00041  251.281 0.00000</span></span>
+<span><span class="co">#&gt; event1 +/-sqrt(Weibull2) class 2    5.32355 0.39052   13.632 0.00000</span></span>
 <span><span class="co">#&gt; CEP                                -0.80979 0.24500   -3.305 0.00095</span></span>
-<span><span class="co">#&gt; male                                0.17328 0.25829    0.671 0.50230</span></span>
+<span><span class="co">#&gt; male                                0.17328 0.25833    0.671 0.50238</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Fixed effects in the longitudinal model:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                         coef      Se     Wald p-value</span></span>
-<span><span class="co">#&gt; intercept class1    59.64993 3.73794   15.958 0.00000</span></span>
-<span><span class="co">#&gt; intercept class2    63.87580 2.48880   25.665 0.00000</span></span>
-<span><span class="co">#&gt; age65 class1        14.76204 5.31366    2.778 0.00547</span></span>
-<span><span class="co">#&gt; age65 class2         5.53815 2.91838    1.898 0.05774</span></span>
-<span><span class="co">#&gt; I(age65^2) class1  -14.00994 1.82782   -7.665 0.00000</span></span>
-<span><span class="co">#&gt; I(age65^2) class2   -4.23437 0.89428   -4.735 0.00000</span></span>
-<span><span class="co">#&gt; CEP                 14.37978 1.29026   11.145 0.00000</span></span>
+<span><span class="co">#&gt; intercept class1    59.64992 3.73834   15.956 0.00000</span></span>
+<span><span class="co">#&gt; intercept class2    63.87581 2.48928   25.660 0.00000</span></span>
+<span><span class="co">#&gt; age65 class1        14.76206 5.31454    2.778 0.00547</span></span>
+<span><span class="co">#&gt; age65 class2         5.53815 2.91916    1.897 0.05781</span></span>
+<span><span class="co">#&gt; I(age65^2) class1  -14.00995 1.82805   -7.664 0.00000</span></span>
+<span><span class="co">#&gt; I(age65^2) class2   -4.23437 0.89449   -4.734 0.00000</span></span>
+<span><span class="co">#&gt; CEP                 14.37978 1.29027   11.145 0.00000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Variance-covariance matrix of the random-effects:</span></span>
 <span><span class="co">#&gt;             intercept     age65 I(age65^2)</span></span>
-<span><span class="co">#&gt; intercept   227.63114                     </span></span>
-<span><span class="co">#&gt; age65      -228.34057  435.7444           </span></span>
+<span><span class="co">#&gt; intercept   227.63116                     </span></span>
+<span><span class="co">#&gt; age65      -228.34060  435.7444           </span></span>
 <span><span class="co">#&gt; I(age65^2)   58.48699 -129.3542   41.96664</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                               coef      Se</span></span>
@@ -669,6 +660,38 @@ less replicates and iterations to reduce the processing time.</p>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="va">CEP</span>, mixture <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, random <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,</span>
 <span>        survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">age_init</span>, <span class="va">agedem</span>, <span class="va">dem</span><span class="op">)</span> <span class="op">~</span> <span class="va">CEP</span> <span class="op">+</span> <span class="va">male</span>, hazard <span class="op">=</span> <span class="st">"Weibull"</span>, </span>
 <span>        subject <span class="op">=</span> <span class="st">'ID'</span>, data <span class="op">=</span> <span class="va">paquidS</span>, ng<span class="op">=</span><span class="fl">2</span>,verbose<span class="op">=</span><span class="cn">F</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span></span>
 <span><span class="co"># An alternative is to directly choose the initial values and explore different </span></span>
 <span><span class="co"># plausible departures. </span></span>
@@ -680,11 +703,15 @@ less replicates and iterations to reduce the processing time.</p>
 <span>                  random <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">age_init</span>, <span class="va">agedem</span>, <span class="va">dem</span><span class="op">)</span></span>
 <span>                  <span class="op">~</span> <span class="va">CEP</span> <span class="op">+</span> <span class="va">male</span>, hazard <span class="op">=</span> <span class="st">"Weibull"</span>, subject <span class="op">=</span> <span class="st">'ID'</span>, data <span class="op">=</span> <span class="va">paquidS</span>,</span>
 <span>                  ng<span class="op">=</span><span class="fl">2</span>,B<span class="op">=</span><span class="va">binit</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span><span class="co"># We can also start with a random departure:</span></span>
 <span><span class="va">mj2d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Jointlcmm.html">Jointlcmm</a></span><span class="op">(</span><span class="va">normMMSE</span> <span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="va">CEP</span>, mixture <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, </span>
 <span>                  random <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">age_init</span>, <span class="va">agedem</span>, <span class="va">dem</span><span class="op">)</span></span>
 <span>                  <span class="op">~</span> <span class="va">CEP</span> <span class="op">+</span> <span class="va">male</span>, hazard <span class="op">=</span> <span class="st">"Weibull"</span>, subject <span class="op">=</span> <span class="st">'ID'</span>, data <span class="op">=</span> <span class="va">paquidS</span>,</span>
-<span>                  ng<span class="op">=</span><span class="fl">2</span>,B<span class="op">=</span><span class="fu">random</span><span class="op">(</span><span class="va">mj1</span><span class="op">)</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span>                  ng<span class="op">=</span><span class="fl">2</span>,B<span class="op">=</span><span class="fu">random</span><span class="op">(</span><span class="va">mj1</span><span class="op">)</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span></code></pre></div>
 <p>In this example, we always converge to the same maximum whatever the
 departure but the latent classes might be exchanged.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -692,7 +719,7 @@ departure but the latent classes might be exchanged.</p>
 <span><span class="fu"><a href="../reference/summarytable.html">summarytable</a></span><span class="op">(</span><span class="va">mj2</span>,<span class="va">mj2b</span>,<span class="va">mj2c</span>,<span class="va">mj2d</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      G    loglik npm      BIC  %class1  %class2</span></span>
 <span><span class="co">#&gt; mj2  2 -9337.187  21 18804.84 21.04208 78.95792</span></span>
-<span><span class="co">#&gt; mj2b 2 -9337.187  21 18804.84 78.95792 21.04208</span></span>
+<span><span class="co">#&gt; mj2b 2 -9337.187  21 18804.84 21.04208 78.95792</span></span>
 <span><span class="co">#&gt; mj2c 2 -9337.187  21 18804.84 78.95792 21.04208</span></span>
 <span><span class="co">#&gt; mj2d 2 -9337.187  21 18804.84 78.95792 21.04208</span></span></code></pre></div>
 </div>
@@ -706,9 +733,11 @@ departure but the latent classes might be exchanged.</p>
 <span>                 random <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">age_init</span>, <span class="va">agedem</span>, <span class="va">dem</span><span class="op">)</span> </span>
 <span>                 <span class="op">~</span> <span class="va">CEP</span> <span class="op">+</span> <span class="va">male</span>, hazard <span class="op">=</span> <span class="st">"Weibull"</span>, subject <span class="op">=</span> <span class="st">'ID'</span>, data <span class="op">=</span> <span class="va">paquidS</span>, </span>
 <span>                 ng <span class="op">=</span> <span class="fl">3</span>, B <span class="op">=</span> <span class="va">mj1</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span> </span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span><span class="co">#&gt; Infinite parameters...</span></span>
 <span><span class="co">#&gt; Last step values :</span></span>
-<span><span class="co">#&gt;       b : -0.02264855 0.05241709 0.1468811 3.443894 0.1038941 3.627087 0.140392 3.791267 -0.2484353 -0.2007211 0.00358595 64.64416 129.2885 3.296868 5.5981 7.900332 -6.886679 -6.096577 -5.304574 13.65079 14.58773 -14.83557 15.37587 3.81936 -5.796415 3.343778 10.07244 </span></span>
+<span><span class="co">#&gt;       b : -0.01460773 0.03389712 0.147233 3.443815 0.1038941 3.627087 0.1407469 3.791207 -0.2484353 -0.2007211 -0.00027607 64.64416 129.2885 3.296557 5.598101 7.900657 -6.886761 -6.096577 -5.304489 13.65079 14.58773 -14.83557 15.37587 3.81936 -5.796415 -3.343778 10.07244 </span></span>
 <span><span class="co">#&gt;       objective function : -9449.079 </span></span>
 <span><span class="co">#&gt;       Convergence criteria: parameters stability= 0 </span></span>
 <span><span class="co">#&gt;                           : function stability= 0 </span></span>
@@ -717,7 +746,9 @@ departure but the latent classes might be exchanged.</p>
 <span><span class="va">mj4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Jointlcmm.html">Jointlcmm</a></span><span class="op">(</span><span class="va">normMMSE</span> <span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="va">CEP</span>, mixture <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,</span>
 <span>                 random <span class="op">=</span><span class="op">~</span> <span class="va">age65</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age65</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, survival <span class="op">=</span> <span class="fu">Surv</span><span class="op">(</span><span class="va">age_init</span>, <span class="va">agedem</span>, <span class="va">dem</span><span class="op">)</span> </span>
 <span>                 <span class="op">~</span> <span class="va">CEP</span> <span class="op">+</span> <span class="va">male</span>, hazard <span class="op">=</span> <span class="st">"Weibull"</span>, subject <span class="op">=</span> <span class="st">'ID'</span>, data <span class="op">=</span> <span class="va">paquidS</span>, </span>
-<span>                 ng <span class="op">=</span> <span class="fl">4</span>, B <span class="op">=</span> <span class="va">mj1</span>,verbose<span class="op">=</span><span class="cn">F</span><span class="op">)</span> </span></code></pre></div>
+<span>                 ng <span class="op">=</span> <span class="fl">4</span>, B <span class="op">=</span> <span class="va">mj1</span>,verbose<span class="op">=</span><span class="cn">F</span><span class="op">)</span> </span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span></code></pre></div>
 <p>The program did not converge properly after 100 iterations (the
 maximum number of iterations specified by default). This is explained by
 the fact that the program converged to an non optimal point (local
@@ -1048,20 +1079,28 @@ Biometrics 2015).</p>
 <span><span class="co"># the time in the longitudinal model and the time in the survival model (fun.time)</span></span>
 <span><span class="va">epoce1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/epoce.html">epoce</a></span><span class="op">(</span><span class="va">mj1</span>, pred.times <span class="op">=</span> <span class="va">landmark</span>, var.time <span class="op">=</span> <span class="st">"age65"</span>,fun.time <span class="op">=</span> </span>
 <span>                  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fl">10</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">65</span> <span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span><span class="co">#&gt; Be patient, epoce function is running ... </span></span>
 <span><span class="co">#&gt; The program took 0.32 seconds</span></span>
 <span><span class="va">epoce2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/epoce.html">epoce</a></span><span class="op">(</span><span class="va">mj2</span>, pred.times <span class="op">=</span> <span class="va">landmark</span>, var.time <span class="op">=</span> <span class="st">"age65"</span>,fun.time <span class="op">=</span> </span>
 <span>                  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fl">10</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">65</span> <span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span><span class="co">#&gt; Be patient, epoce function is running ... </span></span>
 <span><span class="co">#&gt; The program took 0.58 seconds</span></span>
 <span><span class="va">epoce3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/epoce.html">epoce</a></span><span class="op">(</span><span class="va">mj3b</span>, pred.times <span class="op">=</span> <span class="va">landmark</span>, var.time <span class="op">=</span> <span class="st">"age65"</span>,fun.time <span class="op">=</span> </span>
 <span>                  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fl">10</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">65</span> <span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span><span class="co">#&gt; Be patient, epoce function is running ... </span></span>
-<span><span class="co">#&gt; The program took 0.84 seconds</span></span>
+<span><span class="co">#&gt; The program took 0.86 seconds</span></span>
 <span><span class="va">epoce4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/epoce.html">epoce</a></span><span class="op">(</span><span class="va">mj4b</span>, pred.times <span class="op">=</span> <span class="va">landmark</span>, var.time <span class="op">=</span> <span class="st">"age65"</span>,fun.time <span class="op">=</span> </span>
 <span>                  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fl">10</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">65</span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in Surv(time = c(67.4167, 65.9167, 65.9167, 65.9167, 65.9167, 65.9167,</span></span>
+<span><span class="co">#&gt; : type= 'mstate' is deprecated, use a factor variable as status</span></span>
 <span><span class="co">#&gt; Be patient, epoce function is running ... </span></span>
-<span><span class="co">#&gt; The program took 1.12 seconds</span></span></code></pre></div>
+<span><span class="co">#&gt; The program took 1.2 seconds</span></span></code></pre></div>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># computation of the differences in EPOCE</span></span>
 <span><span class="va">diff23</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Diffepoce.html">Diffepoce</a></span><span class="op">(</span><span class="va">epoce2</span>, <span class="va">epoce3</span><span class="op">)</span></span>
@@ -1128,7 +1167,7 @@ model with competing risks …</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Cecile Proust-Lima, Viviane Philipps.</p>
+  <p>Developed by Cecile Proust-Lima, Viviane Philipps, Benoit Liquet, Maris Dussartre.</p>
 </div>
 
 <div class="pkgdown-footer-right">
