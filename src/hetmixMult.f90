@@ -1031,7 +1031,7 @@ double precision function vrais_multo_i(b,npm,id,thi,jd,thj,i)
               if(nalea.gt.0) then
                  asim=0.d0
                  do j=1,ny
-                    asim(j) = seqMC(nMC*(nea+sum(nmes(i,:)))+l)
+                    asim(j) = seqMC(nMC*(nea+sum(nmes(i,:))+j-1)+l)
                  end do
               end if
            endif
@@ -1968,7 +1968,7 @@ end do
                     if(nalea.gt.0) then
                        asim=0.d0
                        do j=1,ny
-                          asim(j) = seqMC(nMC*(nea+sum(nmes(i,:)))+l)
+                          asim(j) = seqMC(nMC*(nea+sum(nmes(i,:))+j-1)+l)
                        end do
                     end if
                  endif
