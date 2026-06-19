@@ -344,3 +344,18 @@ loglikmpjlcmm <- function(b,K0,ny0,nbevt0,ng0,ns0,Y0,nobs0,X0,nv0,Xns0,nv20,prio
              loglik=as.double(res),
              NAOK=TRUE)$loglik
 }
+
+
+
+
+#'@rdname loglik
+#'@export
+loglikpostREmult <- function(RE,g0,Y0,X0,idprob0,idea0,idg0,idcor0,idcontr0,ny0,ns0,ng0,
+                             nv0,nobs0,nea0,nmes0,idiag0,nwg0,ncor0,nalea0,npm0,b1,
+                             ncontr0,nvc0,ntrtot0,epsY0,idlink0,nbzitr0,zitr0,
+                             uniqueY0,indiceY0,nvalSPLORD0,
+                             nMC0,dimMC0,seqMC0,chol0)
+{
+    res <- 0
+    .Fortran(C_postremult,as.integer(g0),as.double(Y0),as.double(X0),as.integer(idprob0),as.integer(idea0),as.integer(idg0),as.integer(idcor0),as.integer(idcontr0),as.integer(ny0),as.integer(ns0),as.integer(ng0),as.integer(nv0),as.integer(nobs0),as.integer(nea0),as.integer(nmes0),as.integer(idiag0),as.integer(nwg0),as.integer(ncor0),as.integer(nalea0),as.integer(npm0),as.double(b1),as.double(RE),as.integer(ncontr0),as.integer(nvc0),as.integer(ntrtot0),as.double(epsY0),as.integer(idlink0),as.integer(nbzitr0),as.double(zitr0),as.double(uniqueY0),as.integer(indiceY0),as.integer(nvalSPLORD0),as.integer(nMC0),as.integer(dimMC0),as.double(seqMC0),as.integer(chol0),loglik=as.double(res))$loglik
+}

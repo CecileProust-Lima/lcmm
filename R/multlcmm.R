@@ -1593,6 +1593,61 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                          as.integer(estim0),
                          as.double(ll))
 
+        if(any(idlink0 == 3))
+        {
+            b1 <- rep(NA,length(fix0))
+            b1[which(fix0==0)] <- out$best
+            b1[which(fix0==1)] <- bfix
+    
+            predREord <- matrix(0, nea0 * (1 + ng0), ns0)
+            predREYord <- matrix(0, nalea0, ns0)
+
+            ppi1 <- matrix(1, nrow=ns0, ncol=1)
+            if(ng0 > 1) ppi1 <- matrix(post$ppi2, nrow=ns0, ncol=ng0, byrow=TRUE)
+
+            nMC <- max(1, nMC)
+
+            sumnmes <- 0
+            for(i in 1:ns0)
+            {
+                dimMC <- nalea0 # integrale sur l'intercept specifique au test
+                if(ncor0>0) dimMC <- nmes0[i,] # on integre sur BM/AR
+                
+                for(g in 1:ng0)
+                {
+                    RE <- rep(0, nea0)
+                    res <- mla(b=RE, m=length(RE), fn=loglikpostREmult, minimize=FALSE, maxiter=100,
+                               g0=g, Y0=Y0[sumnmes+1:sum(nmes0[i,])], X0=X0[sumnmes+1:sum(nmes0[i,]),],
+                               idprob0=idprob0, idea0=idea0, idg0=idg0,
+                               idcor0=idcor0, idcontr0=idcontr0, ny0=ny0, ns0=1, ng0=ng0,
+                               nv0=nv0, nobs0=sum(nmes0[i,]), nea0=nea0, nmes0=nmes0[i,],
+                               idiag0=idiag0, nwg0=nwg0, ncor0=ncor0, nalea0=nalea0,
+                               npm0=length(b1), b1=b1, ncontr0=ncontr, nvc0=nvc,
+                               ntrtot0=ntrtot0, epsY0=epsY, idlink0=idlink0,
+                               nbzitr0=nbzitr0, zitr=zitr, uniqueY0=uniqueY0,
+                               indiceY0=indiceY0[sumnmes+1:sum(nmes0[i,])],
+                               nvalSPLORD0=nvalSPLORD0,
+                               nMC0=nMC, dimMC0=dimMC, seqMC0=seqMC,
+                               chol0=1)$b
+
+                    predREord[, i] <- predREord[, i] + ppi1[i, g] * res[1:nea0]
+                    predREord[nea0 + (g - 1) * nea0 + 1:nea0, i] <- res[1:nea0]
+                }
+
+                sumnmes <- sumnmes + sum(nmes0[i,]) 
+            }
+            
+            post$saveRE <- post$predRE
+            post$saveREY <- post$predRE_Y
+            post$predRE <- c(as.vector(predREord[1:nea0, ]),
+                             as.vector(predREord[-c(1:nea0), ]))
+            post$predRE_Y <- rep(NA, ns0*ny0)
+            post$Yobs <- rep(NA, nobs0)
+            post$resid_m <- rep(NA, nobs0)
+            post$resid_ss <- rep(NA, nobs0)
+            post$pred_ss_g <- rep(NA, nobs0*ng0)
+        }
+
         out$ppi2 <- post$ppi2
         out$predRE <- post$predRE
         out$predRE_Y <- post$predRE_Y
@@ -1728,11 +1783,6 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     classpredRE <- data.frame(rep(unique(IND), each = ng0), rep(1:ng0, ns0), classpredRE)
     colnames(classpredRE) <- c(nom.subject, "class", nom.X0[idea0!=0])
     
-    if(any(idlink0==3) & nea0>0)
-    {
-        predRE[,1+1:nea0] <- NA
-        classpredRE[,1+1:nea0] <- NA
-    }
 
     if (nalea0!=0)
         {
@@ -1781,10 +1831,6 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
     colnames(pred)<-c(nom.subject,"Yname","pred_m","resid_m","pred_ss","resid_ss","obs",temp,temp1)
     rownames(pred) <- NULL
 
-    if(any(idlink0==3))
-    {
-        pred[,3:ncol(pred)] <- NA
-    }
 
     if(!is.null(var.time))
     {
@@ -1901,7 +1947,7 @@ multlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=F
                estimlink=estimlink,epsY=epsY,linktype=idlink0,linknodes=zitr,nbnodes=nbnodes,nbmod=nbmod,modalites=modalites,
                na.action=nayk,AIC=2*(length(out$best)-length(posfix)-out$loglik),BIC=(length(out$best)-length(posfix))*log(ns0)-2*out$loglik,data=datareturn,
                wRandom=wRandom,b0Random=b0Random,runtime=cost[3],CorrEA=CorrEA,
-               levels=levels, var.time=var.time)
+               levels=levels, var.time=var.time, saveRE = post$saveRE, saveREY = post$saveREY)
     
     class(res) <-c("multlcmm")
 

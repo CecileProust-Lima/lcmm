@@ -18,6 +18,7 @@ static R_FortranMethodDef FortRout[] = {
   {"logliklcmmcont", (DL_FUNC) &F77_SUB(logliklcmmcont), 43},
   {"logliklcmmord", (DL_FUNC) &F77_SUB(logliklcmmord), 36},
   {"loglikhlme", (DL_FUNC) &F77_SUB(loglikhlme), 31},
+  {"postremult", (DL_FUNC) &F77_SUB(postremult), 37},
   {NULL, NULL, 0}
 };
 
