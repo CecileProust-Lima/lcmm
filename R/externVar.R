@@ -1307,6 +1307,13 @@ externVar = function(model,
                                     nproc,
                                     maxiter,
                                     verbose){
+                ## remove NA from data
+                vars <- all.vars(classmb)
+                nas <- apply(data[, vars], 2, function(x) which(is.na(x)))
+                toremove <- unique(unlist(nas))
+                if(length(toremove)) data <- data[-toremove, , drop = FALSE]
+
+                ## primary model on (new) data
                 argumentsInEdit <- argumentsIn
                 argumentsInEdit[["B"]] <- B[iKeepOut]
                 argumentsInEdit[["maxiter"]] <- 0
