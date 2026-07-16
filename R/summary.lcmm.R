@@ -14,6 +14,8 @@
 #' \code{Jointlcmm}, \code{mpjlcmm} for a Joint latent class mixed model or \code{epoce} or
 #' \code{Diffepoce} for predictive accuracy computations or \code{externSurv}, \code{externX}
 #' for secondary regression models.
+#' @param long integer. Names are shortened if their length exceed long characters.
+#' Default to 20 characters.
 #' @param \dots further arguments to be passed to or from other methods.  They
 #' are ignored in this function.
 #' @return For \code{epoce} or \code{Diffepoce} objects, returns NULL. For
@@ -28,7 +30,7 @@
 #' 
 #' @export
 #'
-summary.lcmm <- function(object,...)
+summary.lcmm <- function(object, long = 20, ...)
 {
     x <- object
     if (!inherits(x, "lcmm")) stop("use only with \"lcmm\" objects")
@@ -147,16 +149,16 @@ summary.lcmm <- function(object,...)
 
         ## shorten names if > 20 characters
         names_best <- names(x$best)
-        if(any(sapply(names_best, nchar)>20))
+        if(any(sapply(names_best, nchar) > long))
         {
-            islong <- which(sapply(names_best, nchar)>20)
+            islong <- which(sapply(names_best, nchar) > long)
             split_names_best <- strsplit(names_best, split=":", fixed=TRUE)
             short_names_best <- lapply(split_names_best, gsub, pattern="\\(.*\\)", replacement="(...)")
             new_names <- lapply(short_names_best, paste, collapse=":")
             names_best[islong] <- unlist(new_names)[islong]
             names(x$best) <- names_best
             
-            islong <- which(sapply(x$Xnames, nchar)>20)
+            islong <- which(sapply(x$Xnames, nchar) > long)
             if(length(islong))
             {
                 x$Xnames[islong] <- sapply(x$Xnames[islong], gsub, pattern="\\(.*\\)", replacement="(...)")

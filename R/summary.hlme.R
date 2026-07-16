@@ -1,6 +1,6 @@
 #' @export
 #'
-summary.hlme <- function(object,...){
+summary.hlme <- function(object, long = 20, ...){
     x <- object
     if (!inherits(x, "hlme")) stop("use only with \"hlme\" objects")
     
@@ -87,16 +87,16 @@ summary.hlme <- function(object,...){
 
             ## shorten names if > 20 characters
             names_best <- names(x$best)
-            if(any(sapply(names_best, nchar)>20))
+            if(any(sapply(names_best, nchar) > long))
             {
-                islong <- which(sapply(names_best, nchar)>20)
+                islong <- which(sapply(names_best, nchar) > long)
                 split_names_best <- strsplit(names_best, split=":", fixed=TRUE)
                 short_names_best <- lapply(split_names_best, gsub, pattern="\\(.*\\)", replacement="(...)")
                 new_names <- lapply(short_names_best, paste, collapse=":")
                 names_best[islong] <- unlist(new_names)[islong]
                 names(x$best) <- names_best
                 
-                islong <- which(sapply(x$Xnames, nchar)>20)
+                islong <- which(sapply(x$Xnames, nchar) > long)
                 if(length(islong))
                 {
                     x$Xnames[islong] <- sapply(x$Xnames[islong], gsub, pattern="\\(.*\\)", replacement="(...)")

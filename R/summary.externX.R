@@ -1,6 +1,6 @@
 #' @export
 #'
-summary.externX = function(object, ...){
+summary.externX = function(object, long = 20, ...){
   x = object
   if(!inherits(x, "externX")) stop("use only with\"externX\" objects")
   
@@ -70,9 +70,9 @@ summary.externX = function(object, ...){
     
     ## shorten names if > 20 characters
     names_best <- names(x$best)
-    if(any(sapply(names_best, nchar)>20))
+    if(any(sapply(names_best, nchar) > long))
     {
-      islong <- which(sapply(names_best, nchar)>20)
+      islong <- which(sapply(names_best, nchar) > long)
       split_names_best <- strsplit(names_best, split=":", fixed=TRUE)
       short_names_best <- lapply(split_names_best, gsub, pattern="\\(.*\\)", replacement="(...)")
       new_names <- lapply(short_names_best, paste, collapse=":")
