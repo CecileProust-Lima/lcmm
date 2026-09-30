@@ -598,7 +598,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         
         if(nbevt<1)
         {
-            if(maxiter != 0) stop("No observed event in the data")
+            ##if(maxiter != 0) stop("No observed event in the data")
             nbevt <- 1
         }
         
