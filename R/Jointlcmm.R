@@ -575,7 +575,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                 
                 noms.surv <-  c(as.character(surv[2]),as.character(surv[3]))
                 
-                surv <- do.call("Surv",list(time=Tevent,event=factor(Event))) 
+                surv <- do.call("Surv",list(time=Tevent,event=factor(Event, levels = unique(c(0, Event))))) 
             }
         else
         {
@@ -589,7 +589,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                 
                 noms.surv <-  c(as.character(surv[2]),as.character(surv[3]),as.character(surv[4]))   
                 
-                surv <- do.call("Surv",list(time=Tentry,time2=Tevent,event=factor(Event)))   
+                surv <- do.call("Surv",list(time=Tentry,time2=Tevent,event=factor(Event, levels = unique(c(0, Event)))))   
             }
         }
         
