@@ -144,7 +144,7 @@
 #' matrix in each class (the proportional parameter in the last latent class
 #' equals 1 to ensure identifiability).
 #' @param survival two-sided formula object. The left side of the formula
-#' corresponds to a \code{surv()} object of type "counting" for right-censored
+#' corresponds to a \code{Surv()} object of type "counting" for right-censored
 #' and left-truncated data (example: \code{Surv(Time,EntryTime,Indicator)}) or
 #' of type "right" for right-censored data (example:
 #' \code{Surv(Time,Indicator)}). Multiple causes of event can be considered in
@@ -592,6 +592,9 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
                 surv <- do.call("Surv",list(time=Tentry,time2=Tevent,event=factor(Event, levels = unique(c(0, Event)))))   
             }
         }
+
+        ## no factor for Event
+        if(is.factor(Event)) stop("Please don't use factors for the event indicator. It should be a numeric with 0 indicating a censoring and k for an observed event of cause k (k = 1, 2, ...)")
         
         ## nombre d'evenement concurrents
         nbevt <- length(setdiff(unique(surv[, ncol(surv)]), c(NA, 0)))
@@ -1020,7 +1023,7 @@ Jointlcmm <- function(fixed,mixture,random,subject,classmb,ng=1,idiag=FALSE,nwg=
         #IDnum <- as.numeric(IND)
         if(is.null(nom.prior)) prior <- rep(0,length(Y0))  
         if(is.null(nom.pprior)) pprior <- matrix(1,length(Y0),ng)  
-        if(!length(indiceY0)) indiceY0 <- rep(0,length(Y0))  
+        if(!length(indiceY0)) indiceY0 <- rep(0,length(Y0))
         matYX <- cbind(IND,timeobs,prior,pprior,Y0,indiceY0,Tentry,Tevent,Event,Tint,X0)
         matYXord <- matYX[order(IND), , drop = FALSE]
         Y0 <- as.numeric(matYXord[,4+ng])

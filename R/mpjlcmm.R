@@ -532,11 +532,13 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
             ## nombre d'evenement concurrents
             Tevent <- getElement(object=data,name=nom.Tevent)
             Event <- getElement(object=data,name=nom.Event)  
-            survfornbevt <- do.call("Surv",list(time=Tevent,event=factor(Event)))
+            survfornbevt <- do.call("Surv",list(time=Tevent,event=factor(Event, levels = unique(c(0, Event)))))
             nbevt <- length(setdiff(unique(survfornbevt[, ncol(survfornbevt)]), c(NA, 0)))
             ##nbevt <- length(which(names(table(data[,nom.Event]))>0))    #length(unique(Event))-1   
             if(nbevt<1) nbevt <- 1 #stop("No observed event in the data")
             
+            ## no factor for Event
+            if(is.factor(Event)) stop("Please don't use factors for the event indicator. It should be a numeric with 0 indicating a censoring and k for an observed event of cause k (k = 1, 2, ...)")
 
             ## pour la formule pour survivial, creer 3 formules : 
             ## une pour les covariables en mixture, une pour les covariables avec effet specifique a la cause, et une pour les effets communs.  
