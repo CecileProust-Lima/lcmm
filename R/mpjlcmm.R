@@ -2373,8 +2373,8 @@ mpjlcmm <- function(longitudinal,subject,classmb,ng,survival,
         ## predictions marginales et subject-specifiques
         pred_m_g <- matrix(out$pred_m_g,nrow=nobs0,ncol=ng)
         pred_ss_g <- matrix(out$pred_ss_g,nrow=nobs0,ncol=ng)
-        nomyy <- unlist(apply(nmesM,1,function(y,n){rep(y,n)},y=unlist(Ynames)))
-        
+        nomyy <- rep(rep(unlist(Ynames), times = nrow(nmesM)), times = as.vector(t(nmesM)))
+
         if((out$conv %in% c(1,2,3)))
             {
                 pred_m <- out$Yobs-out$resid_m
