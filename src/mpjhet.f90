@@ -2161,7 +2161,7 @@ subroutine postprob_mpj(b,npm,ppi,ppiy)
               end if
 
               ! si variance specifique a la classe
-              if(nw(g).ne.0.and.g.lt.ng) then
+              if(nw(k).ne.0.and.g.lt.ng) then
                  Ut = abs(b1(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+nvc(k)+g))*Ut
               end if
            end if
@@ -2963,7 +2963,7 @@ subroutine residuals_mpj(b1,npm,ppi,resid_m,pred_m_g,resid_ss, &
                  end if
 
                  ! si variance specifique a la classe
-                 if(nw(g).ne.0.and.g.lt.ng) then
+                 if(nw(k).ne.0.and.g.lt.ng) then
                     Ut = abs(b1(nprob+nrisqtot+nvarxevt+tmp+nef(k)+ncontr(k)+nvc(k)+g))*Ut
                  end if
               end if
