@@ -3709,8 +3709,10 @@ subroutine loglikmpjlcmm(K0,ny0,nbevt0,ng0,ns0,Y0,nobs0,X0,nv0,Xns0,nv20, &
   nySPL=0 
   do k=1,nytot
      idlink(k)=idlink0(k)
-     minY(k)=zitr0(1,k)
-     maxY(k)=zitr0(nbzitr0(k),k)
+     if(nbzitr0(k).gt.0) then
+        minY(k)=zitr0(1,k)
+        maxY(k)=zitr0(nbzitr0(k),k)
+     end if
      if (idlink(k).eq.2) then
         nySPL=nySPL+1
      end if
